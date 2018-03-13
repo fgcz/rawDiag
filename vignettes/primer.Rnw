@@ -1,7 +1,14 @@
 %\VignetteIndexEntry{primer: rawDiag}
 \documentclass[nojss]{jss}
 \usepackage{listingsutf8}
-%\usepackage{color}
+\usepackage[T1]{fontenc} % Use modern font encodings
+\usepackage{tabularx}
+\usepackage{makecell}
+
+%\usepackage{color} 
+
+\newcommand*\rawDiag{\textbf{\texttt{rawDiag}}}
+
 
 \author{Christian Trachsel \& Christian Panse}
 \title{Howto Use Diagnostic Plots for Orbitrap Instruments}
@@ -210,6 +217,15 @@ print(gp +
         facet_grid(filename + MassAnalyzer + MSOrder ~ .))
 @
   
+\section{Function overview}
+<<echo=FALSE>>=
+rv <- rawDiag:::.overview()
+@
+
+
+\input{functions}
+
+
 \section{Benchmark}
 
 We performed a benchmark using the following command on a  
