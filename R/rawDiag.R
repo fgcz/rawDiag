@@ -973,11 +973,13 @@ PlotScanFrequency <- function(x, method = 'trellis'){
 #'
 #' @param x a \code{\link{data.frame}} fullfilling the \code{\link{is.rawDiag}} column naming criteria.
 #' @param bins number of bins in both vertical and horizontal directions. default is 80.
+#' @param method plot method. 
 #' @return a ggplot object.
 #' @export PlotPrecursorHeatmap
 #' @note TODO: define bin with dynamically as h= 2x IQR x n e-1/3 or number of bins (max-min)/h
 #' @import hexbin
-PlotPrecursorHeatmap <- function(x, bins = 80){ 
+PlotPrecursorHeatmap <- function(x, method = 'trellis', bins = 80){ 
+  if (method == 'trellis'){
   res <- x %>% 
     dplyr::filter_at(vars("MSOrder"), any_vars(. == "Ms2"))
   
@@ -987,32 +989,33 @@ PlotPrecursorHeatmap <- function(x, bins = 80){
     scale_fill_gradientn(colours = colorvector) + 
     scale_x_continuous(breaks = scales::pretty_breaks(8)) + 
     scale_y_continuous(breaks = scales::pretty_breaks(15)) + 
-    theme_light()
+    theme_light()}else{NULL}
 }
 
 #' mass heatmap
 #'
 #' @param x a \code{\link{data.frame}} fullfilling the \code{\link{is.rawDiag}} column naming criteria.
 #' @param bins number of bins in both vertical and horizontal directions. default is 80.
+#' @param method plot method. 
 #' @description graphs a deconvoluted heatmap of the StartTime
 #' @return a gglot object.
 #' 
 #' @export PlotMassHeatmap
-PlotMassHeatmap <- function(x, bins = 80){ #rename to mass.heatmap
-  
-  res <- x %>% 
-    dplyr::filter_at(vars("MSOrder"), any_vars(. == "Ms2")) %>% 
-    dplyr::mutate("deconv" = round((PrecursorMass - 1.00782) * ChargeState, 0)) %>% 
-    dplyr::filter_at(vars("deconv"), any_vars(. <= 10000))
-  
-  ggplot(res, aes_string(x = 'StartTime', y = 'deconv')) + 
-    geom_hex(bins = bins ) +
-    facet_wrap(~filename) +
-    scale_fill_gradientn(colours = colorvector) +
-    scale_x_continuous(breaks = scales::pretty_breaks(8)) + 
-    scale_y_continuous(breaks = scales::pretty_breaks(15)) + 
-    theme_light() +
-    coord_cartesian(ylim = c(500, 10000))
+PlotMassHeatmap <- function(x, method='trellis', bins = 80){ #rename to mass.heatmap
+  if(method =='trellis'){
+    res <- x %>% 
+      dplyr::filter_at(vars("MSOrder"), any_vars(. == "Ms2")) %>% 
+      dplyr::mutate("deconv" = round((PrecursorMass - 1.00782) * ChargeState, 0)) %>% 
+      dplyr::filter_at(vars("deconv"), any_vars(. <= 10000))
+    
+    ggplot(res, aes_string(x = 'StartTime', y = 'deconv')) + 
+      geom_hex(bins = bins ) +
+      facet_wrap(~filename) +
+      scale_fill_gradientn(colours = colorvector) +
+      scale_x_continuous(breaks = scales::pretty_breaks(8)) + 
+      scale_y_continuous(breaks = scales::pretty_breaks(15)) + 
+      theme_light() +
+      coord_cartesian(ylim = c(500, 10000))}else{NULL}
 }
 
 # ----TechNote Figs----
@@ -1457,10 +1460,10 @@ gp <- ggplot(rbind(b.Linux, b.Apple), aes(y=IO.throuput, x=ncpu, group=ncpu)) +
 #' @return a \code{\link{data.frame}} fullfilling the \code{\link{is.rawDiag}} column naming criteria.
 #' @export getWU163763
 getWU163763 <- function(){
-  rv <- load(file.path(path.package(package = "rawDiag"),
+ load(file.path(path.package(package = "rawDiag"),
     file.path("extdata", "WU163763.RData")))
   
-  get(WU163763)
+  return(WU163763)
 }
 
 # ----Benchmark----
@@ -1649,4 +1652,46 @@ getWU163763 <- function(){
     labs(colour = "Peak width") +
     theme_light()
   return(figure)
+}
+
+
+
+.overview <- function(prefix="primer"){
+  
+  WU <- getWU163763()
+   WU <- WU[WU$filename %in% unique(WU$filename)[1:2], ]
+  
+  lapply(ls("package:rawDiag")[grepl("Plot", ls("package:rawDiag"))], 
+           function(fn){
+             lapply(c('trellis', 'violin', 'overlay'), function(a){
+               pngFileName <- paste(paste(prefix, fn, a, sep='-'), "png", sep='.')
+               
+               message(pngFileName)
+               
+               if (!file.exists(pngFileName)){
+                 
+                 
+                 gp <- get(fn)(WU, a)  +
+                   theme(legend.position = 'none') + 
+                   theme(axis.line=element_blank(),
+                         axis.text.x=element_blank(),
+                         axis.text.y=element_blank(),
+                         axis.ticks=element_blank(),
+                         axis.title.x=element_blank(),
+                         axis.title.y=element_blank(),
+                         legend.position="none",
+                         panel.background=element_blank(),
+                         panel.border=element_blank(),
+                         panel.grid.major=element_blank(),
+                         panel.grid.minor=element_blank(),
+                         plot.background=element_blank())
+                 if (!is.null(gp)){
+                   png(pngFileName, 240, 240)
+                   print(gp)
+                   dev.off()}
+               }
+             })}
+           
+  )
+  
 }
