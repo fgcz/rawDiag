@@ -37,7 +37,7 @@
 
 #data loading and integrity check
 
-#' Title
+#' Is an Object from a rawDiag class?
 #'
 #' @param object any R object.
 #'
@@ -56,7 +56,7 @@ is.rawDiag <- function(object){
  return(TRUE)
 }
 
-#' Title
+#' Force an Object to Belong to a Class \code{rawDiag}
 #'
 #' @param object any R object.
 #'
@@ -71,7 +71,7 @@ as.rawDiag <- function(object){
       object <- dplyr::mutate(object, MasterScanNumber = replace(MasterScanNumber, MasterScanNumber == 0, NA))
     } else if (!"MasterScanNumber" %in% colnames(object)){
       message("MasterScanNumber calculated")
-      object$MasterScanNumber <- calc.master.scan(object)
+      object$MasterScanNumber <- .CalculatioMasterScan(object)
     }
     
     if (!"ElapsedScanTimesec" %in% colnames(object)){
@@ -100,7 +100,7 @@ as.rawDiag <- function(object){
       object$PrescanMode[1] <- 1
     } else {
       message("calculated PrescanMode values")
-      object$PrescanMode <- calc.prescan(object)
+      object$PrescanMode <- .CalculatePrescan(object)
 
     }
     
@@ -192,14 +192,12 @@ read.raw <- function(file, mono = FALSE,
   rv
 }
 
-#' Title
+#' rawDiag Summaries
 #'
-#' @param object 
+#' @param object  a \code{\link{data.frame}} fullfilling the \code{\link{is.rawDiag}} column naming criteria.
 #'
-#' @return
+#' @return a table.
 #' @export summary.rawDiag 
-#'
-#' @examples
 summary.rawDiag <- function(object){
   table(object$filename, object$MSOrder)
 }
@@ -243,15 +241,11 @@ fillNAgaps <- function(x) {
 
 #' Calculate Master Scan Number
 #'
-#' @param x a data frame fullfilling the as.rawDiag column naming criteria
+#' @param x a \code{\link{data.frame}} fullfilling the \code{\link{is.rawDiag}} column naming criteria.
 #'
 #' @return calculates the MS1 master scan number of an MS2 scan and populates the MasterScanNumber
 #' with it
-#' 
-#' @export
-#'
-#' @examples
-calc.master.scan <- function(x){
+.CalculatioMasterScan <- function(x){
   
   res <- x %>% 
     mutate(MasterScanNumber = dplyr::case_when(MSOrder == "Ms" ~ scanNumber)) %>%  
@@ -296,13 +290,11 @@ calc.master.scan <- function(x){
 #TODO:qunatile part needed? If no MS1 scan is present? -> DIA take lowest window as cycle indicator?
 #' Calculate MS Cycle Time
 #'
-#' @param x a data frame fullfilling the as.rawDiag column naming criteria
+#' @param x a \code{\link{data.frame}} fullfilling the \code{\link{is.rawDiag}} column naming criteria.
 #'
 #' @return calculates the time of all ms cycles and the 95% quantile value there of. 
 #' the cycle time is defined as the time between two consecutive MS1 scans
 #' @export calc.cycle.time
-#'
-#' @examples
 calc.cycle.time <- function(x){
   
   df <- x %>% 
@@ -323,13 +315,10 @@ calc.cycle.time <- function(x){
 
 #' Calculate moving average of scan frequency
 #'
-#' @param x a data frame fullfilling the as.rawDiag column naming criteria
+#' @param x a \code{\link{data.frame}} fullfilling the \code{\link{is.rawDiag}} column naming criteria.
 #'
-#' @return 
-#' @export
-#'
-#' @examples
-scan.frequ.moving.aver <- function(x){
+#' @return a \code{data.frame}.
+ScanFrequMovingOver <- function(x){
   res <- x %>%
     dplyr::ungroup() %>% 
     dplyr::select_at(vars("filename", "MSOrder","StartTime")) %>% 
@@ -347,7 +336,7 @@ scan.frequ.moving.aver <- function(x){
   return(res)
 }  
 
-calc.prescan <- function(x){
+.CalculatePrescan <- function(x){
   res <- x %>% 
     dplyr::select_at(vars("AGCMode", "filename", "scanNumber")) %>% 
     mutate(PrescanIDX = dplyr::case_when(AGCMode == "On" ~ scanNumber)) %>%  
@@ -362,446 +351,381 @@ calc.prescan <- function(x){
 
 #' TIC and Base Peak plot function
 #' 
-#' Function for displaying the TIC and Base Peak chromatogram of a mass spectrometry measurement. 
+#' @description  Function for displaying the Total Ion Cound (TIC) and Base Peak chromatogram of a mass spectrometry measurement. 
 #' Multiple files are handled by faceting based on filename.
 #'
-#' @param x a data frame fullfilling the as.rawDiag column naming criteria
-#'
+#' @param x a \code{\link{data.frame}} fullfilling the \code{\link{is.rawDiag}} column naming criteria.
+#' @param method a character 'trellis', 'violin' or 'overlay'.
 #' @return a ggplot object for graphing the TIC and the Base Peak chromatogram
-#' 
-#' @export tic.basepeak
-#' @export tic.basepeak.overlay
-#' @export tic.basepeak.violin
-tic.basepeak <- function(x){
-  
-  df <- x %>% 
-    dplyr::filter_at(vars("MSOrder"), any_vars( . == "Ms")) %>% 
-    dplyr::select_at(vars("StartTime", "TIC", "BasePeakIntensity", "filename")) %>% 
-    dplyr::rename_at(vars("BasePeakIntensity"), funs(as.character("Base_Peak"))) %>% 
-    tidyr::gather(key = "Type", value = "Intensity", c("TIC", "Base_Peak"))
-  
-  df$Type <- factor(df$Type, levels = c("TIC", "Base_Peak"))
-
-   figure <- ggplot(df,aes_string(x= "StartTime", y = "Intensity")) +
-    geom_line(size = 0.3) +
-    facet_wrap(filename ~ Type, scales = "free", ncol = 2) +
-    labs(title = "TIC and Base-Peak plot") +
-    labs(subtitle = "Plotting TIC intensity and base peak intensity against retention time") +
-    labs(x = " Retention Time [min]", y = "Intensity Counts [arb. unit]") +
-    scale_x_continuous(breaks = scales::pretty_breaks(10)) +
-    scale_y_continuous(breaks = scales::pretty_breaks(8)) +
-    theme_light() 
- 
-  return(figure)
+#' @aliases tic.basepeak.overlay tic.basepeak.violin
+#' @import ggplot2
+#' @importFrom ggplot2 facet_wrap geom_violin scale_y_continuous facet_grid aes_string theme_light geom_line stat_summary
+#' @export PlotTicBasepeak
+PlotTicBasepeak <- function(x, method='trellis'){
+  if (method == 'trellis'){
+    df <- x %>% 
+      dplyr::filter_at(vars("MSOrder"), any_vars( . == "Ms")) %>% 
+      dplyr::select_at(vars("StartTime", "TIC", "BasePeakIntensity", "filename")) %>% 
+      dplyr::rename_at(vars("BasePeakIntensity"), funs(as.character("Base_Peak"))) %>% 
+      tidyr::gather(key = "Type", value = "Intensity", c("TIC", "Base_Peak"))
+    
+    df$Type <- factor(df$Type, levels = c("TIC", "Base_Peak"))
+    
+    figure <- ggplot(df,aes_string(x= "StartTime", y = "Intensity")) +
+      geom_line(size = 0.3) +
+      facet_wrap(filename ~ Type, scales = "free", ncol = 2) +
+      labs(title = "TIC and Base-Peak plot") +
+      labs(subtitle = "Plotting TIC intensity and base peak intensity against retention time") +
+      labs(x = " Retention Time [min]", y = "Intensity Counts [arb. unit]") +
+      scale_x_continuous(breaks = scales::pretty_breaks(10)) +
+      scale_y_continuous(breaks = scales::pretty_breaks(8)) +
+      theme_light() 
+    
+    return(figure)
+  }else if(method =='violine'){
+    
+    df <- x %>% 
+      dplyr::filter_at(vars("MSOrder"), any_vars( . == "Ms")) %>% 
+      dplyr::select_at(vars("StartTime", "TIC", "BasePeakIntensity", "filename")) %>% 
+      dplyr::rename_at(vars("BasePeakIntensity"), funs(as.character("Base_Peak"))) %>% 
+      tidyr::gather(key = "Type", value = "Intensity", c("TIC", "Base_Peak"))
+    df$Type <- factor(df$Type, levels = c("TIC", "Base_Peak"))
+    
+    figure <- ggplot(df, aes_string(x = "filename", y = "Intensity")) + 
+      geom_violin()  +
+      facet_grid(Type~., scales = "free")+
+      stat_summary(fun.y = mean , geom = "point", colour = "red") +
+      scale_y_continuous(breaks = scales::pretty_breaks(8)) +
+      theme_light() +
+      theme(axis.text.x = element_text(angle = 90))
+    return(figure)
+  }else if (method  == 'overlay'){
+    
+    df <- x %>% 
+      dplyr::filter_at(vars("MSOrder"), any_vars( . == "Ms")) %>% 
+      dplyr::select_at(vars("StartTime", "TIC", "BasePeakIntensity", "filename")) %>% 
+      dplyr::rename_at(vars("BasePeakIntensity"), funs(as.character("Base_Peak"))) %>% 
+      tidyr::gather(key = "Type", value = "Intensity", c("TIC", "Base_Peak"))
+    df$Type <- factor(df$Type, levels = c("TIC", "Base_Peak"))
+    
+    figure <- ggplot(df, aes_string(x = "StartTime", y = "Intensity", colour = "filename")) +
+      geom_line(size = 0.3) +
+      facet_grid(Type~., scales = "free") +
+      theme_light() +
+      theme(legend.position="top")
+    return(figure)
+  }else{
+    NULL
+  }
 }
-
-#' Title
-#'
-#' @param x 
-#'
-#' @return
-#' @export
-#'
-#' @examples
-tic.basepeak.violin <- function(x){
-  
-  df <- x %>% 
-    dplyr::filter_at(vars("MSOrder"), any_vars( . == "Ms")) %>% 
-    dplyr::select_at(vars("StartTime", "TIC", "BasePeakIntensity", "filename")) %>% 
-    dplyr::rename_at(vars("BasePeakIntensity"), funs(as.character("Base_Peak"))) %>% 
-    tidyr::gather(key = "Type", value = "Intensity", c("TIC", "Base_Peak"))
-  df$Type <- factor(df$Type, levels = c("TIC", "Base_Peak"))
- 
-  figure <- ggplot(df, aes_string(x = "filename", y = "Intensity")) + 
-    geom_violin()  +
-    facet_grid(Type~., scales = "free")+
-    stat_summary(fun.y = mean , geom = "point", colour = "red") +
-    scale_y_continuous(breaks = scales::pretty_breaks(8)) +
-    theme_light() +
-    theme(axis.text.x = element_text(angle = 90))
-  return(figure)
-}
-
-tic.basepeak.overlay <- function(x){
-
-  df <- x %>% 
-    dplyr::filter_at(vars("MSOrder"), any_vars( . == "Ms")) %>% 
-    dplyr::select_at(vars("StartTime", "TIC", "BasePeakIntensity", "filename")) %>% 
-    dplyr::rename_at(vars("BasePeakIntensity"), funs(as.character("Base_Peak"))) %>% 
-    tidyr::gather(key = "Type", value = "Intensity", c("TIC", "Base_Peak"))
-  df$Type <- factor(df$Type, levels = c("TIC", "Base_Peak"))
-  
-  figure <- ggplot(df, aes_string(x = "StartTime", y = "Intensity", colour = "filename")) +
-    geom_line(size = 0.3) +
-    facet_grid(Type~., scales = "free") +
-    theme_light() +
-    theme(legend.position="top")
-  return(figure)
-}
-
-
-
 
 
 #' cycle time
-#'
-#' @param x 
+#' 
+#' @param x a \code{\link{data.frame}} fullfilling the \code{\link{is.rawDiag}} column naming criteria.
+#' @param method a character 'trellis', 'violin' or 'overlay'.
 #' @description graphs cycle time versus rt. each item represents the time for one scan cycle.
-#' @return
-#' @export cycle.time
-#' @export cycle.time.violin
-#' @export cycle.time.overlay
-cycle.time <- function(x){
-  
-  df <- calc.cycle.time(x = x)
-  
-  figure <- ggplot(df, aes_string(x = "StartTime", y = "CycleTime")) + 
-    geom_point(shape = ".") +
-    geom_line(stat = "smooth", method = "gam", formula = y ~ s(x, bs= "cs"), colour = "deepskyblue3", se = FALSE) +
-    labs(title = "Cycle time plot", subtitle = "Caclulated cycle time vs retention time") +
-    labs(x = "Retention Time [min]", y = "Cycle Time [sec]") +
-    geom_hline(aes_string(yintercept = "quan", group = "filename"), colour = "red3", linetype = "longdash")+
-    scale_x_continuous(breaks = scales::pretty_breaks(8)) +
-    scale_y_continuous(breaks = scales::pretty_breaks(8)) +
-    theme_light() + 
-    facet_grid(filename~., scales = "free")
-  return(figure)
-}
-
-#' Title
-#'
-#' @param x 
+#' @return a \code{\link{ggplot}} object.
+#' @aliases cycle.time.violin cycle.time.overlay
+#' @export PlotCycleTime
 #' @import dplyr
-#' @return
-#' @export
-#'
-#' @examples
-cycle.time.violin <- function(x){
-  df <- calc.cycle.time(x=x)
-  dots <- df %>%
-    dplyr::select_at(vars("filename", "quan")) %>% 
-    distinct()
-  
-  figure <- ggplot(df, aes_string(x = "filename", y = "CycleTime", colour = "filename")) + 
-    geom_violin()  +
-    stat_summary(fun.y = mean , geom = "point", colour = "red") +
-    geom_point(data = dots, aes_string(x = "filename", y = "quan"), colour = "black")+
-    scale_y_continuous(breaks = scales::pretty_breaks(8)) +
-    theme_light() +
-    theme(axis.text.x=element_blank(), legend.position = "top")
+PlotCycleTime <- function(x, method='trellis'){
+  if (method == 'trellis'){
+    df <- calc.cycle.time(x = x)
+    
+    figure <- ggplot(df, aes_string(x = "StartTime", y = "CycleTime")) + 
+      geom_point(shape = ".") +
+      geom_line(stat = "smooth", method = "gam", formula = y ~ s(x, bs= "cs"), colour = "deepskyblue3", se = FALSE) +
+      labs(title = "Cycle time plot", subtitle = "Caclulated cycle time vs retention time") +
+      labs(x = "Retention Time [min]", y = "Cycle Time [sec]") +
+      geom_hline(aes_string(yintercept = "quan", group = "filename"), colour = "red3", linetype = "longdash")+
+      scale_x_continuous(breaks = scales::pretty_breaks(8)) +
+      scale_y_continuous(breaks = scales::pretty_breaks(8)) +
+      theme_light() + 
+      facet_grid(filename~., scales = "free")
+    return(figure)
+  }else if (method == 'violin'){
+    df <- calc.cycle.time(x=x)
+    dots <- df %>%
+      dplyr::select_at(vars("filename", "quan")) %>% 
+      distinct()
+    
+    figure <- ggplot(df, aes_string(x = "filename", y = "CycleTime", colour = "filename")) + 
+      geom_violin()  +
+      stat_summary(fun.y = mean , geom = "point", colour = "red") +
+      geom_point(data = dots, aes_string(x = "filename", y = "quan"), colour = "black")+
+      scale_y_continuous(breaks = scales::pretty_breaks(8)) +
+      theme_light() +
+      theme(axis.text.x=element_blank(), legend.position = "top")
     # theme(axis.text.x = element_text(angle = 90))
-  return(figure)
-}
-
-cycle.time.overlay <- function(x){
-  df <- calc.cycle.time(x=x)
- 
-  figure <- ggplot(df, aes_string(x = "StartTime", y = "CycleTime", colour = "filename")) + 
-    geom_point(size = 0.5) +
-    geom_line(aes_string(group = "filename", colour = "filename"), stat = "smooth", method = "gam", formula = y ~ s(x, bs= "cs"), se = FALSE) +
-    scale_y_continuous(breaks = scales::pretty_breaks(8)) +
-    theme_light() +
-    theme(legend.position="top")
-   return(figure)
-}
+    return(figure)
+  } else if(method == 'overlay'){
+    df <- calc.cycle.time(x=x)
+    
+    figure <- ggplot(df, aes_string(x = "StartTime", y = "CycleTime", colour = "filename")) + 
+      geom_point(size = 0.5) +
+      geom_line(aes_string(group = "filename", colour = "filename"), stat = "smooth", method = "gam", formula = y ~ s(x, bs= "cs"), se = FALSE) +
+      scale_y_continuous(breaks = scales::pretty_breaks(8)) +
+      theme_light() +
+      theme(legend.position="top")
+    return(figure)
+  }else{NULL}}
 
 #' mz distribution
 #'
-#' @param x a rawDiag object 
-#' 
+#' @param x a \code{\link{data.frame}} fullfilling the \code{\link{is.rawDiag}} column naming criteria.
+#' @param method a character 'trellis', 'violin' or 'overlay'.
 #' @return a ggplot objecy
-#' @export mz.distribution
-#' @export mz.distribution.overlay
-#' @export mz.distribution.violin
-mz.distribution <- function(x){
-  df <- x %>% 
-    dplyr::filter(MSOrder == "Ms2")
-  
-  figure <- ggplot(df, aes_string(x = "StartTime", y = "PrecursorMass")) + 
-    geom_point(shape = ".") +
-    facet_grid(filename~., scales = "free") +
-    geom_line(stat = "smooth", method = "gam", formula = y ~ s(x, bs= "cs"), size = 1.1, alpha = 0.6, colour = "deepskyblue3", se = FALSE) +
-    scale_x_continuous(breaks = scales::pretty_breaks(8)) +
-    scale_y_continuous(breaks = scales::pretty_breaks(8)) +
-    labs(title = "Retention Time to m/z correlation plot") +
-    labs(subtitle = "Plotting retention time against m/z value of all selected precursors") +
-    labs(x = "Retention Time", y = "Presursor m/z value") +
-    theme_light() +
-  labs(subtitle = "") +
-    scale_fill_manual(values = color.vector.2) + 
-    scale_color_manual(values = color.vector.2) + 
-    scale_x_continuous(breaks = scales::pretty_breaks(5)) +
-    theme(legend.position = 'top') +
-    theme(title = element_text(size = 36)) +
-    theme(axis.title = element_text(size = 20)) +
-    theme(axis.text.x = element_text(face="bold", size=14)) +
-    theme(axis.text.y = element_text(face="bold", size=14)) +
-    theme(axis.line = element_line(size = 1)) +
-    theme(panel.grid.major = element_line(colour = "gray"))
-  
-  return(figure)
-}
-
-mz.distribution.violin <- function(x){
-  df <- x %>% 
-    dplyr::filter(MSOrder == "Ms2")
-  
-  figure <- ggplot(df, aes_string(x = "filename", y = "PrecursorMass")) + 
-    geom_violin() +
-    stat_summary(fun.y = max , geom = "point", colour = "red") +
-    scale_y_continuous(breaks = scales::pretty_breaks(8)) +
-    labs(title = "Retention Time to m/z correlation plot") +
-    labs(subtitle = "Plotting retention time against m/z value of all selected precursors") +
-    labs(x = "Retention Time", y = "Presursor m/z value") +
-    theme_light() +
-    theme(axis.text.x = element_text(angle = 90))
-  return(figure)
-}
-
-#TODO: smooth colour, overploting -> plot useless when many files with lots of points are present-> disable?
-mz.distribution.overlay <- function(x){
-  df <- x %>% 
-    dplyr::filter(MSOrder == "Ms2")
-  
-  figure <- ggplot(df, aes_string(x = "StartTime", y = "PrecursorMass", colour = "filename")) + 
-    geom_point(size = 0.5) +
-    #geom_line(stat = "smooth",
-    #          method = "gam",
-    #          formula = y ~ s(x, bs= "cs"),
-    #          size = 1.1, alpha = 0.6,
-    #          colour = "deepskyblue3", se = FALSE) +
-    scale_x_continuous(breaks = scales::pretty_breaks(8)) +
-    scale_y_continuous(breaks = scales::pretty_breaks(8)) +
-    labs(title = "Retention Time to m/z correlation plot") +
-    labs(subtitle = "Plotting retention time against m/z value of all selected precursors") +
-    labs(x = "Retention Time", y = "Presursor m/z value") +
-    theme_light() +
-    theme(legend.position="top")
-  
-  return(figure)
-}
+#' @aliases mz.distribution.overlay mz.distribution.violin
+#' @export PlotMzDistribution
+PlotMzDistribution <- function(x, method='trellis'){
+  if (method == 'trellis'){
+    df <- x %>% 
+      dplyr::filter(MSOrder == "Ms2")
+    
+    figure <- ggplot(df, aes_string(x = "StartTime", y = "PrecursorMass")) + 
+      geom_point(shape = ".") +
+      facet_grid(filename~., scales = "free") +
+      geom_line(stat = "smooth", method = "gam", formula = y ~ s(x, bs= "cs"), size = 1.1, alpha = 0.6, colour = "deepskyblue3", se = FALSE) +
+      scale_x_continuous(breaks = scales::pretty_breaks(8)) +
+      scale_y_continuous(breaks = scales::pretty_breaks(8)) +
+      labs(title = "Retention Time to m/z correlation plot") +
+      labs(subtitle = "Plotting retention time against m/z value of all selected precursors") +
+      labs(x = "Retention Time", y = "Presursor m/z value") +
+      theme_light() +
+      labs(subtitle = "") +
+      scale_fill_manual(values = color.vector.2) + 
+      scale_color_manual(values = color.vector.2) + 
+      scale_x_continuous(breaks = scales::pretty_breaks(5)) +
+      theme(legend.position = 'top') +
+      theme(title = element_text(size = 36)) +
+      theme(axis.title = element_text(size = 20)) +
+      theme(axis.text.x = element_text(face="bold", size=14)) +
+      theme(axis.text.y = element_text(face="bold", size=14)) +
+      theme(axis.line = element_line(size = 1)) +
+      theme(panel.grid.major = element_line(colour = "gray"))
+    
+    return(figure)
+  }else if (method == 'violin'){
+    df <- x %>% 
+      dplyr::filter(MSOrder == "Ms2")
+    
+    figure <- ggplot(df, aes_string(x = "filename", y = "PrecursorMass")) + 
+      geom_violin() +
+      stat_summary(fun.y = max , geom = "point", colour = "red") +
+      scale_y_continuous(breaks = scales::pretty_breaks(8)) +
+      labs(title = "Retention Time to m/z correlation plot") +
+      labs(subtitle = "Plotting retention time against m/z value of all selected precursors") +
+      labs(x = "Retention Time", y = "Presursor m/z value") +
+      theme_light() +
+      theme(axis.text.x = element_text(angle = 90))
+    return(figure)
+  }else if (method == 'overlay'){
+    df <- x %>% 
+      dplyr::filter(MSOrder == "Ms2")
+    
+    figure <- ggplot(df, aes_string(x = "StartTime", y = "PrecursorMass", colour = "filename")) + 
+      geom_point(size = 0.5) +
+      #geom_line(stat = "smooth",
+      #          method = "gam",
+      #          formula = y ~ s(x, bs= "cs"),
+      #          size = 1.1, alpha = 0.6,
+      #          colour = "deepskyblue3", se = FALSE) +
+      scale_x_continuous(breaks = scales::pretty_breaks(8)) +
+      scale_y_continuous(breaks = scales::pretty_breaks(8)) +
+      labs(title = "Retention Time to m/z correlation plot") +
+      labs(subtitle = "Plotting retention time against m/z value of all selected precursors") +
+      labs(x = "Retention Time", y = "Presursor m/z value") +
+      theme_light() +
+      theme(legend.position="top")
+    
+    return(figure)
+  }else{NULL}}
 
 #TODO: make ChargeState robust for DIA data -> if not in inclusion list all 0! ->set to 2?
 #TODO: only display charge states 1-8 and sum charge states >8 into one factor
 
 
-#'  mass distribution plot
+#'mass distribution plot
 #'
 #' @description plots the mass frequency in dependency to the charge state
-#' @param x a data.frame object as returned by \code{\link{read.raw}}
+#' @param x a \code{\link{data.frame}} fullfilling the \code{\link{is.rawDiag}} column naming criteria.
+#' @param method a character 'trellis', 'violin' or 'overlay'.
 #'
-#' @return a ggplot object
-#' 
-#' @export mass.distribution
-#' @export mass.distribution.violin
-#' @export mass.distribution.overlay
+#' @return a ggplot object.
+#' @aliases mass.distribution.violin mass.distribution.overlay
+#' @export PlotMassDistribution
 #' @examples 
-#' 
+#'  library(ggplot2)
 #'  load(file.path(path.package(package = "rawDiag"),
 #'   file.path("extdata", "WU163763.RData")))
 #'  
-#'  mass.distribution(WU163763) +
+#'  PlotMassDistribution(WU163763, method = 'trellis') +
 #'    facet_wrap(~filename, ncol = 3)
 #'  
-#'  rawDiag:::mass.distribution.overlay(WU163763) +
+#'  PlotMassDistribution(WU163763, method = 'violin') +
 #'    theme(legend.position = 'none')
 #'    
-#'  rawDiag:::mass.distribution.violin(WU163763) +
+#'  PlotMassDistribution(WU163763, method = 'overlay') +
 #'    theme(legend.position = 'none')  
-mass.distribution <- function(x){ #old name mz.frequency
-  
-  res <- x %>% dplyr::filter_at(vars("MSOrder"), any_vars(. == "Ms2")) %>% 
-    dplyr::select_at(vars("ChargeState", "PrecursorMass", "filename"))
-  
-  res$deconv <-  round((res$PrecursorMass -1.00782) * res$ChargeState, 0)
-  
-  res <- dplyr::mutate_at(res, vars("ChargeState"), funs(factor(.)))
-  
-  ncolor <- length(unique(res$ChargeState))
-  
-  figure <- ggplot(res, aes_string(x = "deconv", fill = "ChargeState", colour = "ChargeState")) +
-    geom_histogram(binwidth = 100, alpha = .3, position = "identity") +
-    labs(title = "Precursor mass to charge frequency plot ") +
-    labs(subtitle = "Plotting frequency of precursor masses for each charge state") +
-    labs(x = "Precursor mass [neutral mass]", y = "Frequency [counts]") +
-    labs(fill = "Charge State", colour = "Charge State") +
-    scale_x_continuous(breaks = scales::pretty_breaks(8)) +
-    coord_cartesian(xlim = c(min(res$deconv), 10000)) +
-    theme_light() + 
-    facet_wrap(~filename)
-  
-  return(figure)
-}
-
-
-
-mass.distribution.violin <- function(x){ #mz.frequency.violin
+PlotMassDistribution <- function(x, method = 'trellis'){ 
+  if (method == 'trellis'){
+    res <- x %>% dplyr::filter_at(vars("MSOrder"), any_vars(. == "Ms2")) %>% 
+      dplyr::select_at(vars("ChargeState", "PrecursorMass", "filename"))
+    
+    res$deconv <-  round((res$PrecursorMass -1.00782) * res$ChargeState, 0)
+    
+    res <- dplyr::mutate_at(res, vars("ChargeState"), funs(factor(.)))
+    
+    ncolor <- length(unique(res$ChargeState))
+    
+    figure <- ggplot(res, aes_string(x = "deconv", fill = "ChargeState", colour = "ChargeState")) +
+      geom_histogram(binwidth = 100, alpha = .3, position = "identity") +
+      labs(title = "Precursor mass to charge frequency plot ") +
+      labs(subtitle = "Plotting frequency of precursor masses for each charge state") +
+      labs(x = "Precursor mass [neutral mass]", y = "Frequency [counts]") +
+      labs(fill = "Charge State", colour = "Charge State") +
+      scale_x_continuous(breaks = scales::pretty_breaks(8)) +
+      coord_cartesian(xlim = c(min(res$deconv), 10000)) +
+      theme_light() + 
+      facet_wrap(~filename)
+    
+    return(figure)
+  }else if (method == 'violin'){ #mz.frequency.violin
     res <- x %>% dplyr::filter_at(vars("MSOrder"), any_vars(. == "Ms2")) %>% 
       dplyr::select_at(vars("ChargeState", "PrecursorMass", "filename"))
     
     res$deconv <-  round((res$PrecursorMass -1.00782)* res$ChargeState, 0)
     
     res <- dplyr::mutate_at(res, vars("ChargeState"), funs(factor(.)))
-  
-  figure <- ggplot(res, aes_string(x = "ChargeState", y = "deconv", fill = "filename")) +
-    geom_violin() +
-    #geom_histogram(binwidth = 100, alpha = .3, position = "identity") +
-    labs(title = "Precursor mass to charge frequency plot ") +
-    labs(subtitle = "Plotting frequency of precursor masses for each charge state") +
-    labs(x = "Charge State ", y = "Mass [neutral mass]") +
-    labs(fill = "Charge State", colour = "Charge State") +
-    #scale_x_continuous(breaks = scales::pretty_breaks(8)) +
-    theme_light() +
-    theme(legend.position = "top")
+    
+    figure <- ggplot(res, aes_string(x = "ChargeState", y = "deconv", fill = "filename")) +
+      geom_violin() +
+      #geom_histogram(binwidth = 100, alpha = .3, position = "identity") +
+      labs(title = "Precursor mass to charge frequency plot ") +
+      labs(subtitle = "Plotting frequency of precursor masses for each charge state") +
+      labs(x = "Charge State ", y = "Mass [neutral mass]") +
+      labs(fill = "Charge State", colour = "Charge State") +
+      #scale_x_continuous(breaks = scales::pretty_breaks(8)) +
+      theme_light() +
+      theme(legend.position = "top")
     #facet_wrap(~filename)
-  
-  return(figure)
-}
-
-#TODO: in build up phase
-mass.distribution.overlay <- function(x){ #mz.frequency.overlay
-  res <-  x %>% 
-    dplyr::filter_at(vars("MSOrder"), any_vars(. == "Ms2")) %>% 
-    dplyr::select_at(vars("ChargeState", "PrecursorMass", "filename")) %>% 
-    dplyr::mutate("deconv" = round((PrecursorMass -1.00782)*ChargeState, 0)) %>% 
-    dplyr::mutate_at(vars("ChargeState"), funs(factor(.)))
-  
-  figure <- ggplot(res, aes_string(x = "deconv", colour = "filename")) +
-    geom_density(aes(y= ..density.. )) +
-    #geom_histogram(binwidth = 100, alpha = .3, position = "identity") +
-    labs(title = "Precursor mass to charge frequency plot ") +
-    labs(subtitle = "Plotting frequency of precursor masses for each charge state") +
-    labs(x = "Precursor mass [neutral mass]", y = "Frequency [counts]") +
-    labs(fill = "Charge State", colour = "Charge State") +
-    scale_x_continuous(breaks = scales::pretty_breaks(12)) +
-    coord_cartesian(xlim = c(min(res$deconv), 10000)) +
-    theme_light() +
-    theme(legend.position = "top")
-  #facet_wrap(~filename)
-  
-  return(figure)
+    
+    return(figure)
+  }else if (method == 'overlay'){ #mz.frequency.overlay
+    res <-  x %>% 
+      dplyr::filter_at(vars("MSOrder"), any_vars(. == "Ms2")) %>% 
+      dplyr::select_at(vars("ChargeState", "PrecursorMass", "filename")) %>% 
+      dplyr::mutate("deconv" = round((PrecursorMass -1.00782)*ChargeState, 0)) %>% 
+      dplyr::mutate_at(vars("ChargeState"), funs(factor(.)))
+    
+    figure <- ggplot(res, aes_string(x = "deconv", colour = "filename")) +
+      geom_density(aes(y= ..density.. )) +
+      #geom_histogram(binwidth = 100, alpha = .3, position = "identity") +
+      labs(title = "Precursor mass to charge frequency plot ") +
+      labs(subtitle = "Plotting frequency of precursor masses for each charge state") +
+      labs(x = "Precursor mass [neutral mass]", y = "Frequency [counts]") +
+      labs(fill = "Charge State", colour = "Charge State") +
+      scale_x_continuous(breaks = scales::pretty_breaks(12)) +
+      coord_cartesian(xlim = c(min(res$deconv), 10000)) +
+      theme_light() +
+      theme(legend.position = "top")
+    #facet_wrap(~filename)
+    
+    return(figure)
+  }else{NULL}
 }
 
 #' charge state overview
 #'
-#' @param x 
+#' @param x a \code{\link{data.frame}} fullfilling the \code{\link{is.rawDiag}} column naming criteria.
+#' @param method a character 'trellis', 'violin' or 'overlay'.
 #'
-#' @return a ggplot object
-#' @export charge.state
-#' @export charge.state.overlay
-#' @export charge.state.violin
-charge.state <- function(x){
-  res <- x %>% 
-    dplyr::filter(MSOrder == "Ms2") %>% 
-    dplyr::group_by_at(vars("filename")) %>% 
-    dplyr::count(ChargeState) %>% 
-    dplyr::ungroup() %>% 
-    dplyr::rename_at(vars("n"), funs(as.character("Counts")))
-  
-  res$percentage <- (100 / sum(res$Counts)) * res$Counts
+#' @return a ggplot object.
+#' @aliases charge.state.overlay charge.state.violin
+#' @export PlotChargeState
+PlotChargeState <- function(x, method='trellis'){
+  if (method == 'trellis'){
+    res <- x %>% 
+      dplyr::filter(MSOrder == "Ms2") %>% 
+      dplyr::group_by_at(vars("filename")) %>% 
+      dplyr::count(ChargeState) %>% 
+      dplyr::ungroup() %>% 
+      dplyr::rename_at(vars("n"), funs(as.character("Counts")))
+    
+    res$percentage <- (100 / sum(res$Counts)) * res$Counts
+    
+    xbreaks <- unique(res$ChargeState)
+    
+    figure <- ggplot(res, aes_string(x = "ChargeState", y = "percentage")) +
+      geom_bar(stat = "identity", fill = "deepskyblue2") +
+      geom_text(aes_string(label = "Counts"), vjust=-0.3, size=3.5) +
+      scale_x_continuous(breaks = xbreaks) +
+      scale_y_continuous(breaks = scales::pretty_breaks(15), expand = c(0, 0), limits = c(0, (max(res$percentage))+3)) +
+      labs(title = "Charge state plot") +
+      labs(subtitle = "Plotting the number of occurrences of all selected precursor charge states") +
+      labs(x = "Charge States", y = "Percent [%]") +
+      theme_light() +
+      facet_wrap(~filename)
+    
+    return(figure)
+  }else if(method =='overlay'){
+    res <- x %>% 
+      dplyr::filter(MSOrder == "Ms2") %>% 
+      dplyr::group_by_at(vars("filename")) %>% 
+      dplyr::count(ChargeState) %>% 
+      dplyr::ungroup() %>% 
+      dplyr::rename_at(vars("n"), funs(as.character("Counts")))
+    
+    res$percentage <- (100 / sum(res$Counts)) * res$Counts
+    
+    xbreaks <- unique(res$ChargeState)
+    
+    figure <- ggplot(res, aes_string(x = "ChargeState", y = "percentage", fill = "filename")) +
+      geom_bar(stat = "identity", position = position_dodge(), colour = "black") +
+      #geom_text(aes_string(label = "Counts"), vjust=-0.3, size=3.5, position = position_dodge(width = 0.9)) +
+      scale_x_continuous(breaks = xbreaks) +
+      scale_y_continuous(breaks = scales::pretty_breaks(15), expand = c(0, 0), limits = c(0, (max(res$percentage))+3)) +
+      labs(title = "Charge state plot") +
+      labs(subtitle = "Plotting the number of occurrences of all selected precursor charge states") +
+      labs(x = "Charge States", y = "Percent [%]") +
+      theme_light()+
+      theme(legend.position = "top")
+    
+    return(figure)
+  }else if (method =='violin'){
+    res <- x %>% 
+      dplyr::filter(MSOrder == "Ms2") 
+    
+    figure <- ggplot(res, aes_string(x = "filename", y = "ChargeState", fill = "filename")) +
+      geom_boxplot(width=.05, outlier.colour = "black", position = position_dodge())+ 
+      geom_violin(position = position_dodge())+
+      #geom_violin() +
+      scale_y_continuous(breaks = scales::pretty_breaks(15)) +
+      labs(title = "Charge state plot") +
+      labs(subtitle = "Plotting the number of occurrences of all selected precursor charge states") +
+      labs(x = "filename", y = "Charge State") +
+      theme_light() +
+      theme(axis.text.x=element_blank(), legend.position = "top")
+    
+    return(figure)
+  }else{NULL}}
 
-  xbreaks <- unique(res$ChargeState)
-  
-  figure <- ggplot(res, aes_string(x = "ChargeState", y = "percentage")) +
-    geom_bar(stat = "identity", fill = "deepskyblue2") +
-    geom_text(aes_string(label = "Counts"), vjust=-0.3, size=3.5) +
-    scale_x_continuous(breaks = xbreaks) +
-    scale_y_continuous(breaks = scales::pretty_breaks(15), expand = c(0, 0), limits = c(0, (max(res$percentage))+3)) +
-    labs(title = "Charge state plot") +
-    labs(subtitle = "Plotting the number of occurrences of all selected precursor charge states") +
-    labs(x = "Charge States", y = "Percent [%]") +
-    theme_light() +
-    facet_wrap(~filename)
-  
-  return(figure)
-}
 
-charge.state.overlay <- function(x){
-  res <- x %>% 
-    dplyr::filter(MSOrder == "Ms2") %>% 
-    dplyr::group_by_at(vars("filename")) %>% 
-    dplyr::count(ChargeState) %>% 
-    dplyr::ungroup() %>% 
-    dplyr::rename_at(vars("n"), funs(as.character("Counts")))
-  
-  res$percentage <- (100 / sum(res$Counts)) * res$Counts
-  
-  xbreaks <- unique(res$ChargeState)
-  
-  figure <- ggplot(res, aes_string(x = "ChargeState", y = "percentage", fill = "filename")) +
-    geom_bar(stat = "identity", position = position_dodge(), colour = "black") +
-    #geom_text(aes_string(label = "Counts"), vjust=-0.3, size=3.5, position = position_dodge(width = 0.9)) +
-    scale_x_continuous(breaks = xbreaks) +
-    scale_y_continuous(breaks = scales::pretty_breaks(15), expand = c(0, 0), limits = c(0, (max(res$percentage))+3)) +
-    labs(title = "Charge state plot") +
-    labs(subtitle = "Plotting the number of occurrences of all selected precursor charge states") +
-    labs(x = "Charge States", y = "Percent [%]") +
-    theme_light()+
-    theme(legend.position = "top")
-  
-  return(figure)
-}
-
-charge.state.violin <- function(x){
-  res <- x %>% 
-    dplyr::filter(MSOrder == "Ms2") 
-  
-  figure <- ggplot(res, aes_string(x = "filename", y = "ChargeState", fill = "filename")) +
-        geom_boxplot(width=.05, outlier.colour = "black", position = position_dodge())+ 
-    geom_violin(position = position_dodge())+
-    #geom_violin() +
-    scale_y_continuous(breaks = scales::pretty_breaks(15)) +
-    labs(title = "Charge state plot") +
-    labs(subtitle = "Plotting the number of occurrences of all selected precursor charge states") +
-    labs(x = "filename", y = "Charge State") +
-    theme_light() +
-    theme(axis.text.x=element_blank(), legend.position = "top")
-
-  return(figure)
-}
-
-#TODO: use position dodge for step plot? -> plot obsolete!
-.charge.state.quantiles <- function(x){
-  res <- x %>% 
-    dplyr::filter(MSOrder == "Ms2") %>% 
-    dplyr::select(ChargeState, filename) %>% 
-    dplyr::group_by(filename) %>% 
-    dplyr::mutate_at(vars(ChargeState), funs(steps = cume_dist(.))) %>% 
-    dplyr::group_by(ChargeState) %>% 
-    dplyr::do(unique(.))
- # zero <- data.frame(ChargeState = 0, steps = 0)
-  #res <- dplyr::bind_rows(zero, res)
-  xbreaks <- res$ChargeState
-  
-  figure <- ggplot(res, aes_string(x = "ChargeState", y = "steps")) +
-    geom_step(colour = "deepskyblue2", size = 1.3, alpha = 0.3) +
-    geom_point(shape = 18, colour = "black") +
-    geom_hline(yintercept = 0.95, colour = "red3", linetype = "longdash") +
-    geom_text(aes_string(label = signif("steps", 3)), vjust = -0.5, hjust = 1) +
-    scale_y_continuous(breaks = scales::pretty_breaks(10)) +
-    scale_x_continuous(breaks = xbreaks) +
-    labs(title = "Cumulative charge state percentage plot") +
-    labs(x = "Charge States", y = "Percent [%]") +
-    theme_light() +
-    theme(legend.position = "top")
-  return(figure)
-}
 
 #' scan event
 #' @description plots time for each scan event
-#' @param x a rawDiag object
-#'
-#' @return ggplot object
-#' @export scan.time
-#' @export scan.time.overlay
-#' @export scan.time.violin
+#' @param x a \code{\link{data.frame}} fullfilling the \code{\link{is.rawDiag}} column naming criteria.
+#' @param method a character 'trellis', 'violin' or 'overlay'.
+#' @aliases scan.time.overlay scan.time.violin
+#' @return a ggplot object.
+#' @export PlotScanTime
 #' @import tidyr
-scan.time <- function(x){
-    # TODO
-    # stopifnot(is.rawfile(x))
+PlotScanTime <- function(x, method='trellis'){
+  if(method == 'trellis'){
     res <- x %>% 
-        dplyr::mutate(ElapsedScanTimesec = ElapsedScanTimesec * 1000)
-     
+      dplyr::mutate(ElapsedScanTimesec = ElapsedScanTimesec * 1000)
+    
     figure <- ggplot(res, aes_string(x = "StartTime", y = "ElapsedScanTimesec")) +
       geom_point(shape = ".") +
       facet_wrap(filename ~ MSOrder + MassAnalyzer, scales = "free") +
@@ -816,515 +740,282 @@ scan.time <- function(x){
       geom_hline(data = res, aes_string(yintercept = "transient"), colour = "red3")
     
     return(figure)
-}
-
-scan.time.violin <- function(x){
-  # TODO
-  # stopifnot(is.rawfile(x))
-  res <- x %>% 
-    dplyr::mutate_at(vars("ElapsedScanTimesec"), funs(.*1000)) %>% 
-    dplyr::select_at(vars("ElapsedScanTimesec", "filename", "MassAnalyzer", "MSOrder")) %>% 
-    na.omit()
-  
-  figure <- ggplot(res, aes_string(x = "filename", y = "ElapsedScanTimesec")) +
-    geom_violin()  +
-    facet_grid(MSOrder + MassAnalyzer~., scales = "free") +
-    stat_summary(fun.y = max , geom = "point", colour = "red") +
-    scale_y_continuous(breaks = scales::pretty_breaks(8)) +
-    labs(y = "Elapsed Scan Time [mili seconds]")
+  }else if (method == 'violin'){
+    # TODO
+    # stopifnot(is.rawfile(x))
+    res <- x %>% 
+      dplyr::mutate_at(vars("ElapsedScanTimesec"), funs(.*1000)) %>% 
+      dplyr::select_at(vars("ElapsedScanTimesec", "filename", "MassAnalyzer", "MSOrder")) %>% 
+      na.omit()
+    
+    figure <- ggplot(res, aes_string(x = "filename", y = "ElapsedScanTimesec")) +
+      geom_violin()  +
+      facet_grid(MSOrder + MassAnalyzer~., scales = "free") +
+      stat_summary(fun.y = max , geom = "point", colour = "red") +
+      scale_y_continuous(breaks = scales::pretty_breaks(8)) +
+      labs(y = "Elapsed Scan Time [mili seconds]")
     theme_light() +
-    theme(axis.text.x = element_text(angle = 90))
-  return(figure)
-}
+      theme(axis.text.x = element_text(angle = 90))
+    return(figure)
+  }else if (method == 'overlay'){
+    figure <- ggplot(x, aes_string(x = "StartTime", y = "ElapsedScanTimesec", colour = "filename")) +
+      geom_point(size = 0.5) +
+      geom_line(aes_string(group = "filename", colour = "filename"), stat = "smooth", method = "gam", formula = y ~ s(x, bs= "cs"), se = FALSE) +
+      facet_grid(~ MSOrder + MassAnalyzer, scales = "free") +
+      theme_light() +
+      theme(legend.position="top")
+    return(figure)
+  }
+  else{NULL}}
 
-scan.time.overlay <- function(x){
-  figure <- ggplot(x, aes_string(x = "StartTime", y = "ElapsedScanTimesec", colour = "filename")) +
-    geom_point(size = 0.5) +
-    geom_line(aes_string(group = "filename", colour = "filename"), stat = "smooth", method = "gam", formula = y ~ s(x, bs= "cs"), se = FALSE) +
-    facet_grid(~ MSOrder + MassAnalyzer, scales = "free") +
-    theme_light() +
-    theme(legend.position="top")
-  return(figure)
-}
 
-
-.injection.times.facet <- function(x){
-  maxtimes <- x %>% 
-    dplyr::group_by(filename, MSOrder) %>% 
-    dplyr::summarise(maxima = max(IonInjectionTimems))
-  
-  figure <- ggplot(x, aes_string(x = "StartTime", y = "IonInjectionTimems")) +
-    geom_hline(data = maxtimes, aes_string(yintercept = "maxima"), colour = "red3", linetype = "longdash") +
-    geom_point(shape = ".") +
-    geom_line(stat = "smooth", method = "gam", formula = y ~ s(x, bs= "cs"), colour = "deepskyblue3", se = FALSE) +
-    facet_grid(filename ~ MSOrder, scales = "free") +
-    scale_y_continuous(breaks = scales::pretty_breaks((n = 8))) +
-    scale_x_continuous(breaks = scales::pretty_breaks((n = 8))) +
-    labs(title = "Injection time plot", subtitle = "Plotting injection time against retention time for MS and MSn level") +
-    labs(x = "Retentione Time [min]", y = "Injection Time [ms]") +
-    theme_light()
-  return(figure)
-}
 
 
 #' injection.time
 #'
-#' @param x rawfile
-#'
+#' @param x a \code{\link{data.frame}} fullfilling the \code{\link{is.rawDiag}} column naming criteria.
+#' @param method a character 'trellis' or 'overlay'.
+#' @aliases injection.time.overlay
 #' @return ggplot object
-#' @export injection.time
-#' @export injection.time.overlay
-injection.time <- function(x){
-  figure <- ggplot(x, aes_string(x = "filename", y = "IonInjectionTimems")) +
-    geom_violin() +
-    facet_grid(MSOrder~.) +
-    stat_summary(fun.y = max , geom = "point", colour = "red") +
-    theme_light() +
-    theme(axis.text.x = element_text(angle = 90))
-  return(figure)
+#' @export PlotInjectionTime
+PlotInjectionTime <- function(x, method='trellis'){
+  if (method == 'trellis'){
+    figure <- ggplot(x, aes_string(x = "filename", y = "IonInjectionTimems")) +
+      geom_violin() +
+      facet_grid(MSOrder~.) +
+      stat_summary(fun.y = max , geom = "point", colour = "red") +
+      theme_light() +
+      theme(axis.text.x = element_text(angle = 90))
+    return(figure)
+  }else if(method == 'overlay'){
+    figure <- ggplot(x, aes_string(x = "StartTime", y = "IonInjectionTimems", colour = "filename")) +
+      geom_point(size = 0.5) +
+      geom_line(aes_string(group = "filename", colour = "filename"), stat = "smooth", method = "gam", formula = y ~ s(x, bs= "cs"), se = FALSE) +
+      facet_grid(~ MSOrder, scales = "free") +
+      theme_light() +
+      theme(legend.position="top")
+    return(figure)
+  }else{NULL}
 }
 
-injection.time.overlay <- function(x){
-  figure <- ggplot(x, aes_string(x = "StartTime", y = "IonInjectionTimems", colour = "filename")) +
-    geom_point(size = 0.5) +
-    geom_line(aes_string(group = "filename", colour = "filename"), stat = "smooth", method = "gam", formula = y ~ s(x, bs= "cs"), se = FALSE) +
-    facet_grid(~ MSOrder, scales = "free") +
-    theme_light() +
-    theme(legend.position="top")
-  return(figure)
-}
-
-#' lm.correction
+#' lock mass correction plot
 #'
-#' @param x 
-#'
-#' @return ggplot
-#' @export lm.correction
-#' @export lm.correction.violin
-#' @export lm.correction.overlay
-lm.correction <- function(x){
-  res <- x %>% 
+#' @param x  a \code{\link{data.frame}} fullfilling the \code{\link{is.rawDiag}} column naming criteria.
+#' @param method a character 'trellis', 'violin' or 'overlay'.
+#' @aliases lm.correction.violin lm.correction.overlay
+#' @return a ggplot object.
+#' @export PlotLockMassCorrection
+PlotLockMassCorrection <- function(x, method='trellis'){
+  if (method == 'trellis'){
+    res <- x %>% 
       dplyr::filter(MSOrder == "Ms")
-  figure <- ggplot(res, aes_string(x = "StartTime" , y = "LMCorrection")) +
-    geom_hline(yintercept = c(-5,5), colour = "red3", linetype = "longdash") +
-    geom_line(size = 0.3) +
-    geom_line(stat = "smooth", method= "gam", formula = y ~ s(x, bs ="cs"), colour = "deepskyblue3", se = FALSE) +
-    labs(title = "Lock mass correction plot", subtitle = "Plotting lock mass correction value over time") +
-    labs(x = "Retention Time [min]", y = "Lock Mass Correction [ppm]") +
-    scale_x_continuous(breaks = scales::pretty_breaks(8)) +
-    scale_y_continuous(breaks = scales::pretty_breaks(8), limits = c(-10,10)) +
-    facet_wrap(~filename)+
-    theme_light()
-  return(figure)
-}
-
-lm.correction.violin <- function(x){
-  res <- x %>% 
-    dplyr::filter(MSOrder == "Ms")
-  figure <- ggplot(res, aes_string(x = "filename", y = "LMCorrection")) +
-    geom_hline(yintercept = c(-5,5), colour = "red3", linetype = "longdash") +
-    geom_violin()+
-   theme_light() +
-    theme(axis.text.x = element_text(angle = 90))
-  return(figure)
-}
-
-lm.correction.overlay <- function(x){
-  res <- x %>% 
-    dplyr::filter(MSOrder == "Ms")
-  figure <- ggplot(res, aes_string(x = "StartTime" , y = "LMCorrection", colour = "filename")) +
-    geom_hline(yintercept = c(-5,5), colour = "red3", linetype = "longdash") +
-    geom_line(size = 0.3) +
-    geom_line(stat = "smooth", method= "gam", formula = y ~ s(x, bs ="cs"), colour = "deepskyblue3", se = FALSE) +
-    labs(title = "Lock mass correction plot", subtitle = "Plotting lock mass correction value over time") +
-    labs(x = "Retention Time [min]", y = "Lock Mass Correction [ppm]") +
-    scale_x_continuous(breaks = scales::pretty_breaks(8)) +
-    scale_y_continuous(breaks = scales::pretty_breaks(8), limits = c(-10,10)) +
-    theme_light()
-  return(figure)
-}
+    figure <- ggplot(res, aes_string(x = "StartTime" , y = "LMCorrection")) +
+      geom_hline(yintercept = c(-5,5), colour = "red3", linetype = "longdash") +
+      geom_line(size = 0.3) +
+      geom_line(stat = "smooth", method= "gam", formula = y ~ s(x, bs ="cs"), colour = "deepskyblue3", se = FALSE) +
+      labs(title = "Lock mass correction plot", subtitle = "Plotting lock mass correction value over time") +
+      labs(x = "Retention Time [min]", y = "Lock Mass Correction [ppm]") +
+      scale_x_continuous(breaks = scales::pretty_breaks(8)) +
+      scale_y_continuous(breaks = scales::pretty_breaks(8), limits = c(-10,10)) +
+      facet_wrap(~filename)+
+      theme_light()
+    return(figure)
+  }else if(method == 'violin'){
+    res <- x %>% 
+      dplyr::filter(MSOrder == "Ms")
+    figure <- ggplot(res, aes_string(x = "filename", y = "LMCorrection")) +
+      geom_hline(yintercept = c(-5,5), colour = "red3", linetype = "longdash") +
+      geom_violin()+
+      theme_light() +
+      theme(axis.text.x = element_text(angle = 90))
+    return(figure)
+  }else if (method == 'overlay'){
+    res <- x %>% 
+      dplyr::filter(MSOrder == "Ms")
+    figure <- ggplot(res, aes_string(x = "StartTime" , y = "LMCorrection", colour = "filename")) +
+      geom_hline(yintercept = c(-5,5), colour = "red3", linetype = "longdash") +
+      geom_line(size = 0.3) +
+      geom_line(stat = "smooth", method= "gam", formula = y ~ s(x, bs ="cs"), colour = "deepskyblue3", se = FALSE) +
+      labs(title = "Lock mass correction plot", subtitle = "Plotting lock mass correction value over time") +
+      labs(x = "Retention Time [min]", y = "Lock Mass Correction [ppm]") +
+      scale_x_continuous(breaks = scales::pretty_breaks(8)) +
+      scale_y_continuous(breaks = scales::pretty_breaks(8), limits = c(-10,10)) +
+      theme_light()
+    return(figure)
+  }else{NULL}}
 
 
 
-#' Title
+
+#' cycle.load plot
 #'
-#' @param x 
-#'
-#' @return
-#' @import ggplot2
-#'
-#' @examples
-.ms2.frequency <- function(x){
-  NoMS2 <- x %>% 
-    dplyr::filter(MSOrder == "Ms") %>% 
-    dplyr::count() %>% 
-    dplyr::rename(Counts = n) %>% 
-    dplyr::pull()
-  res <- x %>% 
-    dplyr::filter(MSOrder == "Ms2") %>% 
-    dplyr::count(MasterScanNumber) %>% 
-    dplyr::count(n) %>% 
-    dplyr::rename(NumberOfMS2Scans = n, Counts = nn) %>% 
-    rbind(c(0, NoMS2 -sum(.$Counts))) %>% 
-    dplyr::arrange(NumberOfMS2Scans) %>% 
-    dplyr::mutate(percentage = signif((100/sum(Counts) * Counts), 2))
-  xbreaks <- res$NumberOfMS2Scans
-  if(max(res$NumberOfMS2Scans >=25)){
-    res <- res %>% 
-      dplyr::bind_cols(parts = unlist(cut(.$NumberOfMS2Scans, breaks = c(-1,25,50,75,100))))
-    levels(res$parts) <- list("1-25" = levels(res$parts)[1], 
-                              "26-50" = levels(res$parts)[2], 
-                              "51-75" = levels(res$parts)[3], 
-                              "76-100" = levels(res$parts)[4]) 
-    res <- res %>% 
-      dplyr::select(NumberOfMS2Scans, Counts, percentage) %>% 
-      dplyr::mutate(parts = as.factor("ALL")) %>% 
-      dplyr::bind_rows(res) %>% 
-      dplyr::mutate(x_min = case_when(parts == "ALL" ~ 1,
-                                      parts == "1-25" ~ 1,
-                                      parts == "26-50" ~ 26,
-                                      parts == "51-75" ~ 51,
-                                      parts == "76-100" ~ 76)) %>% 
-      dplyr::mutate(x_max = case_when(parts == "ALL" ~ max(res$NumberOfMS2Scans),
-                                      parts == "1-25" ~ 25,
-                                      parts == "26-50" ~ 50,
-                                      parts == "51-75" ~ 75,
-                                      parts == "76-100" ~ 100))
-    res$parts <- factor(res$parts, levels = c("ALL", "1-25", "26-50", "51-75", "76-100"))  
-    
-    figure <- ggplot(res, aes_string(x = "NumberOfMS2Scans", y = "percentage")) + 
-      geom_bar(stat = "identity", fill = "deepskyblue2") + 
-      geom_text(aes_string(label = "Counts"), vjust=-0.3, size=3.5) + 
-      facet_wrap(~parts, scales = "free", nrow = 5, ncol = 1) +
-      ylim(0, max(res$percentage+5)) + 
-      geom_blank(aes_string(x = "x_min")) +
-      geom_blank(aes_string(x = "x_max"))
-  } else {
-    figure <- ggplot(res, aes_string(x = "NumberOfMS2Scans", y = "percentage")) +
-      geom_bar(stat = "identity", fill = "deepskyblue2") +
-      geom_text(aes_string(label = "Counts"), vjust=-0.3, size=3.5)
-  }
-  figure +
-    scale_x_continuous(breaks = xbreaks) +
-    labs(title = "Cycle load plot") +
-    labs(subtitle = "Plotting the number of MS2 scans associated with each MS1 scan") +
-    labs(x = "Number of MS2 associated with an MS1 scan", y = "Percentage [%]") +
-    theme_light()
-}
-
-.ms.data.points <- function(x){
-  binSize <- 15
-  binNumber <- ceiling(nrow(x) / binSize)
-  binVector <- rep(1:binNumber, each = binSize)
-  res <- x %>% 
-    dplyr::filter(MSOrder == "Ms") %>% 
-    dplyr::select(StartTime) %>% 
-    dplyr::mutate(CycleTime = (dplyr::lead(StartTime) - StartTime)*60) %>% 
-    dplyr::filter(!is.na(CycleTime)) %>% 
-    dplyr::mutate("10sec" = floor(10/CycleTime)) %>% 
-    dplyr::mutate("20sec" = floor(20/CycleTime)) %>% 
-    dplyr::mutate("30sec" = floor(30/CycleTime)) %>% 
-    dplyr::select(StartTime, "10sec", "20sec", "30sec") %>% 
-    dplyr::mutate(Bins = binVector[1:nrow(.)]) %>% 
-    dplyr::group_by(Bins) %>% 
-    dplyr::summarise_all(funs(mean)) %>% 
-    dplyr::mutate_at(c("10sec","20sec","30sec"), funs(floor)) %>% 
-    tidyr::gather("PeakWidthAtBaseline", "Points", 3:5)
-  
-  figure <- ggplot(res, aes_string(x = "StartTime", y = "Points", colour = "PeakWidthAtBaseline")) +
-    geom_point(size = 0.3) +
-    scale_colour_manual(values = c("red3", "darkorchid3", "deepskyblue3")) +
-    scale_y_continuous(breaks = scales::pretty_breaks((n = 20))) + 
-    scale_x_continuous(breaks = scales::pretty_breaks((n = 8))) +
-    labs(title ="Point Over Chromatographic Peak") + 
-    labs(subtitle = "Plotting the number of Ms data points over different preselected chromatographic peak widths") +
-    labs(x = "Retention Time", y = "Points over Peak") +
-    labs(colour = "Peak width") +
-    theme_light()
-  return(figure)
-}
-
-
-#' cycle.load
-#'
-#' @param x 
-#'
-#' @return
+#' @param x a \code{\link{data.frame}} fullfilling the \code{\link{is.rawDiag}} column naming criteria.
+#' @param method a character 'trellis', 'violin' or 'overlay'.
+#' @aliases cycle.load.overlay cycle.load.violin
+#' @return a ggplot object.
 #' @import scales
-#' @export cycle.load
-#' @export cycle.load.overlay
-#' @export cycle.load.violin
-cycle.load <- function(x){ #old name ms2.distribution
-  MS2 <- x %>% 
-    dplyr::filter(MSOrder == "Ms2") %>% 
-    dplyr::group_by_at(vars("filename")) %>% 
-    dplyr::count(MasterScanNumber) %>% 
-    dplyr::rename(scanNumber = MasterScanNumber)
-  MS <- x %>% 
-    dplyr::select(StartTime, scanNumber)
-  res <- dplyr::inner_join(MS, MS2, by = "scanNumber")
-
+#' @export PlotCycleLoad
+PlotCycleLoad <- function(x, method = 'trellis'){ #old name ms2.distribution
+  if (method == 'trellis'){
+    MS2 <- x %>% 
+      dplyr::filter(MSOrder == "Ms2") %>% 
+      dplyr::group_by_at(vars("filename")) %>% 
+      dplyr::count(MasterScanNumber) %>% 
+      dplyr::rename(scanNumber = MasterScanNumber)
+    MS <- x %>% 
+      dplyr::select(StartTime, scanNumber)
+    res <- dplyr::inner_join(MS, MS2, by = "scanNumber")
     
-  figure <- ggplot(res, aes_string(x = "StartTime", y = "n")) +
-    geom_point(shape = ".") +
-    geom_line(stat = "smooth", method = "loess", span = 0.2, colour = "deepskyblue3", se = FALSE) +
-    facet_wrap(~filename) +
-    scale_y_continuous(breaks = scales::pretty_breaks(8)) +
-    scale_x_continuous(breaks = scales::pretty_breaks(8)) +
-    coord_cartesian(ylim = c(0, max(res$n)+1)) +
-    labs(title = "Time resolved number of Ms2 scans") +
-    labs(subtitle = "Plotting the number of Ms2 per Ms1 scan versus retention time") +
-    labs(x = "Retention Time [min]", y = "Number of Ms2 per Ms1 [counts]") +
-    theme_light()
-  return(figure)
-}
-
-cycle.load.violin<- function(x){
-  MS2 <- x %>% 
-    dplyr::filter(MSOrder == "Ms2") %>% 
-    dplyr::group_by_at(vars("filename")) %>% 
-    dplyr::count(MasterScanNumber) %>% 
-    dplyr::rename(scanNumber = MasterScanNumber)
-  MS <- x %>% 
-    dplyr::select(StartTime, scanNumber)
-  res <- dplyr::inner_join(MS, MS2, by = "scanNumber") %>% 
-    dplyr::mutate_at(vars("filename"), funs(as.factor(.))) %>% 
-    dplyr::mutate_at(vars("n"), funs(as.numeric(.)))
     
-  
-  figure <- ggplot(res, aes_string(x = "filename", y = "n")) +
-    geom_violin() +
-    coord_cartesian(ylim = c(0, max(res$n)+1)) +
-    labs(title = "Time resolved number of Ms2 scans") +
-    labs(subtitle = "Plotting the number of Ms2 per Ms1 scan versus retention time") +
-    labs(x = "Retention Time [min]", y = "Number of Ms2 per Ms1 [counts]") +
-    theme_light()
-  return(figure)
-}
-
-cycle.load.overlay <- function(x){
-  MS2 <- x %>% 
-    dplyr::filter(MSOrder == "Ms2") %>% 
-    dplyr::group_by_at(vars("filename")) %>% 
-    dplyr::count(MasterScanNumber) %>% 
-    dplyr::rename(scanNumber = MasterScanNumber)
-  MS <- x %>% 
-    dplyr::select(StartTime, scanNumber)
-  res <- dplyr::inner_join(MS, MS2, by = "scanNumber")
-  
-  figure <- ggplot(res, aes_string(x = "StartTime", y = "n", colour = "filename")) +
-    geom_point(shape = ".") +
-    geom_line(aes_string(group = "filename", colour = "filename"),stat = "smooth", method = "loess", span = 0.2, se = FALSE) +
-    scale_y_continuous(breaks = scales::pretty_breaks(8)) +
-    scale_x_continuous(breaks = scales::pretty_breaks(8)) +
-    coord_cartesian(ylim = c(0, max(res$n)+1)) +
-    labs(title = "Time resolved number of Ms2 scans") +
-    labs(subtitle = "Plotting the number of Ms2 per Ms1 scan versus retention time") +
-    labs(x = "Retention Time [min]", y = "Number of Ms2 per Ms1 [counts]") +
-    theme_light() +
-    theme(legend.position = "top")
-  return(figure)
-}
-
-
-
-
-
-#' Title
-#'
-#' @param f 
-#' @param maxncpu 
-#' @param exe 
-#' @param rdata 
-#'
-#' @return
-#' @export
-#'
-#' @examples
-#' \dontrun{
-#' f <- f[grep("raw$",f<-list.files())]
-#' .benchmark(f, maxncpu = 8, exe='~/bin/fgcz_raw.exe', mono=TRUE, rdata='/tmp/b2.RData')
-#' }
-.benchmark <- function(f, maxncpu = c(16, 32, 64), 
-                       exe = "~/RiderProjects/fgcz-raw/bin/Debug/fgcz_raw.exe", 
-                       rdata = tempfile(fileext = ".RData")){
-  if(require(parallel)){
-    benchmark.rawDiag  <- lapply(maxncpu, 
-                                   function(ncpu){
-                                     ostart <- Sys.time()
-                                     r <- do.call('rbind',  
-                                                  mclapply(f, function(file){
-                                                    
-                                                    start <- Sys.time()
-                                                    
-                                                    S <- read.raw(file, mono = TRUE, exe = exe); 
-                                                    
-                                                    end <- Sys.time()
-                                                    
-                                                    rv <- data.frame(file = file, 
-                                                                     runtime = end - start,
-                                                                     nrow  =nrow(S))
-                                                    rv
-                                                  }, mc.cores = ncpu))
-                                     
-                                     r$ncpu <- ncpu
-                                     r$start.time <-  ostart
-                                     r$end.time <- Sys.time()
-                                     
-                                     return(r)
-                                   })
+    figure <- ggplot(res, aes_string(x = "StartTime", y = "n")) +
+      geom_point(shape = ".") +
+      geom_line(stat = "smooth", method = "loess", span = 0.2, colour = "deepskyblue3", se = FALSE) +
+      facet_wrap(~filename) +
+      scale_y_continuous(breaks = scales::pretty_breaks(8)) +
+      scale_x_continuous(breaks = scales::pretty_breaks(8)) +
+      coord_cartesian(ylim = c(0, max(res$n)+1)) +
+      labs(title = "Time resolved number of Ms2 scans") +
+      labs(subtitle = "Plotting the number of Ms2 per Ms1 scan versus retention time") +
+      labs(x = "Retention Time [min]", y = "Number of Ms2 per Ms1 [counts]") +
+      theme_light()
+    return(figure)
+  }else if(method == 'violin'){
+    MS2 <- x %>% 
+      dplyr::filter(MSOrder == "Ms2") %>% 
+      dplyr::group_by_at(vars("filename")) %>% 
+      dplyr::count(MasterScanNumber) %>% 
+      dplyr::rename(scanNumber = MasterScanNumber)
+    MS <- x %>% 
+      dplyr::select(StartTime, scanNumber)
+    res <- dplyr::inner_join(MS, MS2, by = "scanNumber") %>% 
+      dplyr::mutate_at(vars("filename"), funs(as.factor(.))) %>% 
+      dplyr::mutate_at(vars("n"), funs(as.numeric(.)))
     
-    message(paste("writting result to", rdata, "..."))
-    save(benchmark.rawDiag, file=rdata) 
     
-    return(benchmark.rawDiag)
-  }
-}
+    figure <- ggplot(res, aes_string(x = "filename", y = "n")) +
+      geom_violin() +
+      coord_cartesian(ylim = c(0, max(res$n)+1)) +
+      labs(title = "Time resolved number of Ms2 scans") +
+      labs(subtitle = "Plotting the number of Ms2 per Ms1 scan versus retention time") +
+      labs(x = "Retention Time [min]", y = "Number of Ms2 per Ms1 [counts]") +
+      theme_light()
+    return(figure)
+  }else if (method == 'overlay'){
+    MS2 <- x %>% 
+      dplyr::filter(MSOrder == "Ms2") %>% 
+      dplyr::group_by_at(vars("filename")) %>% 
+      dplyr::count(MasterScanNumber) %>% 
+      dplyr::rename(scanNumber = MasterScanNumber)
+    MS <- x %>% 
+      dplyr::select(StartTime, scanNumber)
+    res <- dplyr::inner_join(MS, MS2, by = "scanNumber")
+    
+    figure <- ggplot(res, aes_string(x = "StartTime", y = "n", colour = "filename")) +
+      geom_point(shape = ".") +
+      geom_line(aes_string(group = "filename", colour = "filename"),stat = "smooth", method = "loess", span = 0.2, se = FALSE) +
+      scale_y_continuous(breaks = scales::pretty_breaks(8)) +
+      scale_x_continuous(breaks = scales::pretty_breaks(8)) +
+      coord_cartesian(ylim = c(0, max(res$n)+1)) +
+      labs(title = "Time resolved number of Ms2 scans") +
+      labs(subtitle = "Plotting the number of Ms2 per Ms1 scan versus retention time") +
+      labs(x = "Retention Time [min]", y = "Number of Ms2 per Ms1 [counts]") +
+      theme_light() +
+      theme(legend.position = "top")
+    return(figure)
+  }else{NULL}}
 
-.benchmark.bak <- function(f, maxncpu=4, 
-                       exe="~/RiderProjects/fgcz-raw/bin/Debug/fgcz_raw.exe", 
-                       rdata=tempfile(fileext = ".RData")){
-  if(require(parallel)){
-    benchmark.rawDiag  <- lapply(rev(1:maxncpu), 
-                                   function(ncpu){
-      ostart <- Sys.time()
-      r <- do.call('rbind',  
-                    mclapply(f, function(file){
-
-        start <- Sys.time()
-         
-        S <- read.raw(file, mono = TRUE, exe = exe); 
-        
-        end <- Sys.time()
-         
-        rv <- data.frame(file = file, 
-                         runtime = end - start,
-                         nrow  =nrow(S))
-        rv
-        }, mc.cores = ncpu))
-      
-      r$ncpu <- ncpu
-      r$start.time <-  ostart
-      r$end.time <- Sys.time()
-      
-      return(r)
-    })
-    
-    message(paste("writting result to", rdata, "..."))
-    save(benchmark.rawDiag, file=rdata) 
-    
-    return(benchmark.rawDiag)
-  }
-}
 
 #mods for cycle based plots and prescans
 
-
-
-
-
-
-    
-
-#' Title
-#'
-#' @param x a dataframe passing the is.rawDiag function
-#'
+#' scan frequency plot
+#' @param x a \code{\link{data.frame}} fullfilling the \code{\link{is.rawDiag}} column naming criteria.
+#' @param method a character 'trellis', 'violin' or 'overlay'.
+#' @aliases scan.frequency.violin scan.frequency.overlay
 #' @return a trellis like plot object displaying the scan frequency of a mass spec run
-#' @export scan.frequency 
-#' @export scan.frequency.violin 
-#' @export scan.frequency.overlay
-#'
-#' @examples
-scan.frequency <- function(x){
-  res <- x %>% 
-    dplyr::ungroup() %>% 
-    scan.frequ.moving.aver(.)
-  
-  figure <- ggplot(res, aes_string(x = "Time", y = "Frequency")) +
-    geom_line() +
-    facet_wrap(~filename+ Type) +
-    scale_y_continuous(breaks = scales::pretty_breaks(16))
-  
-  return(figure)  
+#' @export PlotScanFrequency 
+PlotScanFrequency <- function(x, method = 'trellis'){
+  if (method == 'trellis'){
+    res <- x %>% 
+      dplyr::ungroup() %>% 
+      ScanFrequMovingOver(.)
+    
+    figure <- ggplot(res, aes_string(x = "Time", y = "Frequency")) +
+      geom_line() +
+      facet_wrap(~filename+ Type) +
+      scale_y_continuous(breaks = scales::pretty_breaks(16))
+    
+    return(figure)  
+  }else if (method == 'violin'){
+    res <- x %>% 
+      dplyr::ungroup() %>% 
+      ScanFrequMovingOver(.) %>% 
+      dplyr::ungroup() %>% 
+      dplyr::filter_at(vars("Type"), any_vars(. == "ms2"))
+    
+    figure <- ggplot(res, aes_string(x = "filename", y = "Counts")) +
+      geom_violin()
+    
+    return(figure)  
+  }else if (method =='overlay'){
+    res <- x %>% 
+      dplyr::ungroup() %>% 
+      ScanFrequMovingOver(.)
+    
+    figure <- ggplot(res, aes_string(x = "Time", y = "Frequency", colour = "Type")) +
+      facet_wrap(~filename) +
+      geom_line() 
+    
+    return(figure)  
+  }else{NULL}
 }
-
-
-scan.frequency.violin <- function(x){
-  res <- x %>% 
-    dplyr::ungroup() %>% 
-    scan.frequ.moving.aver(.) %>% 
-    dplyr::ungroup() %>% 
-    dplyr::filter_at(vars("Type"), any_vars(. == "ms2"))
-  
-  figure <- ggplot(res, aes_string(x = "filename", y = "Counts")) +
-    geom_violin()
-  
-  return(figure)  
-}
-
-
-scan.frequency.overlay <- function(x){
-  res <- x %>% 
-    dplyr::ungroup() %>% 
-    scan.frequ.moving.aver(.)
-  
-  figure <- ggplot(res, aes_string(x = "Time", y = "Frequency", colour = "Type")) +
-    facet_wrap(~filename) +
-    geom_line() 
-
-  return(figure)  
-}
-
-
-
-## TODO: define bin with dynamically as h= 2x IQR x n e-1/3 or number of bins (max-min)/h
 
 #' PrecursorMass versus StartTime hexagons MS2
 #'
-#' @param x an rawDiag object
-#'
-#' @return a ggplot object
-#' @export precursor.heatmap
-#'
+#' @param x a \code{\link{data.frame}} fullfilling the \code{\link{is.rawDiag}} column naming criteria.
+#' @param bins number of bins in both vertical and horizontal directions. default is 80.
+#' @return a ggplot object.
+#' @export PlotPrecursorHeatmap
+#' @note TODO: define bin with dynamically as h= 2x IQR x n e-1/3 or number of bins (max-min)/h
 #' @import hexbin
-precursor.heatmap <- function(x, ...){ #rename to precursor.heatmap
-  
- res <- x %>% 
+PlotPrecursorHeatmap <- function(x, bins = 80){ 
+  res <- x %>% 
     dplyr::filter_at(vars("MSOrder"), any_vars(. == "Ms2"))
   
-ggplot(res, aes(x = StartTime, y = PrecursorMass)) + 
-  geom_hex(bins = 80 ) + 
-  facet_wrap(~filename) +
-  scale_fill_gradientn(colours = colorvector) + 
-  scale_x_continuous(breaks = scales::pretty_breaks(8))+ 
-  scale_y_continuous(breaks = scales::pretty_breaks(15))+ 
-  theme_light()
+  ggplot(res, aes_string(x = 'StartTime', y = 'PrecursorMass')) + 
+    geom_hex(bins = bins) + 
+    facet_wrap(~filename) +
+    scale_fill_gradientn(colours = colorvector) + 
+    scale_x_continuous(breaks = scales::pretty_breaks(8)) + 
+    scale_y_continuous(breaks = scales::pretty_breaks(15)) + 
+    theme_light()
 }
 
 #' mass heatmap
 #'
-#' @param x an rawDiag object
+#' @param x a \code{\link{data.frame}} fullfilling the \code{\link{is.rawDiag}} column naming criteria.
+#' @param bins number of bins in both vertical and horizontal directions. default is 80.
 #' @description graphs a deconvoluted heatmap of the StartTime
-#' @return a gglot object
+#' @return a gglot object.
 #' 
-#' @export mass.heatmap
-mass.heatmap <- function(x){ #rename to mass.heatmap
+#' @export PlotMassHeatmap
+PlotMassHeatmap <- function(x, bins = 80){ #rename to mass.heatmap
   
   res <- x %>% 
     dplyr::filter_at(vars("MSOrder"), any_vars(. == "Ms2")) %>% 
     dplyr::mutate("deconv" = round((PrecursorMass - 1.00782) * ChargeState, 0)) %>% 
     dplyr::filter_at(vars("deconv"), any_vars(. <= 10000))
   
-  ggplot(res, aes(x = StartTime, y = deconv))+ 
-    geom_hex(bins = 80 )+ facet_wrap(~filename)+
+  ggplot(res, aes_string(x = 'StartTime', y = 'deconv')) + 
+    geom_hex(bins = bins ) +
+    facet_wrap(~filename) +
     scale_fill_gradientn(colours = colorvector) +
-    scale_x_continuous(breaks = scales::pretty_breaks(8))+ 
-    scale_y_continuous(breaks = scales::pretty_breaks(15))+ 
+    scale_x_continuous(breaks = scales::pretty_breaks(8)) + 
+    scale_y_continuous(breaks = scales::pretty_breaks(15)) + 
     theme_light() +
     coord_cartesian(ylim = c(500, 10000))
 }
 
+# ----TechNote Figs----
 
 .technote_benchmark_figure_1 <- function(){
   load(file.path(path.package(package = "rawDiag"),
@@ -1340,7 +1031,7 @@ mass.heatmap <- function(x){ #rename to mass.heatmap
     theme_light()
   
   gp + facet_grid( .  ~ system  )
-  }
+}
 
 .technote_benchmark_figure_2 <- function(){
   load(file.path(path.package(package = "rawDiag"),
@@ -1469,7 +1160,7 @@ gp <- ggplot(rbind(b.Linux, b.Apple), aes(y=IO.throuput, x=ncpu, group=ncpu)) +
 .technote_application_figure_1 <- function(x){
   res <- x %>%   
     dplyr::ungroup() %>% 
-    scan.frequ.moving.aver(.) %>% 
+    ScanFrequMovingOver(.) %>% 
     mutate(TopN = case_when(filename == "20180220_04_S174020_Pierce_HeLa_Protein_Digest_Std.raw" ~ 36,
                             filename == "20180220_05_S174020_Pierce_HeLa_Protein_Digest_Std.raw" ~ 72,
                             filename == "20180220_07_S174020_Pierce_HeLa_Protein_Digest_Std.raw" ~ 36,
@@ -1759,15 +1450,203 @@ gp <- ggplot(rbind(b.Linux, b.Apple), aes(y=IO.throuput, x=ncpu, group=ncpu)) +
   return(figure)
 }
 
-
+# ----Load data----
 
 #' WU163763
-#'
-#' @return
+#' @description a data set generated from reading \url{https://fgcz-bfabric.uzh.ch/bfabric/userlab/show-workunit.html?id=163763}.
+#' @return a \code{\link{data.frame}} fullfilling the \code{\link{is.rawDiag}} column naming criteria.
 #' @export getWU163763
 getWU163763 <- function(){
-  load(file.path(path.package(package = "rawDiag"),
+  rv <- load(file.path(path.package(package = "rawDiag"),
     file.path("extdata", "WU163763.RData")))
   
-  return(WU163763)
+  get(WU163763)
+}
+
+# ----Benchmark----
+#' benchmar read.raw
+#'
+#' @param f 
+#' @param maxncpu 
+#' @param exe 
+#' @param rdata 
+#' @importFrom parallel mclapply
+#' @return a nested list object.
+#' @examples
+#' \dontrun{
+#' f <- f[grep("raw$",f<-list.files())]
+#' .benchmark(f, maxncpu = 8, exe='~/bin/fgcz_raw.exe', mono=TRUE, rdata='/tmp/b2.RData')
+#' }
+.benchmark <- function(f, maxncpu = c(16, 32, 64), 
+                       exe = "~/RiderProjects/fgcz-raw/bin/Debug/fgcz_raw.exe", 
+                       rdata = tempfile(fileext = ".RData")){
+  if(require(parallel)){
+    benchmark.rawDiag  <- lapply(maxncpu, 
+                                 function(ncpu){
+                                   ostart <- Sys.time()
+                                   r <- do.call('rbind',  
+                                                mclapply(f, function(file){
+                                                  
+                                                  start <- Sys.time()
+                                                  
+                                                  S <- read.raw(file, mono = TRUE, exe = exe); 
+                                                  
+                                                  end <- Sys.time()
+                                                  
+                                                  rv <- data.frame(file = file, 
+                                                                   runtime = end - start,
+                                                                   nrow  =nrow(S))
+                                                  rv
+                                                }, mc.cores = ncpu))
+                                   
+                                   r$ncpu <- ncpu
+                                   r$start.time <-  ostart
+                                   r$end.time <- Sys.time()
+                                   
+                                   return(r)
+                                 })
+    
+    message(paste("writting result to", rdata, "..."))
+    save(benchmark.rawDiag, file=rdata) 
+    
+    return(benchmark.rawDiag)
+  }
+}
+
+
+# ----Superfluously?----
+
+#TODO: use position dodge for step plot? -> plot obsolete!
+.charge_state_quantiles <- function(x){
+  res <- x %>% 
+    dplyr::filter(MSOrder == "Ms2") %>% 
+    dplyr::select(ChargeState, filename) %>% 
+    dplyr::group_by(filename) %>% 
+    dplyr::mutate_at(vars(ChargeState), funs(steps = cume_dist(.))) %>% 
+    dplyr::group_by(ChargeState) %>% 
+    dplyr::do(unique(.))
+  # zero <- data.frame(ChargeState = 0, steps = 0)
+  #res <- dplyr::bind_rows(zero, res)
+  xbreaks <- res$ChargeState
+  
+  figure <- ggplot(res, aes_string(x = "ChargeState", y = "steps")) +
+    geom_step(colour = "deepskyblue2", size = 1.3, alpha = 0.3) +
+    geom_point(shape = 18, colour = "black") +
+    geom_hline(yintercept = 0.95, colour = "red3", linetype = "longdash") +
+    geom_text(aes_string(label = signif("steps", 3)), vjust = -0.5, hjust = 1) +
+    scale_y_continuous(breaks = scales::pretty_breaks(10)) +
+    scale_x_continuous(breaks = xbreaks) +
+    labs(title = "Cumulative charge state percentage plot") +
+    labs(x = "Charge States", y = "Percent [%]") +
+    theme_light() +
+    theme(legend.position = "top")
+  return(figure)
+}
+
+.injection_times_facet <- function(x){
+  maxtimes <- x %>% 
+    dplyr::group_by(filename, MSOrder) %>% 
+    dplyr::summarise(maxima = max(IonInjectionTimems))
+  
+  figure <- ggplot(x, aes_string(x = "StartTime", y = "IonInjectionTimems")) +
+    geom_hline(data = maxtimes, aes_string(yintercept = "maxima"), colour = "red3", linetype = "longdash") +
+    geom_point(shape = ".") +
+    geom_line(stat = "smooth", method = "gam", formula = y ~ s(x, bs= "cs"), colour = "deepskyblue3", se = FALSE) +
+    facet_grid(filename ~ MSOrder, scales = "free") +
+    scale_y_continuous(breaks = scales::pretty_breaks((n = 8))) +
+    scale_x_continuous(breaks = scales::pretty_breaks((n = 8))) +
+    labs(title = "Injection time plot", subtitle = "Plotting injection time against retention time for MS and MSn level") +
+    labs(x = "Retentione Time [min]", y = "Injection Time [ms]") +
+    theme_light()
+  return(figure)
+}
+
+.ms2_frequency <- function(x){
+  NoMS2 <- x %>% 
+    dplyr::filter(MSOrder == "Ms") %>% 
+    dplyr::count() %>% 
+    dplyr::rename(Counts = n) %>% 
+    dplyr::pull()
+  res <- x %>% 
+    dplyr::filter(MSOrder == "Ms2") %>% 
+    dplyr::count(MasterScanNumber) %>% 
+    dplyr::count(n) %>% 
+    dplyr::rename(NumberOfMS2Scans = n, Counts = nn) %>% 
+    rbind(c(0, NoMS2 -sum(.$Counts))) %>% 
+    dplyr::arrange(NumberOfMS2Scans) %>% 
+    dplyr::mutate(percentage = signif((100/sum(Counts) * Counts), 2))
+  xbreaks <- res$NumberOfMS2Scans
+  if(max(res$NumberOfMS2Scans >=25)){
+    res <- res %>% 
+      dplyr::bind_cols(parts = unlist(cut(.$NumberOfMS2Scans, breaks = c(-1,25,50,75,100))))
+    levels(res$parts) <- list("1-25" = levels(res$parts)[1], 
+                              "26-50" = levels(res$parts)[2], 
+                              "51-75" = levels(res$parts)[3], 
+                              "76-100" = levels(res$parts)[4]) 
+    res <- res %>% 
+      dplyr::select(NumberOfMS2Scans, Counts, percentage) %>% 
+      dplyr::mutate(parts = as.factor("ALL")) %>% 
+      dplyr::bind_rows(res) %>% 
+      dplyr::mutate(x_min = case_when(parts == "ALL" ~ 1,
+                                      parts == "1-25" ~ 1,
+                                      parts == "26-50" ~ 26,
+                                      parts == "51-75" ~ 51,
+                                      parts == "76-100" ~ 76)) %>% 
+      dplyr::mutate(x_max = case_when(parts == "ALL" ~ max(res$NumberOfMS2Scans),
+                                      parts == "1-25" ~ 25,
+                                      parts == "26-50" ~ 50,
+                                      parts == "51-75" ~ 75,
+                                      parts == "76-100" ~ 100))
+    res$parts <- factor(res$parts, levels = c("ALL", "1-25", "26-50", "51-75", "76-100"))  
+    
+    figure <- ggplot(res, aes_string(x = "NumberOfMS2Scans", y = "percentage")) + 
+      geom_bar(stat = "identity", fill = "deepskyblue2") + 
+      geom_text(aes_string(label = "Counts"), vjust=-0.3, size=3.5) + 
+      facet_wrap(~parts, scales = "free", nrow = 5, ncol = 1) +
+      ylim(0, max(res$percentage+5)) + 
+      geom_blank(aes_string(x = "x_min")) +
+      geom_blank(aes_string(x = "x_max"))
+  } else {
+    figure <- ggplot(res, aes_string(x = "NumberOfMS2Scans", y = "percentage")) +
+      geom_bar(stat = "identity", fill = "deepskyblue2") +
+      geom_text(aes_string(label = "Counts"), vjust=-0.3, size=3.5)
+  }
+  figure +
+    scale_x_continuous(breaks = xbreaks) +
+    labs(title = "Cycle load plot") +
+    labs(subtitle = "Plotting the number of MS2 scans associated with each MS1 scan") +
+    labs(x = "Number of MS2 associated with an MS1 scan", y = "Percentage [%]") +
+    theme_light()
+}
+
+.ms_data_points <- function(x){
+  binSize <- 15
+  binNumber <- ceiling(nrow(x) / binSize)
+  binVector <- rep(1:binNumber, each = binSize)
+  res <- x %>% 
+    dplyr::filter(MSOrder == "Ms") %>% 
+    dplyr::select(StartTime) %>% 
+    dplyr::mutate(CycleTime = (dplyr::lead(StartTime) - StartTime)*60) %>% 
+    dplyr::filter(!is.na(CycleTime)) %>% 
+    dplyr::mutate("10sec" = floor(10/CycleTime)) %>% 
+    dplyr::mutate("20sec" = floor(20/CycleTime)) %>% 
+    dplyr::mutate("30sec" = floor(30/CycleTime)) %>% 
+    dplyr::select(StartTime, "10sec", "20sec", "30sec") %>% 
+    dplyr::mutate(Bins = binVector[1:nrow(.)]) %>% 
+    dplyr::group_by(Bins) %>% 
+    dplyr::summarise_all(funs(mean)) %>% 
+    dplyr::mutate_at(c("10sec","20sec","30sec"), funs(floor)) %>% 
+    tidyr::gather("PeakWidthAtBaseline", "Points", 3:5)
+  
+  figure <- ggplot(res, aes_string(x = "StartTime", y = "Points", colour = "PeakWidthAtBaseline")) +
+    geom_point(size = 0.3) +
+    scale_colour_manual(values = c("red3", "darkorchid3", "deepskyblue3")) +
+    scale_y_continuous(breaks = scales::pretty_breaks((n = 20))) + 
+    scale_x_continuous(breaks = scales::pretty_breaks((n = 8))) +
+    labs(title ="Point Over Chromatographic Peak") + 
+    labs(subtitle = "Plotting the number of Ms data points over different preselected chromatographic peak widths") +
+    labs(x = "Retention Time", y = "Points over Peak") +
+    labs(colour = "Peak width") +
+    theme_light()
+  return(figure)
 }

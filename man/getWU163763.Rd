@@ -6,6 +6,9 @@
 \usage{
 getWU163763()
 }
+\value{
+a \code{\link{data.frame}} fullfilling the \code{\link{is.rawDiag}} column naming criteria.
+}
 \description{
-WU163763
+a data set generated from reading \url{https://fgcz-bfabric.uzh.ch/bfabric/userlab/show-workunit.html?id=163763}.
 }

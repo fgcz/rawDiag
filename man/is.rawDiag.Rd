@@ -2,7 +2,7 @@
 % Please edit documentation in R/rawDiag.R
 \name{is.rawDiag}
 \alias{is.rawDiag}
-\title{Title}
+\title{Is an Object from a rawDiag class?}
 \usage{
 is.rawDiag(object)
 }
@@ -13,5 +13,5 @@ is.rawDiag(object)
 a boolean
 }
 \description{
-Title
+Is an Object from a rawDiag class?
 }

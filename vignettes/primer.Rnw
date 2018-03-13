@@ -185,7 +185,7 @@ stopifnot(is.rawDiag(WU163230))
 adapt y-axis number of tickmarks
 <<label=cycletime, fig = TRUE, width=4.5, height=6, echo=TRUE, include=TRUE, warnings=TRUE>>=
   library(ggplot2)
-print(gp <- cycle.time(WU163230) + 
+print(gp <- PlotCycleTime(WU163230) + 
         scale_y_continuous(breaks = scales::pretty_breaks(3)))
 @
   
@@ -204,7 +204,7 @@ apply subsetting
 # library(dplyr)
 gp <- WU163230 %>% 
   filter(filename == "20180125_23_500ng_HeLa_15Hz_DDA.raw") %>% 
-  scan.time() 
+  PlotScanTime() 
 
 print(gp + 
         facet_grid(filename + MassAnalyzer + MSOrder ~ .))

@@ -2,7 +2,7 @@
 % Please edit documentation in R/rawDiag.R
 \name{as.rawDiag}
 \alias{as.rawDiag}
-\title{Title}
+\title{Force an Object to Belong to a Class \code{rawDiag}}
 \usage{
 as.rawDiag(object)
 }
@@ -14,5 +14,5 @@ a \code{data.frame} having the column names defined in
 \code{rawDiag:::.getDesiredColNames}.
 }
 \description{
-Title
+Force an Object to Belong to a Class \code{rawDiag}
 }

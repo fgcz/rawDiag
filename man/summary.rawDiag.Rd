@@ -2,13 +2,16 @@
 % Please edit documentation in R/rawDiag.R
 \name{summary.rawDiag}
 \alias{summary.rawDiag}
-\title{Title}
+\title{rawDiag Summaries}
 \usage{
 summary.rawDiag(object)
 }
 \arguments{
-\item{object}{}
+\item{object}{a \code{\link{data.frame}} fullfilling the \code{\link{is.rawDiag}} column naming criteria.}
+}
+\value{
+a table.
 }
 \description{
-Title
+rawDiag Summaries
 }
