@@ -1,0 +1,279 @@
+%\VignetteIndexEntry{primer: rawDiag}
+\documentclass[nojss]{jss}
+\usepackage{listingsutf8}
+%\usepackage{color}
+
+\author{Christian Trachsel \& Christian Panse}
+\title{Howto Use Diagnostic Plots for Orbitrap Instruments}
+
+\Plainauthor{Christian Trachsel \& Christian Panse}
+\Plaintitle{Diagnostoc plots}
+\Shorttitle{rawDiag}
+
+\Keywords{proteomics, mass spectrometry}
+\Plainkeywords{proteomics, mass spectrometry}
+
+\Abstract{
+
+\pkg{rawDiag} is an R package to do quality checks, visualizations and analysis
+of mass spectrometry data, coming from proteomics experiments.
+The package is developed, tested and used at the Functional Genomics Center Zurich. 
+We use this package mainly for prototyping, teaching, and having {\em fun} with proteomics data.
+But it can also be used to do data analysis for small scale data sets.
+Nevertheless, if one is patient, it also handles large data sets.}
+
+
+\newcommand*\fgcz{Functional Genomics Center Zurich\\
+Swiss Federal Institute of Technology in Zurich~\texttt{|}~University of Zurich\\
+Winterthurerstr. 190, CH-8057 Zurich, Switzerland}
+
+\Address{
+  Christian Trachsel \& Christian Panse\\
+  \fgcz
+  \\
+  Telephone: +41-44-63-53912\\
+  E-mail: \email{cp@fgcz.ethz.ch}\\
+  URL: \url{http://www.fgcz.ch}
+}
+
+\newcommand{\rfr}{\href{http://planetorbitrap.com/rawfilereader}{RawFileReader from Thermo Fisher Scientific}~}
+
+\begin{document}
+
+
+
+
+<<echo = FALSE, eval = TRUE>>=
+options(prompt = "R> ", continue = "+  ", width = 70, useFancyQuotes = FALSE)
+library(tidyverse)
+@
+
+%\graphicspath{{./graphics/}}
+\SweaveOpts{concordance = TRUE}
+% prefix.string = graphics/primer}
+
+
+\section{Introduction}
+Mass spectrometry is a well-accepted and widespread method in life-sciences. 
+An important task that needs to be performed prior to any data set acquisition
+is the optimization of the applied mass spectrometry method.
+rawDiagnostic builds on the idea of the discontinued software rawMeat
+(Vast Scientific). Our software allows a mass spectrometrist to analyze a raw
+file in short time and this tool delivers diagnostic plots as result. 
+This is helpful to optimize the instrument method towards the sample at hand.
+
+Our R package reads as input a comma-separated spreadsheet (csv) containing
+instrument log parameters from Thermo Fisher Scientific raw files. The csv file
+can be generated using the OS platform independent of the
+\rfr (\url{http://planetorbitrap.com/rawfilereader}).
+A number of R helper functions reshape and subset the data and pass the desired
+data-frames to ggplot2 for visualization. Trellis plots help to compare result
+between different runs. Plots can be inspected interactively running the
+software as an R shiny instance, allowing the user to customize their
+appearance. Additionally, pdf reports can be generated using a customizable R
+markdown file.
+
+The software is able to process multiple files in parallel on a modern
+laptop/workstation. Here the time limiting step detected is the IO of the disk.
+The software's full potential can be accessed when deployed on an R shiny
+application server where a large 120 min Orbitrap Fusion shotgun run containing
+$\approx 80000$ spectra can be processed in less than 50 seconds.
+ 
+All necessary steps can be done with the R command line or by using the shiny
+application on any modern computer.
+ 
+Our application allows the user to check if instrument method parameters are
+chosen appropriately for the sample investigated or if they could be optimized.
+Among the questions which can be answered are:
+\begin{itemize}
+\item Is the maximum injection time value ok?
+\item Is my signal level limited by injection time or could I trade in scan time/cycle time for deeper sampling?
+\item Is the cycle time in a range to give sufficient data points over a chromatographic peak for quantitative measurements (SRM, PRM, label-free)?
+\item How are the charge states and selected m/z distributed?
+\item Does the instrument making use of the maximum number of ms2 scans per ms1 scan?
+\item Do we see over or undersampling in the run?
+\end{itemize}
+The software analyzes data directly parsed from the raw files,
+which makes the application slim and does not require to run any additional data
+analysis pipeline upfront to access the diagnostic data. The diagnostics are
+therefore peptide ID free and rely on instrument logged data only.
+
+
+\section{Installation}
+
+
+The R package can be installed via the following command line:
+<<eval=FALSE>>=
+devtools::install_github("fgcz/rawDiagnostic")
+@
+
+A docker recipe for compiling the adapter function implemented in
+\proglang{C\#} using the \rfr is contained in the R package and listed below.
+
+\lstdefinelanguage{docker-compose-2}{
+  keywords={version, volumes, services},
+  keywordstyle=\color{blue}\bfseries,
+  keywords=[2]{image, environment, ports, container_name, ports, links, build},
+  keywordstyle=[2]\color{olive}\bfseries,
+  identifierstyle=\color{black},
+  sensitive=false,
+  comment=[l]{\#},
+  commentstyle=\color{blue}\ttfamily,
+  stringstyle=\color{red}\ttfamily,
+  morestring=[b]',
+  morestring=[b]"
+}
+
+\IfFileExists{../inst/docker/Dockerfile}{
+  \lstinputlisting[language=docker-compose-2,
+  caption={Dokerfile for compiling the ThermoFisher rawfilereader adapter code.},
+  breaklines=false,
+  label={code:compose}]{../inst/docker/Dockerfile}
+}{
+
+NO DOCKERFILE
+
+}
+
+The docker image is built and executed by using the follwoing command line.
+\begin{lstlisting}[language=bash]
+docker build -t rawfilereader .
+
+docker run -v /scratch:/scratch \
+  -a stdin -a stdout -i -t rawfilereader bash
+\end{lstlisting}
+
+
+\section{Usage} 
+
+attach the package
+<<>>=
+library(rawDiag)
+@
+
+look into for documentation
+<<eval=FALSE>>=
+help(package="rawDiag")
+@
+
+\paragraph{Read}
+The function \code{read.raw} uses the \rfr to 
+extract the follwoing information out of the mass spectrometric meassurement.
+
+<<>>=
+library(rawDiag)
+rawDiag:::.getDesiredColNames()
+@
+
+We use R for the implementation and read the data using the pipe command as it
+can be seen in the following code snippet:
+
+<<eval = FALSE>>=
+system.time(RAW <- read.raw(file = "~/data/20130115_01_iRT_Fet10fmol.RAW"))
+@
+
+in the following we display some of our demonstration data shipped with the
+package.
+
+load sample data
+<<label=load, eval=TRUE>>=
+load(file.path(path.package(package = "rawDiag"),
+                 file.path("extdata", "WU163230.RData")))
+stopifnot(is.rawDiag(WU163230))
+@
+  
+adapt y-axis number of tickmarks
+<<label=cycletime, fig = TRUE, width=4.5, height=6, echo=TRUE, include=TRUE, warnings=TRUE>>=
+  library(ggplot2)
+print(gp <- cycle.time(WU163230) + 
+        scale_y_continuous(breaks = scales::pretty_breaks(3)))
+@
+  
+print object class
+
+<<>>=
+  class(gp)
+@
+  
+  
+Next, we discover the unexpected mass spec ???
+and
+apply subsetting
+
+<<label=scantime, fig = TRUE, width=4.5, height=4, echo=TRUE, include=TRUE>>=
+# library(dplyr)
+gp <- WU163230 %>% 
+  filter(filename == "20180125_23_500ng_HeLa_15Hz_DDA.raw") %>% 
+  scan.time() 
+
+print(gp + 
+        facet_grid(filename + MassAnalyzer + MSOrder ~ .))
+@
+  
+\section{Benchmark}
+
+We performed a benchmark using the following command on a  
+Intel(R) Xeon(R) CPU E5-2698 v3 @ 2.30GHz system having
+64 processors and running Debian 8.
+We read 517533 scans information from eight raw files using the adapter function \code{read.raw}.
+
+<<eval = FALSE>>= 
+#R
+library(parallel)
+
+f <- list.files()
+f <- f[grep("raw$", f)]
+
+b <- lapply(1, function(x){.benchmark(f, exe="~/RiderProjects/fgcz-raw/bin/Debug/fgcz_raw.exe")})
+
+b <- plyr::rbind.fill(lapply(b, plyr::rbind.fill))
+
+b$overall.runtime <- as.integer(format(b$end.time, "%s")) - 
+  as.integer(format(b$start.time, "%s"))
+
+b$system <- "Linux"
+b.Linux <- b
+save(b.Linux, file='benchmark.RData')
+@
+  
+Here, five times a set
+of eight raw files were read into the R environment 
+using between one singe and eight CPUs in parallel.
+
+The boxplot below displays the result.
+
+<<label=benchmark-time, eval = TRUE, fig = TRUE, width = 4, height =4, echo = FALSE, include = FALSE>>=
+rawDiag:::.technote_benchmark_figure_1() 
+@
+<<label=benchmark-throuput, eval = TRUE, fig = TRUE, width = 4, height = 4, echo = FALSE, include = FALSE>>=
+rawDiag:::.technote_benchmark_figure_2()
+@
+
+\begin{figure}
+\includegraphics[width=0.49\columnwidth]{benchmark-time}
+\includegraphics[width=0.49\columnwidth]{benchmark-throuput}
+
+\caption{Benchmark -- The left plot shows the overall logarithmic 
+scaled runtime of 128 raw files.  The graphic on the right side shows 
+the thereof derived IO throughput as scan information per second. The 
+plots illustrate that both systems, server, and laptop, can analyze 
+95GB of instrument data within less than three minutes.
+}
+ 
+\label{figure:benchmark}
+\end{figure}
+
+\section{Session information}
+An overview of the package versions used to produce this document are shown below.
+
+
+<<sessioninfo, results=tex, echo=FALSE>>=
+toLatex(sessionInfo())
+@
+
+\nocite{*}
+
+\bibliography{rawDiag}
+
+
+\end{document}
