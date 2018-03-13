@@ -250,8 +250,8 @@ rawDiag:::.technote_benchmark_figure_2()
 @
 
 \begin{figure}
-\includegraphics[width=0.49\columnwidth]{benchmark-time}
-\includegraphics[width=0.49\columnwidth]{benchmark-throuput}
+\includegraphics[width=0.49\columnwidth]{primer-benchmark-time}
+\includegraphics[width=0.49\columnwidth]{primer-benchmark-throuput}
 
 \caption{Benchmark -- The left plot shows the overall logarithmic 
 scaled runtime of 128 raw files.  The graphic on the right side shows 
