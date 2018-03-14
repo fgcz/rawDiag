@@ -1684,9 +1684,11 @@ getWU163763 <- function(){
                          panel.grid.minor=element_blank(),
                          plot.background=element_blank()) +
                    theme(plot.title = element_blank()) +
-                   theme(plot.subtitle = element_blank())
+                   theme(plot.subtitle = element_blank()) +
+                   theme(strip.background = element_blank()) +
+                   theme(strip.text = element_blank())
                  if (!is.null(gp)){
-                   png(pngFileName, 240, 240)
+                   png(pngFileName, 200, 200)
                    print(gp)
                    dev.off()}
                }
