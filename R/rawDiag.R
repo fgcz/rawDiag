@@ -780,6 +780,23 @@ PlotScanTime <- function(x, method='trellis'){
 #' @export PlotInjectionTime
 PlotInjectionTime <- function(x, method='trellis'){
   if (method == 'trellis'){
+    maxtimes <- x %>% 
+      dplyr::group_by(filename, MSOrder) %>% 
+      dplyr::summarise(maxima = max(IonInjectionTimems))
+    
+    figure <- ggplot(x, aes_string(x = "StartTime", y = "IonInjectionTimems")) +
+      geom_hline(data = maxtimes, aes_string(yintercept = "maxima"), colour = "red3", linetype = "longdash") +
+      geom_point(shape = ".") +
+      geom_line(stat = "smooth", method = "gam", formula = y ~ s(x, bs= "cs"), colour = "deepskyblue3", se = FALSE) +
+      facet_grid(filename ~ MSOrder, scales = "free") +
+      scale_y_continuous(breaks = scales::pretty_breaks((n = 8))) +
+      scale_x_continuous(breaks = scales::pretty_breaks((n = 8))) +
+      labs(title = "Injection time plot", subtitle = "Plotting injection time against retention time for MS and MSn level") +
+      labs(x = "Retentione Time [min]", y = "Injection Time [ms]") +
+      theme_light()
+    return(figure)
+  }
+  else if (method == 'violin'){
     figure <- ggplot(x, aes_string(x = "filename", y = "IonInjectionTimems")) +
       geom_violin() +
       facet_grid(MSOrder~.) +
@@ -1092,7 +1109,47 @@ PlotMassHeatmap <- function(x, method='trellis', bins = 80){ #rename to mass.hea
   p
 }
 # ----TechNote Figs----
-
+.overview <- function(prefix="primer"){
+  
+  WU <- getWU163763()
+  WU <- WU[WU$filename %in% unique(WU$filename)[1:2], ]
+  
+  lapply(ls("package:rawDiag")[grepl("Plot", ls("package:rawDiag"))], 
+         function(fn){
+           lapply(c('trellis', 'violin', 'overlay'), function(a){
+             pngFileName <- paste(paste(prefix, fn, a, sep='-'), "png", sep='.')
+             
+             message(pngFileName)
+             
+             if (!file.exists(pngFileName)){
+               gp <- get(fn)(WU, a)  +
+                 theme(legend.position = 'none') + 
+                 theme(axis.line=element_blank(),
+                       axis.text.x=element_blank(),
+                       axis.text.y=element_blank(),
+                       axis.ticks=element_blank(),
+                       axis.title.x=element_blank(),
+                       axis.title.y=element_blank(),
+                       legend.position="none",
+                       panel.background=element_blank(),
+                       panel.border=element_blank(),
+                       panel.grid.major=element_blank(),
+                       panel.grid.minor=element_blank(),
+                       plot.background=element_blank()) +
+                 theme(plot.title = element_blank()) +
+                 theme(plot.subtitle = element_blank()) +
+                 theme(strip.background = element_blank()) +
+                 theme(strip.text = element_blank())
+               if (!is.null(gp)){
+                 png(pngFileName, 200, 200)
+                 print(gp)
+                 dev.off()}
+             }
+           })}
+         
+  )
+  
+}
 .technote_benchmark_figure_1 <- function(){
   load(file.path(path.package(package = "rawDiag"),
                  file.path("extdata", "benchmark.RData")))
@@ -1619,24 +1676,6 @@ getWU163763 <- function(){
   return(figure)
 }
 
-.injection_times_facet <- function(x){
-  maxtimes <- x %>% 
-    dplyr::group_by(filename, MSOrder) %>% 
-    dplyr::summarise(maxima = max(IonInjectionTimems))
-  
-  figure <- ggplot(x, aes_string(x = "StartTime", y = "IonInjectionTimems")) +
-    geom_hline(data = maxtimes, aes_string(yintercept = "maxima"), colour = "red3", linetype = "longdash") +
-    geom_point(shape = ".") +
-    geom_line(stat = "smooth", method = "gam", formula = y ~ s(x, bs= "cs"), colour = "deepskyblue3", se = FALSE) +
-    facet_grid(filename ~ MSOrder, scales = "free") +
-    scale_y_continuous(breaks = scales::pretty_breaks((n = 8))) +
-    scale_x_continuous(breaks = scales::pretty_breaks((n = 8))) +
-    labs(title = "Injection time plot", subtitle = "Plotting injection time against retention time for MS and MSn level") +
-    labs(x = "Retentione Time [min]", y = "Injection Time [ms]") +
-    theme_light()
-  return(figure)
-}
-
 .ms2_frequency <- function(x){
   NoMS2 <- x %>% 
     dplyr::filter(MSOrder == "Ms") %>% 
@@ -1729,47 +1768,7 @@ getWU163763 <- function(){
 
 
 
-.overview <- function(prefix="primer"){
-  
-  WU <- getWU163763()
-  WU <- WU[WU$filename %in% unique(WU$filename)[1:2], ]
-  
-  lapply(ls("package:rawDiag")[grepl("Plot", ls("package:rawDiag"))], 
-           function(fn){
-             lapply(c('trellis', 'violin', 'overlay'), function(a){
-               pngFileName <- paste(paste(prefix, fn, a, sep='-'), "png", sep='.')
-               
-               message(pngFileName)
-               
-               if (!file.exists(pngFileName)){
-                 gp <- get(fn)(WU, a)  +
-                   theme(legend.position = 'none') + 
-                   theme(axis.line=element_blank(),
-                         axis.text.x=element_blank(),
-                         axis.text.y=element_blank(),
-                         axis.ticks=element_blank(),
-                         axis.title.x=element_blank(),
-                         axis.title.y=element_blank(),
-                         legend.position="none",
-                         panel.background=element_blank(),
-                         panel.border=element_blank(),
-                         panel.grid.major=element_blank(),
-                         panel.grid.minor=element_blank(),
-                         plot.background=element_blank()) +
-                   theme(plot.title = element_blank()) +
-                   theme(plot.subtitle = element_blank()) +
-                   theme(strip.background = element_blank()) +
-                   theme(strip.text = element_blank())
-                 if (!is.null(gp)){
-                   png(pngFileName, 200, 200)
-                   print(gp)
-                   dev.off()}
-               }
-             })}
-           
-  )
-  
-}
+
 
 #labs.title=element_blank(),
 
