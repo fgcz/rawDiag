@@ -1659,7 +1659,7 @@ getWU163763 <- function(){
 .overview <- function(prefix="primer"){
   
   WU <- getWU163763()
-   WU <- WU[WU$filename %in% unique(WU$filename)[1:2], ]
+  WU <- WU[WU$filename %in% unique(WU$filename)[1:2], ]
   
   lapply(ls("package:rawDiag")[grepl("Plot", ls("package:rawDiag"))], 
            function(fn){
@@ -1669,8 +1669,6 @@ getWU163763 <- function(){
                message(pngFileName)
                
                if (!file.exists(pngFileName)){
-                 
-                 
                  gp <- get(fn)(WU, a)  +
                    theme(legend.position = 'none') + 
                    theme(axis.line=element_blank(),
@@ -1684,7 +1682,9 @@ getWU163763 <- function(){
                          panel.border=element_blank(),
                          panel.grid.major=element_blank(),
                          panel.grid.minor=element_blank(),
-                         plot.background=element_blank())
+                         plot.background=element_blank()) +
+                   theme(plot.title = element_blank()) +
+                   theme(plot.subtitle = element_blank())
                  if (!is.null(gp)){
                    png(pngFileName, 240, 240)
                    print(gp)
@@ -1695,3 +1695,9 @@ getWU163763 <- function(){
   )
   
 }
+
+#labs.title=element_blank(),
+
+
+#labs(title = "Precursor mass to charge frequency plot ") +
+#  labs(subtitle = "Plotting frequency of precursor masses for each charge state") +
