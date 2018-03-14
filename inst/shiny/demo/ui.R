@@ -18,13 +18,13 @@ shinyUI(fluidPage(
   # Sidebar with a slider input for number of bins 
   sidebarLayout(
     sidebarPanel(
-      htmlOutput("cmd"),
-      htmlOutput("root"),
-       htmlOutput("rawfile"),
-      checkboxInput("usemono", "Use mono", TRUE),
-      sliderInput("mccores", "Cores",
-                  min = 1, max = 24,
-                  value = 12),
+      radioButtons("source", "Type of data source:",
+                   c("package" = "package",
+                     "filesystem" = "filesystem",
+                     "bfabric" = "bfabric")),
+      hr(),
+      htmlOutput("source"),
+      hr(),
       sliderInput("graphicsheight", "graphicsheight",
                   min = 480, max = 4096,
                   value = 512),

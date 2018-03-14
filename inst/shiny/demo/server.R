@@ -18,7 +18,20 @@ library(base64enc)
 # Define server logic required to draw a histogram
 shinyServer(function(input, output, session) {
   
-  values <- reactiveValues(pdfcontent=NULL, DATAROOT="/scratch/cpanse/")
+  values <- reactiveValues(pdfcontent=NULL,
+                           DATAROOT="/scratch/cpanse/",
+                           datadir = c("WU163230",
+                                        "WU163763",
+                                        "PXD006932/Exp3A",
+                                        "PXD006932/Exp3B",
+                                        "PXD006932/Exp6A",
+                                        "PXD006932/Exp6B",
+                                        "PXD006932/Exp7A",
+                                        "PXD006932/Exp7B",
+                                        "PXD006932/Exp8A",
+                                        "PXD006932/Exp8B",
+                                        "PXD006932/SA",
+                                        "cfortes_20180313_300um_WW"))
   
   getRawfiles <- reactive({
     list.files(file.path(values$DATAROOT,input$root))
@@ -46,51 +59,43 @@ shinyServer(function(input, output, session) {
     tabPanel("sessionInfo", verbatimTextOutput("sessionInfo"))
   )
   })
-  output$rawfile <- renderUI({
-    f <- getRawfiles()
+  
+  
+  output$source <- renderUI({
+    if (input$source == 'filesystem'){
+    
+      cmds <- c("~/RiderProjects/fgcz-raw/bin/Debug/fgcz_raw.exe",
+                "~cp/bin/fgcz_raw.exe",
+                paste(path.package(package = "rawDiag"), "exec/fgcz_raw.exe", sep="/"))
+      cmds <- sapply(cmds, function(x){if(file.exists(x)){x}else{NA}})
+      cmds <- cmds[!is.na(cmds)]
 
-    selectInput('rawfile', 'rawfile:', f[grep("raw$",f )], multiple = TRUE)
+      inputdir <- sapply(values$datadir, function(x){
+        if(file.exists(file.path(values$DATAROOT, x))){x}
+        else{NA}})
+   
+      f <- getRawfiles()
+      
+      list(
+        selectInput('root', 'root:', inputdir, multiple = FALSE),
+        selectInput('rawfile', 'rawfile:', f[grep("raw$",f )], multiple = TRUE),
+        selectInput('cmd', 'cmd:', cmds, multiple = FALSE),
+        checkboxInput("usemono", "Use mono", TRUE),
+        sliderInput("mccores", "Cores",
+                    min = 1, max = 24,
+                    value = 12))
+      
+    } else if (input$source == 'package') {
+      
+      RDataFiles <- list.files(file.path(path.package(package = "rawDiag"), "extdata"))
+      
+      list(
+        selectInput('RData', 'RData:',  RDataFiles, multiple = FALSE)
+      )
+    } else{
+      NULL
+    }
   })
-  
-  output$cmd <- renderUI({
-  cmds <- c("~/RiderProjects/fgcz-raw/bin/Debug/fgcz_raw.exe",
-            "~cp/bin/fgcz_raw.exe",
-            paste(path.package(package = "rawDiag"), "exec/fgcz_raw.exe", sep="/"))
-  
-  cmds <- sapply(cmds, function(x){if(file.exists(x)){x}else{NA}})
-  
-  cmds <- cmds[!is.na(cmds)]
-  
-  selectInput('cmd', 'cmd:', cmds, multiple = FALSE)
-    
-  })
-  
-  output$root <- renderUI({
-    
-    
-    datadir <- c("WU163230",
-                  "WU163763",
-                  "PXD006932/Exp3A",
-                  "PXD006932/Exp3B",
-                  "PXD006932/Exp6A",
-                  "PXD006932/Exp6B",
-                  "PXD006932/Exp7A",
-                  "PXD006932/Exp7B",
-                  "PXD006932/Exp8A",
-                  "PXD006932/Exp8B",
-                  "PXD006932/SA")
-    
-    
-    
-    inputdir <- sapply(datadir, function(x){
-      if(file.exists(file.path(values$DATAROOT, x))){x}else{NA}})
-    
-    # inputdir <-inputdir[!is.na(inputdir)]
-    
-    selectInput('root', 'root:', inputdir, multiple = FALSE)
-  })
-  
-  
   
   output$render <- renderUI({
     
@@ -180,12 +185,22 @@ shinyServer(function(input, output, session) {
     progress$set(message = paste("loading MS data"))
     on.exit(progress$close())
     
-    rf <- file.path(values$DATAROOT, file.path(input$root, input$rawfile))
-
-    plyr::rbind.fill(mclapply(rf,
-                              function(file){ 
-                                read.raw(file, mono=input$usemono, exe=input$cmd) },
-                              mc.cores = input$mccores))
+    if (input$source == 'filesystem'){
+      rf <- file.path(values$DATAROOT, file.path(input$root, input$rawfile))
+      rv <- plyr::rbind.fill(mclapply(rf,
+                                      function(file){ 
+                                        read.raw(file, mono=input$usemono, exe=input$cmd) },
+                                      mc.cores = input$mccores))}
+    else if(input$source == 'package'){
+      rv <- NULL
+      fn <- file.path(file.path(path.package(package = "rawDiag"), "extdata"),
+                      input$RData)
+      ne <- new.env()
+      load(fn, ne)
+      rv <- ne[[ls(ne)]]
+    }else{rv <- NULL}
+    
+    rv
   })
   
   # rawDataInfo----
