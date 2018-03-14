@@ -13,7 +13,7 @@ library(shiny)
 shinyUI(fluidPage(
   
   # Application title
-  titlePanel("rawfileQC"),
+  titlePanel(paste("rawDiag-demo", "version", packageVersion('rawDiag'))),
   
   # Sidebar with a slider input for number of bins 
   sidebarLayout(
@@ -29,12 +29,12 @@ shinyUI(fluidPage(
                   min = 480, max = 4096,
                   value = 512),
       radioButtons("plottype", "Type of diagnostic plot:",
-                   c("trellis" = "opt1",
-                     "violin" = "opt2",
-                     "overlay" = "opt3")),
+                   c("trellis" = "trellis",
+                     "violin" = "violin",
+                     "overlay" = "overlay")),
        actionButton("load", "load"),
       actionButton("save", "save"),
-       htmlOutput("render"),
+      # htmlOutput("render"),
       htmlOutput("downloadLinkButton")
        
     ),
