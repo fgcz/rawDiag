@@ -17,10 +17,10 @@ library(base64enc)
 
 # Define server logic required to draw a histogram
 shinyServer(function(input, output, session) {
-  
+# ----Configuration----  
   values <- reactiveValues(pdfcontent=NULL,
-                           DATAROOT="/scratch/cpanse/",
-                           datadir = c("WU163230",
+                           filesystemRoot="/scratch/cpanse/",
+                           filesystemDataDir = c("WU163230",
                                         "WU163763",
                                         "PXD006932/Exp3A",
                                         "PXD006932/Exp3B",
@@ -31,16 +31,16 @@ shinyServer(function(input, output, session) {
                                         "PXD006932/Exp8A",
                                         "PXD006932/Exp8B",
                                         "PXD006932/SA",
-                                        "cfortes_20180313_300um_WW"))
+                                        "cfortes_20180313_300um_WW"),
+                           RDataRoot = file.path(path.package(package = "rawDiag"), "extdata"),
+                           RDataData = c("WU163763.RData", "WU163230.RData", "PXD006932_Exp3A_smp.RData"))
   
-  getRawfiles <- reactive({
-    list.files(file.path(values$DATAROOT,input$root))
-  })
+
   
   
   output$tabs <- renderUI({
   
-#---- tabsetPanel ----
+# ----tabsetPanel ----
   tabsetPanel(
     tabPanel("tic.basepeak", plotOutput("tic.basepeak", height = input$graphicsheight)),
     tabPanel("scan.frequency", plotOutput("scan.frequency", height = input$graphicsheight)),
@@ -60,7 +60,10 @@ shinyServer(function(input, output, session) {
   )
   })
   
-  
+  getRawfiles <- reactive({
+    list.files(file.path(values$filesystemRoot,input$root))
+  })
+# ----Source----  
   output$source <- renderUI({
     if (input$source == 'filesystem'){
     
@@ -69,16 +72,12 @@ shinyServer(function(input, output, session) {
                 paste(path.package(package = "rawDiag"), "exec/fgcz_raw.exe", sep="/"))
       cmds <- sapply(cmds, function(x){if(file.exists(x)){x}else{NA}})
       cmds <- cmds[!is.na(cmds)]
-
-      inputdir <- sapply(values$datadir, function(x){
-        if(file.exists(file.path(values$DATAROOT, x))){x}
-        else{NA}})
    
       f <- getRawfiles()
       
       list(
-        selectInput('root', 'root:', inputdir, multiple = FALSE),
-        selectInput('rawfile', 'rawfile:', f[grep("raw$",f )], multiple = TRUE),
+        selectInput('root', 'root:', values$filesystemDataDir, multiple = FALSE),
+        selectInput('rawfile', 'rawfile:', f[grep("raw$", f)], multiple = TRUE),
         selectInput('cmd', 'cmd:', cmds, multiple = FALSE),
         checkboxInput("usemono", "Use mono", TRUE),
         sliderInput("mccores", "Cores",
@@ -87,11 +86,8 @@ shinyServer(function(input, output, session) {
       
     } else if (input$source == 'package') {
       
-      RDataFiles <- list.files(file.path(path.package(package = "rawDiag"), "extdata"))
-      
-      list(
-        selectInput('RData', 'RData:',  RDataFiles, multiple = FALSE)
-      )
+      #RDataFiles <- file.path(values$RDataRoot, values$RDataData)
+        selectInput('RData', 'RData:',  values$RDataData, multiple = FALSE)
     } else{
       NULL
     }
@@ -178,7 +174,7 @@ shinyServer(function(input, output, session) {
   })
   
   pdfFileName <- reactive({tempfile(fileext = ".pdf")})
-  
+  # ----- rawData -------
   rawData <- eventReactive(input$load, {
     
     progress <- shiny::Progress$new(session = session, min = 0, max = 1)
@@ -193,8 +189,7 @@ shinyServer(function(input, output, session) {
                                       mc.cores = input$mccores))}
     else if(input$source == 'package'){
       rv <- NULL
-      fn <- file.path(file.path(path.package(package = "rawDiag"), "extdata"),
-                      input$RData)
+      fn <- file.path(values$RDataRoot, input$RData)
       ne <- new.env()
       load(fn, ne)
       rv <- ne[[ls(ne)]]
@@ -331,7 +326,7 @@ shinyServer(function(input, output, session) {
       progress$set(message = "plotting", detail = "mass.heatmap")
       on.exit(progress$close())
       
-      PlotMassHeatmap(rawData())
+      PlotMassHeatmap(rawData(), bins = input$hexbinsize)
     }
   })
   
@@ -343,7 +338,7 @@ shinyServer(function(input, output, session) {
       progress$set(message = "plotting", detail = "precursor.heatmap")
       on.exit(progress$close())
       
-      PlotPrecursorHeatmap(rawData())
+      PlotPrecursorHeatmap(rawData(), bins = input$hexbinsize)
     }
   })
   
