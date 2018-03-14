@@ -780,6 +780,23 @@ PlotScanTime <- function(x, method='trellis'){
 #' @export PlotInjectionTime
 PlotInjectionTime <- function(x, method='trellis'){
   if (method == 'trellis'){
+    maxtimes <- x %>% 
+      dplyr::group_by(filename, MSOrder) %>% 
+      dplyr::summarise(maxima = max(IonInjectionTimems))
+    
+    figure <- ggplot(x, aes_string(x = "StartTime", y = "IonInjectionTimems")) +
+      geom_hline(data = maxtimes, aes_string(yintercept = "maxima"), colour = "red3", linetype = "longdash") +
+      geom_point(shape = ".") +
+      geom_line(stat = "smooth", method = "gam", formula = y ~ s(x, bs= "cs"), colour = "deepskyblue3", se = FALSE) +
+      facet_grid(filename ~ MSOrder, scales = "free") +
+      scale_y_continuous(breaks = scales::pretty_breaks((n = 8))) +
+      scale_x_continuous(breaks = scales::pretty_breaks((n = 8))) +
+      labs(title = "Injection time plot", subtitle = "Plotting injection time against retention time for MS and MSn level") +
+      labs(x = "Retentione Time [min]", y = "Injection Time [ms]") +
+      theme_light()
+    return(figure)
+  }
+  else if (method == 'violin'){
     figure <- ggplot(x, aes_string(x = "filename", y = "IonInjectionTimems")) +
       geom_violin() +
       facet_grid(MSOrder~.) +
@@ -1018,8 +1035,121 @@ PlotMassHeatmap <- function(x, method='trellis', bins = 80){ #rename to mass.hea
       coord_cartesian(ylim = c(500, 10000))}else{NULL}
 }
 
+# ----Letter Figs----
+.letter_figure1 <- function(){
+  exactScanSpeedEst <- 
+    function(nMS1 = 1, tMS1 = 138/1000 , nMS2 = 18 , tMS2 = 24/1000){ 
+      (1 / (nMS1 * tMS1 + nMS2 * tMS2)) * nMS2 
+    }
+  
+  roughScanSpeedEst <- 
+    function(nMS2 = 1, tMS2 = 64/1000){ 
+      1 / rep(tMS2, length(nMS2))
+    }
+  
+  exactScanSpeedEstR15 <- 
+    function(nMS1 = 1, tMS1 = 138/1000 , nMS2 = 18 , tMS2 = 35/1000){ 
+      (1 / (nMS1 * tMS1 + nMS2 * tMS2)) * nMS2 
+    }
+  
+  roughScanSpeedEst <- 
+    function(nMS2 = 1, tMS2 = 64/1000 ){ 
+      1 / rep(tMS2, length(nMS2))
+    }
+  
+  nMS2 <- c(12, 18, 36, 72, 72:120)
+  
+  ScanSpeed <- rbind(
+    data.frame(nMS2 = nMS2, 
+               scanSpeed = exactScanSpeedEst(nMS2 = nMS2, 
+                                             tMS2 = 24/1000), 
+               func = 'exact', R=7500),
+    data.frame(nMS2 = nMS2, 
+               scanSpeed = exactScanSpeedEst(nMS2 = nMS2, 
+                                             tMS2 = 35/1000), 
+               func = 'exact', R=15000),
+    data.frame(nMS2 = nMS2, 
+               scanSpeed = roughScanSpeedEst(nMS2 = nMS2, 
+                                             tMS2 = 24/1000), 
+               func = 'rough', R=7500),
+    data.frame(nMS2 = nMS2, 
+               scanSpeed = roughScanSpeedEst(nMS2 = nMS2, 
+                                             tMS2 = 35/1000), 
+               func = 'rough', R=15000))
+  
+  stopifnot(require(lattice))
+  cv <- 1-1:7/10
+  t<-trellis.par.get("strip.background")
+  t$col<-(rgb(cv,cv,cv))
+  trellis.par.set("strip.background",t)
+  # MScanSpeed <- c(20.09654, 30.24786)
+  
+  MScanSpeed <- list(
+    R15000 <- c(20.3239509105305,20.3273087594134,20.3226444972288,20.0798890164562,20.066800689259,20.042351139192,19.5538114059853,19.4682387272898,19.3874799962346,20.5326530612245,20.5255102040816,20.527806122449),
+    R7500 <- c(30.6791765637371,30.7659144893112,30.6657957244656,29.6024506988321,29.5382730231668,29.530078498947,28.2862130623,28.2683987574132,28.1165489974583,32.4190476190476,32.5380102040816,32.5643707482993))
+  
+  p <- xyplot(scanSpeed ~ nMS2|paste("R =",R), group=func, data=ScanSpeed, 
+         ylim=c(min(MScanSpeed[[1]])-1,45),
+         xlab=expression(n[MS2]),
+         ylab=expression(f[MS2]),
+         type='b',
+         auto.key = list(columns=2),
+         panel = function(x, y, ...) {
+           panel.grid(h=-1, v=-1)
+           panel.xyplot(x, y, ...)
+           pn = panel.number()
+           panel.points(rep(12, length(MScanSpeed[[pn]])), MScanSpeed[[pn]], pch=16, col='black',cex=0.5)
+           panel.points(12, mean(MScanSpeed[[pn]]), cex=4, pch='-', col='black')
+         },
+         scales=list(
+           x=list(
+             at=nMS2[1:3]
+           )
+         ))
+  p
+}
 # ----TechNote Figs----
-
+.overview <- function(prefix="primer"){
+  
+  WU <- getWU163763()
+  WU <- WU[WU$filename %in% unique(WU$filename)[1:2], ]
+  
+  lapply(ls("package:rawDiag")[grepl("Plot", ls("package:rawDiag"))], 
+         function(fn){
+           lapply(c('trellis', 'violin', 'overlay'), function(a){
+             pngFileName <- paste(paste(prefix, fn, a, sep='-'), "png", sep='.')
+             
+             message(pngFileName)
+             
+             if (!file.exists(pngFileName)){
+               gp <- get(fn)(WU, a)  +
+                 theme(legend.position = 'none') + 
+                 theme(axis.line=element_blank(),
+                       axis.text.x=element_blank(),
+                       axis.text.y=element_blank(),
+                       axis.ticks=element_blank(),
+                       axis.title.x=element_blank(),
+                       axis.title.y=element_blank(),
+                       legend.position="none",
+                       panel.background=element_blank(),
+                       panel.border=element_blank(),
+                       panel.grid.major=element_blank(),
+                       panel.grid.minor=element_blank(),
+                       plot.background=element_blank()) +
+                 theme(plot.title = element_blank()) +
+                 theme(plot.subtitle = element_blank()) +
+                 theme(strip.background = element_blank()) +
+                 theme(strip.text = element_blank())
+               if (!is.null(gp)){
+                 png(pngFileName, 200, 200)
+                 print(gp)
+                 dev.off()}
+             }
+           })}
+         
+  )
+  
+}
 .technote_benchmark_figure_1 <- function(){
   load(file.path(path.package(package = "rawDiag"),
                  file.path("extdata", "benchmark.RData")))
@@ -1296,7 +1426,7 @@ gp <- ggplot(rbind(b.Linux, b.Apple), aes(y=IO.throuput, x=ncpu, group=ncpu)) +
     labs(title = "D") +
     labs(x = "TopN ", y = "Counts") +
     annotate("text", x = "36", y =80000, label = "# PSM", colour = "#2171B5", size = 8)+
-    annotate("text", x = "36", y = 110000, label = "# Ms2 Scans", colour ="#D94801", size = 8)+
+    annotate("text", x = "36", y = 110000, label = "# MS2 Scans", colour ="#D94801", size = 8)+
     scale_y_continuous(breaks = scales::pretty_breaks(5))+
     scale_color_manual(values = c("#2171B5", "#D94801"))+
     theme_light() +
@@ -1546,24 +1676,6 @@ getWU163763 <- function(){
   return(figure)
 }
 
-.injection_times_facet <- function(x){
-  maxtimes <- x %>% 
-    dplyr::group_by(filename, MSOrder) %>% 
-    dplyr::summarise(maxima = max(IonInjectionTimems))
-  
-  figure <- ggplot(x, aes_string(x = "StartTime", y = "IonInjectionTimems")) +
-    geom_hline(data = maxtimes, aes_string(yintercept = "maxima"), colour = "red3", linetype = "longdash") +
-    geom_point(shape = ".") +
-    geom_line(stat = "smooth", method = "gam", formula = y ~ s(x, bs= "cs"), colour = "deepskyblue3", se = FALSE) +
-    facet_grid(filename ~ MSOrder, scales = "free") +
-    scale_y_continuous(breaks = scales::pretty_breaks((n = 8))) +
-    scale_x_continuous(breaks = scales::pretty_breaks((n = 8))) +
-    labs(title = "Injection time plot", subtitle = "Plotting injection time against retention time for MS and MSn level") +
-    labs(x = "Retentione Time [min]", y = "Injection Time [ms]") +
-    theme_light()
-  return(figure)
-}
-
 .ms2_frequency <- function(x){
   NoMS2 <- x %>% 
     dplyr::filter(MSOrder == "Ms") %>% 
@@ -1656,45 +1768,7 @@ getWU163763 <- function(){
 
 
 
-.overview <- function(prefix="primer"){
-  
-  WU <- getWU163763()
-  WU <- WU[WU$filename %in% unique(WU$filename)[1:2], ]
-  
-  lapply(ls("package:rawDiag")[grepl("Plot", ls("package:rawDiag"))], 
-           function(fn){
-             lapply(c('trellis', 'violin', 'overlay'), function(a){
-               pngFileName <- paste(paste(prefix, fn, a, sep='-'), "png", sep='.')
-               
-               message(pngFileName)
-               
-               if (!file.exists(pngFileName)){
-                 gp <- get(fn)(WU, a)  +
-                   theme(legend.position = 'none') + 
-                   theme(axis.line=element_blank(),
-                         axis.text.x=element_blank(),
-                         axis.text.y=element_blank(),
-                         axis.ticks=element_blank(),
-                         axis.title.x=element_blank(),
-                         axis.title.y=element_blank(),
-                         legend.position="none",
-                         panel.background=element_blank(),
-                         panel.border=element_blank(),
-                         panel.grid.major=element_blank(),
-                         panel.grid.minor=element_blank(),
-                         plot.background=element_blank()) +
-                   theme(plot.title = element_blank()) +
-                   theme(plot.subtitle = element_blank())
-                 if (!is.null(gp)){
-                   png(pngFileName, 240, 240)
-                   print(gp)
-                   dev.off()}
-               }
-             })}
-           
-  )
-  
-}
+
 
 #labs.title=element_blank(),
 
