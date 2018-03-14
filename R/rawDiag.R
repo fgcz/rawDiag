@@ -1296,7 +1296,7 @@ gp <- ggplot(rbind(b.Linux, b.Apple), aes(y=IO.throuput, x=ncpu, group=ncpu)) +
     labs(title = "D") +
     labs(x = "TopN ", y = "Counts") +
     annotate("text", x = "36", y =80000, label = "# PSM", colour = "#2171B5", size = 8)+
-    annotate("text", x = "36", y = 110000, label = "# Ms2 Scans", colour ="#D94801", size = 8)+
+    annotate("text", x = "36", y = 110000, label = "# MS2 Scans", colour ="#D94801", size = 8)+
     scale_y_continuous(breaks = scales::pretty_breaks(5))+
     scale_color_manual(values = c("#2171B5", "#D94801"))+
     theme_light() +
