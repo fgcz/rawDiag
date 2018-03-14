@@ -1102,8 +1102,11 @@ PlotMassHeatmap <- function(x, method='trellis', bins = 80){ #rename to mass.hea
            panel.points(12, mean(MScanSpeed[[pn]]), cex=4, pch='-', col='black')
          },
          scales=list(
+          
            x=list(
-             at=nMS2[1:3]
+             #tck=c(12, 18, 72, 120),
+             #at=nMS2[1:3]
+             at = c(12, 18, 72, 120)
            )
          ))
   p
