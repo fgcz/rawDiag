@@ -6,7 +6,7 @@ Authors@R: c(person("Christian", "Panse", email = "cp@fgcz.ethz.ch", role = c("a
         comment = c(ORCID = "0000-0003-1975-3064")),
 	person("Christian", "Trachsel", email = "Christian.Trachsel@fgcz.ethz.ch", role = "aut", "cre"))
 Author: Christian Panse [aut] (0000-0003-1975-3064),
-	Christian Trachsel [aut, cre] (0000-0002-6899-9020),
+	Christian Trachsel [aut, cre]
 Maintainer: Christian Panse <cp@fgcz.ethz.ch>
 Depends: R (>= 3.3),
 	methods
@@ -31,3 +31,4 @@ Encoding: UTF-8
 LazyData: true
 NeedsCompilation: no
 RoxygenNote: 6.0.1
+VignetteBuilder: knitr
