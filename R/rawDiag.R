@@ -1688,7 +1688,7 @@ getWU163763 <- function(){
                    theme(strip.background = element_blank()) +
                    theme(strip.text = element_blank())
                  if (!is.null(gp)){
-                   png(pngFileName, 200, 200)
+                   png(pngFileName, 240, 240)
                    print(gp)
                    dev.off()}
                }
