@@ -27,6 +27,7 @@ shinyUI(fluidPage(
       br(),
       hr(),
       htmlOutput("source"),
+      actionButton("load", "load"),
       hr(),
       
       sliderInput("graphicsheight", "graphicsheight",
@@ -37,7 +38,7 @@ shinyUI(fluidPage(
                    c("trellis" = "trellis",
                      "violin" = "violin",
                      "overlay" = "overlay")),
-       actionButton("load", "load"),
+      
       actionButton("save", "save"),
       # htmlOutput("render"),
       htmlOutput("downloadLinkButton")

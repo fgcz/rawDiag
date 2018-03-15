@@ -59,25 +59,35 @@ shinyServer(function(input, output, session) {
     tabPanel("sessionInfo", verbatimTextOutput("sessionInfo"))
   )
   })
-  
+   
+ 
   getRawfiles <- reactive({
-    list.files(file.path(values$filesystemRoot,input$root))
+    message(file.path(values$filesystemRoot, input$root))
+    
+    f <- list.files(file.path("/scratch/cpanse/",input$root))
+    f[grep("raw$", f)]
+  })
+  
+  
+  output$rawfile <- renderUI({
+    selectInput('rawfile', 'rawfile:', getRawfiles(), multiple = TRUE)
   })
 # ----Source----  
   output$source <- renderUI({
     if (input$source == 'filesystem'){
-    
       cmds <- c("~/RiderProjects/fgcz-raw/bin/Debug/fgcz_raw.exe",
                 "~cp/bin/fgcz_raw.exe",
                 paste(path.package(package = "rawDiag"), "exec/fgcz_raw.exe", sep="/"))
       cmds <- sapply(cmds, function(x){if(file.exists(x)){x}else{NA}})
       cmds <- cmds[!is.na(cmds)]
-   
-      f <- getRawfiles()
+    
+    
+      
       
       list(
         selectInput('root', 'root:', values$filesystemDataDir, multiple = FALSE),
-        selectInput('rawfile', 'rawfile:', f[grep("raw$", f)], multiple = TRUE),
+        htmlOutput('rawfile'),
+        hr(),
         selectInput('cmd', 'cmd:', cmds, multiple = FALSE),
         checkboxInput("usemono", "Use mono", TRUE),
         sliderInput("mccores", "Cores",
@@ -85,8 +95,6 @@ shinyServer(function(input, output, session) {
                     value = 12))
       
     } else if (input$source == 'package') {
-      
-      #RDataFiles <- file.path(values$RDataRoot, values$RDataData)
         selectInput('RData', 'RData:',  values$RDataData, multiple = FALSE)
     } else{
       NULL
@@ -174,6 +182,7 @@ shinyServer(function(input, output, session) {
   })
   
   pdfFileName <- reactive({tempfile(fileext = ".pdf")})
+  
   # ----- rawData -------
   rawData <- eventReactive(input$load, {
     
@@ -182,7 +191,8 @@ shinyServer(function(input, output, session) {
     on.exit(progress$close())
     
     if (input$source == 'filesystem'){
-      rf <- file.path(values$DATAROOT, file.path(input$root, input$rawfile))
+      rf <- file.path(values$filesystemRoot, file.path(input$root, input$rawfile))
+      
       rv <- plyr::rbind.fill(mclapply(rf,
                                       function(file){ 
                                         read.raw(file, mono=input$usemono, exe=input$cmd) },

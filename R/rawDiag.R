@@ -1111,6 +1111,7 @@ PlotMassHeatmap <- function(x, method='trellis', bins = 80){ #rename to mass.hea
          ))
   p
 }
+
 # ----TechNote Figs----
 .overview <- function(prefix="primer"){
   
@@ -1144,15 +1145,15 @@ PlotMassHeatmap <- function(x, method='trellis', bins = 80){ #rename to mass.hea
                  theme(strip.background = element_blank()) +
                  theme(strip.text = element_blank())
                if (!is.null(gp)){
-                 png(pngFileName, 200, 200)
+                 png(pngFileName, 240, 240)
                  print(gp)
                  dev.off()}
              }
            })}
          
   )
-  
 }
+
 .technote_benchmark_figure_1 <- function(){
   load(file.path(path.package(package = "rawDiag"),
                  file.path("extdata", "benchmark.RData")))
@@ -1771,10 +1772,48 @@ getWU163763 <- function(){
 
 
 
-
+.overview_ <- function(prefix="primer"){
+  
+  WU <- getWU163763()
+  WU <- WU[WU$filename %in% unique(WU$filename)[1:2], ]
+  
+  lapply(ls("package:rawDiag")[grepl("Plot", ls("package:rawDiag"))], 
+           function(fn){
+             lapply(c('trellis', 'violin', 'overlay'), function(a){
+               pngFileName <- paste(paste(prefix, fn, a, sep='-'), "png", sep='.')
+               
+               message(pngFileName)
+               
+               if (!file.exists(pngFileName)){
+                 gp <- get(fn)(WU, a)  +
+                   theme(legend.position = 'none') + 
+                   theme(axis.line=element_blank(),
+                         axis.text.x=element_blank(),
+                         axis.text.y=element_blank(),
+                         axis.ticks=element_blank(),
+                         axis.title.x=element_blank(),
+                         axis.title.y=element_blank(),
+                         legend.position="none",
+                         panel.background=element_blank(),
+                         panel.border=element_blank(),
+                         panel.grid.major=element_blank(),
+                         panel.grid.minor=element_blank(),
+                         plot.background=element_blank()) +
+                   theme(plot.title = element_blank()) +
+                   theme(plot.subtitle = element_blank()) +
+                   theme(strip.background = element_blank()) +
+                   theme(strip.text = element_blank())
+                 if (!is.null(gp)){
+                   png(pngFileName, 240, 240)
+                   print(gp)
+                   dev.off()}
+               }
+             })}
+           
+  )
+  
+}
 
 #labs.title=element_blank(),
-
-
 #labs(title = "Precursor mass to charge frequency plot ") +
 #  labs(subtitle = "Plotting frequency of precursor masses for each charge state") +
