@@ -1106,7 +1106,7 @@ PlotMassHeatmap <- function(x, method='trellis', bins = 80){ #rename to mass.hea
            x=list(
              #tck=c(12, 18, 72, 120),
              #at=nMS2[1:3]
-             at = c(12, 18, 72, 120)
+             at = c(12, 18, 36, 72, 120)
            )
          ))
   p
