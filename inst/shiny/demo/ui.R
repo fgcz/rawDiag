@@ -17,22 +17,28 @@ shinyUI(fluidPage(
   
   # Sidebar with a slider input for number of bins 
   sidebarLayout(
-    sidebarPanel(
-      htmlOutput("cmd"),
-      htmlOutput("root"),
-       htmlOutput("rawfile"),
-      checkboxInput("usemono", "Use mono", TRUE),
-      sliderInput("mccores", "Cores",
-                  min = 1, max = 24,
-                  value = 12),
+    sidebarPanel( 
+      
+      img(src='octopussy.png ', align = "right"),
+      radioButtons("source", "Type of data source:",
+                   c("package" = "package",
+                     "filesystem" = "filesystem",
+                     "bfabric" = "bfabric")),
+      br(),
+      hr(),
+      htmlOutput("source"),
+      actionButton("load", "load"),
+      hr(),
+      
       sliderInput("graphicsheight", "graphicsheight",
                   min = 480, max = 4096,
                   value = 512),
+      sliderInput("hexbinsize", "hexbinsize", min = 1, max = 512, value = 80),
       radioButtons("plottype", "Type of diagnostic plot:",
                    c("trellis" = "trellis",
                      "violin" = "violin",
                      "overlay" = "overlay")),
-       actionButton("load", "load"),
+      
       actionButton("save", "save"),
       # htmlOutput("render"),
       htmlOutput("downloadLinkButton")

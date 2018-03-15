@@ -17,17 +17,30 @@ library(base64enc)
 
 # Define server logic required to draw a histogram
 shinyServer(function(input, output, session) {
+# ----Configuration----  
+  values <- reactiveValues(pdfcontent=NULL,
+                           filesystemRoot="/scratch/cpanse/",
+                           filesystemDataDir = c("WU163230",
+                                        "WU163763",
+                                        "PXD006932/Exp3A",
+                                        "PXD006932/Exp3B",
+                                        "PXD006932/Exp6A",
+                                        "PXD006932/Exp6B",
+                                        "PXD006932/Exp7A",
+                                        "PXD006932/Exp7B",
+                                        "PXD006932/Exp8A",
+                                        "PXD006932/Exp8B",
+                                        "PXD006932/SA",
+                                        "cfortes_20180313_300um_WW"),
+                           RDataRoot = file.path(path.package(package = "rawDiag"), "extdata"),
+                           RDataData = c("WU163763.RData", "WU163230.RData", "PXD006932_Exp3A_smp.RData"))
   
-  values <- reactiveValues(pdfcontent=NULL, DATAROOT="/scratch/cpanse/")
-  
-  getRawfiles <- reactive({
-    list.files(file.path(values$DATAROOT,input$root))
-  })
+
   
   
   output$tabs <- renderUI({
   
-#---- tabsetPanel ----
+# ----tabsetPanel ----
   tabsetPanel(
     tabPanel("tic.basepeak", plotOutput("tic.basepeak", height = input$graphicsheight)),
     tabPanel("scan.frequency", plotOutput("scan.frequency", height = input$graphicsheight)),
@@ -46,51 +59,47 @@ shinyServer(function(input, output, session) {
     tabPanel("sessionInfo", verbatimTextOutput("sessionInfo"))
   )
   })
+   
+ 
+  getRawfiles <- reactive({
+    message(file.path(values$filesystemRoot, input$root))
+    
+    f <- list.files(file.path("/scratch/cpanse/",input$root))
+    f[grep("raw$", f)]
+  })
+  
+  
   output$rawfile <- renderUI({
-    f <- getRawfiles()
-
-    selectInput('rawfile', 'rawfile:', f[grep("raw$",f )], multiple = TRUE)
+    selectInput('rawfile', 'rawfile:', getRawfiles(), multiple = TRUE)
   })
-  
-  output$cmd <- renderUI({
-  cmds <- c("~/RiderProjects/fgcz-raw/bin/Debug/fgcz_raw.exe",
-            "~cp/bin/fgcz_raw.exe",
-            paste(path.package(package = "rawDiag"), "exec/fgcz_raw.exe", sep="/"))
-  
-  cmds <- sapply(cmds, function(x){if(file.exists(x)){x}else{NA}})
-  
-  cmds <- cmds[!is.na(cmds)]
-  
-  selectInput('cmd', 'cmd:', cmds, multiple = FALSE)
+# ----Source----  
+  output$source <- renderUI({
+    if (input$source == 'filesystem'){
+      cmds <- c("~/RiderProjects/fgcz-raw/bin/Debug/fgcz_raw.exe",
+                "~cp/bin/fgcz_raw.exe",
+                paste(path.package(package = "rawDiag"), "exec/fgcz_raw.exe", sep="/"))
+      cmds <- sapply(cmds, function(x){if(file.exists(x)){x}else{NA}})
+      cmds <- cmds[!is.na(cmds)]
     
+    
+      
+      
+      list(
+        selectInput('root', 'root:', values$filesystemDataDir, multiple = FALSE),
+        htmlOutput('rawfile'),
+        hr(),
+        selectInput('cmd', 'cmd:', cmds, multiple = FALSE),
+        checkboxInput("usemono", "Use mono", TRUE),
+        sliderInput("mccores", "Cores",
+                    min = 1, max = 24,
+                    value = 12))
+      
+    } else if (input$source == 'package') {
+        selectInput('RData', 'RData:',  values$RDataData, multiple = FALSE)
+    } else{
+      NULL
+    }
   })
-  
-  output$root <- renderUI({
-    
-    
-    datadir <- c("WU163230",
-                  "WU163763",
-                  "PXD006932/Exp3A",
-                  "PXD006932/Exp3B",
-                  "PXD006932/Exp6A",
-                  "PXD006932/Exp6B",
-                  "PXD006932/Exp7A",
-                  "PXD006932/Exp7B",
-                  "PXD006932/Exp8A",
-                  "PXD006932/Exp8B",
-                  "PXD006932/SA")
-    
-    
-    
-    inputdir <- sapply(datadir, function(x){
-      if(file.exists(file.path(values$DATAROOT, x))){x}else{NA}})
-    
-    # inputdir <-inputdir[!is.na(inputdir)]
-    
-    selectInput('root', 'root:', inputdir, multiple = FALSE)
-  })
-  
-  
   
   output$render <- renderUI({
     
@@ -174,18 +183,29 @@ shinyServer(function(input, output, session) {
   
   pdfFileName <- reactive({tempfile(fileext = ".pdf")})
   
+  # ----- rawData -------
   rawData <- eventReactive(input$load, {
     
     progress <- shiny::Progress$new(session = session, min = 0, max = 1)
     progress$set(message = paste("loading MS data"))
     on.exit(progress$close())
     
-    rf <- file.path(values$DATAROOT, file.path(input$root, input$rawfile))
-
-    plyr::rbind.fill(mclapply(rf,
-                              function(file){ 
-                                read.raw(file, mono=input$usemono, exe=input$cmd) },
-                              mc.cores = input$mccores))
+    if (input$source == 'filesystem'){
+      rf <- file.path(values$filesystemRoot, file.path(input$root, input$rawfile))
+      
+      rv <- plyr::rbind.fill(mclapply(rf,
+                                      function(file){ 
+                                        read.raw(file, mono=input$usemono, exe=input$cmd) },
+                                      mc.cores = input$mccores))}
+    else if(input$source == 'package'){
+      rv <- NULL
+      fn <- file.path(values$RDataRoot, input$RData)
+      ne <- new.env()
+      load(fn, ne)
+      rv <- ne[[ls(ne)]]
+    }else{rv <- NULL}
+    
+    rv
   })
   
   # rawDataInfo----
@@ -316,7 +336,7 @@ shinyServer(function(input, output, session) {
       progress$set(message = "plotting", detail = "mass.heatmap")
       on.exit(progress$close())
       
-      PlotMassHeatmap(rawData())
+      PlotMassHeatmap(rawData(), bins = input$hexbinsize)
     }
   })
   
@@ -328,7 +348,7 @@ shinyServer(function(input, output, session) {
       progress$set(message = "plotting", detail = "precursor.heatmap")
       on.exit(progress$close())
       
-      PlotPrecursorHeatmap(rawData())
+      PlotPrecursorHeatmap(rawData(), bins = input$hexbinsize)
     }
   })
   
