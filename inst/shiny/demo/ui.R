@@ -35,9 +35,9 @@ shinyUI(fluidPage(
                   value = 512),
       sliderInput("hexbinsize", "hexbinsize", min = 1, max = 512, value = 80),
       radioButtons("plottype", "Type of diagnostic plot:",
-                   c("trellis" = "trellis",
-                     "violin" = "violin",
-                     "overlay" = "overlay")),
+                   c("overlay" = "overlay",
+		     "trellis" = "trellis",
+                     "violin" = "violin")),
       
       actionButton("save", "save"),
       # htmlOutput("render"),

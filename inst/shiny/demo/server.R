@@ -33,7 +33,7 @@ shinyServer(function(input, output, session) {
                                         "PXD006932/SA",
                                         "cfortes_20180313_300um_WW"),
                            RDataRoot = file.path(path.package(package = "rawDiag"), "extdata"),
-                           RDataData = c("WU163763.RData", "WU163230.RData", "PXD006932_Exp3A_smp.RData"))
+                           RDataData = c("PXD006932_Exp3A.RData", "WU163763.RData", "WU163230.RData"))
   
 
   
@@ -264,8 +264,10 @@ shinyServer(function(input, output, session) {
     progress <- shiny::Progress$new(session = session, min = 0, max = 1)
     progress$set(message = "plotting", detail = "scan.frequency")
     on.exit(progress$close())
+
+    
     if (nrow(rawData()) > 0){
-      
+      #helpText("graphs scan frequency versus RT or scan frequency marginal distribution for violin."),
       PlotScanFrequency(rawData(), method = input$plottype)
     }
   })
