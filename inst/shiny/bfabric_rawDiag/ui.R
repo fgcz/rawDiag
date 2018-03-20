@@ -21,10 +21,6 @@ shinyUI(fluidPage(
     sidebarPanel( 
       
       img(src='octopussy.png ', align = "right"),
-      radioButtons("source", "Type of data source:",
-                   c("package" = "package",
-                     "filesystem" = "filesystem",
-                     "bfabric" = "bfabric")),
       br(),
       hr(),
       #htmlOutput("source"),

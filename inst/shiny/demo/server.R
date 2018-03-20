@@ -213,35 +213,8 @@ shinyServer(function(input, output, session) {
      progress <- shiny::Progress$new(session = session, min = 0, max = 1)
     progress$set(message = "loading info data")
     on.exit(progress$close())
-    
-    rf <- file.path(input$root, input$rawfile)
-    
-    df <- plyr::rbind.fill(mclapply(rf, function(x){
-      
-      cmd <- paste(input$cmd, x, "info") 
-      
-      if (input$usemono){
-        cmd <- paste("mono", cmd)
-      }
-      
-      message(paste("executing", cmd, "..."))
-      
-      info <- scan(pipe(cmd), what = character(), sep="\n")
-      
-      info <- gsub("^\ +", "", info)
-      idx <- which(grepl("filename|Instrument name|Number of scans|Time range|Mass range|Number of ms2 scans|Software version|RAW file version", info))
-      
-      info <- info[idx]
-      info <- do.call('rbind', strsplit(info, split = ": "))
-      info <- as.data.frame(info)
-      names(info) <- c('attribute', 'value')
-       
-      info$filename <- basename(x)
-      info
-    }, mc.cores = input$mccores))
-    
-    df <- (df %>% spread(attribute, value))
-    return(df)
+ 
+    return(summary.rawDiag(rawData()))
   })
   
   

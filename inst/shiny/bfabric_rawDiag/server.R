@@ -15,6 +15,7 @@ library(tidyr)
 library(rmarkdown)
 library(base64enc)
 library(bfabricShiny)
+library(parallel)
 
 # Define server logic required to draw a histogram
 shinyServer(function(input, output, session) {
@@ -199,22 +200,28 @@ shinyServer(function(input, output, session) {
     progress$set(message = paste("loading MS data"))
     on.exit(progress$close())
     
-    resources <- bf$resources()
+    resources <- bf$resources()$relativepath
     
-    print(file.path("/srv/www/htdocs/", resources))
-    ll <- FALSE
-    if (ll){
-    rf <- file.path(values$filesystemRoot, file.path(input$root, input$rawfile))
+    print(resources)
+    print(input$relativepath)
     
-    rv <- plyr::rbind.fill(mclapply(rf,
-                                    function(file){ 
-                                      read.raw(file, mono=input$usemono, exe=input$cmd) },
-                                    mc.cores = 8))
+    rf <- resources[resources %in% input$relativepath]
     
-    }
+    rf <- file.path("/srv/www/htdocs/", rf)
+  
+   
+    # print(rf)
+    # print(input$relativepath)
+    rv <- plyr::rbind.fill(
+      mclapply(rf, function(file){
+       
+        read.raw(file = file,
+                 mono = TRUE)
+        }, mc.cores = 24))
+
    
     
-    NULL
+    rv
   })
   
   # rawDataInfo----
@@ -223,34 +230,8 @@ shinyServer(function(input, output, session) {
     progress$set(message = "loading info data")
     on.exit(progress$close())
     
-    rf <- file.path(input$root, input$rawfile)
-    
-    df <- plyr::rbind.fill(mclapply(rf, function(x){
-      
-      cmd <- paste(input$cmd, x, "info") 
-      
-      if (input$usemono){
-        cmd <- paste("mono", cmd)
-      }
-      
-      message(paste("executing", cmd, "..."))
-      
-      info <- scan(pipe(cmd), what = character(), sep="\n")
-      
-      info <- gsub("^\ +", "", info)
-      idx <- which(grepl("filename|Instrument name|Number of scans|Time range|Mass range|Number of ms2 scans|Software version|RAW file version", info))
-      
-      info <- info[idx]
-      info <- do.call('rbind', strsplit(info, split = ": "))
-      info <- as.data.frame(info)
-      names(info) <- c('attribute', 'value')
-       
-      info$filename <- basename(x)
-      info
-    }, mc.cores = input$mccores))
-    
-    df <- (df %>% spread(attribute, value))
-    return(df)
+   
+    return(summary.rawDiag(rawData()))
   })
   
   
@@ -260,7 +241,7 @@ shinyServer(function(input, output, session) {
     progress$set(message = "plotting", detail = "tic.basepeak")
     on.exit(progress$close())
     
-    if (nrow(rawData()) > 0){
+    if (!is.null(rawData()) && nrow(rawData()) > 0){
       
       
       PlotTicBasepeak(rawData(), method = input$plottype)
