@@ -14,7 +14,7 @@ library(bfabricShiny)
 shinyUI(fluidPage(
   
   # Application title
-  titlePanel(paste("rawDiag-demo", "version", packageVersion('rawDiag'))),
+  titlePanel(paste("bfabric-rawDiag", "version", packageVersion('rawDiag'))),
   
   # Sidebar with a slider input for number of bins 
   sidebarLayout(
@@ -27,8 +27,9 @@ shinyUI(fluidPage(
                      "bfabric" = "bfabric")),
       br(),
       hr(),
-      htmlOutput("source"),
-      actionButton("load", "load"),
+      #htmlOutput("source"),
+      bfabricInput("bfabric8"),
+      # actionButton("load", "load"),
       hr(),
       
       sliderInput("graphicsheight", "graphicsheight",

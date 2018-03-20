@@ -18,6 +18,10 @@ library(bfabricShiny)
 
 # Define server logic required to draw a histogram
 shinyServer(function(input, output, session) {
+  bf <- callModule(bfabric, "bfabric8",
+                   applicationid = c(160, 161, 162, 163, 176, 177, 197, 214, 232),
+                   resoucepattern = 'raw$',
+                   resourcemultiple = TRUE)
   
   #bf <- callModule(bfabric, "bfabric8",  applicationid = c(168, 224), resoucepattern = 'zip$')
 # ----Configuration----  
@@ -188,29 +192,29 @@ shinyServer(function(input, output, session) {
   
   pdfFileName <- reactive({tempfile(fileext = ".pdf")})
   
-  # ----- rawData -------
+  # ----- load rawData -------
   rawData <- eventReactive(input$load, {
     
     progress <- shiny::Progress$new(session = session, min = 0, max = 1)
     progress$set(message = paste("loading MS data"))
     on.exit(progress$close())
     
-    if (input$source == 'filesystem'){
-      rf <- file.path(values$filesystemRoot, file.path(input$root, input$rawfile))
-      
-      rv <- plyr::rbind.fill(mclapply(rf,
-                                      function(file){ 
-                                        read.raw(file, mono=input$usemono, exe=input$cmd) },
-                                      mc.cores = input$mccores))}
-    else if(input$source == 'package'){
-      rv <- NULL
-      fn <- file.path(values$RDataRoot, input$RData)
-      ne <- new.env()
-      load(fn, ne)
-      rv <- ne[[ls(ne)]]
-    }else{rv <- NULL}
+    resources <- bf$resources()
     
-    rv
+    print(file.path("/srv/www/htdocs/", resources))
+    ll <- FALSE
+    if (ll){
+    rf <- file.path(values$filesystemRoot, file.path(input$root, input$rawfile))
+    
+    rv <- plyr::rbind.fill(mclapply(rf,
+                                    function(file){ 
+                                      read.raw(file, mono=input$usemono, exe=input$cmd) },
+                                    mc.cores = 8))
+    
+    }
+   
+    
+    NULL
   })
   
   # rawDataInfo----
