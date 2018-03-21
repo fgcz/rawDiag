@@ -31,6 +31,7 @@ shinyServer(function(input, output, session) {
                                         "PXD006932/Exp8A",
                                         "PXD006932/Exp8B",
                                         "PXD006932/SA",
+                                        "p195",
                                         "cfortes_20180313_300um_WW"),
                            RDataRoot = file.path(path.package(package = "rawDiag"), "extdata"),
                            RDataData = c("PXD006932_Exp3A.RData", "WU163763.RData", "WU163230.RData"))
