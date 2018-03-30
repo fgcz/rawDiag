@@ -188,7 +188,7 @@ read.raw <- function(file, mono = FALSE,
     
   }
   
-  # class(rv) <- c(class(rv), 'rawDiag')
+  class(rv) <- c(class(rv), 'rawDiag')
   rv
 }
 
@@ -198,6 +198,7 @@ read.raw <- function(file, mono = FALSE,
 #'
 #' @return a table.
 #' @export summary.rawDiag 
+#' @method rawDiag summary
 summary.rawDiag <- function(object){
   table(object$filename, object$MSOrder)
 }
@@ -995,18 +996,22 @@ PlotScanFrequency <- function(x, method = 'trellis'){
 #' @export PlotPrecursorHeatmap
 #' @note TODO: define bin with dynamically as h= 2x IQR x n e-1/3 or number of bins (max-min)/h
 #' @import hexbin
-PlotPrecursorHeatmap <- function(x, method = 'trellis', bins = 80){ 
-  if (method == 'trellis'){
+PlotPrecursorHeatmap <- function(x, method = 'overlay', bins = 80){
+  
   res <- x %>% 
     dplyr::filter_at(vars("MSOrder"), any_vars(. == "Ms2"))
   
-  ggplot(res, aes_string(x = 'StartTime', y = 'PrecursorMass')) + 
+  gp <- ggplot(res, aes_string(x = 'StartTime', y = 'PrecursorMass')) + 
     geom_hex(bins = bins) + 
-    facet_wrap(~filename) +
     scale_fill_gradientn(colours = colorvector) + 
     scale_x_continuous(breaks = scales::pretty_breaks(8)) + 
     scale_y_continuous(breaks = scales::pretty_breaks(15)) + 
-    theme_light()}else{NULL}
+    theme_light()
+  
+  if (method == 'trellis'){
+    gp <- gp + facet_wrap(~filename) 
+  }
+  gp
 }
 
 #' mass heatmap

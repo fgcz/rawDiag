@@ -4,7 +4,7 @@
 \alias{PlotPrecursorHeatmap}
 \title{PrecursorMass versus StartTime hexagons MS2}
 \usage{
-PlotPrecursorHeatmap(x, method = "trellis", bins = 80)
+PlotPrecursorHeatmap(x, method = "overlay", bins = 80)
 }
 \arguments{
 \item{x}{a \code{\link{data.frame}} fullfilling the \code{\link{is.rawDiag}} column naming criteria.}
