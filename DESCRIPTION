@@ -5,8 +5,8 @@ Version: 0.0.2
 Authors@R: c(person("Christian", "Panse", email = "cp@fgcz.ethz.ch", role = c("aut", "cre"), 
         comment = c(ORCID = "0000-0003-1975-3064")),
 	person("Christian", "Trachsel", email = "Christian.Trachsel@fgcz.ethz.ch", role = "aut", "cre"))
-Author: Christian Panse [aut] (0000-0003-1975-3064),
-	Christian Trachsel [aut, cre]
+Author: Christian Trachsel [aut, cre]
+	Christian Panse [aut] (0000-0003-1975-3064),
 Maintainer: Christian Panse <cp@fgcz.ethz.ch>
 Depends: R (>= 3.3),
 	methods
@@ -25,7 +25,7 @@ Description: Helps with quality checks, visualizations
     teaching, and having fun with proteomics data. But it can also be 
     used to do data analysis for small scale data sets.
 License: GPL-3
-URL: https://github.com/fgcz/rawDiag/
+URL: https://github.com/protViz/rawDiag/
 BugReports: https://github.com/fgcz/rawDiag/issues
 Encoding: UTF-8
 LazyData: true

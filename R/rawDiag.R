@@ -11,6 +11,28 @@
 #define colours
 
 
+.darkTheme <- function(){
+  theme(legend.position = 'none') +
+    theme(axis.line=element_blank(),
+          axis.text.x=element_blank(),
+          axis.text.y=element_blank(),
+          axis.ticks=element_blank(),
+          axis.title.x=element_blank(),
+          axis.title.y=element_blank(),
+          legend.position="none",
+          panel.background=element_blank(),
+          panel.border=element_blank(),
+          panel.grid.major=element_blank(),
+          panel.grid.minor=element_blank(),
+          plot.background=element_blank()) +
+    theme(plot.title = element_blank()) +
+    theme(plot.subtitle = element_blank()) +
+    theme(strip.background = element_blank()) +
+    theme(strip.text = element_blank()) +
+    theme(plot.background = element_rect(fill = "black")) +
+    theme(panel.spacing = unit(-1, "lines"))
+}
+
 .getDesiredColNames <- function(){
   c("filename",
     "scanNumber",

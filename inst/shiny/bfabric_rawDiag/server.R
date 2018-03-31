@@ -7,7 +7,8 @@
 #    http://shiny.rstudio.com/
 #
 
-library(shiny)
+#library(shiny)
+library(shinythemes)
 library(rawDiag)
 library(parallel)
 #library(magrittr)
@@ -20,8 +21,8 @@ library(parallel)
 # Define server logic required to draw a histogram
 shinyServer(function(input, output, session) {
   bf <- callModule(bfabric, "bfabric8",
-                   applicationid = c(160, 161, 162, 163, 176, 177, 197, 214, 232),
-                   resoucepattern = 'raw$',
+                   applicationid = c(7, 160, 161, 162, 163, 176, 177, 197, 214, 232),
+                   resoucepattern = 'raw$|RAW$',
                    resourcemultiple = TRUE)
   
   #bf <- callModule(bfabric, "bfabric8",  applicationid = c(168, 224), resoucepattern = 'zip$')
@@ -324,10 +325,13 @@ shinyServer(function(input, output, session) {
     if (nrow(rawData()) > 0){
       
       progress <- shiny::Progress$new(session = session, min = 0, max = 1)
-      progress$set(message = "plotting", detail = "mass.heatmap")
+      progress$set(message = "plotting", detail = "MassHeatmap")
       on.exit(progress$close())
       
-      PlotMassHeatmap(rawData(), bins = input$hexbinsize)
+      gp <- PlotMassHeatmap(rawData(), bins = input$hexbinsize)
+      
+      
+      gp 
     }
   })
   

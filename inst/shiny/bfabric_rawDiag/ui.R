@@ -7,11 +7,12 @@
 #    http://shiny.rstudio.com/
 #
 
-library(shiny)
+#library(shiny)
+library(shinythemes)
 library(bfabricShiny)
 
 # Define UI for application that draws a histogram
-shinyUI(fluidPage(
+shinyUI(fluidPage(theme = shinytheme("darkly"),
   
   # Application title
   titlePanel(paste("bfabric-rawDiag", "version", packageVersion('rawDiag'))),
