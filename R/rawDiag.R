@@ -1046,20 +1046,26 @@ PlotPrecursorHeatmap <- function(x, method = 'overlay', bins = 80){
 #' 
 #' @export PlotMassHeatmap
 PlotMassHeatmap <- function(x, method='trellis', bins = 80){ #rename to mass.heatmap
-  if(method =='trellis'){
-    res <- x %>% 
-      dplyr::filter_at(vars("MSOrder"), any_vars(. == "Ms2")) %>% 
-      dplyr::mutate("deconv" = round((PrecursorMass - 1.00782) * ChargeState, 0)) %>% 
-      dplyr::filter_at(vars("deconv"), any_vars(. <= 10000))
-    
-    ggplot(res, aes_string(x = 'StartTime', y = 'deconv')) + 
-      geom_hex(bins = bins ) +
-      facet_wrap(~filename) +
-      scale_fill_gradientn(colours = colorvector) +
-      scale_x_continuous(breaks = scales::pretty_breaks(8)) + 
-      scale_y_continuous(breaks = scales::pretty_breaks(15)) + 
-      theme_light() +
-      coord_cartesian(ylim = c(500, 10000))}else{NULL}
+  
+  res <- x %>% 
+    dplyr::filter_at(vars("MSOrder"), any_vars(. == "Ms2")) %>% 
+    dplyr::mutate("deconv" = round((PrecursorMass - 1.00782) * ChargeState, 0)) %>% 
+    dplyr::filter_at(vars("deconv"), any_vars(. <= 10000))
+  
+  gp <- ggplot(res, aes_string(x = 'StartTime', y = 'deconv')) + 
+    geom_hex(bins = bins ) +
+    facet_wrap(~filename) +
+    scale_fill_gradientn(colours = colorvector) +
+    scale_x_continuous(breaks = scales::pretty_breaks(8)) + 
+    scale_y_continuous(breaks = scales::pretty_breaks(15)) + 
+    theme_light() +
+    coord_cartesian(ylim = c(500, 10000))
+  
+  
+  if (method == 'trellis'){
+    gp <- gp + facet_wrap(~filename) 
+  }
+  gp
 }
 
 # ----Letter Figs----

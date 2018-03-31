@@ -328,7 +328,7 @@ shinyServer(function(input, output, session) {
       progress$set(message = "plotting", detail = "MassHeatmap")
       on.exit(progress$close())
       
-      gp <- PlotMassHeatmap(rawData(), bins = input$hexbinsize)
+      gp <- PlotMassHeatmap(rawData(), bins = input$hexbinsize, method = input$plottype)
       
       
       gp 
@@ -343,7 +343,7 @@ shinyServer(function(input, output, session) {
       progress$set(message = "plotting", detail = "precursor.heatmap")
       on.exit(progress$close())
       
-      PlotPrecursorHeatmap(rawData(), bins = input$hexbinsize)
+      PlotPrecursorHeatmap(rawData(), bins = input$hexbinsize, method = input$plottype)
     }
   })
   
