@@ -27,6 +27,7 @@ PlotMassDistribution(PXD006932_Exp3A_HeLa_1ug_60min_7500_02)
 Shiny example
 
 ```{r}
+# install.packages("shiny")
 rawDiag_shiny <- system.file("shiny", "demo", package = "rawDiag")
 shiny::runApp(rawDiag_shiny, display.mode = "normal")
 ```
