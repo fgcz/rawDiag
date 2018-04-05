@@ -39,4 +39,4 @@ shiny::runApp(rawDiag_shiny, display.mode = "normal")
 
 ## References
 
-C.Trachsel, C.Panse, T.Kockmann, J.Grossmann, W.Wolski, and R. Schlapbach. rawDiag - **An R package supporting rational LC-MS method optimization for bottom-up proteomics.** JPR, 2018. under review Journal of Proteome Research (**pr-2018-001736**).
+C. Trachsel, C. Panse, T. Kockmann, J. Grossmann, W. E. Wolski, and R. Schlapbach. *rawDiag - An R package supporting rational LC-MS method optimization for bottom-up proteomics.* JPR, 2018. under review Journal of Proteome Research (**pr-2018-001736**).
