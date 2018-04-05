@@ -7,25 +7,22 @@
 #    http://shiny.rstudio.com/
 #
 
-#library(shiny)
-library(shinythemes)
+library(shiny)
+library(bfabricShiny)
 library(rawDiag)
 library(parallel)
-#library(magrittr)
 library(tidyr)
 library(rmarkdown)
 library(base64enc)
-library(bfabricShiny)
-library(parallel)
 
 # Define server logic required to draw a histogram
 shinyServer(function(input, output, session) {
-  bf <- callModule(bfabric, "bfabric8",
-                   applicationid = c(7, 160, 161, 162, 163, 176, 177, 197, 214, 232),
-                   resoucepattern = 'raw$|RAW$',
-                   resourcemultiple = TRUE)
+# ----bfabricShinyModule---- 
+ bf <- callModule(bfabric, "bfabric8",
+                applicationid = c(7, 160, 161, 162, 163, 176, 177, 197, 214, 232),
+                 resoucepattern = 'raw$|RAW$',
+                 resourcemultiple = TRUE)
   
-  #bf <- callModule(bfabric, "bfabric8",  applicationid = c(168, 224), resoucepattern = 'zip$')
 # ----Configuration----  
   values <- reactiveValues(pdfcontent=NULL,
                            filesystemRoot="/scratch/cpanse/",
@@ -40,6 +37,7 @@ shinyServer(function(input, output, session) {
                                         "PXD006932/Exp8A",
                                         "PXD006932/Exp8B",
                                         "PXD006932/SA",
+                                        "p195",
                                         "cfortes_20180313_300um_WW"),
                            RDataRoot = file.path(path.package(package = "rawDiag"), "extdata"),
                            RDataData = c("PXD006932_Exp3A.RData", "WU163763.RData", "WU163230.RData"))
@@ -51,14 +49,10 @@ shinyServer(function(input, output, session) {
   
 # ----tabsetPanel ----
   tabsetPanel(
-    tabPanel("tic.basepeak", list(helpText("displays the total ion  chromatogram (TIC) and the base peak chromatogram."), 
-                                  plotOutput("tic.basepeak", height = input$graphicsheight))),
-    tabPanel("scan.frequency", list(helpText("graphs scan frequency versus RT or scan frequency marginal distribution for violin."), 
-                                    plotOutput("scan.frequency", height = input$graphicsheight))),
-    tabPanel("scan.time", list(helpText("plots scan time as function of RT for each MSn level. A smooth curve displays the trend."), 
-                               plotOutput("scan.time", height = input$graphicsheight))),
-    tabPanel("cycle.load", list(helpText("displays duty cycle load (number of MS2 scans per duty cycle) as a function of retention time (RT) (scatter plots) or its marginal distribution (violin)."), 
-                                plotOutput("cycle.load", height = input$graphicsheight))),
+    tabPanel("tic.basepeak", plotOutput("tic.basepeak", height = input$graphicsheight)),
+    tabPanel("scan.frequency", plotOutput("scan.frequency", height = input$graphicsheight)),
+    tabPanel("scan.time", plotOutput("scan.time", height = input$graphicsheight)),
+    tabPanel("cycle.load", plotOutput("cycle.load", height = input$graphicsheight)),
     tabPanel("mass.distribution", plotOutput("mass.distribution", height = input$graphicsheight)),
     tabPanel("lm.correction", plotOutput("lm.correction", height = input$graphicsheight)),
     tabPanel("injection.time", plotOutput("injection.time", height = input$graphicsheight)),
@@ -93,6 +87,7 @@ shinyServer(function(input, output, session) {
                 paste(path.package(package = "rawDiag"), "exec/fgcz_raw.exe", sep="/"))
       cmds <- sapply(cmds, function(x){if(file.exists(x)){x}else{NA}})
       cmds <- cmds[!is.na(cmds)]
+      
       tagList(
         selectInput('root', 'root:', values$filesystemDataDir, multiple = FALSE),
         htmlOutput('rawfile'),
@@ -104,20 +99,26 @@ shinyServer(function(input, output, session) {
                     value = 12))
       
     } else if (input$source == 'package') {
-        selectInput('RData', 'RData:',  values$RDataData, multiple = FALSE)
+      selectInput('RData', 'RData:',  values$RDataData, multiple = FALSE)
     } else{
-     
-      #tabPanel("bfabric", bfabricInput("bfabric8"))
-      #bfabricInput("bfabric8")
+      NULL
     }
   })
   
+  output$sourceBfabric <- renderUI({
+    if(input$source == 'bfabric'){
+      bfabricInput("bfabric8")
+    }else{
+        actionButton("load", "load")
+    }
+  })
+  
+  
+  
   output$render <- renderUI({
-    
     if(nrow(rawData()) > 0){
       actionButton("generatePDF", "pdf")
     }
-   
   })
   
   
@@ -128,6 +129,8 @@ shinyServer(function(input, output, session) {
     }
     
   })
+  
+ 
   
   #---- generateReport ----
   generateReport <- observeEvent(input$generatePDF, {
@@ -179,7 +182,7 @@ shinyServer(function(input, output, session) {
     content = values$pdfcontent
   )
     
-  save <- observeEvent(input$save, {
+  RDataSave <- observeEvent(input$RDataSave, {
     
     progress <- shiny::Progress$new(session = session, min = 0, max = 1)
     progress$set(message = "saving ...")
@@ -194,33 +197,41 @@ shinyServer(function(input, output, session) {
   
   pdfFileName <- reactive({tempfile(fileext = ".pdf")})
   
-  # ----- load rawData -------
+  # ----- rawData -------
   rawData <- eventReactive(input$load, {
     
     progress <- shiny::Progress$new(session = session, min = 0, max = 1)
     progress$set(message = paste("loading MS data"))
     on.exit(progress$close())
     
-    resources <- bf$resources()$relativepath
-    
-    print(resources)
-    print(input$relativepath)
-    
-    rf <- resources[resources %in% input$relativepath]
-    
-    rf <- file.path("/srv/www/htdocs/", rf)
-  
-   
-    # print(rf)
-    # print(input$relativepath)
-    rv <- plyr::rbind.fill(
-      mclapply(rf, function(file){
-       
-        read.raw(file = file,
-                 mono = TRUE)
+    if (input$source == 'filesystem'){
+      rf <- file.path(values$filesystemRoot, file.path(input$root, input$rawfile))
+      
+      rv <- plyr::rbind.fill(mclapply(rf,
+                                      function(file){ 
+                                        read.raw(file, mono=input$usemono, exe=input$cmd) },
+                                      mc.cores = input$mccores))}
+    else if(input$source == 'package'){
+      rv <- NULL
+      fn <- file.path(values$RDataRoot, input$RData)
+      ne <- new.env()
+      load(fn, ne)
+      rv <- ne[[ls(ne)]]
+    }else if(input$source == 'bfabric'){
+      progress <- shiny::Progress$new(session = session, min = 0, max = 1)
+      progress$set(message = paste("loading MS data"))
+      on.exit(progress$close())
+      
+      resources <- bf$resources()$relativepath
+      rf <- resources[resources %in% input$relativepath]
+      rf <- file.path("/srv/www/htdocs/", rf)
+      rv <- plyr::rbind.fill(
+        mclapply(rf, function(file){
+          
+          read.raw(file = file,
+                   mono = TRUE)
         }, mc.cores = 24))
-
-   
+    }else{rv <- NULL}
     
     rv
   })
@@ -230,8 +241,7 @@ shinyServer(function(input, output, session) {
      progress <- shiny::Progress$new(session = session, min = 0, max = 1)
     progress$set(message = "loading info data")
     on.exit(progress$close())
-    
-   
+ 
     return(summary.rawDiag(rawData()))
   })
   
@@ -242,11 +252,11 @@ shinyServer(function(input, output, session) {
     progress$set(message = "plotting", detail = "tic.basepeak")
     on.exit(progress$close())
     
-    if (!is.null(rawData()) && nrow(rawData()) > 0){
+    if (nrow(rawData()) > 0){
       
       
-      PlotTicBasepeak(rawData(), method = input$plottype)
-      
+      values$gp <- PlotTicBasepeak(rawData(), method = input$plottype)
+      values$gp
     }
   })
   #---- scan.frequency ----
@@ -258,7 +268,9 @@ shinyServer(function(input, output, session) {
 
     
     if (nrow(rawData()) > 0){
-      PlotScanFrequency(rawData(), method = input$plottype)
+      #helpText("graphs scan frequency versus RT or scan frequency marginal distribution for violin."),
+      values$gp <- PlotScanFrequency(rawData(), method = input$plottype)
+      values$gp
     }
   })
   #---- scan.time ----
@@ -269,7 +281,7 @@ shinyServer(function(input, output, session) {
     on.exit(progress$close())
     if (nrow(rawData()) > 0){
       
-      PlotScanTime(rawData(), method = input$plottype)
+      values$gp <- PlotScanTime(rawData(), method = input$plottype)
     }
   })
   
@@ -280,7 +292,8 @@ shinyServer(function(input, output, session) {
     on.exit(progress$close())
     
     if (nrow(rawData()) > 0){
-      PlotCycleLoad(rawData(), method = input$plottype)}
+      values$gp <- PlotCycleLoad(rawData(), method = input$plottype)}
+      values$gp
   })
   #---- mass.distribution ----
   output$mass.distribution <- renderPlot({
@@ -290,8 +303,8 @@ shinyServer(function(input, output, session) {
     
     if (nrow(rawData()) > 0){
       
-      PlotMassDistribution(rawData(), method = input$plottype)
-      
+      values$gp <- PlotMassDistribution(rawData(), method = input$plottype)
+      values$gp
     }
   })
   
@@ -302,8 +315,8 @@ shinyServer(function(input, output, session) {
     on.exit(progress$close())
     if (nrow(rawData()) > 0){
       
-      PlotLockMassCorrection(rawData(), method = input$plottype)
-      
+      values$gp <- PlotLockMassCorrection(rawData(), method = input$plottype)
+      values$gp
     }
   })
   
@@ -315,8 +328,8 @@ shinyServer(function(input, output, session) {
       progress$set(message = "ploting", detail = "injection.time")
       on.exit(progress$close())
       
-      PlotInjectionTime(rawData(), method = input$plottype)
-
+      values$gp <- PlotInjectionTime(rawData(), method = input$plottype)
+      values$gp
     }
   })
   
@@ -325,14 +338,12 @@ shinyServer(function(input, output, session) {
     if (nrow(rawData()) > 0){
       
       progress <- shiny::Progress$new(session = session, min = 0, max = 1)
-      progress$set(message = "plotting", detail = "MassHeatmap")
+      progress$set(message = "plotting", detail = "mass.heatmap")
       on.exit(progress$close())
       
-      gp <- PlotMassHeatmap(rawData(), bins = input$hexbinsize, method = input$plottype)
-      
-      
-      gp 
-    }
+      values$gp <- PlotMassHeatmap(rawData(), bins = input$hexbinsize, method = input$plottype)
+      values$gp
+      }
   })
   
   #---- precursor.heatmap ----
@@ -343,7 +354,8 @@ shinyServer(function(input, output, session) {
       progress$set(message = "plotting", detail = "precursor.heatmap")
       on.exit(progress$close())
       
-      PlotPrecursorHeatmap(rawData(), bins = input$hexbinsize, method = input$plottype)
+      values$gp <- PlotPrecursorHeatmap(rawData(), bins = input$hexbinsize,method = input$plottype)
+      values$gp
     }
   })
   
@@ -355,8 +367,8 @@ shinyServer(function(input, output, session) {
       progress$set(message = "plotting", detail = "cycle.time")
       on.exit(progress$close())
       
-      PlotCycleTime(rawData(), method = input$plottype)
-      
+      values$gp <- PlotCycleTime(rawData(), method = input$plottype)
+      values$gp
     }
   })
   
@@ -367,8 +379,8 @@ shinyServer(function(input, output, session) {
       progress$set(message = "plotting", detail = "charge.state")
       on.exit(progress$close())
       
-      PlotChargeState(rawData(), method = input$plottype)
-      
+      values$gp <- PlotChargeState(rawData(), method = input$plottype)
+      values$gp
       
     }
   })
@@ -391,12 +403,14 @@ shinyServer(function(input, output, session) {
   
   
   #---- downloadPDF ----
-  
-  output$downloadData <- downloadHandler(
-    filename = "rawfileQC.pdf",
+  output$foo = downloadHandler(
+    filename = paste("rawDiag.pdf", sep = ''),
     content = function(file) {
-      file.copy(values$pdfcontent, file)
+      ggsave(values$gp, file=file,
+             dpi = 600,
+             device = "pdf",
+             height = input$graphicsheight,
+             units = 'mm', limitsize = FALSE)
     }
   )
-  
 })
