@@ -14,7 +14,7 @@ devtools::install_github("protViz/rawDiag")
 ## Usage
 
 
-an "Hello; World!" example on the R command line
+- "Hello; World!" example on the R command line
 ```{r}
 library(rawDiag)
 load(file.path(path.package(package = "rawDiag"),
@@ -24,8 +24,7 @@ PlotPrecursorHeatmap(PXD006932_Exp3A_HeLa_1ug_60min_7500_02)
 PlotMassDistribution(PXD006932_Exp3A_HeLa_1ug_60min_7500_02)
 ```
 
-a shiny example
-
+- Shiny example
 ```{r}
 rawDiag_shiny <- system.file("shiny", "demo", package = "rawDiag")
 shiny::runApp(rawDiag_shiny, display.mode = "normal")
