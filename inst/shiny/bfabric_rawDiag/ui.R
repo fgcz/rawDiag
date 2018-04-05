@@ -8,7 +8,16 @@
 #
 
 library(shiny)
-library(bfabricShiny)
+
+INPUTTYPES <- c("package" = "package",
+  "filesystem" = "filesystem",
+  "bfabric" = "bfabric")
+if (!require("bfabricShiny")){
+  message("running without bfabricShiny")
+  INPUTTYPES <- c("package" = "package",
+                  "filesystem" = "filesystem")
+}
+
 # Define UI for application that draws a histogram
 shinyUI(fluidPage(
   
@@ -21,16 +30,16 @@ shinyUI(fluidPage(
       
       img(src='octopussy.png ', align = "right"),
       radioButtons("source", "Type of data source:",
-                   c("package" = "package",
-                     "filesystem" = "filesystem",
-                     "bfabric" = "bfabric")),
+                   INPUTTYPES),
       br(),
       
-      hr(),
-      htmlOutput("source"),
+      h3("Data Source"),
+      htmlOutput("sourceFilesystem"),
+      htmlOutput("sourcePackage"),
       htmlOutput("sourceBfabric"),
       hr(),
-      
+      htmlOutput("ReaderParameter"),
+      h3("Graphics Parameter"),
       sliderInput("graphicsheight", "graphicsheight",
                   min = 480, max = 4096,
                   value = 512),
@@ -39,19 +48,13 @@ shinyUI(fluidPage(
                    c("overlay" = "overlay",
 		     "trellis" = "trellis",
                      "violin" = "violin")),
-      
-      #actionButton("save", "save"),
-      # htmlOutput("render"),
-      htmlOutput("downloadLinkButton")
-       
+      htmlOutput("PDF")
     ),
     
     # Show a plot of the generated distribution
     mainPanel(
       tagList(
-        htmlOutput("tabs"),
-        hr(),
-        downloadButton('foo'))
+        htmlOutput("tabs"))
     )
   )
 ))

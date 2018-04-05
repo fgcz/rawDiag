@@ -8,7 +8,10 @@
 #
 
 library(shiny)
-library(bfabricShiny)
+
+if (!require("bfabricShiny")){
+  message("running without bfabricShiny")
+}
 library(rawDiag)
 library(parallel)
 library(tidyr)
@@ -18,10 +21,12 @@ library(base64enc)
 # Define server logic required to draw a histogram
 shinyServer(function(input, output, session) {
 # ----bfabricShinyModule---- 
+  if (require("bfabricShiny")){
  bf <- callModule(bfabric, "bfabric8",
                 applicationid = c(7, 160, 161, 162, 163, 176, 177, 197, 214, 232),
                  resoucepattern = 'raw$|RAW$',
                  resourcemultiple = TRUE)
+  }
   
 # ----Configuration----  
   values <- reactiveValues(pdfcontent=NULL,
@@ -48,23 +53,28 @@ shinyServer(function(input, output, session) {
   output$tabs <- renderUI({
   
 # ----tabsetPanel ----
-  tabsetPanel(
-    tabPanel("tic.basepeak", plotOutput("tic.basepeak", height = input$graphicsheight)),
-    tabPanel("scan.frequency", plotOutput("scan.frequency", height = input$graphicsheight)),
-    tabPanel("scan.time", plotOutput("scan.time", height = input$graphicsheight)),
-    tabPanel("cycle.load", plotOutput("cycle.load", height = input$graphicsheight)),
-    tabPanel("mass.distribution", plotOutput("mass.distribution", height = input$graphicsheight)),
-    tabPanel("lm.correction", plotOutput("lm.correction", height = input$graphicsheight)),
-    tabPanel("injection.time", plotOutput("injection.time", height = input$graphicsheight)),
-    tabPanel("mass.heatmap", plotOutput("mass.heatmap", height = input$graphicsheight)),
-     tabPanel("precursor.heatmap", plotOutput("precursor.heatmap", height = input$graphicsheight)),
-    tabPanel("cycle.time", plotOutput("cycle.time", height = input$graphicsheight)),
-    tabPanel("charge.state", plotOutput("charge.state", height = input$graphicsheight)),
-    tabPanel("raw table", DT::dataTableOutput("table")),
-    tabPanel("raw info", DT::dataTableOutput("tableInfo")),
-    #sessionInfo
-    tabPanel("sessionInfo", verbatimTextOutput("sessionInfo"))
-  )
+    tabsetPanel(
+      tabPanel("TIC/Basepeak", list(helpText("displays the total ion  chromatogram (TIC) and the base peak chromatogram."),
+                                    plotOutput("tic.basepeak", height = input$graphicsheight))),
+      tabPanel("Scan Frequency", list(helpText("graphs scan frequency versus RT or scan frequency marginal distribution for violin."),
+                                      plotOutput("scan.frequency", height = input$graphicsheight))),
+      tabPanel("Scan Time", list(helpText("plots scan time as function of RT for each MSn level. A smooth curve displays the trend."),
+                                 plotOutput("scan.time", height = input$graphicsheight))),
+      tabPanel("Cycle Load", list(helpText("displays duty cycle load (number of MS2 scans per duty cycle) as a function of retention time (RT) (scatter plots) or its marginal distribution (violin)."),
+                                  plotOutput("cycle.load", height = input$graphicsheight))),
+      tabPanel("Mass Distribution", list(helpText("displays mass distribution using color coding according to charge state (trellis) or file (violin)."), plotOutput("mass.distribution", height = input$graphicsheight))),
+      tabPanel("Lock Mass Correction", list(helpText("graphs the lock mass deviations along RT (note: this example data were acquired with lock mass correction)."), plotOutput("lm.correction", height = input$graphicsheight))),
+      tabPanel("Injection Time", list(helpText("displays injection time as a function  of RT. A smooth curve graphs the trend. The maximum is indicated by a red dashed line."), plotOutput("injection.time", height = input$graphicsheight))),
+      tabPanel("Mass Heatmap", list(helpText("draws a 2D histogram of the peak count ~ charge deconvoluted mass along RT."), plotOutput("mass.heatmap", height = input$graphicsheight))),
+      tabPanel("Precursor Heatmap", list(helpText("draws a 2D histogram of the peak count ~ charge deconvoluted mass along RT."), plotOutput("precursor.heatmap", height = input$graphicsheight))),
+      tabPanel("Cycle Time", list(helpText(" displays cycle time with respect to RT (scatter plots) or its marginal distribution (violin). A smooth curve graphs the trend. The maximum is indicated by a red dashed line."), plotOutput("cycle.time", height = input$graphicsheight))),
+      tabPanel("Charge State", list(helpText("displays charge state distributions as biologist-friendly bar charts as absolute counts."), plotOutput("charge.state", height = input$graphicsheight))),
+      tabPanel("Raw table", DT::dataTableOutput("table")),
+      tabPanel("Raw info", DT::dataTableOutput("tableInfo")),
+      #sessionInfo
+      tabPanel("sessionInfo", verbatimTextOutput("sessionInfo"))
+      
+    )
   })
    
  
@@ -80,107 +90,54 @@ shinyServer(function(input, output, session) {
     selectInput('rawfile', 'rawfile:', getRawfiles(), multiple = TRUE)
   })
 # ----Source----  
-  output$source <- renderUI({
+  output$sourceFilesystem <- renderUI({
     if (input$source == 'filesystem'){
+   
+      
+      tagList(
+        selectInput('root', 'root:', values$filesystemDataDir, multiple = FALSE),
+        htmlOutput('rawfile')
+        )
+    } 
+  })
+  output$sourcePackage <- renderUI({
+    if (input$source == 'package') {
+      selectInput('RData', 'RData:',  values$RDataData, multiple = FALSE)
+    } 
+  })
+  
+  output$sourceBfabric <- renderUI({
+    if(input$source == 'bfabric'){
+      if (require("bfabricShiny")){
+       bfabricInput("bfabric8")
+      }
+    }else{
+        actionButton("load", "load")
+    }
+  })
+  
+  output$ReaderParameter <- renderUI({
+    if(input$source  %in% c('bfabric', 'filesystem'))
+    {
       cmds <- c("~/RiderProjects/fgcz-raw/bin/Debug/fgcz_raw.exe",
                 "~cp/bin/fgcz_raw.exe",
                 paste(path.package(package = "rawDiag"), "exec/fgcz_raw.exe", sep="/"))
       cmds <- sapply(cmds, function(x){if(file.exists(x)){x}else{NA}})
       cmds <- cmds[!is.na(cmds)]
       
-      tagList(
-        selectInput('root', 'root:', values$filesystemDataDir, multiple = FALSE),
-        htmlOutput('rawfile'),
-        hr(),
-        selectInput('cmd', 'cmd:', cmds, multiple = FALSE),
-        checkboxInput("usemono", "Use mono", TRUE),
-        sliderInput("mccores", "Cores",
-                    min = 1, max = 24,
-                    value = 12))
-      
-    } else if (input$source == 'package') {
-      selectInput('RData', 'RData:',  values$RDataData, multiple = FALSE)
-    } else{
-      NULL
+      tagList(h3("RawFileReaderOptions"),
+              selectInput('cmd', 'cmd:', cmds, multiple = FALSE),
+              checkboxInput("usemono", "Use mono", TRUE),
+              sliderInput("mccores", "Cores",
+                          min = 1, max = 24,
+                          value = 12))
     }
   })
-  
-  output$sourceBfabric <- renderUI({
-    if(input$source == 'bfabric'){
-      bfabricInput("bfabric8")
-    }else{
-        actionButton("load", "load")
-    }
-  })
-  
-  
-  
-  output$render <- renderUI({
-    if(nrow(rawData()) > 0){
-      actionButton("generatePDF", "pdf")
-    }
-  })
-  
-  
-  output$downloadLinkButton <- renderUI({
-  
-    if(!is.null(values$pdfcontent)){
-      downloadLink('downloadData', 'Download')
-    }
-    
-  })
-  
+
  
   
-  #---- generateReport ----
-  generateReport <- observeEvent(input$generatePDF, {
-    
-    rawfileQC.parameter <<- list(
-      pdf = pdfFileName(),
-      resourceid = -1,
-      data.QC = rawData(),
-      data.Info = rawDataInfo()
-    )
-    
-    progress <- shiny::Progress$new(session = session, min = 0, max = 1)
-    progress$set(message = "render", detail = "PDF ...")
-    on.exit(progress$close())
-    
-    message(tempdir())
-    workdir <- tempdir()
-    
-    rmdfile2run <- file.path(workdir, "rawfileQC.Rmd")
-    
-    if(!dir.create(workdir)){
-      stopApp(7)
-    }
-    
-    
-    if(!file.copy(file.path(path.package("rawfileQC"), "/report/rawfileQC.Rmd") , rmdfile2run)){
-      stopApp(7)
-    }
-    
-    rmarkdown::render(rmdfile2run, output_format ="pdf_document")
-    
-    pdffilename <- file.path(workdir, "rawfileQC.pdf")
-    
-    
-    progress$set(message = "render", detail = "PDF base64encode ...")
-    if(file.exists(pdffilename)){
-      
-      values$pdfcontent <- base64encode(readBin(pdffilename, "raw",
-                           file.info(pdffilename)[1, "size"]), "pdf")
-      message(file.info(pdffilename)[1, "size"])
-    }
-    
-    message(tempdir())
-  })
-  
-  
-  output$pdf  = downloadHandler(
-    filename = "fgcz_rawfileDiagnostic.pdf",
-    content = values$pdfcontent
-  )
+ 
+  # ----- RDataSave -------
     
   RDataSave <- observeEvent(input$RDataSave, {
     
@@ -195,8 +152,7 @@ shinyServer(function(input, output, session) {
     
   })
   
-  pdfFileName <- reactive({tempfile(fileext = ".pdf")})
-  
+ 
   # ----- rawData -------
   rawData <- eventReactive(input$load, {
     
@@ -403,12 +359,22 @@ shinyServer(function(input, output, session) {
   
   
   #---- downloadPDF ----
+  
+  output$PDF <- renderUI({
+    if(nrow(rawData()) > 0){
+      tagList(
+        h3("PDF"),
+        downloadButton('foo'))
+    }
+  })
+  
   output$foo = downloadHandler(
     filename = paste("rawDiag.pdf", sep = ''),
     content = function(file) {
       ggsave(values$gp, file=file,
              dpi = 600,
              device = "pdf",
+             width = 500,
              height = input$graphicsheight,
              units = 'mm', limitsize = FALSE)
     }
