@@ -33,7 +33,8 @@ shiny::runApp(rawDiag_shiny, display.mode = "normal")
 ```
 
 
-## Links
+## See Also
+
 - screen recording (3:02 minutes, size 47MB, no audio track): http://fgcz-ms.uzh.ch/~cpanse/PAPERS/pr-2018-001736.mov
 - shiny demo on our compute server: http://fgcz-ms-shiny.uzh.ch:8080/rawDiag-demo/
 
