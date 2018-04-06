@@ -25,7 +25,7 @@ PlotPrecursorHeatmap(PXD006932_Exp3A_HeLa_1ug_60min_7500_02)
 PlotMassDistribution(PXD006932_Exp3A_HeLa_1ug_60min_7500_02)
 ```
 
-Shiny example
+an interactive shiny example
 
 ```{r}
 # install.packages("shiny")
