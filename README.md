@@ -29,6 +29,7 @@ Shiny example
 
 ```{r}
 # install.packages("shiny")
+# install.packages("DT")
 library(shiny)
 rawDiag_shiny <- system.file("shiny", "demo", package = "rawDiag")
 shiny::runApp(rawDiag_shiny, display.mode = "normal")
