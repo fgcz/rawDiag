@@ -5,6 +5,7 @@ An R package for Diagnostic Plots for Mass Spectrometry Data
 
 ## Installation
 
+please note: due to the data size (>=40MB) download can take a while
 ```{r}
 # install.packages("devtools")
 devtools::install_github("protViz/rawDiag")
