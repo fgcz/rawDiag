@@ -1054,7 +1054,6 @@ PlotMassHeatmap <- function(x, method='trellis', bins = 80){ #rename to mass.hea
   
   gp <- ggplot(res, aes_string(x = 'StartTime', y = 'deconv')) + 
     geom_hex(bins = bins ) +
-    facet_wrap(~filename) +
     scale_fill_gradientn(colours = colorvector) +
     scale_x_continuous(breaks = scales::pretty_breaks(8)) + 
     scale_y_continuous(breaks = scales::pretty_breaks(15)) + 
