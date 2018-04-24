@@ -4,8 +4,23 @@ An R package for Diagnostic Plots for Mass Spectrometry Data
 
 ## Requirements  
 
+Windows/Linux/MacOSX
+
 The *New RawFileReader from Thermo Fisher Scientific* (see http://planetorbitrap.com/rawfilereader)
 have to be installed to use the R function `read.raw`.
+
+for Linux (Debian) system follow:
+
+```
+apt-get update \
+  && apt-get install mono-complete vim less unzip r-base -y \
+  && cd /tmp/ \
+  && unzip /tmp/ThermoRawFileReader_linux.4.0.22.nupkg \
+  && gacutil -i lib/ThermoFisher.CommonCore.BackgroundSubtraction.dll \
+  && gacutil -i lib/ThermoFisher.CommonCore.Data.dll \
+  && gacutil -i lib/ThermoFisher.CommonCore.RawFileReader.dll \
+  && echo $?
+```
 
 ## Installation
 
