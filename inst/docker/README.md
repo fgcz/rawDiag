@@ -1,4 +1,4 @@
-# Get ThermoRawFileLibrary 
+# Get *RawFileReader from Thermo Fisher Scientific*
 
 - http://planetorbitrap.com/rawfilereader
 
