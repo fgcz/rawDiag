@@ -5,7 +5,7 @@
 # Build Docker image
 
 ```bash 
-docker build .
+docker build -t cpanse/fgcz-raw:v1  .
 ```
 
 
