@@ -12,7 +12,7 @@ The *New RawFileReader from Thermo Fisher Scientific* (see http://planetorbitrap
 have to be downloaded and installed to use the R function `read.raw`.
 
 for Linux (Debian) system run the following code snippet:
-```
+```{sh}
 apt-get update \
   && apt-get install mono-complete vim less unzip r-base -y \
   && cd /tmp/ \
