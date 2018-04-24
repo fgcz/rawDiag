@@ -2,6 +2,10 @@
 
 An R package for Diagnostic Plots for Mass Spectrometry Data
 
+## Requirements  
+
+*New RawFileReader from Thermo Fisher Scientific* see http://planetorbitrap.com/rawfilereader 
+have to be installed to use R function `read.raw`.
 
 ## Installation
 
