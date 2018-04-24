@@ -10,4 +10,6 @@
 docker build -t cpanse/fgcz-raw:v1  .
 ```
 
-## docker run -v /scratch/:/scratch/ -a stdin -a stdout -i -t
+## Run the commandline program
+
+docker run -v /scratch/:/scratch/ -a stdin -a stdout -i -t cpanse/fgcz-raw:v1 .
