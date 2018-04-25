@@ -5,11 +5,10 @@ An R package for Diagnostic Plots for Mass Spectrometry Data
 ## Requirements  
 for Windows/Linux/MacOSX platforms
 
-Due to license reason, we can not distribute Thermo Fisher Scientific software with the *rawDiag* package.
-
+Due to license reason, we currently can not distribute Thermo Fisher Scientific software with the *rawDiag* package (we hope that this will change soon).
 
 The *New RawFileReader from Thermo Fisher Scientific* (see http://planetorbitrap.com/rawfilereader)
-have to be downloaded and installed to use the R function `read.raw`.
+has to be downloaded and installed to use the R function `read.raw`.
 
 for Linux (Debian) system run the following code snippet:
 ```{sh}
