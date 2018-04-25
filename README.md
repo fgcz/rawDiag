@@ -1,6 +1,6 @@
 # rawDiag <img src="inst/shiny/demo/www/octopussy.png" align="right" width="100px" />
 
-An R package for Diagnostic Plots for Mass Spectrometry Data
+an R package supporting rational LC-MS method optimization for bottom-up proteomics
 
 ## Requirements  
 for Windows/Linux/MacOSX platforms
