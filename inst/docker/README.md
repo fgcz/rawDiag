@@ -15,5 +15,5 @@ docker build -t cpanse/fgcz-raw:v1  .
 - Run the commandline program
 
 ```bash
-docker run -v /scratch/:/scratch/ -a stdin -a stdout -i -t cpanse/fgcz-raw:v1
+docker run -v /scratch/:/scratch/ -a stdin -a stdout -i -t cpanse/fgcz-raw:v1 /usr/local/bin/fgcz_raw.exe
 ```
