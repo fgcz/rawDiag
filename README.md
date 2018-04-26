@@ -1,15 +1,14 @@
 # rawDiag <img src="inst/shiny/demo/www/octopussy.png" align="right" width="100px" />
 
-An R package for Diagnostic Plots for Mass Spectrometry Data
+an R package supporting rational LC-MS method optimization for bottom-up proteomics
 
 ## Requirements  
 for Windows/Linux/MacOSX platforms
 
-Due to license reason, we can not distribute Thermo Fisher Scientific software with the *rawDiag* package.
-
+Due to license reason, we currently can not distribute Thermo Fisher Scientific software with the *rawDiag* package (we hope that this will change soon).
 
 The *New RawFileReader from Thermo Fisher Scientific* (see http://planetorbitrap.com/rawfilereader)
-have to be downloaded and installed to use the R function `read.raw`.
+has to be downloaded and installed to use the R function `read.raw`.
 
 for Linux (Debian) system run the following code snippet:
 ```{sh}
@@ -62,5 +61,9 @@ shiny::runApp(rawDiag_shiny, display.mode = "normal")
 - shiny demo on our compute server: http://fgcz-ms-shiny.uzh.ch:8080/rawDiag-demo/
 
 ## References
+
+rawDiag - an R package supporting rational LC-MS method optimization for bottom-up proteomics
+Christian Trachsel, Christian Panse, Tobias Kockmann, Witold Eryk Wolski, Jonas Grossmann, Ralph Schlapbach
+bioRxiv 304485; doi: https://doi.org/10.1101/304485
 
 C. Trachsel, C. Panse, T. Kockmann, J. Grossmann, W. E. Wolski, and R. Schlapbach. *rawDiag - An R package supporting rational LC-MS method optimization for bottom-up proteomics.*, 2018. (manuscript submitted to Journal of Proteome Research; **pr-2018-001736**).
