@@ -7,6 +7,7 @@ submission (pr-2018-001736) reviewer comments:
 
   \itemize{
 	  \item added \code{as.rawDiag.mzR} - include support for all major vendors
-	  through using opem file standards.
+	  through using opem file standards. 
+	  \href{https://github.com/protViz/rawDiag/issues/9}{#9}
   }
 }
