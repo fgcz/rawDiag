@@ -1,0 +1,47 @@
+---
+title: "rawDiag - Diagnostic Plots for Mass Spectrometry Data"
+subtitle: "Howto Use Diagnostic Plots for Orbitrap Instruments"
+author: "Christian Trachsel, Christian Panse"
+date: "`r Sys.Date()`"
+output: tint::tintPdf
+bibliography: rawDiag.bib
+link-citations: yes
+---
+
+```{r setup, include=FALSE}
+library(tint)
+# invalidate cache when the package version changes
+knitr::opts_chunk$set(tidy = FALSE, cache.extra = packageVersion('tint'))
+options(htmltools.dir.version = FALSE, warn = -1)
+```
+
+# Intro
+[@TrachselJPR]
+
+# Installation
+
+
+The R package can be installed via the following command line.
+
+```{r eval=FALSE}
+devtools::install_github("protViz/rawDiag")
+```
+
+```{r}
+library(rawDiag)
+```
+
+# Read Data 
+
+
+## ThermoFileReader
+
+
+## Use mzR
+
+The code snippet below demonstrate how open file standards through using the mzR 
+bioconductor package can be used.
+```{r}
+library(mzR)
+rawDiag:::as.rawDiag.mzR
+```
