@@ -151,7 +151,7 @@ docker run -v /scratch:/scratch \
 \end{lstlisting}
 
 
-\section{Usage} 
+\section{Getting started} 
 
 attach the package
 <<>>=
@@ -163,7 +163,8 @@ look into for documentation
 help(package="rawDiag")
 @
 
-\paragraph{Read}
+\section(Read Data)
+\subsection{Using \code{read.raw}}
 The function \code{read.raw} uses the \rfr to 
 extract the follwoing information out of the mass spectrometric meassurement.
 
@@ -178,6 +179,30 @@ can be seen in the following code snippet:
 <<eval = FALSE>>=
 system.time(RAW <- read.raw(file = "~/data/20130115_01_iRT_Fet10fmol.RAW"))
 @
+
+\subsection{Using the \code{mzR} package}
+
+<<eval = FALSE>>=
+library(mzR); library(rawDiag)
+RAW <- rawDiag:::as.rawDiag.mzR(openMSfile("/scratch/cpanse/PXD006932/Exp3A/20161213_NGHF_DBJ_SA_Exp3A_HeLa_1ug_15min_15000_01.mzML"))
+
+PlotChargeState(RAW)
+PlotCycleLoad(RAW)
+PlotCycleTime(RAW)
+# PlotInjectionTime(RAW)
+# PlotLockMassCorrection(RAW)
+PlotMassDistribution(RAW)
+PlotPrecursorHeatmap(RAW)
+PlotMzDistribution(RAW)
+PlotPrecursorHeatmap(RAW)
+PlotScanFrequency(RAW)
+PlotScanTime(RAW)
+PlotTicBasepeak(RAW)
+@
+
+
+
+\section{Usage}
 
 in the following we display some of our demonstration data shipped with the
 package.

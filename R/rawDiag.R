@@ -1873,6 +1873,10 @@ as.rawDiag.mzR <- function(object){
                     'ChargeState')
   
   rv$filename <- basename(fileName(object))
+  rv$StartTime <- rv$StartTime / 60
+  rv$MSOrder <- gsub("^2$", "Ms2", rv$MSOrder)
+  rv$MSOrder <- gsub("^1$", "Ms", rv$MSOrder)
+
   as.rawDiag(rv)
 }
 #labs.title=element_blank(),
