@@ -6,6 +6,10 @@ date: "`r Sys.Date()`"
 output: tint::tintPdf
 bibliography: rawDiag.bib
 link-citations: yes
+vignette: >
+  %\VignetteIndexEntry{Getting Started with rawDiag}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
 ---
 
 ```{r setup, include=FALSE}
@@ -43,6 +47,32 @@ RawFileReader libraries^[See [RawFileReader](http://planetorbitrap.com/rawfilere
 ```{r eval=FALSE}
 MS <- read.raw(file = "20180306_39_autoQC01.raw"), mono = TRUE)
 ```
+
+
+The read.raw function requires the library beeing installed and the 
+with that vignette file shipped C# code compiled. On a Debian Linux Platform it 
+can be done by the following bash snippet.
+```
+RUN apt-get update \
+  && apt-get install mono-complete vim less unzip r-base curl -y \
+  && cd /tmp/ \
+  && unzip /tmp/ThermoRawFileReader_linux.4.0.22.nupkg \
+  && gacutil -i lib/ThermoFisher.CommonCore.BackgroundSubtraction.dll \
+  && gacutil -i lib/ThermoFisher.CommonCore.Data.dll \
+  && gacutil -i lib/ThermoFisher.CommonCore.RawFileReader.dll \
+  && echo $?
+
+ADD fgcz_raw.cs /tmp/
+RUN cd /tmp \
+  && mcs /out:/usr/local/bin/fgcz_raw.exe \
+  fgcz_raw.cs /r:lib/ThermoFisher.CommonCore.Data.dll \
+  /r:lib/ThermoFisher.CommonCore.MassPrecisionEstimator.dll \
+  /r:lib/ThermoFisher.CommonCore.RawFileReader.dll /target:exe 
+```
+
+## Use Bruker timsTOF Data
+
+t.b.d.
 
 ## Use mzR
 

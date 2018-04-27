@@ -1,0 +1,10 @@
+^.*\.Rproj$
+^\.Rproj\.user$
+^.*_cache.*$
+#^.*vignettes/*
+#^.*PXD006932_Exp3A.RData$
+# ^.*WU163763.RData$
+# ^.*WU163763.RData$
+#^.*PXD006932_Exp3A.RData$
+#^.*U163230.RData$
+#^.*WU163763_PD.RData$
