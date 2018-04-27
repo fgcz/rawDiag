@@ -1846,6 +1846,35 @@ getWU163763 <- function(){
   
 }
 
+
+#' mzR reader method
+#'
+#' @param object an mzR object
+#'
+#' @return an \code{\link{rawDiag}} object
+#' @author Christian Panse <cp@fgcz.ethz.ch>, Witold E.Wolski <wew@fgcz.ethz.ch>
+as.rawDiag.mzR <- function(object){
+  #time.start <- Sys.time()
+  runInfo <- runInfo(object)
+  rv <- lapply(1:runInfo$scanCount, 
+               function(x){data.frame(header(object, x))})
+  rv <- bind_rows(rv)
+  
+  #time.end <- Sys.time()
+  #message(time.start - time.end)
+  
+  rv <- rv[, c('acquisitionNum', 'retentionTime', 'basePeakMZ',
+               'basePeakIntensity', 'totIonCurrent', 'msLevel', 'precursorMZ',
+               'precursorCharge')]
+  
+  
+  colnames(rv) <- c('scanNumber', 'StartTime', 'BasePeakMass',
+                    'BasePeakIntensity', 'TIC', 'MSOrder', 'PrecursorMass',
+                    'ChargeState')
+  
+  rv$filename <- basename(fileName(object))
+  as.rawDiag(rv)
+}
 #labs.title=element_blank(),
 #labs(title = "Precursor mass to charge frequency plot ") +
 #  labs(subtitle = "Plotting frequency of precursor masses for each charge state") +
