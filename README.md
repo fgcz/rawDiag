@@ -1,4 +1,4 @@
-# rawDiag <img src="inst/shiny/demo/www/octopussy.png" align="right" width="100px" />
+# rawDiag <img src="inst/graphics/sticker.png" align="right" width="100px" />
 
 an R package supporting rational LC-MS method optimization for bottom-up proteomics
 
