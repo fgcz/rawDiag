@@ -149,6 +149,41 @@ as.rawDiag <- function(object){
   object[, colnames(object) %in% .getDesiredColNames()]
 }
 
+#' mzR reader method
+#'
+#' @param object an mzR object
+#'
+#' @return an \code{\link{rawDiag}} object
+#' @author Christian Panse <cp@fgcz.ethz.ch>, Witold E.Wolski <wew@fgcz.ethz.ch>
+#' @example 
+#' 
+#' \dontrun{
+#' library(mzR)
+#' mzmlFilename <- "PXD006932/Exp3A/20161213_NGHF_DBJ_SA_Exp3A_HeLa_1ug_15min_15000_01.mzML"
+#' S <- as.rawDiag.mzR(openMSfile(mzmlFilename))
+#' }
+as.rawDiag.mzR <- function(object){
+  #time.start <- Sys.time()
+  runInfo <- runInfo(object)
+  rv <- lapply(1:runInfo$scanCount, 
+               function(x){data.frame(header(object, x))})
+  rv <- bind_rows(rv)
+  
+  #time.end <- Sys.time()
+  #message(time.start - time.end)
+  
+  rv <- rv[, c('acquisitionNum', 'retentionTime', 'basePeakMZ',
+               'basePeakIntensity', 'totIonCurrent', 'msLevel', 'precursorMZ',
+               'precursorCharge')]
+  
+  
+  colnames(rv) <- c('scanNumber', 'StartTime', 'BasePeakMass',
+                    'BasePeakIntensity', 'TIC', 'MSOrder', 'PrecursorMass',
+                    'ChargeState')
+  
+  rv$filename <- basename(fileName(object))
+  as.rawDiag(rv)
+}
 .read.thermo.raw.ssh <- function(file, mono = TRUE, hostname = "fgcz-r-021.uzh.ch",
                                  exec = "mono ~cpanse/bin/fgcz_raw.exe",
                                  user='cpanse', argv="qc"){
@@ -1054,7 +1089,6 @@ PlotMassHeatmap <- function(x, method='trellis', bins = 80){ #rename to mass.hea
   
   gp <- ggplot(res, aes_string(x = 'StartTime', y = 'deconv')) + 
     geom_hex(bins = bins ) +
-    facet_wrap(~filename) +
     scale_fill_gradientn(colours = colorvector) +
     scale_x_continuous(breaks = scales::pretty_breaks(8)) + 
     scale_y_continuous(breaks = scales::pretty_breaks(15)) + 
@@ -1846,6 +1880,7 @@ getWU163763 <- function(){
   )
   
 }
+
 
 #labs.title=element_blank(),
 #labs(title = "Precursor mass to charge frequency plot ") +

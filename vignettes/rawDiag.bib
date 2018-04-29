@@ -1,5 +1,6 @@
 % 29183128 
 @Article{pmid29183128,
+   doi = {10.1021/acs.jproteome.7b00602},
    Author="Kelstrup, C. D.  and Bekker-Jensen, D. B.  and Arrey, T. N.  and Hogrebe, A.  and Harder, A.  and Olsen, J. V. ",
    Title="{{P}erformance {E}valuation of the {Q} {E}xactive {H}{F}-{X} for {S}hotgun {P}roteomics}",
    Journal="J. Proteome Res.",
@@ -13,6 +14,7 @@
 
 % 29324744
 @Article{pmid29324744,
+   doi = {10.1371/journal.pone.0189209},
    Author="Chiva, C.  and Olivella, R.  and Borras, E.  and Espadas, G.  and Pastor, O.  and Sole, A.  and Sabido, E. ",
    Title="{{Q}{C}loud: {A} cloud-based quality control system for mass spectrometry-based proteomics laboratories}",
    Journal="PLoS ONE",
@@ -56,14 +58,15 @@
 }
 
 @BOOK{Cleveland93,
-  Author={William S. Cleveland},
+  Author={Cleveland, William S.},
   Title={Visualizing Data},
   Publisher={Hobart Press, Summit, New Jersey, U.S.A},
-  YEAR=1993,
+  YEAR={1993},
   Edition={1st}
 }
 
 @book{RSarkar2008,
+  doi = {10.1007/978-0-387-75969-2},
   author = {Sarkar, Deepayan},
   title = {Lattice: {M}ultivariate Data Visualization with {R}},
   publisher = {Springer},
@@ -100,6 +103,7 @@
 
   
 @book{Wilkinson2005,
+ doi = {10.1007/0-387-28695-0},
  author = {Wilkinson, Leland},
  title = {The Grammar of Graphics (Statistics and Computing)},
  year = {2005},
@@ -108,15 +112,16 @@
  address = {Secaucus, NJ, USA},
 } 
 
- @Book{Hadley2009,
+@Book{Hadley2009,
+  doi = {10.1007/978-0-387-98141-3},
     author = {Hadley Wickham},
     title = {ggplot2: Elegant Graphics for Data Analysis},
     publisher = {Springer-Verlag New York},
     year = {2009},
     isbn = {978-0-387-98140-6},
     url = {http://ggplot2.org},
-  }
-  
+}
+
   
   % 27553853 
 @Article{Savaryn2016,
@@ -193,3 +198,86 @@
   Year=2013
 }
  
+ @article{pmid24645190,
+  doi = {10.1038/nmeth.2837},
+  url = {https://doi.org/10.1038/nmeth.2837},
+  year  = {2014},
+  month = {feb},
+  publisher = {Springer Nature},
+  volume = {11},
+  number = {2},
+  pages = {113--113},
+  title = {Kick the bar chart habit},
+  journal = {Nature Methods}
+}
+
+
+ % 24645190
+@Article{pmid24645190OLD,
+   doi = {10.1038/nmeth.2837},
+   Author="No authors listed",
+   Title="{{K}ick the bar chart habit}",
+   journal = {Nature Methods},
+   Year="2014",
+   Volume="11",
+   Number="2",
+   Pages="113",
+   Month="Feb"
+}
+
+@article{Kelstrup2017,
+  doi = {10.1021/acs.jproteome.7b00602},
+  url = {https://doi.org/10.1021/acs.jproteome.7b00602},
+  year  = {2017},
+  month = {dec},
+  publisher = {American Chemical Society ({ACS})},
+  volume = {17},
+  number = {1},
+  pages = {727--738},
+  author = {Christian D. Kelstrup and Dorte B. Bekker-Jensen and Tabiwang N. Arrey and Alexander Hogrebe and Alexander Harder and Jesper V. Olsen},
+  title = {Performance Evaluation of the Q Exactive {HF}-X for Shotgun Proteomics},
+  journal = {Journal of Proteome Research}
+}
+
+
+@article{Kelstrup2012,
+  doi = {10.1021/pr3000249},
+  url = {https://doi.org/10.1021/pr3000249},
+  year  = {2012},
+  month = {may},
+  publisher = {American Chemical Society ({ACS})},
+  volume = {11},
+  number = {6},
+  pages = {3487--3497},
+  author = {Christian D. Kelstrup and Clifford Young and Richard Lavallee and Michael L. Nielsen and Jesper V. Olsen},
+  title = {Optimized Fast and Sensitive Acquisition Methods for Shotgun Proteomics on a Quadrupole Orbitrap Mass Spectrometer},
+  journal = {Journal of Proteome Research}
+}
+
+
+@article{Kelstrup2014,
+  doi = {10.1021/pr500985w},
+  url = {https://doi.org/10.1021/pr500985w},
+  year  = {2014},
+  month = {nov},
+  publisher = {American Chemical Society ({ACS})},
+  volume = {13},
+  number = {12},
+  pages = {6187--6195},
+  author = {Christian D. Kelstrup and Rosa R. Jersie-Christensen and Tanveer S. Batth and Tabiwang N. Arrey and Andreas Kuehn and Markus Kellmann and Jesper V. Olsen},
+  title = {Rapid and Deep Proteomes by Faster Sequencing on a Benchtop Quadrupole Ultra-High-Field Orbitrap Mass Spectrometer},
+  journal = {Journal of Proteome Research}
+}
+
+@article{TrachselJPR,
+	author = {Trachsel, Christian and Panse, Christian and Kockmann, Tobias and Wolski, Witold Eryk and Grossmann, Jonas and Schlapbach, Ralph},
+	title = {rawDiag - an R package supporting rational LC-MS method optimization for bottom-up proteomics},
+	year = {2018},
+	doi = {10.1101/304485},
+	publisher = {Cold Spring Harbor Laboratory},
+	abstract = {Optimizing methods for liquid chromatography coupled to mass spectrometry (LC-MS) is a non-trivial task. Here we present rawDiag, a software tool supporting rational method optimization by providing MS operator-tailored diagnostic plots of scan level metadata. rawDiag is implemented as R package and can be executed on the command line, or through a graphical user interface (GUI) for less experienced users. The code runs platform independent and can process a hundred raw files in less than three minutes on current consumer hardware as we show by our benchmark. In order to demonstrate the functionality of our package, we included a real-world example taken from our daily core facility business. The R package itself, a shiny demo application, and a Dockerfile that builds the entire architecture from scratch is accessible through a GitHub repository, see https://github.com/protViz/rawDiag},
+	URL = {https://www.biorxiv.org/content/early/2018/04/24/304485},
+	eprint = {https://www.biorxiv.org/content/early/2018/04/24/304485.full.pdf},
+	journal = {bioRxiv}
+}
+

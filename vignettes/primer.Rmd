@@ -1,0 +1,147 @@
+---
+title: "rawDiag - Diagnostic Plots for Mass Spectrometry Data"
+subtitle: "Howto Use Diagnostic Plots for Orbitrap Instruments"
+author: "Christian Trachsel, Christian Panse"
+date: "`r Sys.Date()`"
+output: tint::tintPdf
+bibliography: rawDiag.bib
+link-citations: yes
+vignette: >
+  %\VignetteIndexEntry{Getting Started with rawDiag}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+library(tint)
+# invalidate cache when the package version changes
+knitr::opts_chunk$set(tidy = FALSE, cache.extra = packageVersion('tint'))
+options(htmltools.dir.version = FALSE, warn = -1)
+```
+
+# Intro
+[@TrachselJPR]
+
+# Installation
+
+
+The R package can be installed via the following command line.
+
+```{r eval=FALSE}
+devtools::install_github("protViz/rawDiag")
+```
+
+```{r}
+library(rawDiag)
+```
+
+# Read Data 
+
+
+
+## Thermo Fisher Scientific's RawFileReader
+
+Most promissing for Orbitrap instrument is to use
+the function read.raw which uses the 
+RawFileReader libraries^[See [RawFileReader](http://planetorbitrap.com/rawfilereader#.WuM718iLmL4) New RawFileReader from Thermo Fisher Scientific.]
+```{r eval=FALSE}
+MS <- read.raw(file = "20180306_39_autoQC01.raw"), mono = TRUE)
+```
+
+
+The read.raw function requires the library beeing installed and the 
+with that vignette file shipped C# code compiled. On a Debian Linux Platform it 
+can be done by the following bash snippet.
+```
+RUN apt-get update \
+  && apt-get install mono-complete vim less unzip r-base curl -y \
+  && cd /tmp/ \
+  && unzip /tmp/ThermoRawFileReader_linux.4.0.22.nupkg \
+  && gacutil -i lib/ThermoFisher.CommonCore.BackgroundSubtraction.dll \
+  && gacutil -i lib/ThermoFisher.CommonCore.Data.dll \
+  && gacutil -i lib/ThermoFisher.CommonCore.RawFileReader.dll \
+  && echo $?
+
+ADD fgcz_raw.cs /tmp/
+RUN cd /tmp \
+  && mcs /out:/usr/local/bin/fgcz_raw.exe \
+  fgcz_raw.cs /r:lib/ThermoFisher.CommonCore.Data.dll \
+  /r:lib/ThermoFisher.CommonCore.MassPrecisionEstimator.dll \
+  /r:lib/ThermoFisher.CommonCore.RawFileReader.dll /target:exe 
+```
+
+## Use Bruker timsTOF Data
+
+t.b.d.
+
+## Use mzR
+
+The code snippet below demonstrate how open file standards through using the
+mzR^[See [mzR](http://bioconductor.org/packages/mzR/) parser for netCDF, mzXML, mzData and mzML and mzIdentML files.]
+bioconductor package can be used.
+```{r}
+library(mzR)
+rawDiag:::as.rawDiag.mzR
+```
+
+# Usage
+
+In the following we display some of our demonstration data shipped with the
+package. The following code will make the WU163230 data available.
+```{r load}
+data(WU163230.RData)
+```
+
+The package handles data.frame object. having a defined set column names
+```{r}
+class(WU163230)
+rawDiag:::.getDesiredColNames()
+```
+
+Helper-functions test if the data.frame have the right column names.
+```{r}
+is.rawDiag(WU163230)
+```
+
+```{r recursorHeatmap, fig.margin = TRUE, fig.cap = "A precursor heatmap of WU163230", fig.width=3.5, fig.height=2.5, cache=TRUE}
+PlotPrecursorHeatmap(WU163230)
+```
+
+```{r}
+knitr::kable(summary.rawDiag(WU163230))
+```
+
+```{r cycletime, fig.margin = TRUE, fig.cap = "A cycle time plot of WU163230.", fig.width=3.5, fig.height=7, cache=TRUE}
+library(ggplot2)
+
+gp <- PlotCycleTime(WU163230) + 
+  scale_y_continuous(breaks = scales::pretty_breaks(3))
+```
+
+print object class
+
+```{r}
+  class(gp)
+```
+
+
+```{r cycletime2, fig.margin = TRUE, fig.cap = "A cycle time of one raw file.", fig.width=3.5, fig.height=3.5, cache=TRUE}
+library(tidyverse)
+gp <- WU163230 %>% 
+  filter(filename == "20180125_23_500ng_HeLa_15Hz_DDA.raw") %>% 
+  PlotScanTime() 
+
+print(gp + 
+        facet_grid(filename + MassAnalyzer + MSOrder ~ .))
+```
+  
+# Plot Functions Overview
+t.b.d.
+
+# Session Information
+An overview of the package versions used to produce this document are shown below.
+
+```{r}
+sessionInfo()
+```
+
