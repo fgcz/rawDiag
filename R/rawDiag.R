@@ -184,6 +184,7 @@ as.rawDiag.mzR <- function(object){
   rv$filename <- basename(fileName(object))
   as.rawDiag(rv)
 }
+
 .read.thermo.raw.ssh <- function(file, mono = TRUE, hostname = "fgcz-r-021.uzh.ch",
                                  exec = "mono ~cpanse/bin/fgcz_raw.exe",
                                  user='cpanse', argv="qc"){
@@ -198,6 +199,38 @@ as.rawDiag.mzR <- function(object){
                         stringsAsFactors = FALSE,
                         header = TRUE))
   
+}
+
+#' Reading Bruker tdf files
+#'
+#' @param filea filename if the tdf file
+#'
+#' @return a rawDiagobject
+#' @import RSQLite
+#' @export read.tdf
+#' 
+#' 
+#' @details 
+#' 
+#'   Id LargestPeakMz AverageMz MonoisotopicMz Charge ScanNumber Intensity Parent
+#' 1  1      827.5638  828.0039       827.5638      1   623.2419      3239      3
+#' 2  2      727.6347  727.9152       727.6347      1   682.1215      2610      3
+#' 
+#' 
+read.tdf <- function(filename){
+  con <- dbConnect(RSQLite::SQLite(), filename)
+  rv <- dbGetQuery(con, "SELECT * FROM Precursors a INNER JOIN Frames b on a.id == b.id;");
+  dbDisconnect(con)
+  
+  
+  rv <- rv[, c('Id','Time','ScanNumber','Intensity','SummedIntensities',
+               'MonoisotopicMz', 'Charge', 'MsMsType')];
+  colnames(rv) <- c('scanNumber','StartTime','BasePeakMass','BasePeakIntensity',
+                    'totIonCurrent', 'PrecursorMass','ChargeState','MSOrder')
+  rv$filename <- basename(filename)
+  rv$MSOrder[rv$MSOrder == 0] <- "Ms"
+  rv$MSOrder[rv$MSOrder == 8] <- "Ms2"
+  as.rawDiag(rv)
 }
 
 #' mass spec reader function 
