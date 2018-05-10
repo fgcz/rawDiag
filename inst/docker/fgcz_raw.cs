@@ -1,10 +1,10 @@
-﻿/// adapded from the ThermoFischer `Hello, world!` example provided by Jim Shofstahl 
-/// see URL http://planetorbitrap.com/rawfilereader#.WjkqIUtJmL4
-/// the ThermoFisher library has to be manual downloaded and installed
-/// Please read the License document
-/// Witold Wolski <wew@fgcz.ethz.ch> and Christian Panse <cp@fgcz.ethz.ch
-/// 2017-09-25 Zurich, Switzerland
-/// 2018-04-24 Zurich, Switzerland
+﻿ /// adapded from the ThermoFischer `Hello, world!` example provided by Jim Shofstahl 
+ /// see URL http://planetorbitrap.com/rawfilereader#.WjkqIUtJmL4
+ /// the ThermoFisher library has to be manual downloaded and installed
+ /// Please read the License document
+ /// Witold Wolski <wew@fgcz.ethz.ch> and Christian Panse <cp@fgcz.ethz.ch
+ /// 2017-09-25 Zurich, Switzerland
+ /// 2018-04-24 Zurich, Switzerland
 
  
 using System;
@@ -13,8 +13,9 @@ using System.Diagnostics;
 using System.IO;
 using System.Runtime.ExceptionServices;
 using System.Collections;
+//using System.Data.Common;
 using System.Linq;
-using System.Runtime.InteropServices;
+//using System.Runtime.InteropServices;
 using ThermoFisher.CommonCore.Data;
 using ThermoFisher.CommonCore.Data.Business;
 using ThermoFisher.CommonCore.Data.FilterEnums;
@@ -22,11 +23,225 @@ using ThermoFisher.CommonCore.Data.Interfaces;
 using ThermoFisher.CommonCore.MassPrecisionEstimator;
 using ThermoFisher.CommonCore.RawFileReader;
 
-namespace fgcz_raw
+
+namespace FGCZExtensions
+{
+    //Extension methods must be defined in a static class
+    public static class StringExtension
+    {
+        /// <summary>
+        /// make all the existing header names distinct
+        /// </summary>
+        /// <author>
+        /// Christian Panse <cp@fgcz.ethz.ch> 2017-11-02
+        /// </author>
+        /// <param name="s"> a string</param>
+        /// <returns>a string</returns>
+        public static string CleanRawfileTrailerHeader(this string s)
+        {
+            return(s.Replace(" ", "")
+                .Replace("#", "")
+                .Replace("m/z", "mZ")
+                .Replace("M/Z", "mZ")
+                .Replace("(", "")
+                .Replace(".", "")
+                .Replace(")", "")
+                .Replace(":", "")
+                .Replace("-", "")
+                .Replace("=", ""));
+        }
+    }
+
+    public static class IRawDataPlusExtension
+    {
+        private static void PrintSpectrum(this IRawDataPlus rawFile, int scanNumber)
+        {
+            var trailerFields = rawFile.GetTrailerExtraHeaderInformation();
+
+            var idx_PEPMASS = trailerFields
+                .Select((item, index) => new
+                {
+                    name = item.Label.ToString().CleanRawfileTrailerHeader(),
+                    Position = index
+                })
+                .First(x => x.name.Contains("Monoisotopic")).Position;
+
+            var idx_CHARGE = trailerFields
+                .Select((item, index) => new
+                {
+                    name = item.Label.ToString(),
+                    Position = index
+                })
+                .First(x => x.name.Contains("Charge State")).Position;
+
+            var scanStatistics = rawFile.GetScanStatsForScanNumber(scanNumber);
+            var centroidStream = rawFile.GetCentroidStream(scanNumber, false);
+            if (scanStatistics.IsCentroidScan && centroidStream.Length > 0)
+            {
+                // Get the centroid (label) data from the RAW file for this scan
+                var scanTrailer = rawFile.GetTrailerExtraInformation(scanNumber);
+
+                Console.WriteLine("BEGIN IONS");
+                Console.WriteLine("TITLE=File: \"{0}\"; scans: {1}", Path.GetFileName(rawFile.FileName),
+                    scanNumber);
+                Console.WriteLine("PEPMASS={0} {1}", scanTrailer.Values.ToArray()[idx_PEPMASS],
+                    Math.Round(scanStatistics.BasePeakIntensity));
+                Console.WriteLine("CHARGE={0}+", scanTrailer.Values.ToArray()[idx_CHARGE]);
+                Console.WriteLine("RTINSECONDS={0}", Math.Round(scanStatistics.StartTime * 60));
+                Console.WriteLine("SCANS={0}", scanNumber);
+
+                for (int i = 0; i < centroidStream.Length; i++)
+                {
+                    Console.WriteLine("{0:F4} {1:F0}", centroidStream.Masses[i], centroidStream.Intensities[i]);
+                }
+                Console.WriteLine("END IONS\n");
+            }
+            else
+            {
+                Console.WriteLine("# No centroid stream available");
+            }
+        }
+
+        
+        public static void ExtractQualityControlTable(this IRawDataPlus rawFile)
+        {
+            int firstScanNumber = rawFile.RunHeaderEx.FirstSpectrum;
+            int lastScanNumber = rawFile.RunHeaderEx.LastSpectrum;
+            var filename =Path.GetFileName(rawFile.FileName);
+            if (true)
+            {
+                // TODO(cp): rename header; start with capital character
+                Console.Write(
+                    "filename"
+                    + "\tscanNumber"
+                    + "\tScanEventNumber"
+                    + "\tStartTime"
+                    + "\tBasePeakMass"
+                    + "\tBasePeakIntensity"
+                    + "\tTIC"
+                    + "\tScanType"
+                    + "\tCycleNumber"
+                    + "\tFrequency"
+                    + "\tHighMass"
+                    + "\tIonizationMode"
+                    + "\tMSOrder"
+                    + "\tMassAnalyzer"
+                    + "\tDetector"
+                    + "\tLock"
+                    + "\tPrecursorMass"
+                    + "\tLastPrecursorMass"
+                    + "\tCollisionEnergy"
+                    + "\tIsolationWidth"
+                );
+                var trailerFields = rawFile.GetTrailerExtraHeaderInformation();
+                foreach (var field in trailerFields)
+                {
+                    Console.Write("\t{0}", field.Label.ToString().CleanRawfileTrailerHeader());
+                }
+            }
+            
+            // "filename"          "scanNumber"       "StartTime"          "BasePeakMass"      "BasePeakIntensity"  
+            // "TIC"                "ScanType"           "CycleNumber"   "MSOrder"            "MassAnalyzer"  
+            // "PrecursorMass"     
+            
+            // "ChargeState"      
+            //  [13] "IonInjectionTimems" "OrbitrapResolution" "FTResolution"       "MasterScanNumber" 
+            //  [17] "LMCorrectionppm"    "LMmZCorrectionppm" -> LMCorrection
+
+
+            Console.WriteLine();
+
+            foreach (var scanNumber in Enumerable
+                .Range(1, lastScanNumber - firstScanNumber))
+            {
+                var scanStatistics = rawFile.GetScanStatsForScanNumber(scanNumber);
+                var scanFilter = rawFile.GetFilterForScanNumber(scanNumber);
+                var scanEvent = rawFile.GetScanEventForScanNumber(scanNumber);
+                var scanTrailer = rawFile.GetTrailerExtraInformation(scanNumber);
+
+//                       var xx = rawFile.
+                // Console.WriteLine("Polarity: {0}", filter.Polarity);
+
+                Console.Write(
+                    Path.GetFileName(filename)
+                    + "\t" + scanNumber
+                    + "\t" + scanStatistics.ScanEventNumber
+                    + "\t" + scanStatistics.StartTime
+                    + "\t" + scanStatistics.BasePeakMass
+                    + "\t" + scanStatistics.BasePeakIntensity.ToString()
+                    + "\t" + scanStatistics.TIC.ToString()
+                    + "\t" + scanStatistics.ScanType.ToString()
+                    + "\t" + scanStatistics.CycleNumber.ToString()
+                    + "\t" + scanStatistics.Frequency.ToString()
+                    + "\t" + scanStatistics.HighMass.ToString()
+                    + "\t" + scanFilter.IonizationMode.ToString()
+                    + "\t" + scanFilter.MSOrder.ToString()
+                    + "\t" + scanFilter.MassAnalyzer.ToString()
+                    + "\t" + scanFilter.Detector.ToString()
+                    + "\t" + scanFilter.Lock.ToString() + "\t");
+
+                try
+                {
+                    var reaction0 = scanEvent.GetReaction(0);
+                    Console.Write(reaction0.PrecursorMass
+                                  + "\t" + reaction0.LastPrecursorMass
+                                  + "\t" + reaction0.CollisionEnergy
+                                  + "\t" + reaction0.IsolationWidth
+                    );
+                }
+                catch
+                {
+                    Console.Write("NA\tNA\tNA\tNA");
+                }
+
+                foreach (var scanTrailerField in scanTrailer.Values)
+                {
+                    Console.Write("\t{0}", scanTrailerField);
+                }
+                Console.WriteLine();
+            }
+            //GetIntensitySum(rawFile, i, firstFilter.ToString(), true));
+        }
+
+        /// <summary>
+        /// TODO(cp): replace the console output by a text stream as return value
+        /// </summary>
+        /// <param name="rawFile"></param>
+        public static void ExtractMascotGenericFile(this IRawDataPlus rawFile)
+        {
+            int firstScanNumber = rawFile.RunHeaderEx.FirstSpectrum;
+            int lastScanNumber = rawFile.RunHeaderEx.LastSpectrum;
+     
+            foreach (var scanNumber in Enumerable.Range(1, lastScanNumber - firstScanNumber))
+            {
+                if ( rawFile.GetFilterForScanNumber(scanNumber).ToString().Contains("Full ms2"))
+                {
+                    rawFile.PrintSpectrum(scanNumber);
+                }
+            }
+        }
+    }
+}
+
+namespace FGCZ_Raw
 {
 
+    using FGCZExtensions;
+    /// <summary>
+    /// A C# example program showing how to use RAWFileReader.  More information on the RAWFileReader methods used
+    /// in this example and the other methods available in RAWFileReader can be found in the RAWFileReader user
+    /// documentation, that is installed with the RAWFileReader software.
+    /// This program has been tested with RAWFileReader 4.0.22  Changes maybe necessary with other versions
+    /// of RAWFileReader.
+    /// </summary>
     internal static class Program
     {
+        /// <summary>
+        /// The main routine for this example program.  This example program only shows how to use the RawFileReader library
+        /// in a single-threaded application but our documentation for RawFileReader describes how to use it in a multi-threaded
+        /// application.
+        /// </summary>
+        /// <param name="args">The command line arguments for this program.  The RAW file name should be passed as the first argument</param>
         private static void Main(string[] args)
         {
             // This local variable controls if the AnalyzeAllScans method is called
@@ -53,8 +268,18 @@ namespace fgcz_raw
                 if (args.Length > 0)
                 {
                     filename = args[0];
-                    mode = args[1];
+
+                    if (args.Length == 1)
+                    {
+                        Console.WriteLine("missing mode argument. setting to mode = 'info'.");
+                        mode = "info";
+                    }
+                    else
+                    {
+                        mode = args[1];
+                    }
                     
+
                     if (!hashtable.Contains(mode))
                     {
                         Console.WriteLine("mode '{0}' not allowed. Please use one of the following modes:", mode);
@@ -62,7 +287,7 @@ namespace fgcz_raw
                         {
                             Console.WriteLine("{0} - {1}", k.ToString(), hashtable[k].ToString());
                         }
-                        
+
                         Environment.Exit(1);
                     }
                 }
@@ -96,7 +321,6 @@ namespace fgcz_raw
                 if (rawFile.IsError)
                 {
                     Console.WriteLine("Error opening ({0}) - {1}", rawFile.FileError, filename);
-
                     return;
                 }
 
@@ -110,12 +334,15 @@ namespace fgcz_raw
 
                 if (mode == "info")
                 {
+                    Console.WriteLine("***");
+                    
                     // Get the number of instruments (controllers) present in the RAW file and set the 
                     // selected instrument to the MS instrument, first instance of it
                     Console.WriteLine("The RAW file has data from {0} instruments", rawFile.InstrumentCount);
                 }
 
                 rawFile.SelectInstrument(Device.MS, 1);
+                //Console.WriteLine("DEBUG {0}", rawFile.GetInstrumentMethod(3).ToString());
 
                 // Get the first and last scan from the RAW file
                 int firstScanNumber = rawFile.RunHeaderEx.FirstSpectrum;
@@ -153,6 +380,7 @@ namespace fgcz_raw
                     Console.WriteLine("   Description: " + rawFile.FileHeader.FileDescription);
                     Console.WriteLine("   Instrument model: " + rawFile.GetInstrumentData().Model);
                     Console.WriteLine("   Instrument name: " + rawFile.GetInstrumentData().Name);
+//                    Console.WriteLine("   Instrument method: {0}", rawFile.GetAllInstrumentFriendlyNamesFromInstrumentMethod().Length);
                     Console.WriteLine("   Serial number: " + rawFile.GetInstrumentData().SerialNumber);
                     Console.WriteLine("   Software version: " + rawFile.GetInstrumentData().SoftwareVersion);
                     Console.WriteLine("   Firmware version: " + rawFile.GetInstrumentData().HardwareVersion);
@@ -163,8 +391,8 @@ namespace fgcz_raw
                         Enumerable
                             .Range(1, lastScanNumber - firstScanNumber)
                             .Count(x => rawFile.GetFilterForScanNumber(x)
-                                .ToString()
-                                .Contains("Full ms2")));
+                               .ToString()
+                               .Contains("Full ms2")));
                     Console.WriteLine("   Scan range: {0} - {1}", firstScanNumber, lastScanNumber);
                     Console.WriteLine("   Time range: {0:F2} - {1:F2}", startTime, endTime);
                     Console.WriteLine("   Mass range: {0:F4} - {1:F4}", rawFile.RunHeaderEx.LowMass,
@@ -183,26 +411,25 @@ namespace fgcz_raw
                     Console.WriteLine("   Sample row number: " + rawFile.SampleInformation.RowNumber);
                     Console.WriteLine("   Sample dilution factor: " + rawFile.SampleInformation.DilutionFactor);
                     Console.WriteLine();
-                }
 
                 // Read the first instrument method (most likely for the MS portion of the instrument).
                 // NOTE: This method reads the instrument methods from the RAW file but the underlying code
                 // uses some Microsoft code that hasn't been ported to Linux or MacOS.  Therefore this
                 // method won't work on those platforms therefore the check for Windows.
-                if (Environment.OSVersion.ToString().Contains("Windows"))
-                {
-                    var deviceNames = rawFile.GetAllInstrumentNamesFromInstrumentMethod();
-
-                    foreach (var device in deviceNames)
+                    if (Environment.OSVersion.ToString().Contains("Windows"))
                     {
-                        Console.WriteLine("Instrument method: " + device);
-                    }
+                        var deviceNames = rawFile.GetAllInstrumentNamesFromInstrumentMethod();
 
-                    Console.WriteLine();
+                        foreach (var device in deviceNames)
+                        {
+                            Console.WriteLine("Instrument method: " + device);
+                        }
+
+                        Console.WriteLine();
+                    }
                 }
 
                 // Display all of the trailer extra data fields present in the RAW file
-                //ListTrailerExtraFields(rawFile);
 
                 // Get the number of filters present in the RAW file
                 int numberFilters = rawFile.GetFilters().Count;
@@ -217,6 +444,7 @@ namespace fgcz_raw
                     Console.WriteLine("   Scan filter (last scan): " + lastFilter.ToString());
                     Console.WriteLine("   Total number of filters: " + numberFilters);
                     Console.WriteLine();
+                   //  ListTrailerExtraFields(rawFile);
                     Environment.Exit(0);
                 }
 
@@ -249,107 +477,15 @@ namespace fgcz_raw
                 
                 if (mode == "qc")
                 {
-                    // clsScanInfo oScanInfo;
-                    
-                    if (true)
-                    {
-                        Console.WriteLine(
-                            "filename" 
-                            + "\tscanNumber"
-                            + "\tScanEventNumber"
-                            + "\tStartTime"
-                            + "\tBasePeakMass" 
-                            + "\tBasePeakIntensity"
-                            + "\tTIC"
-                            + "\tScanType"
-                            + "\tCycleNumber"
-                            + "\tFrequency"
-                            + "\tHighMass"
-                            + "\tIonizationMode"
-                            + "\tMSOrder"
-                            + "\tMassAnalyzer" 
-                            + "\tDetector" 
-                            + "\tLock"
-                            + "\tPrecursorMass"
-                            + "\tLastPrecursorMass"
-                            + "\tCollisionEnergy"
-                            + "\tIsolationWidth"
-                            );
-                    }
-
-                    foreach (var scanNumber in Enumerable
-                        .Range(1, lastScanNumber - firstScanNumber))
-                    {
-                        var scanStatistics = rawFile.GetScanStatsForScanNumber(scanNumber);
-                        var scanFilter = rawFile.GetFilterForScanNumber(scanNumber);
-                        var scanEvent = rawFile.GetScanEventForScanNumber(scanNumber);
-                        
- //                       Console.WriteLine(rawFile.GetScanEventStringForScanNumber());
-
-                        Console.Write(
-                            Path.GetFileName(filename)
-                            + "\t" + scanNumber
-                            + "\t" + scanStatistics.ScanEventNumber
-                            + "\t" + scanStatistics.StartTime
-                            + "\t" + scanStatistics.BasePeakMass
-                            + "\t" + scanStatistics.BasePeakIntensity.ToString()
-                            + "\t" + scanStatistics.TIC.ToString()
-                            + "\t" + scanStatistics.ScanType.ToString()
-                            + "\t" + scanStatistics.CycleNumber.ToString()
-                            + "\t" + scanStatistics.Frequency.ToString()
-                            + "\t" + scanStatistics.HighMass.ToString()
-                            + "\t" + scanFilter.IonizationMode.ToString()
-                            + "\t" + scanFilter.MSOrder.ToString()
-                            + "\t" + scanFilter.MassAnalyzer.ToString()
-                            + "\t" + scanFilter.Detector.ToString()
-                            + "\t" + scanFilter.Lock.ToString() + "\t");
-
-                        try
-                        {
-                            var reaction0 = scanEvent.GetReaction(0);
-                            
-                            Console.Write(reaction0.PrecursorMass
-                                + "\t" + reaction0.LastPrecursorMass
-                                + "\t" + reaction0.CollisionEnergy
-                                + "\t" + reaction0.IsolationWidth
-                            );
-                        }catch{
-                            Console.Write("NA\tNA\tNA\tNA");
-                        }
-                        Console.Write("\n");
-                    }
+                    rawFile.ExtractQualityControlTable();
                     Environment.Exit(0);
                 }
-                
                 
                 if (mode == "mgf")
                 {
-                    foreach (var i in Enumerable
-                        .Range(1, lastScanNumber - firstScanNumber)
-                        .Where(x => rawFile.GetFilterForScanNumber(x)
-                            .ToString()
-                            .Contains(" ms2 ")))
-                    {
-                        
-                        var scanStatistics = rawFile.GetScanStatsForScanNumber(i);
-                        var scanFilter = rawFile.GetFilterForScanNumber(i);
-
-                        var centroidStream = rawFile.GetCentroidStream(i, false);
-                        Console.WriteLine(centroidStream.Length);
-
-                        for (var peakid = 0; peakid < centroidStream.Length; peakid++)
-                        {
-                            Console.WriteLine("{0}\t{1:F4}\t{2:F0}\t{3:F0}\tscan={4}", peakid, centroidStream.Masses[peakid],
-                                centroidStream.Intensities[peakid], centroidStream.Charges[peakid], i);
-                            
-                        }
-                        
-                         Console.WriteLine("# GetSpec");
-                         GetSpectrum(rawFile, i, firstFilter.ToString(), true);
-                    }
+                    rawFile.ExtractMascotGenericFile();
                     Environment.Exit(0);
                 }
-                
                 
                 if (mode == "allScans"){
                     Console.WriteLine("BEGIN DEBUG");
@@ -362,7 +498,7 @@ namespace fgcz_raw
     
     
                     // Read the scan information for each scan in the RAW file
-                    // ReadScanInformation(rawFile, firstScanNumber, lastScanNumber, true);
+                    ReadScanInformation(rawFile, firstScanNumber, lastScanNumber, true);
     
                     // Get a spectrum from the RAW file.  
                     //Environment.Exit(0);
@@ -371,6 +507,7 @@ namespace fgcz_raw
                     GetAverageSpectrum(rawFile, 1, 15, false);
                     Environment.Exit(0);
     
+                    // Read each spectrum
                     //ReadAllSpectra(rawFile, firstScanNumber, lastScanNumber, true);
     
                     // Calculate the mass precision for a spectrum
@@ -406,6 +543,18 @@ namespace fgcz_raw
             Console.WriteLine("   Before {0} kb, After {1} kb, Extra {2} kb", memoryBefore, memoryAfter, memoryAfter - memoryBefore);
         }
 
+        /// <summary>
+        /// Reads all of the scans in the RAW and looks for out of order data
+        /// </summary>
+        /// <param name="rawFile">
+        /// The RAW file being read
+        /// </param>
+        /// <param name="firstScanNumber">
+        /// The first scan in the RAW file
+        /// </param>
+        /// <param name="lastScanNumber">
+        /// the last scan in the RAW file
+        /// </param>
         private static void AnalyzeAllScans(IRawDataPlus rawFile, int firstScanNumber, int lastScanNumber)
         {
             // Test the preferred (normal) data and centroid (high resolution/label) data
@@ -856,6 +1005,146 @@ namespace fgcz_raw
                 catch (Exception ex)
                 {
                     Console.WriteLine("Error reading spectrum {0} - {1}", scanNumber, ex.Message);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Read all spectra in the RAW file.
+        /// </summary>
+        /// <param name="rawFile">
+        /// The raw file.
+        /// </param>
+        /// <param name="firstScanNumber">
+        /// The first scan number.
+        /// </param>
+        /// <param name="lastScanNumber">
+        /// The last scan number.
+        /// </param>
+        /// <param name="outputData">
+        /// The output data flag.
+        /// </param>
+        [HandleProcessCorruptedStateExceptions]
+        private static void ReadAllSpectra(IRawDataPlus rawFile, int firstScanNumber, int lastScanNumber, bool outputData)
+        {
+            for (int scanNumber = firstScanNumber; scanNumber <= lastScanNumber; scanNumber++)
+            {
+                try
+                {
+                    // Get the scan filter for the spectrum
+                    var scanFilter = rawFile.GetFilterForScanNumber(firstScanNumber);  
+                    
+                    if (string.IsNullOrEmpty(scanFilter.ToString()))
+                    {
+                        continue;
+                    }
+
+                    // Get the scan from the RAW file.  This method uses the Scan.FromFile method which returns a
+                    // Scan object that contains both the segmented and centroid (label) data from an FTMS scan
+                    // or just the segmented data in non-FTMS scans.  The GetSpectrum method demonstrates an
+                    // alternative method for reading scans.
+                    var scan = Scan.FromFile(rawFile, scanNumber);
+                    
+                    // If that scan contains FTMS data then Centroid stream will be populated so check to see if it is present.
+                    int labelSize = 0;
+
+                    if (scan.HasCentroidStream)
+                    {
+                        labelSize = scan.CentroidScan.Length;
+                    }
+
+                    // For non-FTMS data, the preferred data will be populated
+                    int dataSize = scan.PreferredMasses.Length;
+
+                    if (outputData)
+                    {
+                        Console.WriteLine("Spectrum {0} - {1}: normal {2}, label {3} points", scanNumber, scanFilter.ToString(), dataSize, labelSize);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Error reading spectrum {0} - {1}", scanNumber, ex.Message);
+                }
+            }
+        }
+
+            
+        /// <summary>
+        /// Reads the general scan information for each scan in the RAW file using the scan filter object and also the
+        /// trailer extra data section for that same scan.
+        /// </summary>
+        /// <param name="rawFile">
+        /// The RAW file being read
+        /// </param>
+        /// <param name="firstScanNumber">
+        /// The first scan in the RAW file
+        /// </param>
+        /// <param name="lastScanNumber">
+        /// the last scan in the RAW file
+        /// </param>
+        /// <param name="outputData">
+        /// The output data flag.
+        /// </param>
+        private static void ReadScanInformation(IRawDataPlus rawFile, int firstScanNumber, int lastScanNumber, bool outputData)
+        {
+            // Read each scan in the RAW File
+            for (int scan = firstScanNumber; scan <= lastScanNumber; scan++)
+            {
+                // Get the retention time for this scan number.  This is one of two comparable functions that will
+                // convert between retention time and scan number.
+                double time = rawFile.RetentionTimeFromScanNumber(scan);
+
+                // Get the scan filter for this scan number
+                var scanFilter = rawFile.GetFilterForScanNumber(scan);
+
+                // Get the scan event for this scan number
+                var scanEvent = rawFile.GetScanEventForScanNumber(scan);
+               
+                // Get the ionizationMode, MS2 precursor mass, collision energy, and isolation width for each scan
+                if (scanFilter.MSOrder == MSOrderType.Ms2)
+                {
+                    // Get the reaction information for the first precursor
+                    var reaction = scanEvent.GetReaction(0);
+
+                    double precursorMass = reaction.PrecursorMass;
+                    double collisionEnergy = reaction.CollisionEnergy;
+                    double isolationWidth = reaction.IsolationWidth;
+                    double monoisotopicMass = 0.0;
+                    int masterScan = 0;
+                    var ionizationMode = scanFilter.IonizationMode;
+                    var order = scanFilter.MSOrder;
+
+                    // Get the trailer extra data for this scan and then look for the monoisotopic m/z value in the 
+                    // trailer extra data list
+                    var trailerData = rawFile.GetTrailerExtraInformation(scan);
+
+                    for (int i = 0; i < trailerData.Length; i++)
+                    {
+                        if (trailerData.Labels[i] == "Monoisotopic M/Z:")
+                        {
+                            monoisotopicMass = Convert.ToDouble(trailerData.Values[i]);
+                        }
+
+                        if ((trailerData.Labels[i] == "Master Scan Number:") || (trailerData.Labels[i] == "Master Scan Number") || (trailerData.Labels[i] == "Master Index:"))
+                        {
+                            masterScan = Convert.ToInt32(trailerData.Values[i]);
+                        }
+                    }
+
+                    if (outputData)
+                    {
+                        Console.WriteLine(
+                            "Scan number: {0} @ time {1:F2} - Master scan = {2}, Ionization mode={3}, MS Order={4}, Precursor mass={5:F4}, Monoisotopic Mass = {6:F4}, Collision energy={7:F2}, Isolation width={8:F2}",
+                            scan, time, masterScan, ionizationMode, order, precursorMass, monoisotopicMass, collisionEnergy, isolationWidth);
+                    }
+                }
+                else if (scanFilter.MSOrder == MSOrderType.Ms)
+                {
+                    var scanDependents = rawFile.GetScanDependents(scan, 5);
+
+                    Console.WriteLine(
+                        "Scan number {0} @ time {1:F2} - Instrument type={2}, Number dependent scans={3}",
+                        scan, time, scanDependents.RawFileInstrumentType, scanDependents.ScanDependentDetailArray.Length);
                 }
             }
         }
