@@ -54,10 +54,10 @@ namespace FGCZExtensions
 
     public static class IRawDataPlusExtension
     {
-        private static void PrintSpectrum(this IRawDataPlus rawFile, int scanNumber)
+        private static void PrintMGFSpectrum(this IRawDataPlus rawFile, int scanNumber)
         {
             var trailerFields = rawFile.GetTrailerExtraHeaderInformation();
-
+            
             var idx_PEPMASS = trailerFields
                 .Select((item, index) => new
                 {
@@ -76,18 +76,24 @@ namespace FGCZExtensions
 
             var scanStatistics = rawFile.GetScanStatsForScanNumber(scanNumber);
             var centroidStream = rawFile.GetCentroidStream(scanNumber, false);
+            var scanEvent = rawFile.GetScanEventForScanNumber(scanNumber);
+            
             if (scanStatistics.IsCentroidScan && centroidStream.Length > 0)
             {
                 // Get the centroid (label) data from the RAW file for this scan
                 var scanTrailer = rawFile.GetTrailerExtraInformation(scanNumber);
+                var reaction0 = scanEvent.GetReaction(0);
 
                 Console.WriteLine("BEGIN IONS");
-                Console.WriteLine("TITLE=File: \"{0}\"; scans: {1}", Path.GetFileName(rawFile.FileName),
+                Console.WriteLine("TITLE=File: \"{0}\"; SpectrumID: \"{1}\"; scans: \"{2}\"", 
+                    Path.GetFileName(rawFile.FileName),
+                    null,
                     scanNumber);
-                Console.WriteLine("PEPMASS={0} {1}", scanTrailer.Values.ToArray()[idx_PEPMASS],
+                Console.WriteLine("PEPMASS=*{0}* {1}",
+                    reaction0.PrecursorMass,
                     Math.Round(scanStatistics.BasePeakIntensity));
                 Console.WriteLine("CHARGE={0}+", scanTrailer.Values.ToArray()[idx_CHARGE]);
-                Console.WriteLine("RTINSECONDS={0}", Math.Round(scanStatistics.StartTime * 60));
+                Console.WriteLine("RTINSECONDS={0}", Math.Round(scanStatistics.StartTime * 60 * 100)/100);
                 Console.WriteLine("SCANS={0}", scanNumber);
 
                 for (int i = 0; i < centroidStream.Length; i++)
@@ -216,7 +222,7 @@ namespace FGCZExtensions
             {
                 if ( rawFile.GetFilterForScanNumber(scanNumber).ToString().Contains("Full ms2"))
                 {
-                    rawFile.PrintSpectrum(scanNumber);
+                    rawFile.PrintMGFSpectrum(scanNumber);
                 }
             }
         }
