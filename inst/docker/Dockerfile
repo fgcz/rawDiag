@@ -1,4 +1,4 @@
-FROM rocker/rstudio-stable
+FROM bioconductor/devel_proteomics2
 
 LABEL version="1.0"
 LABEL description="This file illustrates \
@@ -29,12 +29,6 @@ RUN cd /tmp \
   && echo $?
 
 
-RUN apt-get install libxml2
+RUN apt-get install libxml2 -y
 ADD install.R /tmp
 RUN R --no-save < /tmp/install.R && echo $?
-
-
-
-#RUN cd /tmp/ && curl -s https://codeload.github.com/protViz/rawDiag/zip/master > master.zip && unzip master.zip
-#RUN cd /tmp/ && R CMD build rawDiag-master
-#RUN echo "install.packages('devtools', repos=''); library(devtools); devtools::install_github('protViz/rawDiag')" | R --no-save

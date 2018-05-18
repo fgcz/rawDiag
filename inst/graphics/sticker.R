@@ -13,5 +13,3 @@ sticker("~/octopussy_.png",
   s_width = 0.45,
   u_size = 4,
   url = 'https://github.com/protViz/rawDiag')
-
-sticker("~/octopussy_.png", package="rawDiag", p_size=14, s_x=1, s_y=1.05, s_height = 0.55, s_width=0.55, filename="rawDiag_sticker3.png", h_fill='white', h_col = 'cornflowerblue', p_color = 'cornflowerblue', p_y = 0.35, spotlight=TRUE)

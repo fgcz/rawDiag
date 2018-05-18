@@ -37,6 +37,11 @@ library(rawDiag)
 
 # Read Data 
 
+```{r eval=FALSE}
+MS <- read.raw(file = file.path(path.package(package = "rawDiag"),
+                                     file.path("extdata", "20180306_39_autoQC01.raw")),
+                           mono = TRUE)
+```
 
 
 ## Thermo Fisher Scientific's RawFileReader
@@ -83,6 +88,8 @@ bioconductor package can be used.
 library(mzR)
 rawDiag:::as.rawDiag.mzR
 ```
+<<<<<<< HEAD
+=======
 
 # Usage
 
@@ -145,3 +152,4 @@ An overview of the package versions used to produce this document are shown belo
 sessionInfo()
 ```
 
+>>>>>>> 50a1a57481d328c575c994231743116aa7555011
