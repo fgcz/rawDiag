@@ -1642,7 +1642,8 @@ gp <- ggplot(rbind(b.Linux, b.Apple), aes(y=IO.throuput, x=ncpu, group=ncpu)) +
     dplyr::mutate_at(vars("ChargeState"), funs(factor(.)))
   
   figure <- ggplot(res, aes_string(x = "deconv", colour = "filename")) +
-    geom_density(aes(y= ..density.. )) +
+    geom_line(stat = "density") +
+    #geom_density(aes(y= ..density.. )) +
     labs(title = "B ") +
     labs(x = "Neutral Mass [Da]", y = "Density") +
     labs(fill = "Charge State", colour = "Charge State") +
