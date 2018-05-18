@@ -15,6 +15,7 @@ Imports: ggplot2 (>= 2.2.1),
 	hexbin,
 	magrittr,
 	parallel,
+	RSQLite,
 	scales,
 	tidyr,
 	tidyverse

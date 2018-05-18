@@ -215,6 +215,7 @@ stopifnot(is.rawDiag(WU163230))
 @
   
 adapt y-axis number of tickmarks
+
 <<label=cycletime, fig = TRUE, width=4.5, height=6, echo=TRUE, include=TRUE, warnings=TRUE>>=
   library(ggplot2)
 print(gp <- PlotCycleTime(WU163230) + 
