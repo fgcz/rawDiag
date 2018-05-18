@@ -711,7 +711,8 @@ PlotMassDistribution <- function(x, method = 'trellis'){
       dplyr::mutate_at(vars("ChargeState"), funs(factor(.)))
     
     figure <- ggplot(res, aes_string(x = "deconv", colour = "filename")) +
-      geom_density(aes(y= ..density.. )) +
+      geom_line(stat = "density") +
+      #geom_density(aes(y= ..density.. )) + with base line along x axis with density value y= 0
       #geom_histogram(binwidth = 100, alpha = .3, position = "identity") +
       labs(title = "Precursor mass to charge frequency plot ") +
       labs(subtitle = "Plotting frequency of precursor masses for each charge state") +
