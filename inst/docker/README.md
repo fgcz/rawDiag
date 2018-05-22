@@ -23,5 +23,5 @@ docker run -v /scratch/$USER/PXD006932/Exp3A/:/scratch/$USER/PXD006932/Exp3A/ \
   -a stdin \
   -a stdout \
   -i -t \
-  $USER/fgcz-raw:v1 mono /usr/local/bin/fgcz_raw.exe
+  $USER/fgcz-raw:v1 mono /usr/local/bin/fgcz_raw.exe /scratch/$USER/PXD006932/Exp3A/20161213_NGHF_DBJ_SA_Exp3A_HeLa_1ug_7min_7500_03.raw info
 ```
