@@ -7,11 +7,11 @@ an R package supporting rational LC-MS method optimization for bottom-up proteom
 ## 1. System Requirements  
 for Windows/Linux/MacOSX platforms
 
-### The R System
+### 1.1 The R System
 - R (>3.4.0)
 - install https://CRAN.R-project.org/package=devtools
 
-### The New Raw File Reader for Thermo Fisher Scientific Instruments
+### 1.2 The New Raw File Reader for Thermo Fisher Scientific Instruments
 
 Due to license reason, we currently can not distribute Thermo Fisher Scientific software with the *rawDiag* package (we hope that this will change soon).
 The *New RawFileReader from Thermo Fisher Scientific* (see http://planetorbitrap.com/rawfilereader)
@@ -29,7 +29,7 @@ apt-get update \
   && echo $?
 ```
 
-### [Open File Standards*](http://www.psidev.info/)
+### 1.3 [Open File Standards](http://www.psidev.info/)
 support through Bioconductor [mzR](http://bioconductor.org/packages/mzR/). 
 
 ## 2. Installation guide
