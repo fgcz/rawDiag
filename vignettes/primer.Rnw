@@ -1,6 +1,6 @@
 %\VignetteIndexEntry{primer: rawDiag}
 \documentclass[nojss]{jss}
-\usepackage{listingsutf8}
+\usepackage{listings}
 \usepackage[T1]{fontenc} % Use modern font encodings
 \usepackage{tabularx}
 \usepackage{makecell}
@@ -8,7 +8,6 @@
 %\usepackage{color} 
 
 \newcommand*\rawDiag{\textbf{\texttt{rawDiag}}}
-
 
 \author{Christian Trachsel \& Christian Panse}
 \title{Howto Use Diagnostic Plots for Orbitrap Instruments}
@@ -46,9 +45,6 @@ Winterthurerstr. 190, CH-8057 Zurich, Switzerland}
 \newcommand{\rfr}{\href{http://planetorbitrap.com/rawfilereader}{RawFileReader from Thermo Fisher Scientific}~}
 
 \begin{document}
-
-
-
 
 <<echo = FALSE, eval = TRUE>>=
 options(prompt = "R> ", continue = "+  ", width = 70, useFancyQuotes = FALSE)
@@ -111,7 +107,8 @@ therefore peptide ID free and rely on instrument logged data only.
 
 The R package can be installed via the following command line:
 <<eval=FALSE>>=
-devtools::install_github("fgcz/rawDiagnostic")
+library(devtools)
+devtools::install_github("fgcz/rawDiag")
 @
 
 A docker recipe for compiling the adapter function implemented in
@@ -159,14 +156,17 @@ library(rawDiag)
 @
 
 look into for documentation
+
 <<eval=FALSE>>=
 help(package="rawDiag")
 @
 
-\section(Read Data)
-\subsection{Using \code{read.raw}}
+\section{Read Data}
+
+\subsection{Using The New Raw File Reader}
+
 The function \code{read.raw} uses the \rfr to 
-extract the follwoing information out of the mass spectrometric meassurement.
+extract the following information out of the mass spectrometric meassurement.
 
 <<>>=
 library(rawDiag)
@@ -180,10 +180,11 @@ can be seen in the following code snippet:
 system.time(RAW <- read.raw(file = "~/data/20130115_01_iRT_Fet10fmol.RAW"))
 @
 
-\subsection{Using the \code{mzR} package}
+\subsection{Using the mzR package}
 
 <<eval = FALSE>>=
-library(mzR); library(rawDiag)
+library(mzR); 
+library(rawDiag)
 RAW <- rawDiag:::as.rawDiag.mzR(openMSfile("/scratch/cpanse/PXD006932/Exp3A/20161213_NGHF_DBJ_SA_Exp3A_HeLa_1ug_15min_15000_01.mzML"))
 
 PlotChargeState(RAW)
@@ -210,7 +211,7 @@ package.
 load sample data
 <<label=load, eval=TRUE>>=
 load(file.path(path.package(package = "rawDiag"),
-                 file.path("extdata", "WU163230.RData")))
+                 file.path("extdata", "WU163763.RData")))
 stopifnot(is.rawDiag(WU163230))
 @
   
@@ -218,7 +219,7 @@ adapt y-axis number of tickmarks
 
 <<label=cycletime, fig = TRUE, width=4.5, height=6, echo=TRUE, include=TRUE, warnings=TRUE>>=
   library(ggplot2)
-print(gp <- PlotCycleTime(WU163230) + 
+print(gp <- PlotCycleTime(WU163763) + 
         scale_y_continuous(breaks = scales::pretty_breaks(3)))
 @
   
@@ -235,21 +236,14 @@ apply subsetting
 
 <<label=scantime, fig = TRUE, width=4.5, height=4, echo=TRUE, include=TRUE>>=
 # library(dplyr)
-gp <- WU163230 %>% 
-  filter(filename == "20180125_23_500ng_HeLa_15Hz_DDA.raw") %>% 
+gp <- WU163763 %>% 
+  filter(filename == "20180220_04_S174020_Pierce_HeLa_Protein_Digest_Std.raw") %>% 
   PlotScanTime() 
 
 print(gp + 
         facet_grid(filename + MassAnalyzer + MSOrder ~ .))
 @
   
-\section{Function overview}
-<<echo=FALSE>>=
-rv <- rawDiag:::.overview()
-@
-
-
-\input{functions}
 
 
 \section{Benchmark}
