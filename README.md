@@ -28,7 +28,7 @@ apt-get update \
   && gacutil -i lib/ThermoFisher.CommonCore.RawFileReader.dll \
   && echo $?
 ```
-- *open file standards* through Bioconductor [http://bioconductor.org/packages/mzR/](mzR). 
+- *open file standards* through Bioconductor [mzR](http://bioconductor.org/packages/mzR/). 
 ## 2. Installation guide
 
 please note: due to the data size (>=40MB) download can take a while
