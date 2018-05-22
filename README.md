@@ -4,11 +4,12 @@ an R package supporting rational LC-MS method optimization for bottom-up proteom
 
 "Its raw, fast and colourfull!"
 
-## Requirements  
+## 1. System Requirements  
 for Windows/Linux/MacOSX platforms
 
-Due to license reason, we currently can not distribute Thermo Fisher Scientific software with the *rawDiag* package (we hope that this will change soon).
-
+- R (>3.4.0)
+- install https://CRAN.R-project.org/package=devtools
+- The New RawFileReader - Due to license reason, we currently can not distribute Thermo Fisher Scientific software with the *rawDiag* package (we hope that this will change soon).
 The *New RawFileReader from Thermo Fisher Scientific* (see http://planetorbitrap.com/rawfilereader)
 has to be downloaded and installed to use the R function `read.raw`.
 
