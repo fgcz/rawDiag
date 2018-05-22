@@ -7,14 +7,11 @@
 
 - Get *The New RawFileReader from Thermo Fisher Scientific* from http://planetorbitrap.com/rawfilereader
 
-### Build Docker image
+## Build Docker image
 
 ```bash 
 docker build -t $USER/fgcz-raw:v1  .
 ```
-
-### Run the commandline program
-
 
 ## Testing
 
