@@ -38,7 +38,7 @@ please note: due to the data size (>=40MB) download can take a while
 ```{r}
 # install.packages("devtools")
 library("devtools")
-devtools::install_github("protViz/rawDiag")
+devtools::install_github("protViz/rawDiag", build_vignettes = TRUE))
 ```
 
 ## 3. Usage
