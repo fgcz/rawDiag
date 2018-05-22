@@ -19,5 +19,9 @@ docker build -t $USER/fgcz-raw:v1  .
 copy some sample data in the following we use http://central.proteomexchange.org/cgi/GetDataset?ID=PXD006932
 
 ```bash
-docker run -v /scratch/$USER/PXD006932/Exp3A/:/scratch/$USER/PXD006932/Exp3A/ -a stdin -a stdout -i -t $USER/fgcz-raw:v1 mono /usr/local/bin/fgcz_raw.exe
+docker run -v /scratch/$USER/PXD006932/Exp3A/:/scratch/$USER/PXD006932/Exp3A/ \
+  -a stdin \
+  -a stdout \
+  -i -t \
+  $USER/fgcz-raw:v1 mono /usr/local/bin/fgcz_raw.exe
 ```
