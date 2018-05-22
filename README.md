@@ -7,13 +7,17 @@ an R package supporting rational LC-MS method optimization for bottom-up proteom
 ## 1. System Requirements  
 for Windows/Linux/MacOSX platforms
 
+### R 
 - R (>3.4.0)
 - install https://CRAN.R-project.org/package=devtools
-- The New RawFileReader - Due to license reason, we currently can not distribute Thermo Fisher Scientific software with the *rawDiag* package (we hope that this will change soon).
+
+### The New Raw File Reader 
+
+Due to license reason, we currently can not distribute Thermo Fisher Scientific software with the *rawDiag* package (we hope that this will change soon).
 The *New RawFileReader from Thermo Fisher Scientific* (see http://planetorbitrap.com/rawfilereader)
 has to be downloaded and installed to use the R function `read.raw`.
 
-for Linux (Debian) system run the following code snippet:
+on Linux (Debian) system run the following code snippet once you have downloaded the libraries:
 ```{sh}
 apt-get update \
   && apt-get install mono-complete vim less unzip r-base -y \
@@ -25,14 +29,14 @@ apt-get update \
   && echo $?
 ```
 
-## Installation
+## Installation guide
 
 please note: due to the data size (>=40MB) download can take a while
 ```{r}
 # install.packages("devtools")
+library("devtools")
 devtools::install_github("protViz/rawDiag")
 ```
-
 
 ## Usage
 
