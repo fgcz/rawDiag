@@ -28,7 +28,7 @@ apt-get update \
   && gacutil -i lib/ThermoFisher.CommonCore.RawFileReader.dll \
   && echo $?
 ```
-
+- *open file standards* through Bioconductor [http://bioconductor.org/packages/mzR/](mzR). 
 ## 2. Installation guide
 
 please note: due to the data size (>=40MB) download can take a while
@@ -60,16 +60,19 @@ library(shiny)
 rawDiag_shiny <- system.file("shiny", "demo", package = "rawDiag")
 shiny::runApp(rawDiag_shiny, display.mode = "normal")
 ```
+## 4. Instructions for use
 
+read the vignettes.
 
-## See Also
+```{r}
+browseVignettes('rawDiag')
+```
 
+## Useful Links
+- http://planetorbitrap.com/rawfilereader
 - screen recording (3:02 minutes, size 47MB, no audio track): http://fgcz-ms.uzh.ch/~cpanse/PAPERS/pr-2018-001736.mov
 - shiny demo on our compute server: http://fgcz-ms-shiny.uzh.ch:8080/rawDiag-demo/
-
-## References
-
-rawDiag - an R package supporting rational LC-MS method optimization for bottom-up proteomics
+- rawDiag - an R package supporting rational LC-MS method optimization for bottom-up proteomics
 Christian Trachsel, Christian Panse, Tobias Kockmann, Witold Eryk Wolski, Jonas Grossmann, Ralph Schlapbach
 bioRxiv 304485; doi: https://doi.org/10.1101/304485
 (manuscript submitted to Journal of Proteome Research; **pr-2018-001736**).
