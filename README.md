@@ -29,7 +29,7 @@ apt-get update \
   && echo $?
 ```
 
-## Installation guide
+## 2. Installation guide
 
 please note: due to the data size (>=40MB) download can take a while
 ```{r}
@@ -38,7 +38,7 @@ library("devtools")
 devtools::install_github("protViz/rawDiag")
 ```
 
-## Usage
+## 3. Usage
 
 "Hello; World!" example on the R command line
 
