@@ -79,3 +79,4 @@ browseVignettes('rawDiag')
 Christian Trachsel, Christian Panse, Tobias Kockmann, Witold Eryk Wolski, Jonas Grossmann, Ralph Schlapbach
 bioRxiv 304485; doi: https://doi.org/10.1101/304485
 (manuscript submitted to Journal of Proteome Research; **pr-2018-001736**).
+- example data: ftp://massive.ucsd.edu/MSV000082389/raw/rawDiag/raw/
