@@ -1256,8 +1256,9 @@ PlotMassHeatmap <- function(x, method='trellis', bins = 80){ #rename to mass.hea
 }
 
 .technote_benchmark_figure_1 <- function(){
-  load(file.path(path.package(package = "rawDiag"),
-                 file.path("extdata", "benchmark.RData")))
+  #load(file.path(path.package(package = "rawDiag"),
+  #               file.path("extdata", "benchmark.RData")))
+  data(benchmark)
   
   gp <- ggplot(rbind(b.Linux, b.Apple), aes(y=overall.runtime, x=ncpu, group=ncpu), color=system) + 
     coord_trans(y = "log10") +
@@ -1272,8 +1273,9 @@ PlotMassHeatmap <- function(x, method='trellis', bins = 80){ #rename to mass.hea
 }
 
 .technote_benchmark_figure_2 <- function(){
-  load(file.path(path.package(package = "rawDiag"),
-                 file.path("extdata", "benchmark.RData")))
+  #load(file.path(path.package(package = "rawDiag"),
+  #               file.path("extdata", "benchmark.RData")))
+  data(benchmark)
   
 b.Linux$IO.throuput <- sum(unique(b.Linux$nrow)) / b.Linux$overall.runtime 
 b.Apple$IO.throuput <- sum(unique(b.Apple$nrow)) / b.Apple$overall.runtime 
@@ -1752,6 +1754,40 @@ getWU163763 <- function(){
   }
 }
 
+.benchmark.mzR <- function(f, maxncpu = c(16, 32, 64), 
+                       rdata = tempfile(fileext = ".RData")){
+  if(require(parallel)){
+    benchmark.rawDiag  <- lapply(maxncpu, 
+                                 function(ncpu){
+                                   ostart <- Sys.time()
+                                   r <- do.call('rbind',  
+                                                mclapply(f, function(file){
+                                                  
+                                                  start <- Sys.time()
+                                                  
+						  S <- as.rawDiag.mzR(openMSfile(file))
+                                                  
+                                                  end <- Sys.time()
+                                                  
+                                                  rv <- data.frame(file = file, 
+                                                                   runtime = end - start,
+                                                                   nrow  =nrow(S))
+                                                  rv
+                                                }, mc.cores = ncpu))
+                                   
+                                   r$ncpu <- ncpu
+                                   r$start.time <-  ostart
+                                   r$end.time <- Sys.time()
+                                   
+                                   return(r)
+                                 })
+    
+    message(paste("writting result to", rdata, "..."))
+    save(benchmark.rawDiag, file=rdata) 
+    
+    return(benchmark.rawDiag)
+  }
+}
 
 # ----Superfluously?----
 
