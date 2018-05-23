@@ -204,15 +204,67 @@ PlotTicBasepeak(RAW)
 
 \section{Usage}
 
-in the following we display some of our demonstration data shipped with the
-package.
 
-load sample data
+In the following section we demonstrate how the software can be used for the optimization of an
+LC-MS/MS method. For this we first load the demonstration data shipped with the package.
+
+load sample data:
 <<label=load, eval=TRUE>>=
 load(file.path(path.package(package = "rawDiag"),
                  file.path("extdata", "WU163763.RData")))
 stopifnot(is.rawDiag(WU163763))
 @
+
+This data was recorded to investigate the optimal number of MS2 scans between two consecutive MS1 scans on a
+Q-Exactive HF-X mass spectrometer injecting a commercial HeLa digest. Since the data was recorded in triplicate 
+per used method, we will have overplotting issues. Therefore we first filter the data for a single injection
+per method.
+
+<<label=filter, eval=TRUE>>=
+  library(tidyverse)
+df <- dplyr::filter(WU163763, filename == "20180220_04_S174020_Pierce_HeLa_Protein_Digest_Std.raw" |
+                      filename == "20180220_05_S174020_Pierce_HeLa_Protein_Digest_Std.raw" |
+                      filename == "20180220_09_S174020_Pierce_HeLa_Protein_Digest_Std.raw")
+@
+
+Now to the actual walk through. Assuming we have a starting method we want to optimize. This method is 
+performing 18 MS2 scans for each MS1 scan. With the given transient lenght from the used instrument we can calculate
+the cycle time (time required to scan one MS1 and 18 MS2 scans). In our case we find the cycle time to be
+$\approx$ 0.6 second. For a 120 min chromatography with expected peak width of 20-30 seconds, this would result in
+30-50 MS1 points per peak. In other words the instrument would spend too much time recording MS1 compared 
+to MS2. Therefore we addapted the methods to perform 36 and 72 MS2 scans respectively. With these two new methods
+we recorded the the data and we can now analyse the results with the dignostic plots of this package.
+
+First parameter we want to check is the TIC or base peak. With this plot we can see if the data was recorded
+properly and if the signal response of the sample is the same over the three injections.
+
+
+<<label=TIC, fig = TRUE, echo=TRUE, include=TRUE, warnings=TRUE>>=
+print(gp <- PlotTicBasepeak(df, method = "overlay"))
+@
+
+signal response and chromatography is ok for the three injections. As next point we want to check the actuall cycle time
+of the injections. Please note we also make use of the grammar of graphics implementation of ggplot2 by modifiying the plot appearance on the fly. Here we change the standard plot legend from the right side of each plot to the top for better readabillity. This is done by adding the additional facet\_wrap statement after the initial call of the plot function.
+
+<<label=Time, fig = TRUE, echo=TRUE, include=TRUE, warnings=TRUE>>=
+print(gp <- PlotCycleTime(df, method = "trellis") +
+  facet_wrap(~ filename, ncol =1))
+@
+ 
+We can see the the cycle time for the top 18 method (file 09) is arround 0.6 seconds during the elution phase of the peptides.
+The red dashed line indicates the calculated cycle time. As already mentioned, with this method we produce too many MS1 data points. The cycle time of the top 36 and top 72 methods respectively have cycle times of 1.1 second and 2 seconds respectively. With the used chromatography we produce $\approx$20-30 MS1 point for the top 36 and $\approx$10-15 MS1 points for the top 72 method. This is a much better value compared to the initial method.
+The next thing to check is if the instrument is actually using the available MS2 capacity. For this we plot the cycle load (the actually performed MS2 scans for each MS1 scan).
+
+This is done by adding the additional "facet\_wrap()" statement after the initial call of the plot function.
+
+<<label=Load, fig = TRUE, echo=TRUE, include=TRUE, warnings=TRUE>>=
+print(gp <- PlotCycleLoad(df, method = "trellis"))
+@
+
+From the plot we can see that all mehtods actually use the available number of MS2 scans during the main peptide elution phase. The blue line is representing the trend as a fitted gam model.
+
+The parameter to be optimized for this walk through is the "top-N" spacing (number of MS2 scans between 
+to MS1 scans).
   
 adapt y-axis number of tickmarks
 
