@@ -212,7 +212,7 @@ load sample data
 <<label=load, eval=TRUE>>=
 load(file.path(path.package(package = "rawDiag"),
                  file.path("extdata", "WU163763.RData")))
-stopifnot(is.rawDiag(WU163230))
+stopifnot(is.rawDiag(WU163763))
 @
   
 adapt y-axis number of tickmarks
