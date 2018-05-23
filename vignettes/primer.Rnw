@@ -9,18 +9,30 @@
 
 \newcommand*\rawDiag{\textbf{\texttt{rawDiag}}}
 
-\author{Christian Trachsel \& Christian Panse}
-\title{Howto Use Diagnostic Plots for Orbitrap Instruments}
+\author{Christian Trachsel \& Tobias Kockmann \& Christian Panse}
+%\title{Howto Use Diagnostic Plots for Orbitrap Instruments}
+\title{\pkg{rawDiag}: an R Package for Diagnostic Plots of Mass Spectrometry Raw Data}
 
-\Plainauthor{Christian Trachsel \& Christian Panse}
+\Plainauthor{Christian Trachsel \& Tobias Kockmann \& Christian Panse}
 \Plaintitle{Diagnostoc plots}
 \Shorttitle{rawDiag}
 
 \Keywords{proteomics, mass spectrometry}
-\Plainkeywords{proteomics, mass spectrometry}
+\Plainkeywords{proteomics, mass spectrometry, visualization, method optimization}
 
 \Abstract{
 
+\pkg{rawDiag} is an R package which provides the user with visualizations of mass 
+spectrometry data characteristics, coming from LC-MS/MS proteomics experiments. The plots implemented
+in this package allow the user to check LC-MS/MS method parameters and facilitated the optimization 
+thereof. The package is developed, tested and used at the Functional Genomics Center Zurich. 
+The package is optimized for reading thermo fisher raw files but any other mass spectrometry 
+data format is supported over the open standard mzR. \pkg{rawDiag} can be run on modern laptop 
+infrastructure with sufficient speed but for larege datasets, a server infrastructure might be beneficial.  
+
+
+
+OLD: 
 \pkg{rawDiag} is an R package to do quality checks, visualizations and analysis
 of mass spectrometry data, coming from proteomics experiments.
 The package is developed, tested and used at the Functional Genomics Center Zurich. 
@@ -60,46 +72,33 @@ library(tidyverse)
 Mass spectrometry is a well-accepted and widespread method in life-sciences. 
 An important task that needs to be performed prior to any data set acquisition
 is the optimization of the applied mass spectrometry method.
-rawDiagnostic builds on the idea of the discontinued software rawMeat
+\pkg{rawDiag} builds on the idea of the discontinued software rawMeat
 (Vast Scientific). Our software allows a mass spectrometrist to analyze a raw
-file in short time and this tool delivers diagnostic plots as result. 
-This is helpful to optimize the instrument method towards the sample at hand.
+file in short time and delivers diagnostic plots of LC-MS/MS run chararcteristics as result. 
+These visualizations are helpful for the optimization of the instrument method towards the sample at hand.
 
 Our R package reads as input a comma-separated spreadsheet (csv) containing
-instrument log parameters from Thermo Fisher Scientific raw files. The csv file
-can be generated using the OS platform independent of the
-\rfr (\url{http://planetorbitrap.com/rawfilereader}).
-A number of R helper functions reshape and subset the data and pass the desired
+LC-MS/MS run parameters. \pkg{rawDiag} is optimized to work with Thermo Fisher Scientic raw files. The
+package calls a c# executable which is able generate the required csv file on the fly directly from a
+raw file using the new raw file reader technology \rfr (\url{http://planetorbitrap.com/rawfilereader}).
+However, any other mass spectrometry data format is also supported via the open standard mzR which requires
+a conversion of the data prior to loading. A number of R helper functions reshape and subset the data and pass the desired
 data-frames to ggplot2 for visualization. Trellis plots help to compare result
 between different runs. Plots can be inspected interactively running the
-software as an R shiny instance, allowing the user to customize their
-appearance. Additionally, pdf reports can be generated using a customizable R
+software as an R shiny instance. Additionally, pdf reports can be generated using a customizable R
 markdown file.
 
-The software is able to process multiple files in parallel on a modern
-laptop/workstation. Here the time limiting step detected is the IO of the disk.
-The software's full potential can be accessed when deployed on an R shiny
-application server where a large 120 min Orbitrap Fusion shotgun run containing
-$\approx 80000$ spectra can be processed in less than 50 seconds.
- 
+Processing speed of the software on modern laptop infrastructure is sufficient to provide the user with
+results a few minutes after the mass spectrometry data was acquired (a single file containing $\approx 80'000$ individual
+spectra is processed in less than 50 sec). For the analysis of larger data sets, 
+computing on a server deployed installation is recommended.
+
 All necessary steps can be done with the R command line or by using the shiny
 application on any modern computer.
  
-Our application allows the user to check if instrument method parameters are
-chosen appropriately for the sample investigated or if they could be optimized.
-Among the questions which can be answered are:
-\begin{itemize}
-\item Is the maximum injection time value ok?
-\item Is my signal level limited by injection time or could I trade in scan time/cycle time for deeper sampling?
-\item Is the cycle time in a range to give sufficient data points over a chromatographic peak for quantitative measurements (SRM, PRM, label-free)?
-\item How are the charge states and selected m/z distributed?
-\item Does the instrument making use of the maximum number of ms2 scans per ms1 scan?
-\item Do we see over or undersampling in the run?
-\end{itemize}
-The software analyzes data directly parsed from the raw files,
-which makes the application slim and does not require to run any additional data
-analysis pipeline upfront to access the diagnostic data. The diagnostics are
-therefore peptide ID free and rely on instrument logged data only.
+The diagnostic visualization are peptide ID free and rely on data logged by the instrument directly in the
+raw data file. This makes the software slim and fast and does not require an full additional data analysis
+pipeline.
 
 
 \section{Installation}
