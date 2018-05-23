@@ -184,6 +184,7 @@ as.rawDiag.mzR <- function(object){
   rv$filename <- basename(fileName(object))
   as.rawDiag(rv)
 }
+
 .read.thermo.raw.ssh <- function(file, mono = TRUE, hostname = "fgcz-r-021.uzh.ch",
                                  exec = "mono ~cpanse/bin/fgcz_raw.exe",
                                  user='cpanse', argv="qc"){
@@ -198,6 +199,38 @@ as.rawDiag.mzR <- function(object){
                         stringsAsFactors = FALSE,
                         header = TRUE))
   
+}
+
+#' Reading Bruker tdf files
+#'
+#' @param filea filename if the tdf file
+#'
+#' @return a rawDiagobject
+#' @import RSQLite
+#' @export read.tdf
+#' 
+#' 
+#' @details 
+#' 
+#'   Id LargestPeakMz AverageMz MonoisotopicMz Charge ScanNumber Intensity Parent
+#' 1  1      827.5638  828.0039       827.5638      1   623.2419      3239      3
+#' 2  2      727.6347  727.9152       727.6347      1   682.1215      2610      3
+#' 
+#' 
+read.tdf <- function(filename){
+  con <- dbConnect(RSQLite::SQLite(), filename)
+  rv <- dbGetQuery(con, "SELECT * FROM Precursors a INNER JOIN Frames b on a.id == b.id;");
+  dbDisconnect(con)
+  
+  
+  rv <- rv[, c('Id','Time','ScanNumber','Intensity','SummedIntensities',
+               'MonoisotopicMz', 'Charge', 'MsMsType')];
+  colnames(rv) <- c('scanNumber','StartTime','BasePeakMass','BasePeakIntensity',
+                    'totIonCurrent', 'PrecursorMass','ChargeState','MSOrder')
+  rv$filename <- basename(filename)
+  rv$MSOrder[rv$MSOrder == 0] <- "Ms"
+  rv$MSOrder[rv$MSOrder == 8] <- "Ms2"
+  as.rawDiag(rv)
 }
 
 #' mass spec reader function 
@@ -678,7 +711,8 @@ PlotMassDistribution <- function(x, method = 'trellis'){
       dplyr::mutate_at(vars("ChargeState"), funs(factor(.)))
     
     figure <- ggplot(res, aes_string(x = "deconv", colour = "filename")) +
-      geom_density(aes(y= ..density.. )) +
+      geom_line(stat = "density") +
+      #geom_density(aes(y= ..density.. )) + with base line along x axis with density value y= 0
       #geom_histogram(binwidth = 100, alpha = .3, position = "identity") +
       labs(title = "Precursor mass to charge frequency plot ") +
       labs(subtitle = "Plotting frequency of precursor masses for each charge state") +
@@ -1610,7 +1644,8 @@ gp <- ggplot(rbind(b.Linux, b.Apple), aes(y=IO.throuput, x=ncpu, group=ncpu)) +
     dplyr::mutate_at(vars("ChargeState"), funs(factor(.)))
   
   figure <- ggplot(res, aes_string(x = "deconv", colour = "filename")) +
-    geom_density(aes(y= ..density.. )) +
+    geom_line(stat = "density") +
+    #geom_density(aes(y= ..density.. )) +
     labs(title = "B ") +
     labs(x = "Neutral Mass [Da]", y = "Density") +
     labs(fill = "Charge State", colour = "Charge State") +

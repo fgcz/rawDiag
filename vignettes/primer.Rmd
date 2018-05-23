@@ -88,8 +88,6 @@ bioconductor package can be used.
 library(mzR)
 rawDiag:::as.rawDiag.mzR
 ```
-<<<<<<< HEAD
-=======
 
 # Usage
 
