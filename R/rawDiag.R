@@ -1260,16 +1260,16 @@ PlotMassHeatmap <- function(x, method='trellis', bins = 80){ #rename to mass.hea
   #               file.path("extdata", "benchmark.RData")))
   data(benchmark)
   
-  gp <- ggplot(rbind(b.Linux, b.Apple), aes(y=overall.runtime, x=ncpu, group=ncpu), color=system) + 
+  gp <- ggplot(rbind(b.Linux, b.Apple, X.Linux), aes(y=overall.runtime, x=ncpu, group=ncpu), color=system) + 
     coord_trans(y = "log10") +
-    scale_y_continuous(breaks = c(90, 120, 180,240, 480, 600, 960)) +
+    scale_y_continuous(breaks = c(90, 120, 180, 240, 480, 600, 900, 1800, 3600, 1800 + 3600)) +
     stat_summary(fun.y = mean, geom = "line", aes( group = 1)) + #colour = "deepskyblue2") +
     geom_boxplot() +
     labs(x = "number of used processes", y = "overall  time [in seconds] of read.raw",
          subtitle='overall runtime') +
     theme_light()
   
-  gp + facet_grid( .  ~ system  )
+  gp + facet_grid( .  ~ system * method )
 }
 
 .technote_benchmark_figure_2 <- function(){
@@ -1277,10 +1277,12 @@ PlotMassHeatmap <- function(x, method='trellis', bins = 80){ #rename to mass.hea
   #               file.path("extdata", "benchmark.RData")))
   data(benchmark)
   
-b.Linux$IO.throuput <- sum(unique(b.Linux$nrow)) / b.Linux$overall.runtime 
+b.Linux$IO.throuput <- sum(unique(b.Linux$nrow)) / b.Linux$overall.runtime
+X.Linux$IO.throuput <- sum(unique(X.Linux$nrow)) / X.Linux$overall.runtime 
+
 b.Apple$IO.throuput <- sum(unique(b.Apple$nrow)) / b.Apple$overall.runtime 
 
-gp <- ggplot(rbind(b.Linux, b.Apple), aes(y=IO.throuput, x=ncpu, group=ncpu)) + 
+gp <- ggplot(rbind(b.Linux, b.Apple, X.Linux), aes(y=IO.throuput, x=ncpu, group=ncpu)) + 
   stat_summary(fun.y = mean, geom = "line", aes( group = 1)) + #, colour = "deepskyblue2") +
   geom_boxplot() +
   labs(x = "number of used processes", y = "IO throughput  [number of scan info / s]", 
@@ -1292,7 +1294,7 @@ gp <- ggplot(rbind(b.Linux, b.Apple), aes(y=IO.throuput, x=ncpu, group=ncpu)) +
   # annotate("text", x = 40, y = 0.20, label = paste("max throughput =", round(max(b.Linux$IO.throuput), 2), "GBytes/s")) +
 #  annotate("text", x = 40, y = 0.15, label = paste("min throughput =", round(min(b.Linux$IO.throuput), 2), "GBytes/s"))
 
-  gp + facet_grid( .  ~ system )
+  gp + facet_grid( .  ~ system * method)
 }
 #remove
 .technote_example_figure_1 <- function(x){
