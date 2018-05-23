@@ -251,11 +251,9 @@ print(gp <- PlotCycleTime(df, method = "trellis") +
   facet_wrap(~ filename, ncol =1))
 @
  
-We can see the the cycle time for the top 18 method (file 09) is arround 0.6 seconds during the elution phase of the peptides.
-The red dashed line indicates the calculated cycle time. As already mentioned, with this method we produce too many MS1 data points. The cycle time of the top 36 and top 72 methods respectively have cycle times of 1.1 second and 2 seconds respectively. With the used chromatography we produce $\approx$20-30 MS1 point for the top 36 and $\approx$10-15 MS1 points for the top 72 method. This is a much better value compared to the initial method.
+We can see the the cycle time for the top 18 method (file: 20180220\_09\_) is arround 0.6 seconds during the elution phase of the peptides.
+The red dashed line indicates the calculated cycle time. As already mentioned, with this method we produce too many MS1 data points. The cycle time of the top 36 (file: 20180220\_04\_) and top 72 (file: 20180220\_05\_) methods respectively have cycle times of 1.1 second and 2 seconds respectively. With the used chromatography we produce $\approx$20-30 MS1 point for the top 36 and $\approx$10-15 MS1 points for the top 72 method. This is a much better value compared to the initial method.
 The next thing to check is if the instrument is actually using the available MS2 capacity. For this we plot the cycle load (the actually performed MS2 scans for each MS1 scan).
-
-This is done by adding the additional "facet\_wrap()" statement after the initial call of the plot function.
 
 <<label=Load, fig = TRUE, echo=TRUE, include=TRUE, warnings=TRUE>>=
 print(gp <- PlotCycleLoad(df, method = "trellis"))
@@ -263,9 +261,15 @@ print(gp <- PlotCycleLoad(df, method = "trellis"))
 
 From the plot we can see that all mehtods actually use the available number of MS2 scans during the main peptide elution phase. The blue line is representing the trend as a fitted gam model.
 
-The parameter to be optimized for this walk through is the "top-N" spacing (number of MS2 scans between 
-to MS1 scans).
-  
+<<label=IT, fig = TRUE, echo=TRUE, include=TRUE, warnings=TRUE>>=
+print(gp <- PlotInjectionTime(subset(df, MSOrder %in% "Ms2"), method = "trellis") +
+        facet_wrap(~ filename, ncol =1))
+@
+In order to check if the instrument is still abel to collect an appropriate amount of ions for all MS2 scans, we can check the injetion time characteristics for the three runs.
+
+
+Ab hier alles weg??
+
 adapt y-axis number of tickmarks
 
 <<label=cycletime, fig = TRUE, width=4.5, height=6, echo=TRUE, include=TRUE, warnings=TRUE>>=
