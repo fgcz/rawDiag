@@ -1,0 +1,672 @@
+%\VignetteIndexEntry{JPR pr-2018-001736}
+\documentclass[journal=jprobs,manuscript=article]{achemso}
+\setkeys{acs}{articletitle=true}
+\setkeys{acs}{doi = true}
+\SectionNumbersOn
+
+\usepackage[T1]{fontenc} % Use modern font encodings
+\usepackage[colorlinks = true,
+            linkcolor = blue,
+            urlcolor  = blue,
+            citecolor = blue,
+            anchorcolor = blue]{hyperref}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Place any additional packages needed here.  Only include packages
+%% which are essential, to avoid problems later.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{chemformula} % Formula subscripts using \ch{}
+\usepackage[T1]{fontenc} % Use modern font encodings
+\usepackage{tabularx}
+\usepackage{makecell}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% If issues arise when submitting your manuscript, you may want to
+%% un-comment the next line.  This provides information on the
+%% version of every file you have used.   
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%\listfiles
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Place any additional macros here.  Please use \newcommand* where
+%% possible, and avoid layout-changing macros (which are not used
+%% when typesetting).
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand*\mycommand[1]{\texttt{\emph{#1}}}
+\newcommand*\code[1]{\texttt{\emph{#1}}}
+
+\newcommand{\doi}[1]{\href{http://dx.doi.org/#1}{\nolinkurl{#1}}}
+\newcommand*\rawDiag{\textbf{\texttt{rawDiag}}}
+
+\newcommand*\fgcz{$\ast$~correspondence, 1. Functional Genomics Center Zurich\\ Swiss Federal Institute of Technology Zurich~\texttt{|}~
+University of Zurich\\Winterthurerstr. 190, CH-8057 Zurich, SWITZERLAND}
+
+\author{Christian Trachsel$^1$}
+\affiliation{\fgcz}
+\email{christian.trachsel@fgcz.ethz.ch}
+\phone{+41 44 63 53910}
+
+\author{Christian Panse$^1$}
+\affiliation{\fgcz}
+
+\author{Tobias Kockmann$^1$}
+\affiliation{\fgcz}
+
+\author{Witold E. Wolski$^1$}
+\affiliation{\fgcz}
+
+\author{Jonas Grossmann$^1$}
+\affiliation{\fgcz}
+
+\author{Ralph Schlapbach$^1$}
+\affiliation{\fgcz}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% The document title should be given as usual. Some journals require
+%% a running title from the author: this should be supplied as an
+%% optional argument to \title.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\title[\rawDiag]
+  {\rawDiag~--~an R package supporting rational LC-MS method optimization for bottom-up proteomics}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Some journals require a list of abbreviations or keywords to be
+%% supplied. These should be set up here, and will be printed after
+%% the title and author information, if needed.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\abbreviations{IR,NMR,UV}
+\keywords{mass-spectrometry, R-package, platform-independent,
+method-optimization, reproducible research, quality-control, visualization}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% The manuscript does not need to include \maketitle, which is
+%% executed automatically.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+<<echo = FALSE, eval = TRUE>>=
+options(prompt = "R> ", continue = "+  ", width = 70, useFancyQuotes = FALSE)
+library(tidyverse)
+library(rawDiag)
+dir.create('graphics')
+stopifnot(packageVersion('rawDiag') >= '0.0.1')
+@
+
+\graphicspath{{./graphics/}}
+\SweaveOpts{concordance = TRUE, prefix.string = graphics/rawDiag}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% The "tocentry" environment can be used to create an entry for the
+%% graphical table of contents. It is given here as some journals
+%% require that it is printed as part of the abstract page. It will
+%% be automatically moved as appropriate.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{tocentry}
+
+%Some journals require a graphical entry for the Table of Contents.
+%This should be laid out ``print ready'' so that the sizing of the
+%text is correct.
+
+%Inside the \texttt{tocentry} environment, the font used is Helvetica
+%8\,pt, as required by \emph{Journal of the American Chemical
+%Society}.
+
+%The surrounding frame is 9\,cm by 3.5\,cm, which is the maximum
+%permitted for  \emph{Journal of the American Chemical Society}
+%graphical table of content entries. The box will not resize if the
+%content is too big: instead it will overflow the edge of the box.
+
+%This box and the associated title will always be printed on a
+%separate page at the end of the document.
+
+\includegraphics[height=3.5cm,keepaspectratio]{39515832-84b561ea-4dfb-11e8-9411-276bc6fb71d6}
+
+\end{tocentry}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% The abstract environment will automatically gobble the contents
+%% if an abstract is not used by the target journal.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{abstract}
+Optimizing methods for liquid chromatography coupled to mass spectrometry (LC-MS) is a non-trivial task. Here we present \rawDiag, a software tool supporting rational method optimization by providing MS operator-tailored diagnostic plots of scan level metadata.
+\rawDiag~is implemented as R package and can be executed on the command line, or through a graphical user interface (GUI) for less experienced users. The code runs platform independent and can process a hundred raw files in less than three minutes on current consumer hardware as we show by our benchmark.  In order to demonstrate the functionality of our package, we included a real-world example taken from our daily core facility business.
+\end{abstract}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Introduction}
+Over the last decade, liquid chromatography coupled to mass 
+spectrometry (LC-MS) has evolved into the method of choice in the 
+field of proteomics \cite{Cox2011, Yates2009, Nesvizhskii2007,
+Mallick2010, Bensimon2012}. During a typical bottom up LC-MS 
+measurement, a complex mixture of analytes is separated by a liquid 
+chromatography system that is connected to a mass spectrometer (MS) through 
+an ion source interface. The analytes which elute from the chromatography system  over time are 
+converted into a beam of ions in this interface and the MS records from this ion 
+beam a series of mass spectra containing detailed information on the 
+analyzed sample \cite{Savaryn2016, Matthiesen2013}. These mass spectra,
+as well as their metadata, are considered as the raw measurement data and 
+usually recorded in a vendor specific binary format. During a 
+measurement, the mass spectrometer applies internal heuristics which enables the instrument to 
+adapt to sample properties like sample complexity or amount in near real time. Still, method 
+parameters controlling these heuristics, need to be set prior to the 
+measurement. For an optimal measurement result, a carefully balanced 
+set of parameters is required, but their complex interactions with each other make LC-MS method 
+optimization a challenging task.
+
+Here we present \rawDiag, a platform independent software tool 
+implemented in R that supports LC-MS operators during the process of 
+empirical method optimization. Our work builds on the ideas of the 
+discontinued software ``rawMeat'' (vastScientific). Our application is currently 
+tailored towards spectral data acquired on Thermo Fisher Scientific 
+instruments (raw format), with a special focus on Orbitrap mass 
+analysers (Exactive or Fusion instruments). These instruments are 
+heavily used in the field of bottom-up proteomics in order to analyse 
+complex peptide mixtures derived from enzymatic digests of 
+proteomes. \rawDiag~is meant to run post mass spectrometry acquisition,  
+optimally as interactive R shiny application and produces a series of diagnostic 
+plots visualizing the impact of method parameter choices on the acquired data 
+across injections. If static reports are required, pdf files can be 
+generated using R markdown. The visualizations generated by 
+\rawDiag~can be used in an iterative method optimization process (see 
+Figure~\ref{figure:arch}) where an initial method is tested, analyzed 
+and based on these results a hypothesis can be formulated to optimize 
+the method parameters. The same sample is then re-analyzed with the optimized 
+method and the data can enter the refinement loop again until the operator is 
+satisfied with the found set of method parameters for his type of sample.
+
+In this manuscript we 
+present the architecture and implementation of our tool. We provide example plots,
+show how plots can be redesigned to meet different requirements and discuss the application based on a use 
+case.
+
+\begin{figure}
+ \includegraphics[width=1.0\columnwidth]{arch}
+\caption{
+\rawDiag~R package (see the grey box).
+1~Scan data is recorded using the initial method and the information stored as raw instrument data.
+2~\rawDiag~reads the mass spectrometric files directly through an adapter function based on probity libraries or through using the open file standards.
+3~An utility function projects and completes missing column names of the
+rawDiag data frame object (4).
+5~The R-package provides a variety of functions for visualizing mass spectrometry related parameters.
+6~Typical R command line usage enables a very sharp analysis tool for the experienced R users.
+7~Also, basic reporting functionality is provided through using R markdown.
+8~Interactive mass-spectrometry analysis and exploration is possible, e.g., through using the R shiny package.
+}
+\label{figure:arch}
+\end{figure}
+
+% 
+% Among typical applications for this are:
+% 
+% \begin{itemize}
+% \item The fine tuning of the number of ms2 measurements per ms cycle in a shotgun (DDA) experiment. For an optimal method 
+% \item The optimization of measurement points over a given chromatographic peak. This is is especially needed in quantitative experiments where a minimal number of data points is required for an optimal peak shape remodeling.    
+% \end{itemize}
+% 
+% The tool is  visualizing the impact of instrument parameters on characteristics of a LC-MS analysis, allowing the user to check if instrument method was properly set up or if method optimization is needed. The tool can address different questions for different applications. Among these questions are:
+% 
+% \begin{enumerate}
+% \item General questions:
+%     \begin{itemize}
+%     \item Are the injection time parameters adjusted to the amount of sample that is analyzed? e.g. are low abundant analytes selected for ms2 fragmentation or are longer ion package preparation times required to achieve a deeper sampling?
+%     \item Are precursors selected evenly over the entire gradient or do we have high density area and low density areas?
+%     \end{itemize}
+% \item Discovery type of experiments:
+% \begin{itemize}
+% \item It the ``TopN''value properly chosen? E.g. is the instrument using the maximum number of ms2 slots in each cycle or is the complexity of the sample low and the instrument is mainly recording ms1 scans?
+% \item \ldots
+% \end{itemize}
+% 
+% \item Quantitative type of experiments:
+% \begin{itemize}
+% \item Is the cycle time fast enough to provide a sufficient amount of data points over a chromatographic feature?
+% \item \ldots
+% \end{itemize}
+% 
+% \end{enumerate}
+% 
+
+
+\section{Experimental Procedures}
+
+\subsection{Architecture}
+
+\rawDiag~acts as an interface to vendor specific software libraries 
+that are able to access the spectrum-level metadata contained in a 
+mass spectrometer measurement. The package provides support for R 
+command line, interactivity through R shiny and pdf report generation 
+using R markdown. A rough overview of the architecture can be seen in 
+Figure~\ref{figure:arch}.
+
+\subsection{Implementation}
+
+The entire software is implemented as R package providing a full 
+documentation and includes example data. All diagnostic plots are 
+generated by R functions using the ggplot2 \cite{Hadley2009} graphical 
+system, based on ``The Grammar of Graphics'' \cite{Wilkinson2005}. The 
+package ships with an adapter function \code{read.raw} which returns 
+an R \code{data.frame} object from the raw data input file. In its current 
+implementation, the adapter functions default input method is set for 
+reading Thermo Fisher Scientific raw files,
+using a \texttt{C\#} programmed executable,
+based on the platform-independent New RawFileReader .Net 
+assembly\cite{RawFileReader}. 
+A Docker recipe for the entire build process of the \texttt{C\#}
+based executable also ships with the R package.
+
+Since in general more than one mass 
+spectrometry file is loaded and visualized, the adapter function 
+supports multiprocessor infrastructure through the parallel R package.
+In order to be flexible with the entire variety of 
+instruments, we implemented the two utility functions 
+\code{is.rawDiag} and \code{as.rawDiag}. While the 
+\code{is.rawDiag} function checks if the input object 
+fulfills the requirements of the package's diagnostic plot functions, 
+the \code{as.rawDiag} method coerce the object into the 
+right format by deriving missing values if possible, otherwise filling 
+missing columns with NA values.
+The package also ships with an adapter function \code{as.rawDiag.mzR}
+which enables the support of open file standards\cite{mzR,msdata}.
+
+
+\subsection{Visualization}
+
+This package is providing several plot functions tailored 
+towards mass spectrometry data. A list of the implemented 
+plot functions with a short description 
+can be found in Table~\ref{table:functions}.
+An inherent problem of visualizing 
+data is the fact that depending on the data at hand certain 
+visualizations lose their usefulness (e.g. overplotting in scatter 
+plot if too many data points are present). To address this 
+problematic, we implemented most of the plot functions in different 
+versions inspired by the work of Cleveland\cite{Cleveland93}, Sarkar\cite{RSarkar2008} and Wickham\cite{Wickham2014,Hadley2009}. The 
+data can be displayed in trellis plot manner using the faceting 
+functionality of ggplot2 (see Figure~\ref{figure:viz}A). Alternatively,
+overplotting using color coding (Figure~\ref{figure:viz}B) or violin plots based on 
+descriptive statistics values (Figure~\ref{figure:viz}C) can 
+be chosen. This allows the user to interactively change the appearance 
+of the plots based on the situation at hand. E.g. a large number of 
+files are best visualized by violin plots giving the user an idea 
+about the distribution of the data points. Based on this a smaller 
+subset of files can be selected and visualized with another technique. \\
+To benefit from the grammar of graphics, e.g., adapt y-axis scaling, change axis labels, 
+add title or subtitles, each of the implemented plot functions always returns 
+the \code{ggplot} object. Due to the implementation of this design 
+pattern those \code{ggplot} objects can be further altered by adding new 
+layers allowing a customization of the plots if needed. 
+The following R code snippet produces the three plots shown in Figure~\ref{figure:viz} 
+and demonstrates the described feature of modifying an existing \code{ggplot} object
+by eliminating the legend in the last two plots.
+
+<<label=color, echo = FALSE>>=
+color.vector <- c("#08306B", #"#6BAED6",
+                  "#2171B5",
+                  "#6BAED6", #"#08306B",
+                  "#00441B", #"#74C476",
+                  "#238B45",
+                  "#74C476", #"#00441B",
+                  "#7F2704", #"#3F007D",
+                  "#D94801", #"#6A51A3",
+                  "#FD8D3C")
+
+color.vector.2 <- c("#08306B", #"#6BAED6",
+                    "#6BAED6", #"#08306B",
+                    "#00441B", #"#74C476",
+                    "#74C476", #"#00441B",
+                    "#7F2704") #"#3F007D",
+
+@
+
+<<label=codeSnippet, eval = TRUE, fig = TRUE, eval=FALSE>>=
+library(rawDiag)
+data(WU163763)
+PlotMassDistribution(WU163763)
+PlotMassDistribution(WU163763, method = 'overlay') +
+  theme(legend.position = 'none')
+PlotMassDistribution(WU163763, method = 'violin') +
+  theme(legend.position = 'none')
+@
+
+<<label=visualization_trellis, eval = TRUE, fig = TRUE, width = 16, height = 6, echo = FALSE, include = FALSE>>=
+rawDiag:::.technote_viz_figure_1(WU163763) 
+@
+<<label=visualization_overlay, eval = TRUE, fig = TRUE, width = 8, height = 4, echo = FALSE, include = FALSE>>=
+rawDiag:::.technote_viz_figure_2(WU163763) +
+  theme(legend.position = 'none')
+@
+<<label=visualization_violin, eval = TRUE, fig = TRUE, width = 8, height = 4, echo = FALSE, include = FALSE>>=
+rawDiag:::.technote_viz_figure_3(WU163763) +
+  theme(legend.position = 'none')
+@
+
+The interactivity of the visualizations is achieved by an implementation 
+of the plot functions into an R shiny applications. Static versions of 
+the plots can be easily generated by the provided R markdown file that 
+allows the generation of pdf reports.
+
+\begin{figure}[ht]
+\includegraphics[width=0.98\columnwidth,keepaspectratio]{rawDiag-visualization_trellis}
+\includegraphics[width=0.49\columnwidth,keepaspectratio]{rawDiag-visualization_overlay}
+\includegraphics[width=0.49\columnwidth,keepaspectratio]{rawDiag-visualization_violin}
+
+\caption{Concurrent metadata visualization applying \code{PlotMassDistribution} to nine raw files acquired in DDA mode (sample was 1$\mu$g HeLa digest.) \textbf{A)} method trellis; the mass distribution is plotted as a histogram and the color code represents the charge states the precursors \textbf{B)} method overlay; the mass distribution is graphed as a density function and the color code represents the different raw files. \textbf{C)} method violin; the mass distribution is displayed as a violin plot and the colors indicate the different raw files.}
+
+%facet plot of the mass distribution in relation to the precursor charge from nine raw files. \textbf{B)} Overlay representation of the same mass distributions as density plot but without the charge state information. \textbf{C)} Descriptive plot where the mass distribution is displayed as violin grouped by the charge state for the same nine raw files.}
+\label{figure:viz}
+\end{figure}
+
+<<echo=FALSE>>=
+rv <- rawDiag:::.overview(prefix="graphics/rawDiag")
+@
+
+\newcommand{\G}[1]{
+\IfFileExists{graphics/rawDiag-#1.png}{\parbox[c]{1.5cm}{\includegraphics[width=1.5cm, height=1.5cm]{graphics/rawDiag-#1}}}{-}
+}
+
+
+\begin{table}
+\centering
+\begin{scriptsize}
+%\resizebox{0.9\columnwidth}{!}{
+\begin{tabularx}{\textwidth}{lcccX}
+\hline
+\hline
+function name  & trellis & overlay & violin & description\\
+\hline
+\code{read.raw}          &&&& reads mass spectrometric measurement file.\\
+\code{is.rawDiag}      &&&& tests if an object is an \code{rawDiag} S3 class.\\
+\code{as.rawDiag}      &&&& coerces an object to a \code{rawDiag} S3 class object.\\
+\code{summary.rawDiag}      &&&& provides a summary.\\
+\hline
+\code{PlotChargeState}    &\G{PlotChargeState-trellis}       &\G{PlotChargeState-overlay}       &        -                         & displays charge state distributions as biologist-friendly bar charts as absolute counts.\cite{pmid24645190}\\
+\code{PlotCycleLoad}         &\G{PlotCycleLoad-trellis}   &\G{PlotCycleLoad-overlay}   &\G{PlotCycleLoad-violin}& displays duty cycle load (number of MS2 scans per duty cycle) as a function of retention time (RT) (scatter plots) or its marginal distribution (violin).\\
+\code{PlotCycleTime}         &\G{PlotCycleTime-trellis}         &\G{PlotCycleTime-overlay}         &\G{PlotCycleTime-violin}        & displays cycle time with respect to RT (scatter plots) or its marginal distribution (violin). A smooth curve graphs the trend. The maximum is indicated by a red dashed line.\\
+\code{PlotInjectionTime}     &\G{PlotInjectionTime-trellis}&\G{PlotInjectionTime-overlay}     &\G{PlotInjectionTime-violin}           & displays injection time as a function  of RT. A smooth curve graphs the trend. The maximum is indicated by a red dashed line.\\
+\code{PlotLockMassCorrection}      &\G{PlotLockMassCorrection-trellis}      &\G{PlotLockMassCorrection-overlay}      &\G{PlotLockMassCorrection-violin}     & graphs the lock mass deviations along RT (note: this example data were acquired with lock mass correction).\\
+\code{PlotMassDistribution}  &\G{PlotMassDistribution-trellis}  &\G{PlotMassDistribution-overlay}  &\G{PlotMassDistribution-violin} & displays mass distribution using color coding according to charge state (trellis) or file (overlay, violin).\\
+\code{PlotMassHeatmap}       &\G{PlotMassHeatmap-trellis}                    & \G{PlotMassHeatmap-overlay}                                   & -                                 & draws a computer scientist-friendly hexagon binned heatmap of the peak count charge deconvoluted mass along RT.\\
+\code{PlotMzDistribution}    &\G{PlotMzDistribution-trellis}&\G{PlotMzDistribution-overlay}& \G{PlotMzDistribution-violin}& a scatter plot of m/z versus RT on MS1 level (no density; with overplotting.). violin display the marginal m/z distribution of each file.\\
+\code{PlotPrecursorHeatmap}  &\G{PlotPrecursorHeatmap-trellis}            & \G{PlotPrecursorHeatmap-overlay}                                   & -                                 & according to \code{PlotMassHeatmap}  but displaying convoluted data.\\
+\code{PlotScanFrequency}     &\G{PlotScanFrequency-trellis}     &\G{PlotScanFrequency-overlay}     &\G{PlotScanFrequency-violin}    & graphs scan frequency versus RT or scan frequency marginal distribution for violin.\\
+\code{PlotScanTime}         &\G{PlotScanTime-trellis}          &\G{PlotScanTime-overlay}          &\G{PlotScanTime-violin}         & plots scan time as function of RT for each MSn level. A smooth curve displays the trend.\\
+\code{PlotTicBasepeak}      &\G{PlotTicBasepeak-trellis}       &\G{PlotTicBasepeak-overlay}       &\G{PlotTicBasepeak-violin}      & displays the total ion  chromatogram (TIC) and the base peak chromatogram.\\
+\hline
+\hline
+\end{tabularx}
+\end{scriptsize}
+\caption{
+The \rawDiag~cheatsheet lists the functions of the package using a subset of the provided  `WU163763` dataset.
+Each thumbnail gives an impression of the plot function's result. 
+The column names `trellis,' `overlay' and `violin'  were given as method attribute.
+Marginal distribution plots for discrete response variables are not supported.
+}
+\label{table:functions}
+\end{table}
+%%%%%%%%%%%%
+
+\subsection{Evaluation}
+
+<<label=benchmark-time, eval = TRUE, fig = TRUE, width = 4, height =4, echo = FALSE, include = FALSE>>=
+rawDiag:::.technote_benchmark_figure_1() 
+@
+<<label=benchmark-throuput, eval = TRUE, fig = TRUE, width = 4, height = 4, echo = FALSE, include = FALSE>>=
+rawDiag:::.technote_benchmark_figure_2()
+@
+
+<<echo=FALSE>>=
+data(benchmark)
+  
+b.Linux$IO.throuput <- sum(unique(b.Linux$nrow)) / b.Linux$overall.runtime 
+@
+
+
+We tested the performance of our approach by running an scan information throughput 
+benchmark as a function of the number of used processes on a Linux 
+server and an Apple MacBook Pro. The hardware specifications are listed 
+in Table~\ref{table:specs}.
+
+\begin{table}
+\centering
+%\resizebox{0.9\columnwidth}{!}{
+\begin{tabularx}{\textwidth}{l|X|X}
+\hline
+\hline
+specs & Linux Server  & Apple MacBook Pro 2017\\
+\hline
+number of cores & 64  & 8\\
+CPU & Intel(R) Xeon(R) CPU E5-2698 v3 @ 2.30GHz & 2.9GHz Intel Core i7\\
+disk  & RAID Module RMS25CB080  & SSD SM1024L\\
+filesystem  &   XFS & APFS\\
+\hline
+OS  & SMP Debian {3.16.43-2+deb8u2} &  Darwin Kernel Version 17.4.0\\
+Mono JIT compiler version& 5.8.0.127& 5.2.0.224\\
+\hline
+\hline
+\end{tabularx}
+%}
+
+\caption{\label{table:specs}Summary of the hardware specifications.}
+\end{table}
+
+As benchmark data, we downloaded the raw files described in 
+\cite{pmid29183128} on the  filesystem. For the benchmark 
+we limited the input to \Sexpr{length(unique(b.Linux$nrow))} files, 
+corresponding to two times the available number of processor cores of 
+the Linux system. The data has an overall file size of 
+\Sexpr{round(sum(unique(b.Linux$file.size)) / 1024^3)} GBytes and 
+contains \Sexpr{format(sum(unique(b.Linux$nrow)), scientific=FALSE, big.mark = "'")} individual mass spectra in total.
+
+The left plot in Figure~\ref{figure:benchmark} depicts the overall 
+runtime in dependency of the number of used CPUs for five repetitions 
+starting with 64 cores to avoid caching issues. The right scatter plot 
+in Figure~\ref{figure:benchmark} is derived from the overall runtime 
+and illustrates the scan information throughput in dependency of the number of used 
+process cores.
+
+The best performance on our system is achieved by using
+\Sexpr{min(b.Linux$ncpu [b.Linux$IO.throuput == max(b.Linux$IO.throuput)])}
+CPUs having an performance of reading
+\Sexpr{format(round(max(b.Linux$IO.throuput)), scientific = FALSE, big.mark = "'")} scan information per second.
+
+\begin{figure}
+\includegraphics[width=0.49\columnwidth]{rawDiag-benchmark-time}
+\includegraphics[width=0.49\columnwidth]{rawDiag-benchmark-throuput}
+
+\caption{Benchmark -- The left plot shows the overall logarithmic 
+scaled runtime of 128 raw files.  The graphic on the right side shows 
+the thereof derived IO throughput as scan information per second. The 
+plots illustrate that both systems, server, and laptop, can analyze 
+95GB of instrument data within less than three minutes.
+}
+ 
+\label{figure:benchmark}
+\end{figure}
+
+
+\section{Results and discussion}
+
+Our application \rawDiag~acts as an interface to file reader 
+libraries from mass spectrometry vendors. These libraries are able to 
+access the scan data as well as the scan metadata stored in the 
+proprietary file formats. In its current configuration, \rawDiag~is 
+able to read data from Thermo Fischer Scientific raw files via a 
+\texttt{C\#} executable. This executable is extracting the information 
+stored in the raw file via the platform-independent RawFileReader .Net 
+assembly. To avoid writing to the disk, the information is directly fed into an R 
+session using the \code{pipe} command. The data integrity is checked by the 
+\code{is.rawDiag} function and coerced by the \code{as.rawDiag} function into the
+proper format for the plot functions if required. As soon as the data is 
+extracted and loaded into the R session, the different plot functions 
+can be called upon the data for the visualizations of LC-MS run 
+characteristics. In the envisioned method optimization 
+pipeline (see Figure~\ref{figure:arch}) a test sample which mimics the 
+actual research sample as close as possible is analyzed with an initial method. After the 
+analysis is finished, the acquired data can be visualized by our application. Based on the 
+visualized run characteristics a hypothesis for the method optimizations can be 
+formulated and the optimized methods can again be used to analyze the test sample. A use case example
+of this process will be discussed in the following paragraph.
+In the interactive mode, the application runs as an R shiny server 
+and generates a summary table of all loaded data allowing to get an 
+overview in a single glance. The user is provided with a series of 
+plots which provide a rational basis for optimizing method parameters during the iterative process of 
+empirical mass spectrometry method optimization. In order to be flexible towards
+different situations where a single visualization technique might lose its usability,
+most plot functions can be called in three different versions. This allows to circumvent
+overplotting issues or helps to detect trends when multiple files are loaded. A list of the currently 
+implemented plot functions can be found in Table~\ref{table:functions} and the flexibility of choosing different 
+visualization styles is depicted in Figure~\ref{figure:viz}. 
+
+
+
+\subsection{Use case -- Optimize data dependent analysis}
+
+Starting from an initial method template based on the work of Kelstrup et al.,\cite{pmid29183128} 
+we analyzed 1 $\mu$g of a commercial tryptic HeLa digest on a Q-Exactive HF-X 
+instrument using a classical shotgun heuristics. Subsequently, the 
+resulting raw data was mined using \rawDiag. Inspection of the 
+diagnostic plots suggested that analysis time was not optimally 
+distributed between the different scan levels (precursor and fragment 
+ions). To test this hypothesis, we ramped the parameter 
+controlling the number of dependent scans per instrument cycle (TopN), in two 
+steps and applied the resulting methods by analyzing the same material 
+in technical triplicates. Visualization applying \rawDiag~confirmed 
+that all three methods exploit the max. number of dependent scans (18, 
+36 and 72) during the separation phase of the gradient (see Figure~\ref{figure:application}B). Concurrently, 
+the MS2 scan speed increased from $\approx$30 to $\approx$36 and $\approx$40 Hz respectively
+(see Figure~\ref{figure:application}A). Using the modified methods, the instrument is spending 5 and 10 min more time on MS2 
+scans during the main peptide elution phase, comparing the methods to the initial "Top18" method (see Figure~\ref{figure:application}E). 
+As a concomitant effect the average cycle load (number of MS2 scans per cycle) increased from 10 ("Top18") to 16 and 21 
+("Top36" and "Top72", respectively). These optimized methods not only showed better run characteristics but
+ultimately also resulted in more peptide and protein 
+identifications as shown in Figure~\ref{figure:application}C and \ref{figure:application}D. (Data searched by 
+Sequest through Proteome~Discoverer agains a human database applying standard search parameters and filtered for high confidence)
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\SweaveInput{technote_application.Rnw}
+<<label=usecase1_data, echo=FALSE>>=
+library(tidyverse)
+data(WU163763)
+
+WU163763 <- filter(WU163763, filename != "20180220_03_S174020_Pierce_HeLa_Protein_Digest_Std.raw") 
+
+load(file.path(path.package(package = "rawDiag"),
+               file.path("extdata", "WU163763_PD.RData")))
+
+searchResults <- WU163763_PD
+
+color.vector <- c("#08306B", #"#6BAED6",
+                  "#2171B5",
+                  "#6BAED6", #"#08306B",
+                  "#00441B", #"#74C476",
+                  "#238B45",
+                  "#74C476", #"#00441B",
+                  "#7F2704", #"#3F007D",
+                  "#D94801", #"#6A51A3",
+                  "#FD8D3C") #"#9E9AC8")
+
+DescValues <- searchResults %>% 
+  group_by(TopN) %>% 
+  summarise_at(vars(proteins, peptides, psm), funs(mean(.), sd(.))) %>% 
+  mutate_at(vars("proteins_mean","peptides_mean", "psm_mean","proteins_sd","peptides_sd", "psm_sd"), funs(round(.,0)))
+@
+
+<<label=usecase1, eval = TRUE, fig = TRUE, width = 6, height = 6, echo = FALSE, include = FALSE>>=
+rawDiag:::.technote_application_figure_1(WU163763)
+@
+% , pdf=FALSE, png=TRUE
+<<label=usecase2, eval = TRUE, fig = TRUE, width = 6, height = 6, echo = FALSE, include = FALSE>>=
+rawDiag:::.technote_application_figure_2(WU163763) 
+
+@
+<<label=usecase3, eval = TRUE, fig = TRUE, width = 6, height = 4, echo = FALSE, include = FALSE>>=
+rawDiag:::.technote_application_figure_3(searchResults)
+@
+
+<<label=usecase4, eval = TRUE, fig = TRUE, width = 6, height = 4, echo = FALSE, include = FALSE>>=
+rawDiag:::.technote_application_figure_4(WU163763, searchResults)
+@
+
+<<label=usecase5, eval = TRUE, fig = TRUE, width = 6, height = 4, echo = FALSE, include = FALSE>>=
+rawDiag:::.technote_application_figure_5(WU163763)
+@
+
+
+\begin{figure}[H]
+\centering
+ \includegraphics[width=0.49\columnwidth]{rawDiag-usecase1}
+ \includegraphics[width=0.49\columnwidth]{rawDiag-usecase2}
+ \includegraphics[width=0.32\columnwidth]{rawDiag-usecase3}
+ \includegraphics[width=0.32\columnwidth]{rawDiag-usecase4}
+ \includegraphics[width=0.32\columnwidth]{rawDiag-usecase5}
+\caption{\textbf{A)}~Moving average of the scan speed of triplicate measurements of "Top18" (blue), "Top36" (green) and "Top72" (orange).
+\textbf{B)} Number of MS2 scans for each scan cycle for "Top18" (blue), "Top36" (green) and "Top72" (orange).
+\textbf{C)} Number of Proteins (orange) and peptides (blue) for the different TopN settings (note: number of peptides is divided by 10 in this plot due to scaling reasons).
+\textbf{D)} Number of PSM (blue) and MS2 scans (orange) for the different TopN settings.
+\textbf{E)} Time spent on MS1 (blue) and MS2 (orange) for the different TopN settings. Time range for calculation is the elution phase of the peptides between 15-70 min. }
+\label{figure:application}
+\end{figure}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Interestingly, the number of peptide spectrum matches (PSM) is decreasing in the "Top72" method 
+compared with the "Top36". Based on this one could formulate a new 
+hypothesis: the "Top72" method is sampling the precursors to such a deep 
+level, that we reach an injection time limit for many low abundant 
+species (MS2 quality is suffering from low amount of ions). To 
+test this, the methods could now be further fine tuned by reducing the 
+number of MS2 from 72 to a lower number but at the same time increase the 
+injection time to increase the spectra quality.
+
+
+\subsection{Related work}
+To our knowledge the only alternative tool that is able to extract and visualize metadata from raw files on single scan granularity  is rawMeat (Vast Scientific). Unfortunately, it was discontinued years ago and built on the meanwhile outdated MSFileReader libraries from Thermo Fisher Scientific (MS Windows only). This implies that it does not fully support the latest generation of qOrbi instruments. Other loosely related tools \cite{pmid28802010, pmid25798920, pmid29324744, pmid27700092} are tailored towards longitudinal data recording and serve the purpose of quality control\cite{SIMPATIQCO} (monitoring of instrument performance) rather than method optimization. 
+
+
+
+\section{Conclusion}
+In this manuscript, we presented \rawDiag~an R package to visualize characteristics of LC-MS measurements. Through its diagnostic plots, \rawDiag~supports scientists during empirical method optimization by providing a rational base for choosing appropriate data acquisition parameters. The software is interactive and easy to operate through an R shiny GUI application, even for users without prior R knowledge. More advanced users can fully customize the appearance of the visualizations by executing their own code from the R command line. This also enables \rawDiag~to be customized and implemented into more complex environments, e.g., data analysis pipelines embedded into LIMS systems.
+In its current implementation, the software is tailored towards the Thermo Fisher Scientific raw file format, but its architecture allows easy adaptation towards other mass spectrometry data formats. An interesting showcase would be the novel Bruker tdf 2.0 format (introduced for the timsTOF Pro), where scan metadata is not ``hidden'' in proprietary binary files, but stored in an open SQLite database directly accessible to R.
+In the future, we plan to extend \rawDiag~by allowing users to link additional metadata not originally logged by the instrument software (derived metadata), but created offline by external tools. A simple, but very useful example, is to scan metadata created by search engines. These typically links scans to similarity scores, peptide assignments, and their corresponding probabilities. This would allow visualizing assignment rates and score distributions across injections. Having the peptide assignments at hand will open the door for chained metadata usage, for instance by linking a scan over the amino acid sequence of the identified peptide to physicochemical properties like hydrophobicity, iRT scores, or MW. Such derived metadata can then be compared to primary metadata like empirical mass or RT. Linking primary and derived metadata will also clear the way to big data applications similar to MassIVE\footnote{\url{https://massive.ucsd.edu/ProteoSAFe/static/massive.jsp}, March 2018} but bypassing the necessary conversion to open data formats like mzML. This is beneficial since the conversion process does not preserve all useful primary metadata.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% The "Acknowledgement" section can be given in all manuscript
+%% classes.  This should be given within the "acknowledgement"
+%% environment, which will make the correct section or running title.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\section{Funding Sources}
+The work has been supported by ETH Zurich and University of Zurich.
+
+\begin{acknowledgement}
+The authors thank ...
+Jim Shofstahl for ...
+reviewer 1 and reviewer 2 for ...
+Lilly for the sticker ....
+\end{acknowledgement}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% The same is true for Supporting Information, which should use the
+%% suppinfo environment.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{suppinfo}
+
+The package vignette as well as the R package itself, a Dockerfile which build
+the entire architecture from scratch, is accessible through a git repository
+under the following URL: \url{https://github.com/protViz/rawDiag}.
+
+
+A demo system including all data shown in this manuscript is available through
+\url{http://fgcz-ms-shiny.uzh.ch:8080/rawDiag-demo/}.
+
+\end{suppinfo}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% The appropriate \bibliography command should be placed here.
+%% Notice that the class file automatically sets \bibliographystyle
+%% and also names the section correctly.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\nocite{msdata,mzR,SIMPATIQCO}
+\bibliography{rawDiag}
+
+\end{document}
