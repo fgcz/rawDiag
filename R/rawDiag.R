@@ -1260,7 +1260,9 @@ PlotMassHeatmap <- function(x, method='trellis', bins = 80){ #rename to mass.hea
   #               file.path("extdata", "benchmark.RData")))
   data(benchmark)
   
-  gp <- ggplot(rbind(b.Linux, b.Apple, X.Linux), aes(y=overall.runtime, x=ncpu, group=ncpu), color=system) + 
+  gp <- ggplot(rbind(b.Linux, b.Apple, X.Linux), aes(y=overall.runtime, x=ncpu,
+                                                     group=ncpu), 
+               color=system) + 
     coord_trans(y = "log10") +
     scale_y_continuous(breaks = c(90, 120, 180, 240, 480, 600, 900, 1800, 3600, 1800 + 3600)) +
     stat_summary(fun.y = mean, geom = "line", aes( group = 1)) + #colour = "deepskyblue2") +
@@ -1285,6 +1287,8 @@ b.Apple$IO.throuput <- sum(unique(b.Apple$nrow)) / b.Apple$overall.runtime
 gp <- ggplot(rbind(b.Linux, b.Apple, X.Linux), aes(y=IO.throuput, x=ncpu, group=ncpu)) + 
   stat_summary(fun.y = mean, geom = "line", aes( group = 1)) + #, colour = "deepskyblue2") +
   geom_boxplot() +
+  coord_trans(y = "log10") +
+  scale_y_continuous(breaks = c(500, 1000, 2000, 4000, 8000, 16000, 32000, 64000)) +
   labs(x = "number of used processes", y = "IO throughput  [number of scan info / s]", 
        subtitle='IO throughput') +
   theme_light() 

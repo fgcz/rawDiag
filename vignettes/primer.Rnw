@@ -63,7 +63,7 @@ with the principle described in \cite{Wickham2014}.
 Thermo Fisher Scientic raw files. The
 package calls a \proglang{C\#} executable which is able generate the required
 \code{data.frame} on the fly directly from a
-raw file using the {\em New Raw File Reader} technology \cite{RawFileReader}.
+raw file using the {\em New Raw File Reader} technology \citep{RawFileReader}.
 However, any other mass spectrometry data format is also supported via the open 
 standard \pkg{mzR} \citep{mzR} which requires
 a conversion of the data prior to loading. 
@@ -71,8 +71,8 @@ A number of R helper functions reshape and subset the data and pass the desired
 data-frames to \pkg{ggplot2} \citep{Hadley2009} for visualization. 
 Trellis plots help to compare result
 between different runs. Plots can be inspected interactively running the
-software as an R shiny instance. Additionally, pdf reports can be generated using
-a customizable \pkg{rmarkdown} file.
+software as an R shiny instance. Additionally, pdf reports can be generated
+using a customizable \pkg{rmarkdown} file.
 
 Processing speed of the software on modern laptop infrastructure is sufficient
 to provide the user with
@@ -89,7 +89,6 @@ The diagnostic visualization are peptide ID free and rely on data logged by the
 instrument directly in the raw data file. This makes the software slim and fast
 and does not require an full additional data analysis
 pipeline.
-
 
 \section{Getting started} 
 
