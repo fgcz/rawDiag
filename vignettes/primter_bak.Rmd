@@ -6,11 +6,16 @@ date: "`r Sys.Date()`"
 output: tint::tintPdf
 bibliography: rawDiag.bib
 link-citations: yes
+
+---
+
+
+```
 vignette: >
   %\VignetteIndexEntry{Getting Started with rawDiag}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
----
+```
 
 ```{r setup, include=FALSE}
 library(tint)
