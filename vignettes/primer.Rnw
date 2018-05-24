@@ -1,60 +1,44 @@
 %\VignetteIndexEntry{primer: rawDiag}
 \documentclass[nojss]{jss}
-\usepackage{listings}
+%\usepackage{listings}
 \usepackage[T1]{fontenc} % Use modern font encodings
-\usepackage{tabularx}
-\usepackage{makecell}
-
+%\usepackage{tabularx}
+%\usepackage{makecell}
 %\usepackage{color} 
 
 \newcommand*\rawDiag{\textbf{\texttt{rawDiag}}}
 
 \author{Christian Trachsel \& Tobias Kockmann \& Christian Panse}
-%\title{Howto Use Diagnostic Plots for Orbitrap Instruments}
 \title{\pkg{rawDiag}: an R Package for Diagnostic Plots of Mass Spectrometry Raw Data}
 
 \Plainauthor{Christian Trachsel \& Tobias Kockmann \& Christian Panse}
+
 \Plaintitle{Diagnostoc plots}
+
 \Shorttitle{rawDiag}
 
 \Keywords{proteomics, mass spectrometry}
+
 \Plainkeywords{proteomics, mass spectrometry, visualization, method optimization}
 
 \Abstract{
-
-\pkg{rawDiag} is an R package which provides the user with visualizations of mass 
-spectrometry data characteristics, coming from LC-MS/MS proteomics experiments. The plots implemented
-in this package allow the user to check LC-MS/MS method parameters and facilitated the optimization 
-thereof. The package is developed, tested and used at the Functional Genomics Center Zurich. 
-The package is optimized for reading thermo fisher raw files but any other mass spectrometry 
-data format is supported over the open standard mzR. \pkg{rawDiag} can be run on modern laptop 
-infrastructure with sufficient speed but for larege datasets, a server infrastructure might be beneficial.  
-
-
-
-OLD: 
-\pkg{rawDiag} is an R package to do quality checks, visualizations and analysis
-of mass spectrometry data, coming from proteomics experiments.
-The package is developed, tested and used at the Functional Genomics Center Zurich. 
-We use this package mainly for prototyping, teaching, and having {\em fun} with proteomics data.
-But it can also be used to do data analysis for small scale data sets.
-Nevertheless, if one is patient, it also handles large data sets.}
-
-
-\newcommand*\fgcz{Functional Genomics Center Zurich\\
-Swiss Federal Institute of Technology in Zurich~\texttt{|}~University of Zurich\\
-Winterthurerstr. 190, CH-8057 Zurich, Switzerland}
+\pkg{rawDiag} is an R package which provides the user with visualizations of mass spectrometry data characteristics, coming from LC-MS/MS proteomics experiments. The plots implemented
+in this package allow the user to check LC-MS/MS method parameters and facilitated the optimization thereof. The package is developed, tested and used at the Functional Genomics Center Zurich. 
+The package is optimized for reading Thermo Fisher raw files, but any other mass spectrometry data format is supported over the open standard mzR. \pkg{rawDiag} can be run on modern laptop infrastructure with sufficient speed, but for large datasets, a server infrastructure might be beneficial.  
+}
 
 \Address{
-  Christian Trachsel \& Christian Panse\\
-  \fgcz
+  Christian Trachsel \& Tobias Kockmann \& Christian Panse\\
+  Functional Genomics Center Zurich\\
+  Swiss Federal Institute of Technology in Zurich~\texttt{|}~University of Zurich\\
+  Winterthurerstr. 190, CH-8057 Zurich, Switzerland\\
   \\
   Telephone: +41-44-63-53912\\
   E-mail: \email{cp@fgcz.ethz.ch}\\
   URL: \url{http://www.fgcz.ch}
 }
 
-\newcommand{\rfr}{\href{http://planetorbitrap.com/rawfilereader}{RawFileReader from Thermo Fisher Scientific}~}
+
 
 \begin{document}
 
@@ -79,8 +63,8 @@ These visualizations are helpful for the optimization of the instrument method t
 
 Our R package reads as input a comma-separated spreadsheet (csv) containing
 LC-MS/MS run parameters. \pkg{rawDiag} is optimized to work with Thermo Fisher Scientic raw files. The
-package calls a c# executable which is able generate the required csv file on the fly directly from a
-raw file using the new raw file reader technology \rfr (\url{http://planetorbitrap.com/rawfilereader}).
+package calls a \proglang{C\#} executable which is able generate the required csv file on the fly directly from a
+raw file using the new raw file reader technology \cite{RawFileReader}.
 However, any other mass spectrometry data format is also supported via the open standard mzR which requires
 a conversion of the data prior to loading. A number of R helper functions reshape and subset the data and pass the desired
 data-frames to ggplot2 for visualization. Trellis plots help to compare result
@@ -101,51 +85,6 @@ raw data file. This makes the software slim and fast and does not require an ful
 pipeline.
 
 
-\section{Installation}
-
-
-The R package can be installed via the following command line:
-<<eval=FALSE>>=
-library(devtools)
-devtools::install_github("fgcz/rawDiag")
-@
-
-A docker recipe for compiling the adapter function implemented in
-\proglang{C\#} using the \rfr is contained in the R package and listed below.
-
-\lstdefinelanguage{docker-compose-2}{
-  keywords={version, volumes, services},
-  keywordstyle=\color{blue}\bfseries,
-  keywords=[2]{image, environment, ports, container_name, ports, links, build},
-  keywordstyle=[2]\color{olive}\bfseries,
-  identifierstyle=\color{black},
-  sensitive=false,
-  comment=[l]{\#},
-  commentstyle=\color{blue}\ttfamily,
-  stringstyle=\color{red}\ttfamily,
-  morestring=[b]',
-  morestring=[b]"
-}
-
-\IfFileExists{../inst/docker/Dockerfile}{
-  \lstinputlisting[language=docker-compose-2,
-  caption={Dokerfile for compiling the ThermoFisher rawfilereader adapter code.},
-  breaklines=false,
-  label={code:compose}]{../inst/docker/Dockerfile}
-}{
-
-NO DOCKERFILE
-
-}
-
-The docker image is built and executed by using the follwoing command line.
-\begin{lstlisting}[language=bash]
-docker build -t rawfilereader .
-
-docker run -v /scratch:/scratch \
-  -a stdin -a stdout -i -t rawfilereader bash
-\end{lstlisting}
-
 
 \section{Getting started} 
 
@@ -164,7 +103,7 @@ help(package="rawDiag")
 
 \subsection{Using The New Raw File Reader}
 
-The function \code{read.raw} uses the \rfr to 
+The function \code{read.raw} uses the \cite{RawFileReader} to 
 extract the following information out of the mass spectrometric meassurement.
 
 <<>>=
@@ -184,7 +123,8 @@ system.time(RAW <- read.raw(file = "~/data/20130115_01_iRT_Fet10fmol.RAW"))
 <<eval = FALSE>>=
 library(mzR); 
 library(rawDiag)
-RAW <- rawDiag:::as.rawDiag.mzR(openMSfile("/scratch/cpanse/PXD006932/Exp3A/20161213_NGHF_DBJ_SA_Exp3A_HeLa_1ug_15min_15000_01.mzML"))
+RAW <- rawDiag:::as.rawDiag.mzR(
+  openMSfile("20161213_NGHF_DBJ_SA_Exp3A_HeLa_1ug_15min_15000_01.mzML"))
 
 PlotChargeState(RAW)
 PlotCycleLoad(RAW)
@@ -205,8 +145,9 @@ PlotTicBasepeak(RAW)
 \section{Usage}
 
 
-In the following section we demonstrate how the software can be used for the optimization of an
-LC-MS/MS method. For this we first load the demonstration data shipped with the package.
+In the following section we demonstrate how the software can be used for the
+optimization of an LC-MS/MS method. For this we first load the demonstration
+data shipped with the package.
 
 load sample data:
 <<label=load, eval=TRUE>>=
@@ -215,16 +156,18 @@ load(file.path(path.package(package = "rawDiag"),
 stopifnot(is.rawDiag(WU163763))
 @
 
-This data was recorded to investigate the optimal number of MS2 scans between two consecutive MS1 scans on a
-Q-Exactive HF-X mass spectrometer injecting a commercial HeLa digest. Since the data was recorded in triplicate 
-per used method, we will have overplotting issues. Therefore we first filter the data for a single injection
-per method.
+This data was recorded to investigate the optimal number of MS2 scans between
+two consecutive MS1 scans on a Q-Exactive HF-X mass spectrometer injecting a
+commercial HeLa digest. Since the data was recorded in triplicate 
+per used method, we will have overplotting issues. Therefore we first filter
+the data for a single injectionper method.
 
 <<label=filter, eval=TRUE>>=
   library(tidyverse)
-df <- dplyr::filter(WU163763, filename == "20180220_04_S174020_Pierce_HeLa_Protein_Digest_Std.raw" |
-                      filename == "20180220_05_S174020_Pierce_HeLa_Protein_Digest_Std.raw" |
-                      filename == "20180220_09_S174020_Pierce_HeLa_Protein_Digest_Std.raw")
+df <- dplyr::filter(WU163763, 
+  filename == "20180220_04_S174020_Pierce_HeLa_Protein_Digest_Std.raw" |
+  filename == "20180220_05_S174020_Pierce_HeLa_Protein_Digest_Std.raw" |
+  filename == "20180220_09_S174020_Pierce_HeLa_Protein_Digest_Std.raw")
 @
 
 Now to the actual walk through. Assuming we have a starting method we want to optimize. This method is 
@@ -268,37 +211,6 @@ print(gp <- PlotInjectionTime(subset(df, MSOrder %in% "Ms2"), method = "trellis"
 In order to check if the instrument is still abel to collect an appropriate amount of ions for all MS2 scans, we can check the injetion time characteristics for the three runs.
 
 
-Ab hier alles weg??
-
-adapt y-axis number of tickmarks
-
-<<label=cycletime, fig = TRUE, width=4.5, height=6, echo=TRUE, include=TRUE, warnings=TRUE>>=
-  library(ggplot2)
-print(gp <- PlotCycleTime(WU163763) + 
-        scale_y_continuous(breaks = scales::pretty_breaks(3)))
-@
-  
-print object class
-
-<<>>=
-  class(gp)
-@
-  
-  
-Next, we discover the unexpected mass spec ???
-and
-apply subsetting
-
-<<label=scantime, fig = TRUE, width=4.5, height=4, echo=TRUE, include=TRUE>>=
-# library(dplyr)
-gp <- WU163763 %>% 
-  filter(filename == "20180220_04_S174020_Pierce_HeLa_Protein_Digest_Std.raw") %>% 
-  PlotScanTime() 
-
-print(gp + 
-        facet_grid(filename + MassAnalyzer + MSOrder ~ .))
-@
-  
 
 
 \section{Benchmark}
@@ -306,7 +218,8 @@ print(gp +
 We performed a benchmark using the following command on a  
 Intel(R) Xeon(R) CPU E5-2698 v3 @ 2.30GHz system having
 64 processors and running Debian 8.
-We read 517533 scans information from eight raw files using the adapter function \code{read.raw}.
+We read 517533 scans information from eight raw files using the adapter
+function \code{read.raw}.
 
 <<eval = FALSE>>= 
 #R
@@ -315,7 +228,8 @@ library(parallel)
 f <- list.files()
 f <- f[grep("raw$", f)]
 
-b <- lapply(1, function(x){.benchmark(f, exe="~/RiderProjects/fgcz-raw/bin/Debug/fgcz_raw.exe")})
+b <- lapply(1, function(x){.benchmark(f,
+  exe="~/RiderProjects/fgcz-raw/bin/Debug/fgcz_raw.exe")})
 
 b <- plyr::rbind.fill(lapply(b, plyr::rbind.fill))
 
@@ -355,7 +269,8 @@ plots illustrate that both systems, server, and laptop, can analyze
 \end{figure}
 
 \section{Session information}
-An overview of the package versions used to produce this document are shown below.
+An overview of the package versions used to produce this document are shown
+below.
 
 
 <<sessioninfo, results=tex, echo=FALSE>>=
