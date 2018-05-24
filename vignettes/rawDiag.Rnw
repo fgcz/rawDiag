@@ -1,4 +1,4 @@
-%\VignetteIndexEntry{JPR pr-2018-001736}
+% JPR pr-2018-001736
 \documentclass[journal=jprobs,manuscript=article]{achemso}
 \setkeys{acs}{articletitle=true}
 \setkeys{acs}{doi = true}

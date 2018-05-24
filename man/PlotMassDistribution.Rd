@@ -21,8 +21,7 @@ plots the mass frequency in dependency to the charge state
 }
 \examples{
  library(ggplot2)
- load(file.path(path.package(package = "rawDiag"),
-  file.path("extdata", "WU163763.RData")))
+ data(WU163763)
  
  PlotMassDistribution(WU163763, method = 'trellis') +
    facet_wrap(~filename, ncol = 3)

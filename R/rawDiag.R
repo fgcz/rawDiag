@@ -648,11 +648,10 @@ PlotMzDistribution <- function(x, method='trellis'){
 #' @export PlotMassDistribution
 #' @examples 
 #'  library(ggplot2)
-#'  load(file.path(path.package(package = "rawDiag"),
-#'   file.path("extdata", "WU163763.RData")))
+#'  data(WU163763)
 #'  
 #'  PlotMassDistribution(WU163763, method = 'trellis') +
-#'    facet_wrap(~filename, ncol = 3)
+#'    facet_wrap(~ filename, ncol = 3)
 #'  
 #'  PlotMassDistribution(WU163763, method = 'violin') +
 #'    theme(legend.position = 'none')
@@ -1216,7 +1215,8 @@ PlotMassHeatmap <- function(x, method='trellis', bins = 80){ #rename to mass.hea
 # ----TechNote Figs----
 .overview <- function(prefix="primer"){
   
-  WU <- getWU163763()
+  data(WU163763)
+  WU <- WU163763
   WU <- WU[WU$filename %in% unique(WU$filename)[1:2], ]
   
   lapply(ls("package:rawDiag")[grepl("Plot", ls("package:rawDiag"))], 
@@ -1256,8 +1256,6 @@ PlotMassHeatmap <- function(x, method='trellis', bins = 80){ #rename to mass.hea
 }
 
 .technote_benchmark_figure_1 <- function(){
-  #load(file.path(path.package(package = "rawDiag"),
-  #               file.path("extdata", "benchmark.RData")))
   data(benchmark)
   
   gp <- ggplot(rbind(b.Linux, b.Apple, X.Linux), aes(y=overall.runtime, x=ncpu,
@@ -1275,29 +1273,27 @@ PlotMassHeatmap <- function(x, method='trellis', bins = 80){ #rename to mass.hea
 }
 
 .technote_benchmark_figure_2 <- function(){
-  #load(file.path(path.package(package = "rawDiag"),
-  #               file.path("extdata", "benchmark.RData")))
   data(benchmark)
   
-b.Linux$IO.throuput <- sum(unique(b.Linux$nrow)) / b.Linux$overall.runtime
-X.Linux$IO.throuput <- sum(unique(X.Linux$nrow)) / X.Linux$overall.runtime 
-
-b.Apple$IO.throuput <- sum(unique(b.Apple$nrow)) / b.Apple$overall.runtime 
-
-gp <- ggplot(rbind(b.Linux, b.Apple, X.Linux), aes(y=IO.throuput, x=ncpu, group=ncpu)) + 
-  stat_summary(fun.y = mean, geom = "line", aes( group = 1)) + #, colour = "deepskyblue2") +
-  geom_boxplot() +
-  coord_trans(y = "log10") +
-  scale_y_continuous(breaks = c(500, 1000, 2000, 4000, 8000, 16000, 32000, 64000)) +
-  labs(x = "number of used processes", y = "IO throughput  [number of scan info / s]", 
-       subtitle='IO throughput') +
-  theme_light() 
+  b.Linux$IO.throuput <- sum(unique(b.Linux$nrow)) / b.Linux$overall.runtime
+  X.Linux$IO.throuput <- sum(unique(X.Linux$nrow)) / X.Linux$overall.runtime 
+  
+  b.Apple$IO.throuput <- sum(unique(b.Apple$nrow)) / b.Apple$overall.runtime 
+  
+  gp <- ggplot(rbind(b.Linux, b.Apple, X.Linux), aes(y=IO.throuput, x=ncpu, group=ncpu)) + 
+    stat_summary(fun.y = mean, geom = "line", aes( group = 1)) + #, colour = "deepskyblue2") +
+    geom_boxplot() +
+    coord_trans(y = "log10") +
+    scale_y_continuous(breaks = c(500, 1000, 2000, 4000, 8000, 16000, 32000, 64000)) +
+    labs(x = "number of used processes", y = "IO throughput  [number of scan info / s]", 
+         subtitle='IO throughput') +
+    theme_light() 
   # coord_trans(y = "log10") +
   #  scale_y_continuous(breaks = c(0.1, 0.25, 0.5, 1.0, 1.25)) +
   
   # annotate("text", x = 40, y = 0.20, label = paste("max throughput =", round(max(b.Linux$IO.throuput), 2), "GBytes/s")) +
-#  annotate("text", x = 40, y = 0.15, label = paste("min throughput =", round(min(b.Linux$IO.throuput), 2), "GBytes/s"))
-
+  #  annotate("text", x = 40, y = 0.15, label = paste("min throughput =", round(min(b.Linux$IO.throuput), 2), "GBytes/s"))
+  
   gp + facet_grid( .  ~ system * method)
 }
 #remove
@@ -1704,9 +1700,7 @@ gp <- ggplot(rbind(b.Linux, b.Apple, X.Linux), aes(y=IO.throuput, x=ncpu, group=
 #' @return a \code{\link{data.frame}} fullfilling the \code{\link{is.rawDiag}} column naming criteria.
 #' @export getWU163763
 getWU163763 <- function(){
- load(file.path(path.package(package = "rawDiag"),
-    file.path("extdata", "WU163763.RData")))
-  
+  data(WU163763)
   return(WU163763)
 }
 
@@ -1918,7 +1912,8 @@ getWU163763 <- function(){
 
 .overview_ <- function(prefix="primer"){
   
-  WU <- getWU163763()
+  data(WU163763)
+  WU <- WU163763
   WU <- WU[WU$filename %in% unique(WU$filename)[1:2], ]
   
   lapply(ls("package:rawDiag")[grepl("Plot", ls("package:rawDiag"))], 

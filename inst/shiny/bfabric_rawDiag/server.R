@@ -46,7 +46,7 @@ shinyServer(function(input, output, session) {
                                         "p195",
                                         "cfortes_20180313_300um_WW"),
                            RDataRoot = file.path(path.package(package = "rawDiag"), "extdata"),
-                           RDataData = c("PXD006932_Exp3A.RData", "WU163763.RData", "WU163230.RData"))
+                           RDataData = c("WU163763"))
   
 
   
@@ -176,9 +176,8 @@ shinyServer(function(input, output, session) {
                                       mc.cores = input$mccores))}
     else if(input$source == 'package'){
       rv <- NULL
-      fn <- file.path(values$RDataRoot, input$RData)
       ne <- new.env()
-      load(fn, ne)
+      data("WU163763", envir=ne)
       rv <- ne[[ls(ne)]]
     }else if(input$source == 'bfabric'){
       progress <- shiny::Progress$new(session = session, min = 0, max = 1)

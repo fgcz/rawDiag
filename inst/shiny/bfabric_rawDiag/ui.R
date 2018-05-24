@@ -28,7 +28,7 @@ shinyUI(fluidPage(
   sidebarLayout(
     sidebarPanel( 
       
-      img(src='octopussy.png ', align = "right"),
+      img(src='octopussy.png ', align = "right", width = '150px'),
       radioButtons("source", "Type of data source:",
                    INPUTTYPES),
       br(),
@@ -42,7 +42,7 @@ shinyUI(fluidPage(
       h3("Graphics Parameter"),
       sliderInput("graphicsheight", "graphicsheight",
                   min = 480, max = 4096,
-                  value = 512),
+                  value = 640),
       sliderInput("hexbinsize", "hexbinsize", min = 1, max = 512, value = 80),
       radioButtons("plottype", "Type of diagnostic plot:",
                    c("overlay" = "overlay",
