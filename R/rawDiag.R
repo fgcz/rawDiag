@@ -1216,7 +1216,8 @@ PlotMassHeatmap <- function(x, method='trellis', bins = 80){ #rename to mass.hea
 # ----TechNote Figs----
 .overview <- function(prefix="primer"){
   
-  WU <- getWU163763()
+  data(WU163763)
+  WU <- WU163763
   WU <- WU[WU$filename %in% unique(WU$filename)[1:2], ]
   
   lapply(ls("package:rawDiag")[grepl("Plot", ls("package:rawDiag"))], 
@@ -1704,9 +1705,8 @@ gp <- ggplot(rbind(b.Linux, b.Apple, X.Linux), aes(y=IO.throuput, x=ncpu, group=
 #' @return a \code{\link{data.frame}} fullfilling the \code{\link{is.rawDiag}} column naming criteria.
 #' @export getWU163763
 getWU163763 <- function(){
- load(file.path(path.package(package = "rawDiag"),
-    file.path("extdata", "WU163763.RData")))
   
+  data(WU163763)
   return(WU163763)
 }
 
@@ -1918,7 +1918,8 @@ getWU163763 <- function(){
 
 .overview_ <- function(prefix="primer"){
   
-  WU <- getWU163763()
+  data(WU163763)
+  WU <- WU163763
   WU <- WU[WU$filename %in% unique(WU$filename)[1:2], ]
   
   lapply(ls("package:rawDiag")[grepl("Plot", ls("package:rawDiag"))], 
