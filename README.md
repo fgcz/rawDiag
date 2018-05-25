@@ -17,7 +17,8 @@ Due to license reason, we currently can not distribute Thermo Fisher Scientific 
 The *New RawFileReader from Thermo Fisher Scientific* (see http://planetorbitrap.com/rawfilereader)
 has to be downloaded and installed to use the R function `read.raw`.
 
-on Linux (Debian) system run the following code snippet once you have downloaded the libraries:
+#### on Linux 
+(Debian) system run the following code snippet once you have downloaded the libraries:
 ```{sh}
 apt-get update \
   && apt-get install mono-complete vim less unzip r-base -y \
@@ -28,6 +29,12 @@ apt-get update \
   && gacutil -i lib/ThermoFisher.CommonCore.RawFileReader.dll \
   && echo $?
 ```
+#### on Apple
+
+```{sh}
+#
+```
+
 
 ### 1.3 [Open File Standards](http://www.psidev.info/)
 support through Bioconductor [mzR](http://bioconductor.org/packages/mzR/). 
