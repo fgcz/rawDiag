@@ -187,8 +187,10 @@ as.rawDiag.mzR <- function(object){
   
   rv$MSOrder[rv$MSOrder == 1] <- "Ms" 
   rv$MSOrder[rv$MSOrder == 2] <- "Ms2" 
+  rv$StartTime <- rv$StartTime / 60
   
   rv$filename <- basename(fileName(object))
+  
   as.rawDiag(rv)
 }
 

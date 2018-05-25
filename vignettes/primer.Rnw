@@ -1,4 +1,4 @@
-%\VignetteIndexEntry{primer: rawDiag}
+%\VignetteIndexEntry{A quick tour of rawDiag}
 \documentclass[nojss]{jss}
 
 \usepackage[T1]{fontenc} % Use modern font encodings
@@ -17,9 +17,16 @@
 \Plainkeywords{proteomics, mass spectrometry, visualization, method optimization, R-package}
 
 \Abstract{
-\pkg{rawDiag} is an R package which provides the user with visualizations of mass spectrometry data characteristics, coming from LC-MS/MS proteomics experiments. The plots implemented
-in this package allow the user to check LC-MS/MS method parameters and facilitated the optimization thereof. The package is developed, tested and used at the Functional Genomics Center Zurich. 
-The package is optimized for reading Thermo Fisher raw files, but any other mass spectrometry data format is supported over the open standard \pkg{mzR}. \pkg{rawDiag} can be run on modern laptop infrastructure with sufficient speed, but for large datasets, a server infrastructure might be beneficial.  
+\pkg{rawDiag} is an R package which provides the user with visualizations of
+mass spectrometry data characteristics, coming from LC-MS/MS proteomics
+experiments. The plots implemented
+in this package allow the user to check LC-MS/MS method parameters and
+facilitated the optimization thereof. The package is developed, tested and used
+at the Functional Genomics Center Zurich. 
+The package is optimized for reading Thermo Fisher raw files, but any other mass
+spectrometry data format is supported over the open standard \pkg{mzR}.
+\pkg{rawDiag} can be run on modern laptop infrastructure with sufficient speed,
+but for large datasets, a server infrastructure might be beneficial.  
 }
 
 \Address{
@@ -113,6 +120,17 @@ library(rawDiag)
 
 \subsection{Utility Functions}
 
+We first load the demonstration
+data shipped with the package. 
+Pleas note, the raw data are available trough
+\href{https://massive.ucsd.edu/ProteoSAFe/dataset.jsp?task=b231e78d674345798ebe50e46a9a3a93}{MassIVE MSV000082389}.
+
+load sample data:
+<<>>=
+data(WU163763)
+stopifnot(is.rawDiag(WU163763))
+@
+
 <<>>=
 data("WU163763")
 is.rawDiag(WU163763)
@@ -154,16 +172,7 @@ RAW$scanNumber
 \section{Usage}
 
 In the following section we demonstrate how the software can be used for the
-optimization of an LC-MS/MS method. For this we first load the demonstration
-data shipped with the package. 
-Pleas note, the raw data are available trough
-\href{https://massive.ucsd.edu/ProteoSAFe/dataset.jsp?task=b231e78d674345798ebe50e46a9a3a93}{MassIVE MSV000082389}.
-
-load sample data:
-<<label=load, eval=TRUE>>=
-data(WU163763)
-stopifnot(is.rawDiag(WU163763))
-@
+optimization of an LC-MS/MS method. 
 
 This data was recorded to investigate the optimal number of MS2 scans between
 two consecutive MS1 scans on a Q-Exactive HF-X mass spectrometer injecting a
@@ -200,7 +209,8 @@ is the same over the three injections.
 print(gp <- PlotTicBasepeak(df, method = "overlay"))
 @
 
-signal response and chromatography is ok for the three injections. As next point we want to check the actuall cycle time
+signal response and chromatography is ok for the three injections. As next point
+we want to check the actuall cycle time
 of the injections. Please note we also make use of the
 grammar of graphics \citep{Hadley2009}
 implementation of \pkg{ggplot2} by modifiying the plot appearance on the fly. 
@@ -214,9 +224,18 @@ print(gp <- PlotCycleTime(df, method = "trellis") +
   facet_wrap(~ filename, ncol =1))
 @
  
-We can see the the cycle time for the top 18 method (file: 20180220\_09\_) is arround 0.6 seconds during the elution phase of the peptides.
-The red dashed line indicates the calculated cycle time. As already mentioned, with this method we produce too many MS1 data points. The cycle time of the top 36 (file: 20180220\_04\_) and top 72 (file: 20180220\_05\_) methods respectively have cycle times of 1.1 second and 2 seconds respectively. With the used chromatography we produce $\approx$20-30 MS1 point for the top 36 and $\approx$10-15 MS1 points for the top 72 method. This is a much better value compared to the initial method.
-The next thing to check is if the instrument is actually using the available MS2 capacity. For this we plot the cycle load (the actually performed MS2 scans for each MS1 scan).
+We can see the the cycle time for the top 18 method (file: 20180220\_09\_) is
+arround 0.6 seconds during the elution phase of the peptides.
+The red dashed line indicates the calculated cycle time. As already mentioned,
+with this method we produce too many MS1 data points. The cycle time of the top
+36 (file: 20180220\_04\_) and top 72 (file: 20180220\_05\_) methods respectively
+have cycle times of 1.1 second and 2 seconds respectively. With the used
+chromatography we produce $\approx$20-30 MS1 point for the top 36 and
+$\approx$10-15 MS1 points for the top 72 method. This is a much better value
+compared to the initial method.
+The next thing to check is if the instrument is actually using the available
+MS2 capacity. For this we plot the cycle load (the actually performed MS2 scans
+for each MS1 scan).
 
 <<label=Load, fig = TRUE, echo=TRUE, include=TRUE, warnings=TRUE>>=
 print(gp <- PlotCycleLoad(df, method = "trellis"))
@@ -225,8 +244,10 @@ print(gp <- PlotCycleLoad(df, method = "trellis"))
 From the plot we can see that all mehtods actually use the available number of MS2 scans during the main peptide elution phase. The blue line is representing the trend as a fitted gam model.
 
 <<label=IT, fig = TRUE, echo=TRUE, include=TRUE, warnings=TRUE>>=
-print(gp <- PlotInjectionTime(subset(df, MSOrder %in% "Ms2"), method = "trellis") +
-        facet_wrap(~ filename, ncol =1))
+print(gp <- PlotInjectionTime(subset(df, MSOrder %in% "Ms2"), 
+    method = "trellis") +
+  facet_wrap(~ filename, ncol =1)
+  )
 @
 In order to check if the instrument is still abel to collect an appropriate amount of ions for all MS2 scans, we can check the injetion time characteristics for the three runs.
 

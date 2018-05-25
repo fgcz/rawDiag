@@ -20,7 +20,8 @@ Imports: ggplot2 (>= 2.2.1),
 	tidyr,
 	tidyverse
 Suggests:
-	knitr
+	knitr,
+	testthat
 Description: Helps with quality checks, visualizations 
     and analysis of mass spectrometry data, coming from proteomics 
     experiments. The package is developed, tested and used at the Functional 
