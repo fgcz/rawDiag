@@ -24,7 +24,7 @@ plots the mass frequency in dependency to the charge state
  data(WU163763)
  
  PlotMassDistribution(WU163763, method = 'trellis') +
-   facet_wrap(~filename, ncol = 3)
+   facet_wrap(~ filename, ncol = 3)
  
  PlotMassDistribution(WU163763, method = 'violin') +
    theme(legend.position = 'none')

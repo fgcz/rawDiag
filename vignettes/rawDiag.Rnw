@@ -1,4 +1,4 @@
-% JPR pr-2018-001736
+%\VignetteIndexEntry{JPR pr-2018-001736}
 \documentclass[journal=jprobs,manuscript=article]{achemso}
 \setkeys{acs}{articletitle=true}
 \setkeys{acs}{doi = true}
@@ -442,6 +442,10 @@ filesystem  &   XFS & APFS\\
 OS  & SMP Debian {3.16.43-2+deb8u2} &  Darwin Kernel Version 17.4.0\\
 Mono JIT compiler version& 5.8.0.127& 5.2.0.224\\
 \hline
+R&3.4.3&3.4.2\\
+mzR & 2.8.1&\\
+ThermoRawFileReader&4.0.22&4.0.22\\
+\hline
 \hline
 \end{tabularx}
 %}
@@ -450,12 +454,17 @@ Mono JIT compiler version& 5.8.0.127& 5.2.0.224\\
 \end{table}
 
 As benchmark data, we downloaded the raw files described in 
-\cite{pmid29183128} on the  filesystem. For the benchmark 
-we limited the input to \Sexpr{length(unique(b.Linux$nrow))} files, 
+\cite{pmid29183128} on the filesystem availbale through
+\href{http://proteomecentral.proteomexchange.org/cgi/GetDataset?ID=PXD006932}{proteomeXchange PXD006932}. 
+For the benchmark we limited the input to \Sexpr{length(unique(b.Linux$nrow))} files, 
 corresponding to two times the available number of processor cores of 
 the Linux system. The data has an overall file size of 
 \Sexpr{round(sum(unique(b.Linux$file.size)) / 1024^3)} GBytes and 
-contains \Sexpr{format(sum(unique(b.Linux$nrow)), scientific=FALSE, big.mark = "'")} individual mass spectra in total.
+contains \Sexpr{format(sum(unique(b.Linux$nrow)), scientific=FALSE, big.mark = "'")}
+individual mass spectra in total.
+For comparison to the open file standards using the mzR package \cite{mzR}, 
+we converted the raw files into mzML files using  version ProteoWizard 3.0.11252
+64-bit on Windows 10. 
 
 The left plot in Figure~\ref{figure:benchmark} depicts the overall 
 runtime in dependency of the number of used CPUs for five repetitions 
@@ -470,6 +479,7 @@ CPUs having an performance of reading
 \Sexpr{format(round(max(b.Linux$IO.throuput)), scientific = FALSE, big.mark = "'")} scan information per second.
 
 \begin{figure}
+
 \includegraphics[width=0.49\columnwidth]{rawDiag-benchmark-time}
 \includegraphics[width=0.49\columnwidth]{rawDiag-benchmark-throuput}
 

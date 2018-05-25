@@ -92,28 +92,38 @@ pipeline.
 
 \section{Getting started} 
 
-attach the package
-<<>>=
-library(rawDiag)
-@
-
 look into for documentation
 
 <<eval=FALSE>>=
 help(package="rawDiag")
 @
 
-\section{Read Data}
+browse the package's vignette files
+
+<<eval=FALSE>>=
+browseVignettes('rawDiag')
+@
+
+attach the package
+<<>>=
+library(rawDiag)
+@
+
+\section{Getting the Data}
+
+\subsection{Utility Functions}
+
+<<>>=
+data("WU163763")
+is.rawDiag(WU163763)
+names(WU163763)
+@
 
 \subsection{Using The New Raw File Reader}
 
 The function \code{read.raw} uses the \citep{RawFileReader} to 
 extract the following information out of the mass spectrometric meassurement.
 
-<<>>=
-library(rawDiag)
-rawDiag:::.getDesiredColNames()
-@
 
 We use R for the implementation and read the data using the pipe command as it
 can be seen in the following code snippet:
@@ -122,28 +132,23 @@ can be seen in the following code snippet:
 system.time(RAW <- read.raw(file = "~/data/20130115_01_iRT_Fet10fmol.RAW"))
 @
 
-\subsection{Reading the Open Proteomics Standards Files}
+\subsection{Reading the Open Proteomics Standard Files}
 
-<<eval = FALSE>>=
+The package also ships with an adapter function \code{as.rawDiag.mzR}
+which enables the support of open file standards through using the Bioconductor 
+\pkg{mzR} package \cite{mzR}.
+
+The demonstration is shown using the code snippet below by using a tiny mzML
+file.
+<<>>=
 library(mzR); 
-library(rawDiag)
-RAW <- rawDiag:::as.rawDiag.mzR(
-  openMSfile("20161213_NGHF_DBJ_SA_Exp3A_HeLa_1ug_15min_15000_01.mzML"))
 
-PlotChargeState(RAW)
-PlotCycleLoad(RAW)
-PlotCycleTime(RAW)
-# PlotInjectionTime(RAW)
-# PlotLockMassCorrection(RAW)
-PlotMassDistribution(RAW)
-PlotPrecursorHeatmap(RAW)
-PlotMzDistribution(RAW)
-PlotPrecursorHeatmap(RAW)
-PlotScanFrequency(RAW)
-PlotScanTime(RAW)
-PlotTicBasepeak(RAW)
+mzML <- "20180220_04_S174020_Pierce_HeLa_Protein_Digest_Std_5000_5010.mzML"
+mzML <- file.path(path.package(package = "rawDiag"), "extdata", mzML)
+system.time(RAW <- rawDiag:::as.rawDiag.mzR(openMSfile(mzML)))
+summary.rawDiag(RAW)
+RAW$scanNumber
 @
-
 
 
 \section{Usage}

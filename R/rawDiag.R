@@ -155,12 +155,16 @@ as.rawDiag <- function(object){
 #'
 #' @return an \code{\link{rawDiag}} object
 #' @author Christian Panse <cp@fgcz.ethz.ch>, Witold E.Wolski <wew@fgcz.ethz.ch>
+#' @export as.rawDiag.mzR
 #' @example 
 #' 
+#' 
 #' \dontrun{
-#' library(mzR)
-#' mzmlFilename <- "PXD006932/Exp3A/20161213_NGHF_DBJ_SA_Exp3A_HeLa_1ug_15min_15000_01.mzML"
-#' S <- as.rawDiag.mzR(openMSfile(mzmlFilename))
+#' library(mzR); 
+#' library(rawDiag)
+#' mzML <- "20180220_04_S174020_Pierce_HeLa_Protein_Digest_Std_5000_5010.mzML"
+#' mzML <- file.path(path.package(package = "rawDiag"), "extdata", mzML)
+#' RAW <- rawDiag:::as.rawDiag.mzR(openMSfile(mzML))
 #' }
 as.rawDiag.mzR <- function(object){
   #time.start <- Sys.time()
@@ -180,6 +184,9 @@ as.rawDiag.mzR <- function(object){
   colnames(rv) <- c('scanNumber', 'StartTime', 'BasePeakMass',
                     'BasePeakIntensity', 'TIC', 'MSOrder', 'PrecursorMass',
                     'ChargeState')
+  
+  rv$MSOrder[rv$MSOrder == 1] <- "Ms" 
+  rv$MSOrder[rv$MSOrder == 2] <- "Ms2" 
   
   rv$filename <- basename(fileName(object))
   as.rawDiag(rv)

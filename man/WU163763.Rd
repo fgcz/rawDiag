@@ -38,7 +38,11 @@ Dataset for demonstration of rawDiag package functions. Contains 9 raw files rec
 \source{
 \itemize{
   \item \href{ftp://massive.ucsd.edu/MSV000082389}{}
+  \item at the Functional Genomics Center Zurich
+  \itemize{
   \item \href{https://fgcz-bfabric.uzh.ch/bfabric/userlab/show-workunit.html?id=163763}{bfabric workunit 163763}
+  \item \url{http://fgcz-ms.uzh.ch/p2692/Proteomics/QEXACTIVEHFX_1/tobiasko_20180220_scanSpeed/}
+  }
 }}
 \references{
 \url{https://doi.org/10.1101/304485}
