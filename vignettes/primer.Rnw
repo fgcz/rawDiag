@@ -137,7 +137,7 @@ is.rawDiag(WU163763)
 names(WU163763)
 @
 
-\subsection{Using The New Raw File Reader}
+\subsection{Using The New RawFileReader}
 
 The function \code{read.raw} uses the \citep{RawFileReader} to 
 extract the following information out of the mass spectrometric meassurement.
@@ -147,7 +147,8 @@ We use R for the implementation and read the data using the pipe command as it
 can be seen in the following code snippet:
 
 <<eval = FALSE>>=
-system.time(RAW <- read.raw(file = "~/data/20130115_01_iRT_Fet10fmol.RAW"))
+raw <- file.path(path.package(package = "rawDiag"), "extdata", 'sample.raw')
+system.time(RAW <- read.raw(file = raw))
 @
 
 \subsection{Reading the Open Proteomics Standard Files}

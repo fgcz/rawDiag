@@ -5,8 +5,8 @@
 \title{mass spec reader function}
 \usage{
 read.raw(file, mono = FALSE, exe = file.path(path.package(package =
-  "rawDiag"), "exec/fgcz_raw.exe"), argv = "qc", method = "thermo",
-  ssh = FALSE)
+  "rawDiag"), "exec/fgcz_raw.exe"), mono_path = "", rawDiag = TRUE,
+  argv = "qc", method = "thermo", ssh = FALSE)
 }
 \arguments{
 \item{file}{the name of the Thermo Fisher Scietific raw file which the data
@@ -14,7 +14,14 @@ are to be read from.}
 
 \item{mono}{a boolean indicates if the mono enviroment should be used.}
 
-\item{exe}{the adapter software.}
+\item{exe}{the adapter software; default is set to
+\code{file.path(path.package(package = "rawDiag"), "exec/fgcz_raw.exe")}}
+
+\item{mono_path}{define the PATH where the ThermoFisher.CommonCore* dll files
+are located; default is \code{""} (empty string) ; no MONO_PATH is set.}
+
+\item{rawDiag}{boolean; if TRUE (default) the output is coerced to an rawDiag object.
+if FALSE the function will return all available columns.}
 
 \item{argv}{argument vector for the adapter.}
 
@@ -28,11 +35,23 @@ a \code{data.frame}.
 }
 \description{
 this function is a generic adapter function for 
-  reading mass spectrometric measurement.
+  reading mass spectrometric measurement. It requieres the 
+  \href{http://planetorbitrap.com/rawfilereader}{New RawFileReader} dll files
+  \itemize{
+  \item ThermoFisher.CommonCore.BackgroundSubtraction.dll, 
+  \item ThermoFisher.CommonCore.MassPrecisionEstimator.dll 
+  \item ThermoFisher.CommonCore.RawFileReader.dll
+  }
+  be installed on the system. This can be done by using 
+  the Global Assembly Cache (GAC) or by setting the
+  \code{MONO_PATH} enviroment.
 }
 \examples{
 read.raw
 }
-\seealso{
-\url{http://planetorbitrap.com/rawfilereader}
+\references{
+\itemize{
+\item  \url{http://planetorbitrap.com/rawfilereader}
+\item \url{http://www.mono-project.com/docs/advanced/assemblies-and-the-gac/}
+}
 }

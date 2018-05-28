@@ -248,14 +248,32 @@ read.tdf <- function(filename){
 #' @param file the name of the Thermo Fisher Scietific raw file which the data
 #' are to be read from.  
 #' @param mono a boolean indicates if the mono enviroment should be used.
-#' @param exe the adapter software. 
+#' @param mono_path define the PATH where the ThermoFisher.CommonCore* dll files
+#' are located; default is \code{""} (empty string) ; no MONO_PATH is set.
+#' @param rawDiag boolean; if TRUE (default) the output is coerced to an rawDiag object.
+#' if FALSE the function will return all available columns.
+#' @param exe the adapter software; default is set to
+#' \code{file.path(path.package(package = "rawDiag"), "exec/fgcz_raw.exe")}
 #' @param argv argument vector for the adapter.
 #' @param method the adapter type. default is 'thermo' which read Thermo Fisher Scietific raw files.
 #' @param ssh boolean, if ssh pipe should be used. defaul is FALSE
-#'  @author Christian Panse <cp@fgcz.ethz.ch>, 2018
-#' @seealso \url{http://planetorbitrap.com/rawfilereader}
+#'@author Christian Panse <cp@fgcz.ethz.ch>, 2017, 2018
+#' @references \itemize{
+#' \item  \url{http://planetorbitrap.com/rawfilereader}
+#' \item \url{http://www.mono-project.com/docs/advanced/assemblies-and-the-gac/}
+#' }
 #' @description this function is a generic adapter function for 
-#'   reading mass spectrometric measurement.
+#'   reading mass spectrometric measurement. It requieres the 
+#'   \href{http://planetorbitrap.com/rawfilereader}{New RawFileReader} dll files
+#'   \itemize{
+#'   \item ThermoFisher.CommonCore.BackgroundSubtraction.dll, 
+#'   \item ThermoFisher.CommonCore.MassPrecisionEstimator.dll 
+#'   \item ThermoFisher.CommonCore.RawFileReader.dll
+#'   }
+#'   be installed on the system. This can be done by using 
+#'   the Global Assembly Cache (GAC) or by setting the
+#'   \code{MONO_PATH} enviroment.
+#'
 #'   
 #' @return a \code{data.frame}.
 #' 
@@ -265,10 +283,16 @@ read.tdf <- function(filename){
 #' read.raw
 read.raw <- function(file, mono = FALSE, 
                      exe = file.path(path.package(package = "rawDiag"), "exec/fgcz_raw.exe"),  
+                     mono_path = "",
+                     rawDiag = TRUE,
                      argv = "qc",
                      method = "thermo", ssh = FALSE){
   
   rv <- NULL
+  if (mono_path != ''){
+    print(Sys.setenv(MONO_PATH = mono_path))
+  }
+    
   if (method == "thermo" && ssh){
     return(.read.thermo.raw.ssh(file))
   }
@@ -282,9 +306,13 @@ read.raw <- function(file, mono = FALSE,
     
     message(paste ("executing", cmd, "..."))
     
+    if(rawDiag){
     rv <- as.rawDiag(read.csv(pipe(cmd), 
                                 sep='\t', stringsAsFactors = FALSE, header = TRUE))
-    
+    }else{
+      rv <- read.csv(pipe(cmd), 
+                                sep='\t', stringsAsFactors = FALSE, header = TRUE)
+    }
   }
   
   class(rv) <- c(class(rv), 'rawDiag')
