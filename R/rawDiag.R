@@ -1295,13 +1295,20 @@ PlotMassHeatmap <- function(x, method='trellis', bins = 80){ #rename to mass.hea
 
 .ASMS_benchmark_figure_1 <- function(){
   data(benchmark)
-  
+  library(lattice)
   S <- rbind(b.Linux, b.Apple, X.Linux)
   
   S$IO.throuput <- sum(unique(S$nrow)) / S$overall.runtime
   
   xyplot(overall.runtime ~ ncpu | system, 
-         subset=system=='Linux', group=method, 
+         subset=system=='Linux', 
+         group=method,
+         panel=function(x, y, ...){
+           
+           panel.loess(x, y, col='red')
+           panel.xyplot(x, y, ...)
+         },
+         
          data=S, auto.key = TRUE, 
          xlab = 'number of utilized cores',
          ylab = 'overall  runtime [s]',
