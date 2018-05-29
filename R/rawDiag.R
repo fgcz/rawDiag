@@ -282,7 +282,8 @@ read.tdf <- function(filename){
 #' @examples
 #' read.raw
 read.raw <- function(file, mono = FALSE, 
-                     exe = file.path(path.package(package = "rawDiag"), "exec/fgcz_raw.exe"),  
+                     exe = file.path(path.package(package = "rawDiag"),
+                                     "exec/fgcz_raw.exe"),  
                      mono_path = "",
                      rawDiag = TRUE,
                      argv = "qc",
@@ -1292,12 +1293,42 @@ PlotMassHeatmap <- function(x, method='trellis', bins = 80){ #rename to mass.hea
   )
 }
 
+.ASMS_benchmark_figure_1 <- function(){
+  data(benchmark)
+  
+  S <- rbind(b.Linux, b.Apple, X.Linux)
+  
+  S$IO.throuput <- sum(unique(S$nrow)) / S$overall.runtime
+  
+  xyplot(overall.runtime ~ ncpu | system, 
+         subset=system=='Linux', group=method, 
+         data=S, auto.key = TRUE, 
+         xlab = 'number of utilized cores',
+         ylab = 'overall  runtime [s]',
+         scales=list(y = list(log=TRUE, at=c(1,30,60,120,180,300,600,1800,3600,3600 * 1.5))))
+}
+
+.ASMS_benchmark_figure_2 <- function(){
+  data(benchmark)
+  
+  S <- rbind(b.Linux, b.Apple, X.Linux)
+  
+  S$IO.throuput <- sum(unique(S$nrow)) / S$overall.runtime
+  
+  xyplot(IO.throuput ~ ncpu|system, 
+         subset=system=='Linux', group=method, 
+         data=S, auto.key = TRUE, 
+         xlab = 'number of utilized cores',
+         ylab = 'processing speed [Hz]',
+         scales=list(y = list(log=TRUE, at=c(500,1000,2000,4000,8000,16000,32000,64000, 1280000))))
+}
+
 .technote_benchmark_figure_1 <- function(){
   data(benchmark)
   
   gp <- ggplot(rbind(b.Linux, b.Apple, X.Linux), aes(y=overall.runtime, x=ncpu,
                                                      group=ncpu), 
-               color=system) + 
+               color=method) + 
     coord_trans(y = "log10") +
     scale_y_continuous(breaks = c(90, 120, 180, 240, 480, 600, 900, 1800, 3600, 1800 + 3600)) +
     stat_summary(fun.y = mean, geom = "line", aes( group = 1)) + #colour = "deepskyblue2") +
@@ -1306,7 +1337,7 @@ PlotMassHeatmap <- function(x, method='trellis', bins = 80){ #rename to mass.hea
          subtitle='overall runtime') +
     theme_light()
   
-  gp + facet_grid( .  ~ system * method )
+  gp + facet_grid( .  ~ system * method ) 
 }
 
 .technote_benchmark_figure_2 <- function(){
