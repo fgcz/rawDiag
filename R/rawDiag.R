@@ -1303,15 +1303,15 @@ PlotMassHeatmap <- function(x, method='trellis', bins = 80){ #rename to mass.hea
   xyplot(overall.runtime ~ ncpu | system, 
          subset=system=='Linux', 
          group=method,
-         panel=function(x, y, ...){
+         panel=function(...){
            
-           panel.loess(x, y, col='red')
-           panel.xyplot(x, y, ...)
+           panel.xyplot(...)
+           panel.xyplot(..., type='a', lwd=2)
          },
          
          data=S, auto.key = TRUE, 
          xlab = 'number of utilized cores',
-         ylab = 'overall  runtime [s]',
+         ylab = 'overall runtime [s]',
          scales=list(y = list(log=TRUE, at=c(1,30,60,120,180,300,600,1800,3600,3600 * 1.5))))
 }
 
@@ -1326,7 +1326,12 @@ PlotMassHeatmap <- function(x, method='trellis', bins = 80){ #rename to mass.hea
          subset=system=='Linux', group=method, 
          data=S, auto.key = TRUE, 
          xlab = 'number of utilized cores',
-         ylab = 'processing speed [Hz]',
+         ylab = 'processing frequency [Hz]',
+         panel=function(...){
+           
+           panel.xyplot(...)
+           panel.xyplot(..., type='a', lwd=2)
+         },
          scales=list(y = list(log=TRUE, at=c(500,1000,2000,4000,8000,16000,32000,64000, 1280000))))
 }
 
