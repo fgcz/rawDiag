@@ -1037,7 +1037,6 @@ PlotCycleLoad <- function(x, method = 'trellis'){ #old name ms2.distribution
       dplyr::mutate_at(vars("filename"), funs(as.factor(.))) %>% 
       dplyr::mutate_at(vars("n"), funs(as.numeric(.)))
     
-    
     figure <- ggplot(res, aes_string(x = "filename", y = "n")) +
       geom_violin() +
       coord_cartesian(ylim = c(0, max(res$n)+1)) +
@@ -1109,7 +1108,9 @@ PlotScanFrequency <- function(x, method = 'trellis'){
     
     figure <- ggplot(res, aes_string(x = "Time", y = "Frequency", colour = "Type")) +
       facet_wrap(~filename) +
-      geom_line() 
+      geom_line() +
+      theme_light() +
+      theme(legend.position = "top")
     
     return(figure)  
   }else{NULL}

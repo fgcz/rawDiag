@@ -266,7 +266,7 @@ the \code{as.rawDiag} method coerce the object into the
 right format by deriving missing values if possible, otherwise filling 
 missing columns with NA values.
 The package also ships with an adapter function \code{as.rawDiag.mzR}
-which enables the support of open file standards\cite{mzR,msdata}.
+which enables the support of open file standards\cite{mzR, msdata}.
 
 
 \subsection{Visualization}
@@ -649,10 +649,7 @@ In the future, we plan to extend \rawDiag~by allowing users to link additional m
 The work has been supported by ETH Zurich and University of Zurich.
 
 \begin{acknowledgement}
-The authors thank ...
-Jim Shofstahl for ...
-reviewer 1 and reviewer 2 for ...
-Lilly for the sticker ....
+The authors would like to thank Jim Shofstahl for his great support regarding the new Thermo Fisher RawFileReader library. Additionally, we would like to thank the two reviewers for their time to read our manuscript and their constructive and valuable input towards it. Further thank goes to Jay Tracy and our colleagues at the FGCZ for proofreading our manuscript. Last we would like to thank Lilly for her support with the graphical design of the package sticker. 
 \end{acknowledgement}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

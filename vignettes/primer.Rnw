@@ -220,7 +220,7 @@ top for better readabillity. This is done by adding the additional
 \code{facet\_wrap}
 statement after the initial call of the plot function.
 
-<<label=Time, fig = TRUE, echo=TRUE, include=TRUE, warnings=TRUE>>=
+<<label=PlotCycleTime, fig = TRUE, echo=TRUE, include=TRUE, warnings=TRUE>>=
 print(gp <- PlotCycleTime(df, method = "trellis") +
   facet_wrap(~ filename, ncol =1))
 @
@@ -238,13 +238,13 @@ The next thing to check is if the instrument is actually using the available
 MS2 capacity. For this we plot the cycle load (the actually performed MS2 scans
 for each MS1 scan).
 
-<<label=Load, fig = TRUE, echo=TRUE, include=TRUE, warnings=TRUE>>=
+<<label=PlotCycleLoad, fig = TRUE, echo=TRUE, include=TRUE, warnings=TRUE>>=
 print(gp <- PlotCycleLoad(df, method = "trellis"))
 @
 
 From the plot we can see that all mehtods actually use the available number of MS2 scans during the main peptide elution phase. The blue line is representing the trend as a fitted gam model.
 
-<<label=IT, fig = TRUE, echo=TRUE, include=TRUE, warnings=TRUE>>=
+<<label=PlotInjectionTime, fig = TRUE, echo=TRUE, include=TRUE, warnings=TRUE>>=
 print(gp <- PlotInjectionTime(subset(df, MSOrder %in% "Ms2"), 
     method = "trellis") +
   facet_wrap(~ filename, ncol =1)
