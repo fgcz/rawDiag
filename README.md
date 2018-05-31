@@ -80,11 +80,11 @@ browseVignettes('rawDiag')
 
 ## 5. Useful Links
 - http://planetorbitrap.com/rawfilereader
-- screen recording (3:02 minutes, size 47MB, no audio track): http://fgcz-ms.uzh.ch/~cpanse/PAPERS/pr-2018-001736.mov
-- shiny demo on our compute server: http://fgcz-ms-shiny.uzh.ch:8080/rawDiag-demo/
+- [screen recording (3:02 minutes, size 47MB, no audio track)](http://fgcz-ms.uzh.ch/~cpanse/PAPERS/pr-2018-001736.mov)
+- [shiny demo on our compute server](http://fgcz-ms-shiny.uzh.ch:8080/rawDiag-demo/)
 - rawDiag - an R package supporting rational LC-MS method optimization for bottom-up proteomics
 Christian Trachsel, Christian Panse, Tobias Kockmann, Witold Eryk Wolski, Jonas Grossmann, Ralph Schlapbach
 bioRxiv 304485; doi: https://doi.org/10.1101/304485
 (manuscript submitted to Journal of Proteome Research; **pr-2018-001736**).
-- public MassIVE example dataset: ftp://massive.ucsd.edu/MSV000082389/raw/rawDiag/raw/
-- [ASMS 2018 poster as PDF(1.8M, md5=dab9388c1a465d931e9d2345119a2827](http://fgcz-ms.uzh.ch/~cpanse/ASMS2018_ID291250.pdf)
+- [public MassIVE example dataset MSV000082389](ftp://massive.ucsd.edu/MSV000082389/raw/rawDiag/raw/_
+- [ASMS 2018 poster as PDF(1.8M, md5=dab9388c1a465d931e9d2345119a2827)](http://fgcz-ms.uzh.ch/~cpanse/ASMS2018_ID291250.pdf)
