@@ -1,0 +1,359 @@
+%\VignetteIndexEntry{ASMS 2018 poster (in portrait) abstract ID number: 291250}
+%\documentclass[landscape,a0,draft]{a0poster}
+\documentclass[landscape,a0]{a0poster}
+
+\usepackage{multicol}
+
+\usepackage{graphics}
+\usepackage{graphicx}
+\usepackage{color}
+\usepackage{float}
+\usepackage{subfigure}
+\usepackage[latin1]{inputenc}
+\usepackage{sidecap}
+\usepackage[scaled]{helvet}
+\usepackage[latin1]{inputenc}
+\graphicspath{{./graphics/}}
+
+\usepackage[font={scriptsize}]{caption}
+\usepackage{xcolor}
+\usepackage[colorlinks = true,
+            linkcolor = black,
+            urlcolor  = black,
+            citecolor = blue,
+            anchorcolor = black]{hyperref}
+
+
+\usepackage{tabularx}
+
+\addtolength{\textwidth}{1cm}
+\addtolength{\oddsidemargin}{-1cm}
+\setlength{\topmargin}{-2.6cm}
+\setlength{\headheight}{0cm}
+\setlength{\headsep}{0cm}
+\setlength{\footskip}{0cm}
+\setlength{\columnsep}{3cm}
+\setlength{\parindent}{0cm}
+\setlength{\parskip}{2ex}
+\pagestyle{empty}
+\newcommand*\code[1]{\texttt{\emph{#1}}}
+\newcommand{\scscst}{\scriptscriptstyle}
+\newcommand{\scst}{\scriptstyle}
+\renewcommand{\familydefault}{phv}
+\renewcommand*\familydefault{\sfdefault}
+\definecolor{NTNUBlue}{rgb}{0,0.6,1}
+\definecolor{FGCZ}{rgb}{0,0.6,1}
+\makeatletter
+\renewcommand{\section}{\@startsection
+        {section}%                          % the name
+        {1}%                                % the level
+        {0mm}%                              % the indent
+        {-\baselineskip}%                   % the beforeskip
+        {1mm}%                              % the afterskip
+        {\Large\color{NTNUBlue}\bfseries}}% % the style
+\renewcommand{\subsection}{\@startsection
+        {subsection}%                       % the name
+        {2}%                                % the level
+        {0mm}%                              % the indent
+        {-0.9\baselineskip}%                % the beforeskip
+        {1mm}%                              % the afterskip
+        {\large\color{NTNUBlue}\bfseries}}% % the style
+\renewcommand{\subsubsection}{\@startsection
+        {subsubsection}%                    % the name
+        {3}%                                % the level
+        {0mm}%                              % the indent
+        {-0.7\baselineskip}%                % the beforeskip
+        {1mm}%                              % the afterskip
+        {\color{NTNUBlue}\bfseries}}% % the style
+\makeatother
+\newcommand{\G}[1]{
+\IfFileExists{graphics/rawDiag-#1.png}{\parbox[c]{3.5cm}{\includegraphics[width=3.5cm, height=3.5cm]{graphics/rawDiag-#1}}}{-}
+}
+
+\def\subfigtopskip{-1pt}       % Length from the top of the subfigure box to
+                               %   the begining of the FIGURE box.
+\def\subfigbottomskip{-1pt}    % Length from the bottom of the CAPTION to
+                               %   the bottom of the subfigure.
+\def\subfigcapskip{-1pt}       % Length from the bottom of the FIGURE to the
+                               %   begining of the CAPTION.
+\def\subfigcapmargin{-1pt}     % Indentation of the caption from the sides
+                               %   of the subfigure box.
+
+\renewcommand{\normalsize}{\fontsize{24.88}{30}\selectfont}
+%\renewcommand{\normalsize}{\fontsize{20.74}{25}\selectfont}
+%\renewcommand{\normalsize}{\fontsize{22.00}{26.52}\selectfont}
+
+
+\usepackage{eso-pic}
+\newcommand\BackgroundPic{
+\put(0,0){
+\parbox[b][\paperheight]{\paperwidth}{%
+\vfill
+\centering
+%\includegraphics[width=\paperwidth,height=\paperheight, keepaspectratio]{background}
+\vfill
+}}}
+
+
+
+\begin{document}
+
+
+\SweaveOpts{concordance=TRUE, prefix.string=./graphics/ASMS}
+
+\newcommand*\rawDiag{\textbf{\texttt{rawDiag}}}
+\newcommand*\fgcz{Functional Genomics Center Zurich, Swiss Federal Institute of Technology Zurich~\texttt{|}~
+University of Zurich, Winterthurerstr. 190, CH-8057 Zurich, SWITZERLAND.}
+
+\begin{center}
+\resizebox{0.86\paperwidth}{!}{
+\noindent\centerline{
+\colorbox{black}{	
+	\includegraphics[keepaspectratio=true,height=5cm]{FGCZ_l}
+        \hspace{-0.5cm}
+	\includegraphics[keepaspectratio=true,height=5cm]{FGCZ_c}
+        \hspace{-0.5cm}
+        \includegraphics[keepaspectratio=true,height=5cm]{FGCZ_c}
+        \hspace{-0.5cm}
+	\includegraphics[keepaspectratio=true,height=5cm]{FGCZ_c}
+        \hspace{-0.5cm}
+	\includegraphics[keepaspectratio=true,height=5cm]{FGCZ_c}
+	\hspace{-0.5cm}
+	\includegraphics[keepaspectratio=true,height=5cm]{FGCZ_r}
+}}}
+\\[2cm]
+
+
+\parbox{0.95\textwidth}{
+
+\resizebox{.95\textwidth}{!}{ \textsf{ \textbf{{\Huge \rawDiag~--~an R package supporting rational LC-MS method optimization for bottom-up proteomics}}
+}\\[2.0cm] }
+
+\vspace{0.5cm}
+\resizebox{.9\textwidth}{!}{\hspace{3.5cm} Christian Trachsel$^\diamond$, \underline{Christian Panse}$^{\diamond}$,  \underline{Tobias Kockmann}$^{\diamond}$, Witold E. Wolski$^{\diamond}$,  \underline{Jonas Grossmann}$^{\diamond}$, Laura Kunz$^\diamond$, Jay Tracy$^\diamond$, Claudia Fortes$^\diamond$, Paolo Nanni$^\diamond$ and Ralph Schlapbach$^\diamond$}\\[1.0cm]
+}
+
+\end{center}
+\vspace{0.5cm}
+\begin{multicols}{3}
+\setlength{\columnseprule}{1pt}
+
+\begin{figure}[H]
+\includegraphics[width=1.0\columnwidth]{rawDiagR2}
+\caption{
+\rawDiag~R package architecture.
+1~ LC-MS scan files in vendor-specific binary format.
+2~\rawDiag~reads scan metadata through vendor library (magenta = Thermo Fisher Scientific RawFileReader, black = Bruker Daltonics .tdf/SQLite), or by conversion to PSI formats using MSconvert (blue = mzML).
+3~Utility function coerces scan metadata from different sources to common format.
+4~Central data structure used for visualization/modeling: tidy data frame~\cite{Wickham2014} in wide format (rows: scans, columns: scan attributes)
+5~The R-package provides a variety of functions to visualize mass
+spectrum-related metadata (see Table 1 for details).
+6~Typical R command line usage for experienced R users.
+7~Reporting functionality is provided through R markdown.
+8~Interactive GUI-driven exploration is possible through the R shiny package.
+}
+\label{figure:arch}
+\end{figure}
+\begin{multicols}{2}
+\setlength{\columnseprule}{1pt}
+\section{Introduction}
+Mass spectra, as well as their metadata, are considered as the raw measurement data and usually recorded in a vendor specific binary format. During a measurement, the mass spectrometer applies internal heuristics which enables the instrument to adapt to sample properties like sample complexity or amount in near real time. Still, method
+parameters controlling these heuristics, need to be set before the measurement. An optimal measurement result requires a carefully balanced set of parameters, but their complex interactions with each other make LC-MS method optimization a challenging task.
+
+Here we present \rawDiag, a platform-independent software tool
+implemented in R that supports LC-MS operators during the process of
+empirical method optimization. Our work builds on the ideas of the
+discontinued software ``rawMeat'' (vastScientific). Our application is currently tailored towards spectral data acquired on Thermo Fisher Scientific instruments (raw format), with a particular focus on Orbitrap mass
+analyzers (Exactive or Fusion instruments) and the PSI open proteomics file standard~\cite{mzR}.
+ \rawDiag~is meant to run after mass spectrometry acquisition,
+optimally as an interactive R shiny application and produces a series of diagnostic plots.
+
+
+\section{Implementation}
+The entire software is implemented as a R~\cite{R} package providing full
+documentation and includes example data.
+A rough sketch of the package can be seen in Figure~\ref{figure:arch}.
+All diagnostic plots are
+generated by R functions using the ggplot2~\cite{Hadley2009} graphical
+system, based on ``The Grammar of Graphics'' \cite{Wilkinson2005}. The
+package ships with an adapter function \code{read.raw} which returns
+an R \code{data.frame} object from the raw data input file. In its current
+implementation, the adapter functions default input method is set for
+reading Thermo Fisher Scientific raw files,
+using a \texttt{C\#} programmed executable,
+based on the platform-independent New RawFileReader .Net
+assembly~\cite{RawFileReader}.
+The package also ships with an S3 utility function \code{as.rawDiag} to coerce data from the PSI open proteomics file standard, e.g., by using the code snippet \code{as.rawDiag.mzR(openMSfile(mzML))}, into the by \rawDiag~used tidy data frame~\cite{Wickham2014}.
+Figure~\ref{figure:benchmark} graphs a comparison of both methods.
+
+
+<<label=benchmarkTime, fig = TRUE, echo=FALSE, include=FALSE, warnings=FALSE, width=4, height=4>>=
+library(rawDiag); data("benchmark"); library(lattice)
+rawDiag:::.ASMS_benchmark_figure_1()
+@
+<<label=benchmarkThrouput, fig = TRUE, echo=FALSE, include=FALSE, warnings=FALSE, width=4, height=4>>=
+rawDiag:::.ASMS_benchmark_figure_2()
+@
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.49\columnwidth]{ASMS-benchmarkTime}
+\includegraphics[width=0.49\columnwidth]{ASMS-benchmarkThrouput}
+\caption{
+Import layer benchmark -- The left plot shows the total processing time needed to extract scan metadata from 128 scan files as a function of utilized computing cores. The right plot shows the corresponding processing speed. Magenta: Extraction from .raw files using the New Thermo Fisher Scientific RawFileReader library~\cite{RawFileReader}. Blue: Extraction from the same files after conversion to mzML format using MSconvert. Time needed for conversion is \textbf{not} considered!
+The benchmark was performed on a Linux Debian 8 system running on a 
+Intel(R) Xeon(R) CPU E5-2698 v3 @ 2.30GHz hardware having 64 cores.
+The software versions are: R 3.4.3, mzR 2.8.1, and ThermoRawFileReader 4.0.22.
+}
+\label{figure:benchmark}
+\end{figure}
+
+{\scriptsize
+\bibliographystyle{plainurl}
+\bibliography{rawDiag}
+}
+\end{multicols}
+
+
+<<echo=FALSE>>=
+rv <- rawDiag:::.overview(prefix="graphics/rawDiag")
+@
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\columnwidth}{lcccX}
+\hline
+\hline
+function name  & trellis & overlay & violin & description\\
+\hline
+\code{PlotChargeState}    &\G{PlotChargeState-trellis}       &\G{PlotChargeState-overlay}       &        -                         & displays charge state distributions as biologist-friendly bar charts as absolute counts.\\
+\code{PlotCycleLoad}         &\G{PlotCycleLoad-trellis}   &\G{PlotCycleLoad-overlay}   &\G{PlotCycleLoad-violin}& displays duty cycle load (number of MS2 scans per duty cycle) as a function of retention time (RT) (scatter plots) or its marginal distribution (violin).\\
+\code{PlotCycleTime}         &\G{PlotCycleTime-trellis}         &\G{PlotCycleTime-overlay}         &\G{PlotCycleTime-violin}        & displays cycle time with respect to RT (scatter plots) or its marginal distribution (violin). A smooth curve graphs the trend. The maximum is indicated by a red dashed line.\\
+\code{PlotInjectionTime}     &\G{PlotInjectionTime-trellis}&\G{PlotInjectionTime-overlay}     &\G{PlotInjectionTime-violin}           & displays injection time as a function  of RT. A smooth curve graphs the trend. The maximum is indicated by a red dashed line.\\
+\code{PlotLockMassCorrection}      &\G{PlotLockMassCorrection-trellis}      &\G{PlotLockMassCorrection-overlay}      &\G{PlotLockMassCorrection-violin}     & graphs the lock mass deviations along RT (note: this example data were acquired with lock mass correction).\\
+\code{PlotMassDistribution}  &\G{PlotMassDistribution-trellis}  &\G{PlotMassDistribution-overlay}  &\G{PlotMassDistribution-violin} & displays mass distribution using color coding according to charge state (trellis) or file (overlay, violin).\\
+\code{PlotMassHeatmap}       &\G{PlotMassHeatmap-trellis}                    & \G{PlotMassHeatmap-overlay}                                   & -                                 & draws a computer scientist-friendly hexagon binned heatmap of the peak count charge deconvoluted mass along RT.\\
+\code{PlotMzDistribution}    &\G{PlotMzDistribution-trellis}&\G{PlotMzDistribution-overlay}& \G{PlotMzDistribution-violin}& a scatter plot of m/z versus RT on MS1 level (no density; with overplotting.). violin display the marginal m/z distribution of each file.\\
+\code{PlotPrecursorHeatmap}  &\G{PlotPrecursorHeatmap-trellis}            & \G{PlotPrecursorHeatmap-overlay}                                   & -                                 & according to \code{PlotMassHeatmap}  but displaying convoluted data.\\
+\code{PlotScanFrequency}     &\G{PlotScanFrequency-trellis}     &\G{PlotScanFrequency-overlay}     &\G{PlotScanFrequency-violin}    & graphs scan frequency versus RT or scan frequency marginal distribution for violin.\\
+\code{PlotScanTime}         &\G{PlotScanTime-trellis}          &\G{PlotScanTime-overlay}          &\G{PlotScanTime-violin}         & plots scan time as function of RT for each MSn level. A smooth curve displays the trend.\\
+\code{PlotTicBasepeak}      &\G{PlotTicBasepeak-trellis}       &\G{PlotTicBasepeak-overlay}       &\G{PlotTicBasepeak-violin}      & displays the total ion  chromatogram (TIC) and the base peak chromatogram.\\
+\hline
+\hline
+\end{tabularx}
+\caption{
+The \rawDiag~cheatsheet lists the main functions of the package. Each thumbnail gives an impression of the generated graphical output using \texttt{trellis}, \texttt{overlay} or \texttt{violin} as method parameter. \texttt{-} indicates missing graphical output due to a discrete response variable. All thumbnails are based on a subset of two .raw files taken from the package dataset \texttt{WU163763}.
+All listed functions return a \texttt{ggplot} object~\cite{Wilkinson2005}.
+}
+\label{table:functions}
+\end{table}
+%\begin{table}[H]
+%\includegraphics[width=1.0\columnwidth]{overview}
+%\caption{
+%}
+%\label{table:functions}
+%\end{table}
+
+\begin{multicols}{2}
+
+\section{Application Example}
+The R code snippets below show the usage of the package optimization of an LC-MS/MS method. 
+<<label = library>>=
+library(rawDiag)
+data("WU163763"); df <- WU163763
+@
+<<label = gsub, echo=FALSE>>=
+df$filename <- gsub("_Pierce_HeLa_Protein_Digest_Std.raw", "", 
+  gsub("20180220_", "", 
+  df$filename))
+@
+
+\subsection*{Sample Data}
+This data was recorded to investigate the optimal number of MS2 scans between
+two consecutive MS1 scans on a Q-Exactive HF-X mass spectrometer injecting a
+commercial HeLa digest.
+%Since the data was recorded in triplicate per used method, we will have overplotting issues. Therefore we first filter the data for a single injectionper method.
+The instrument data is available through \url{http://www.bfabric.org}~\cite{bfabric} workunit \texttt{WU163763} sample \texttt{S174020} or \href{ftp://massive.ucsd.edu/MSV000082389/}{MassIVE MSV000082389}.
+For the following demonstration we select three out of nine mass spectrometry runs.
+<<label=filter>>=
+df <- df[grep("0[459]_S174020",
+  df$filename), ]
+@
+
+\subsection*{Total Ion Chromatogram}
+First, we want to inspect the TIC or base peak chromatogram. 
+With this plot we can
+see if the data was recorded properly and if the signal response of the sample
+is the same over the three injections.
+
+<<label=PlotTicBasepeak, fig = TRUE, echo=TRUE, include=FALSE, warnings=FALSE, width=8, height=4>>=
+PlotTicBasepeak(df,
+  method = "overlay")
+@
+\includegraphics[width=1.0\columnwidth]{ASMS-PlotTicBasepeak}
+%signal response and chromatography is ok for the three injections. 
+
+\subsection*{Instrument Cycle Time}
+
+Next,
+we want to check the actuall cycle time
+of the injections.
+
+<<label=PlotCycleTime, fig = TRUE, echo=TRUE, include=FALSE, warnings=FALSE, width=8, height=5>>=
+PlotCycleTime(df) 
+@
+\includegraphics[width=1.0\columnwidth]{ASMS-PlotCycleTime}
+
+It gets obvious that all three run were recorded usimg different LC-MS methods resulting in cycle times $0.6, 1.0$ and $2$ seconds.
+
+\subsection*{Scans per Instrument Cycle}
+
+The next thing to check is if the instrument is actually using the available
+MS2 capacity. For this we plot the cycle load (the actually performed MS2 scans
+for each MS1 scan).
+
+<<label=PlotCycleLoad, fig = TRUE, echo=TRUE, include=FALSE, warnings=TRUE, width=8, height=3.5>>=
+PlotCycleLoad(df)
+@
+
+\includegraphics[width=1.0\columnwidth]{ASMS-PlotCycleLoad}
+
+From the plot we can see that all methods actually use a different number of dependend scans (set by the topN parameter).
+
+\subsection*{Scan Frequency}
+
+As expected all three mass spectrometry methods result in different scan speed.
+
+<<label=PlotScanFrequency, fig = TRUE, echo=TRUE, include=FALSE, warnings=FALSE, width=8, height=3.5>>=
+PlotScanFrequency(df, 
+  method='overlay')
+@
+\includegraphics[width=1.0\columnwidth]{ASMS-PlotScanFrequency}
+
+\section*{Acknowledgements}
+The authors thank Jim Shofstahl for his support regarding the {\em New Thermo Fisher RawFileReader} library. We thank Sven Bremer from Bruker Daltonics for the discussions of timsTOF file format. We thank Lilly van de Venn for the package sticker design.
+We thank our colleagues at the Functional Genomics Center Zurich, the Swiss Federal Institute of Technology Zurich and the University of Zurich for the support of our work.
+
+\begin{flushright}
+\includegraphics[height=0.25\columnwidth, keepaspectratio]{QR_Code_rawDiag}
+\includegraphics[height=0.25\columnwidth, keepaspectratio]{39515832-84b561ea-4dfb-11e8-9411-276bc6fb71d6}
+\includegraphics[height=0.25\columnwidth, keepaspectratio]{qr}
+\end{flushright}
+\end{multicols}
+\end{multicols}
+
+
+\vspace{-0.5cm}
+\resizebox{1.0\textwidth}{!}
+{
+ASMS 2018 poster id: 291250, {\bf ThP 375},
+Contact: 
+$^\diamond$
+\fgcz~
+Phone: +41 44 635 39 12,
+Fax: +41 44 635 39 22,
+EMail: \url{cp@fgcz.ethz.ch},
+URL: \url{http://fgcz.ethz.ch}.
+} 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\end{document}
