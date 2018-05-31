@@ -27,8 +27,7 @@ if FALSE the function will return all available columns.}
 
 \item{method}{the adapter type. default is 'thermo' which read Thermo Fisher Scietific raw files.}
 
-\item{ssh}{boolean, if ssh pipe should be used. defaul is FALSE
-@author Christian Panse <cp@fgcz.ethz.ch>, 2018}
+\item{ssh}{boolean, if ssh pipe should be used. defaul is FALSE}
 }
 \value{
 a \code{data.frame}.
@@ -54,4 +53,7 @@ read.raw
 \item  \url{http://planetorbitrap.com/rawfilereader}
 \item \url{http://www.mono-project.com/docs/advanced/assemblies-and-the-gac/}
 }
+}
+\author{
+Christian Panse <cp@fgcz.ethz.ch>, 2017, 2018
 }

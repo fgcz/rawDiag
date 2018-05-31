@@ -1294,9 +1294,19 @@ PlotMassHeatmap <- function(x, method='trellis', bins = 80){ #rename to mass.hea
   )
 }
 
+#' ASMS_benchmark_figure_1
+#'
+#' @return xyplot
+#' @importFrom lattice xyplot
 .ASMS_benchmark_figure_1 <- function(){
   data(benchmark)
-  library(lattice)
+  cv <- 1 - 2:7/10
+  t <- trellis.par.get("strip.background")
+  t$col <- (rgb(cv,cv,cv))
+  
+  t$col<-(rgb(cv,cv,cv))
+  trellis.par.set("strip.background",t)
+  
   S <- rbind(b.Linux, b.Apple, X.Linux)
   
   S$IO.throuput <- sum(unique(S$nrow)) / S$overall.runtime
@@ -1316,9 +1326,18 @@ PlotMassHeatmap <- function(x, method='trellis', bins = 80){ #rename to mass.hea
          scales=list(y = list(log=TRUE, at=c(1,30,60,120,180,300,600,1800,3600,3600 * 1.5))))
 }
 
+#' ASMS_benchmark_figure_2
+#'
+#' @return xyplot
+#' @importFrom lattice xyplot
 .ASMS_benchmark_figure_2 <- function(){
   data(benchmark)
+  cv <- 1 - 2:7 / 10
+  t <- trellis.par.get("strip.background")
+  t$col <- (rgb(cv,cv,cv))
   
+  t$col<-(rgb(cv,cv,cv))
+  trellis.par.set("strip.background",t)
   S <- rbind(b.Linux, b.Apple, X.Linux)
   
   S$IO.throuput <- sum(unique(S$nrow)) / S$overall.runtime
