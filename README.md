@@ -2,7 +2,7 @@
 
 an R package supporting rational LC-MS method optimization for bottom-up proteomics
 
-"Its raw, fast and colourfull!"
+"Its raw, fast and colorful!"
 
 ## 1. System Requirements  
 for Windows/Linux/MacOSX platforms
