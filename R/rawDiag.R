@@ -1358,18 +1358,32 @@ PlotMassHeatmap <- function(x, method='trellis', bins = 80){ #rename to mass.hea
 .technote_benchmark_figure_1 <- function(){
   data(benchmark)
   
-  gp <- ggplot(rbind(b.Linux, b.Apple, X.Linux), aes(y=overall.runtime, x=ncpu,
-                                                     group=ncpu), 
-               color=method) + 
-    coord_trans(y = "log10") +
-    scale_y_continuous(breaks = c(90, 120, 180, 240, 480, 600, 900, 1800, 3600, 1800 + 3600)) +
-    stat_summary(fun.y = mean, geom = "line", aes( group = 1)) + #colour = "deepskyblue2") +
-    geom_boxplot() +
-    labs(x = "number of used processes", y = "overall  time [in seconds] of read.raw",
-         subtitle='overall runtime') +
-    theme_light()
+  gp <- ggplot(rbind(b.Linux, b.Apple, X.Linux), aes(y = overall.runtime, 
+                                                     x = ncpu, 
+                                                     colour = method)) + 
+  geom_line(size = 1.3) +
+  facet_wrap(~system) + 
+  coord_trans( y = "log10") +
+  scale_colour_manual(values = c("cornflowerblue", "magenta")) + 
+  scale_y_continuous(breaks = c(90, 120, 180, 240, 480, 600, 900, 1800, 3600, 5400)) +
+  labs(x = "number of used processes", y = "overall  time [in seconds] of read.raw",
+        subtitle='overall runtime') +
+  theme_light()
   
-  gp + facet_grid( .  ~ system * method ) 
+  gp
+  
+  #gp <- ggplot(rbind(b.Linux, b.Apple, X.Linux), aes(y=overall.runtime, x=ncpu,
+  #                                                   group=ncpu), 
+  #             color=method) + 
+  #  coord_trans(y = "log10") +
+  #  scale_y_continuous(breaks = c(90, 120, 180, 240, 480, 600, 900, 1800, 3600, 1800 + 3600)) +
+  #  stat_summary(fun.y = mean, geom = "line", aes( group = 1)) + #colour = "deepskyblue2") +
+  #  geom_boxplot() +
+  #  labs(x = "number of used processes", y = "overall  time [in seconds] of read.raw",
+  #       subtitle='overall runtime') +
+  #  theme_light()
+  
+  #gp + facet_grid( .  ~ system * method ) 
 }
 
 .technote_benchmark_figure_2 <- function(){
@@ -1380,21 +1394,35 @@ PlotMassHeatmap <- function(x, method='trellis', bins = 80){ #rename to mass.hea
   
   b.Apple$IO.throuput <- sum(unique(b.Apple$nrow)) / b.Apple$overall.runtime 
   
-  gp <- ggplot(rbind(b.Linux, b.Apple, X.Linux), aes(y=IO.throuput, x=ncpu, group=ncpu)) + 
-    stat_summary(fun.y = mean, geom = "line", aes( group = 1)) + #, colour = "deepskyblue2") +
-    geom_boxplot() +
-    coord_trans(y = "log10") +
+  gp <- ggplot(rbind(b.Linux, b.Apple, X.Linux), aes(y = IO.throuput, 
+                                                     x = ncpu, 
+                                                     colour = method)) + 
+    geom_line(size = 1.3) +
+    facet_wrap(~system) + 
+    coord_trans( y = "log10") +
+    scale_colour_manual(values = c("cornflowerblue", "magenta")) + 
     scale_y_continuous(breaks = c(500, 1000, 2000, 4000, 8000, 16000, 32000, 64000)) +
     labs(x = "number of used processes", y = "IO throughput  [number of scan info / s]", 
          subtitle='IO throughput') +
     theme_light() 
+  
+  gp
+  
+  #gp <- ggplot(rbind(b.Linux, b.Apple, X.Linux), aes(y=IO.throuput, x=ncpu, group=ncpu)) + 
+  #  stat_summary(fun.y = mean, geom = "line", aes( group = 1)) + #, colour = "deepskyblue2") +
+  #  geom_boxplot() +
+  #  coord_trans(y = "log10") +
+  #  scale_y_continuous(breaks = c(500, 1000, 2000, 4000, 8000, 16000, 32000, 64000)) +
+  #  labs(x = "number of used processes", y = "IO throughput  [number of scan info / s]", 
+  #       subtitle='IO throughput') +
+  #  theme_light() 
   # coord_trans(y = "log10") +
   #  scale_y_continuous(breaks = c(0.1, 0.25, 0.5, 1.0, 1.25)) +
   
   # annotate("text", x = 40, y = 0.20, label = paste("max throughput =", round(max(b.Linux$IO.throuput), 2), "GBytes/s")) +
   #  annotate("text", x = 40, y = 0.15, label = paste("min throughput =", round(min(b.Linux$IO.throuput), 2), "GBytes/s"))
   
-  gp + facet_grid( .  ~ system * method)
+  #gp + facet_grid( .  ~ system * method)
 }
 #remove
 .technote_example_figure_1 <- function(x){
