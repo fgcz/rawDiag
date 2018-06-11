@@ -300,7 +300,7 @@ rawDiag:::.technote_benchmark_figure_2()
 
 \caption{Benchmark -- The left plot shows the overall logarithmic 
 scaled runtime of 128 raw files.  The graphic on the right side shows 
-the thereof derived IO throughput as scan information per second. The 
+the derived IO throughput as scan information per second. The 
 plots illustrate that both systems, server, and laptop, can analyze 
 95GB of instrument data within less than three minutes.
 }
