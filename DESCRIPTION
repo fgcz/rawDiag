@@ -21,6 +21,7 @@ Imports: ggplot2 (>= 2.2.1),
 	tidyverse
 Suggests:
 	knitr,
+	lattice,
 	testthat
 Description: Helps with quality checks, visualizations 
     and analysis of mass spectrometry data, coming from proteomics 

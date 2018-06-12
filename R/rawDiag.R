@@ -1298,8 +1298,8 @@ PlotMassHeatmap <- function(x, method='trellis', bins = 80){ #rename to mass.hea
 #' ASMS_benchmark_figure_1
 #'
 #' @return xyplot
-#' @importFrom lattice xyplot
 .ASMS_benchmark_figure_1 <- function(){
+  library(lattice)
   data(benchmark)
   cv <- 1 - 2:7/10
   t <- trellis.par.get("strip.background")
@@ -1324,14 +1324,14 @@ PlotMassHeatmap <- function(x, method='trellis', bins = 80){ #rename to mass.hea
          data=S, auto.key = TRUE, 
          xlab = 'number of utilized cores',
          ylab = 'overall runtime [s]',
-         scales=list(y = list(log=TRUE, at=c(1,30,60,120,180,300,600,1800,3600,3600 * 1.5))))
+         scales=list(y = list(log = TRUE, at=c(1, 30, 60, 120, 180, 300, 600, 1800, 3600, 3600 * 1.5))))
 }
 
 #' ASMS_benchmark_figure_2
 #'
 #' @return xyplot
-#' @importFrom lattice xyplot
 .ASMS_benchmark_figure_2 <- function(){
+  library(lattice)
   data(benchmark)
   cv <- 1 - 2:7 / 10
   t <- trellis.par.get("strip.background")
