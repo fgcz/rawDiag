@@ -30,7 +30,7 @@ but for large datasets, a server infrastructure might be beneficial.
 }
 
 \Address{
-  Christian Trachsel \& Tobias Kockmann \& Christian Panse\\
+  Christian Trachsel. Tobias Kockmann, Christian Panse\\
   Functional Genomics Center Zurich\\
   Swiss Federal Institute of Technology in Zurich~\texttt{|}~University of Zurich\\
   Winterthurerstr. 190, CH-8057 Zurich, Switzerland\\
@@ -62,7 +62,7 @@ chararcteristics as result.
 These visualizations are helpful for the optimization of the instrument method
 towards the sample at hand.
 
-Our R package reads as input from the instrument raw data and keeps the data 
+Our R package~citet{R} reads as input from the instrument raw data and keeps the data 
 in a \code{data.frame} object where each row represents a scan event and each
 column contains LC-MS/MS run parameters. The data is organiced in a way to work 
 with the principle described in \cite{Wickham2014}.
@@ -150,7 +150,7 @@ can be seen in the following code snippet:
 raw <- file.path(path.package(package = "rawDiag"), "extdata", 'sample.raw')
 system.time(RAW <- read.raw(file = raw, mono = TRUE))
 summary.rawDiag(RAW)
-RAW$scanNumber
+length(RAW$scanNumber)
 @
 
 \subsection{Reading the Open Proteomics Standard Files}
