@@ -89,13 +89,17 @@ shinyServer(function(input, output, session) {
     message(file.path(values$filesystemRoot, input$root))
     
     f <- list.files(file.path("/scratch/cpanse/",input$root))
-    f[grep("raw$", f) & file.exists(f)]
+    f[grep("raw$", f)]
     
   })
   
   
   output$rawfile <- renderUI({
+    if(length(getRawfiles()) > 0){
     selectInput('rawfile', 'rawfile:', getRawfiles(), multiple = TRUE)
+    }else{
+      helpText("no files available")
+    }
   })
 # ----Source----  
   output$sourceFilesystem <- renderUI({
@@ -117,8 +121,10 @@ shinyServer(function(input, output, session) {
       if (require("bfabricShiny")){
        bfabricInput("bfabric8")
       }
-    }else{
+    }else if(input$source == 'package'){
         actionButton("load", "load")
+    }else if(input$source == 'filesystem' & length(getRawfiles()) > 0){
+      actionButton("load", "load")
     }
   })
   
