@@ -48,8 +48,10 @@ library("devtools")
 devtools::install_github("fgcz/rawDiag", build_vignettes = TRUE)
 ```
 
-## 3. Usage
+## 3. Demonstration
 
+
+### R commandline code snippet
 "Hello; World!" example on the R command line
 
 ```{r}
@@ -61,7 +63,7 @@ PlotPrecursorHeatmap(PXD006932_Exp3A_HeLa_1ug_60min_7500_02)
 PlotMassDistribution(PXD006932_Exp3A_HeLa_1ug_60min_7500_02)
 ```
 
-an interactive shiny example
+### An interactive shiny example
 
 ```{r}
 # install.packages("shiny")
@@ -71,7 +73,9 @@ rawDiag_shiny <- system.file('shiny', 'demo', package = 'rawDiag')
 shiny::runApp(rawDiag_shiny, display.mode = 'normal')
 ```
 
-running via [dockerhub](https://hub.docker.com/r/cpanse/rawdiag/)
+### An interactive shiny example running on docker 
+
+source: [dockerhub](https://hub.docker.com/r/cpanse/rawdiag/)
 
 ```
 docker pull cpanse/rawdiag \
