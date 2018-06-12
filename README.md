@@ -71,7 +71,7 @@ rawDiag_shiny <- system.file('shiny', 'demo', package = 'rawDiag')
 shiny::runApp(rawDiag_shiny, display.mode = 'normal')
 ```
 
-running via docker
+running via [dockerhub](https://hub.docker.com/r/cpanse/rawdiag/)
 
 ```
 docker pull cpanse/rawdiag \
