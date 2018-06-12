@@ -24,7 +24,8 @@ in this package allow the user to check LC-MS/MS method parameters and
 facilitated the optimization thereof. The package is developed, tested and used
 at the Functional Genomics Center Zurich. 
 The package is optimized for reading Thermo Fisher raw files, but any other mass
-spectrometry data format is supported over the open standard \pkg{mzR}.
+spectrometry data format is supported over the open standards using the
+\pkg{mzR} package.
 \pkg{rawDiag} can be run on modern laptop infrastructure with sufficient speed,
 but for large datasets, a server infrastructure might be beneficial.  
 }
@@ -55,8 +56,10 @@ library(tidyverse)
 Mass spectrometry is a well-accepted and widespread method in life-sciences. 
 An important task that needs to be performed prior to any data set acquisition
 is the optimization of the applied mass spectrometry method.
-\pkg{rawDiag} \citep{TrachselJPR} builds on the idea of the discontinued software rawMeat
-(Vast Scientific). Our software allows a mass spectrometrist to analyze a raw
+\pkg{rawDiag} \citep{TrachselJPR} builds on the idea of the discontinued
+software rawMeat
+(Vast Scientific). 
+Our software allows a mass spectrometrist to analyze a raw
 file in short time and delivers diagnostic plots of LC-MS/MS run
 chararcteristics as result. 
 These visualizations are helpful for the optimization of the instrument method
@@ -64,15 +67,16 @@ towards the sample at hand.
 
 Our R package reads as input from the instrument raw data and keeps the data 
 in a \code{data.frame} object where each row represents a scan event and each
-column contains LC-MS/MS run parameters. The data is organiced in a way to work 
-with the principle described in \cite{Wickham2014}.
+column contains LC-MS/MS run parameters. 
+The resulting R \code{data.frame} is structured as tidy data based on
+\citet{Wickham2014}.
 \pkg{rawDiag} is optimized to work with
 Thermo Fisher Scientic raw files. The
-package calls a \proglang{C\#} executable which is able generate the required
+package calls a \proglang{C\#} executable that generates the required
 \code{data.frame} on the fly directly from a
-raw file using the {\em New Raw File Reader} technology \citep{RawFileReader}.
+raw file using the {\em New RawFileReader} .Net assembly \citep{RawFileReader}.
 However, any other mass spectrometry data format is also supported via the open 
-standard \pkg{mzR} \citep{mzR} which requires
+standards using the R package \pkg{mzR} \citep{mzR} which requires
 a conversion of the data prior to loading. 
 A number of R helper functions reshape and subset the data and pass the desired
 data-frames to \pkg{ggplot2} \citep{Hadley2009} for visualization. 
