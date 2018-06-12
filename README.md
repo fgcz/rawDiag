@@ -13,9 +13,9 @@ for Windows/Linux/MacOSX platforms
 
 ### 1.2 The New Raw File Reader for Thermo Fisher Scientific Instruments
 
-Due to license reason, we currently can not distribute Thermo Fisher Scientific software with the *rawDiag* package (we hope that this will change soon).
+Due to license reason, we currently not allowed to distribute Thermo Fisher Scientific software with the *rawDiag* package (we hope that this will change soon).
 The *New RawFileReader from Thermo Fisher Scientific* (see http://planetorbitrap.com/rawfilereader)
-has to be downloaded and installed to use the R function `read.raw`.
+has to be separately downloaded and installed in order to be able to use the R function `read.raw`.
 
 #### on Linux 
 (Debian) system run the following code snippet once you have downloaded the libraries:
@@ -67,8 +67,8 @@ an interactive shiny example
 # install.packages("shiny")
 # install.packages("DT")
 library(shiny)
-rawDiag_shiny <- system.file("shiny", "demo", package = "rawDiag")
-shiny::runApp(rawDiag_shiny, display.mode = "normal")
+rawDiag_shiny <- system.file('shiny', 'demo', package = 'rawDiag')
+shiny::runApp(rawDiag_shiny, display.mode = 'normal')
 ```
 ## 4. Instructions for use
 
