@@ -281,7 +281,7 @@ read.tdf <- function(filename){
 #'
 #' @examples
 #' read.raw
-read.raw <- function(file, mono = FALSE, 
+read.raw <- function(file, mono = if(Sys.info()['sysname'] %in% c("Darwin", "Linux")) TRUE else FALSE, 
                      exe = file.path(path.package(package = "rawDiag"),
                                      "exec/fgcz_raw.exe"),  
                      mono_path = "",
@@ -1488,25 +1488,25 @@ PlotMassHeatmap <- function(x, method='trellis', bins = 80){ #rename to mass.hea
   MS <- x %>% 
     dplyr::select(StartTime, scanNumber)
   res <- dplyr::inner_join(MS, MS2, by = "scanNumber") %>% 
-    mutate(TopN = case_when(filename == "20180220_04_S174020_Pierce_HeLa_Protein_Digest_Std.raw" ~ 36,
-                            filename == "20180220_05_S174020_Pierce_HeLa_Protein_Digest_Std.raw" ~ 72,
-                            filename == "20180220_07_S174020_Pierce_HeLa_Protein_Digest_Std.raw" ~ 36,
-                            filename == "20180220_08_S174020_Pierce_HeLa_Protein_Digest_Std.raw" ~ 72,
-                            filename == "20180220_09_S174020_Pierce_HeLa_Protein_Digest_Std.raw" ~ 18,
-                            filename == "20180220_11_S174020_Pierce_HeLa_Protein_Digest_Std.raw" ~ 72,
-                            filename == "20180220_12_S174020_Pierce_HeLa_Protein_Digest_Std.raw" ~ 36,
-                            filename == "20180220_13_S174020_Pierce_HeLa_Protein_Digest_Std.raw" ~ 18,
-                            filename == "20180220_16_S174020_Pierce_HeLa_Protein_Digest_Std.raw" ~ 18)
+    mutate(TopN = case_when(filename == "04_S174020" ~ 36,
+                            filename == "05_S174020" ~ 72,
+                            filename == "07_S174020" ~ 36,
+                            filename == "08_S174020" ~ 72,
+                            filename == "09_S174020" ~ 18,
+                            filename == "11_S174020" ~ 72,
+                            filename == "12_S174020" ~ 36,
+                            filename == "13_S174020" ~ 18,
+                            filename == "16_S174020" ~ 18)
     ) %>% 
-    mutate(Replicate = case_when(filename == "20180220_04_S174020_Pierce_HeLa_Protein_Digest_Std.raw" ~ "R1",
-                                 filename == "20180220_05_S174020_Pierce_HeLa_Protein_Digest_Std.raw" ~ "R1",
-                                 filename == "20180220_07_S174020_Pierce_HeLa_Protein_Digest_Std.raw" ~ "R2",
-                                 filename == "20180220_08_S174020_Pierce_HeLa_Protein_Digest_Std.raw" ~ "R2",
-                                 filename == "20180220_09_S174020_Pierce_HeLa_Protein_Digest_Std.raw" ~ "R1",
-                                 filename == "20180220_11_S174020_Pierce_HeLa_Protein_Digest_Std.raw" ~ "R3",
-                                 filename == "20180220_12_S174020_Pierce_HeLa_Protein_Digest_Std.raw" ~ "R3",
-                                 filename == "20180220_13_S174020_Pierce_HeLa_Protein_Digest_Std.raw" ~ "R2",
-                                 filename == "20180220_16_S174020_Pierce_HeLa_Protein_Digest_Std.raw" ~ "R3")
+    mutate(Replicate = case_when(filename == "04_S174020" ~ "R1",
+                                 filename == "05_S174020" ~ "R1",
+                                 filename == "07_S174020" ~ "R2",
+                                 filename == "08_S174020" ~ "R2",
+                                 filename == "09_S174020" ~ "R1",
+                                 filename == "11_S174020" ~ "R3",
+                                 filename == "12_S174020" ~ "R3",
+                                 filename == "13_S174020" ~ "R2",
+                                 filename == "16_S174020" ~ "R3")
     ) %>% 
     mutate(Filetag = paste(TopN, Replicate, sep = "_")) %>% 
     filter(Filetag == "18_R1" | Filetag == "36_R1" |Filetag == "72_R1")
@@ -1537,25 +1537,25 @@ PlotMassHeatmap <- function(x, method='trellis', bins = 80){ #rename to mass.hea
   res <- x %>%   
     dplyr::ungroup() %>% 
     ScanFrequMovingOver(.) %>% 
-    mutate(TopN = case_when(filename == "20180220_04_S174020_Pierce_HeLa_Protein_Digest_Std.raw" ~ 36,
-                            filename == "20180220_05_S174020_Pierce_HeLa_Protein_Digest_Std.raw" ~ 72,
-                            filename == "20180220_07_S174020_Pierce_HeLa_Protein_Digest_Std.raw" ~ 36,
-                            filename == "20180220_08_S174020_Pierce_HeLa_Protein_Digest_Std.raw" ~ 72,
-                            filename == "20180220_09_S174020_Pierce_HeLa_Protein_Digest_Std.raw" ~ 18,
-                            filename == "20180220_11_S174020_Pierce_HeLa_Protein_Digest_Std.raw" ~ 72,
-                            filename == "20180220_12_S174020_Pierce_HeLa_Protein_Digest_Std.raw" ~ 36,
-                            filename == "20180220_13_S174020_Pierce_HeLa_Protein_Digest_Std.raw" ~ 18,
-                            filename == "20180220_16_S174020_Pierce_HeLa_Protein_Digest_Std.raw" ~ 18)
+    mutate(TopN = case_when(filename == "04_S174020" ~ 36,
+                            filename == "05_S174020" ~ 72,
+                            filename == "07_S174020" ~ 36,
+                            filename == "08_S174020" ~ 72,
+                            filename == "09_S174020" ~ 18,
+                            filename == "11_S174020" ~ 72,
+                            filename == "12_S174020" ~ 36,
+                            filename == "13_S174020" ~ 18,
+                            filename == "16_S174020" ~ 18)
     ) %>% 
-    mutate(Replicate = case_when(filename == "20180220_04_S174020_Pierce_HeLa_Protein_Digest_Std.raw" ~ "R1",
-                                 filename == "20180220_05_S174020_Pierce_HeLa_Protein_Digest_Std.raw" ~ "R1",
-                                 filename == "20180220_07_S174020_Pierce_HeLa_Protein_Digest_Std.raw" ~ "R2",
-                                 filename == "20180220_08_S174020_Pierce_HeLa_Protein_Digest_Std.raw" ~ "R2",
-                                 filename == "20180220_09_S174020_Pierce_HeLa_Protein_Digest_Std.raw" ~ "R1",
-                                 filename == "20180220_11_S174020_Pierce_HeLa_Protein_Digest_Std.raw" ~ "R3",
-                                 filename == "20180220_12_S174020_Pierce_HeLa_Protein_Digest_Std.raw" ~ "R3",
-                                 filename == "20180220_13_S174020_Pierce_HeLa_Protein_Digest_Std.raw" ~ "R2",
-                                 filename == "20180220_16_S174020_Pierce_HeLa_Protein_Digest_Std.raw" ~ "R3")
+    mutate(Replicate = case_when(filename == "04_S174020" ~ "R1",
+                                 filename == "05_S174020" ~ "R1",
+                                 filename == "07_S174020" ~ "R2",
+                                 filename == "08_S174020" ~ "R2",
+                                 filename == "09_S174020" ~ "R1",
+                                 filename == "11_S174020" ~ "R3",
+                                 filename == "12_S174020" ~ "R3",
+                                 filename == "13_S174020" ~ "R2",
+                                 filename == "16_S174020" ~ "R3")
     ) %>% 
     mutate(Filetag = paste(TopN, Replicate, sep = "_")) %>% 
     ungroup() %>% 
@@ -1618,25 +1618,25 @@ PlotMassHeatmap <- function(x, method='trellis', bins = 80){ #rename to mass.hea
 #' @return a ggplot opbject
 .technote_application_figure_4 <- function(x, y){
   x <- x %>% 
-    mutate(TopN = case_when(filename == "20180220_04_S174020_Pierce_HeLa_Protein_Digest_Std.raw" ~ 36,
-                            filename == "20180220_05_S174020_Pierce_HeLa_Protein_Digest_Std.raw" ~ 72,
-                            filename == "20180220_07_S174020_Pierce_HeLa_Protein_Digest_Std.raw" ~ 36,
-                            filename == "20180220_08_S174020_Pierce_HeLa_Protein_Digest_Std.raw" ~ 72,
-                            filename == "20180220_09_S174020_Pierce_HeLa_Protein_Digest_Std.raw" ~ 18,
-                            filename == "20180220_11_S174020_Pierce_HeLa_Protein_Digest_Std.raw" ~ 72,
-                            filename == "20180220_12_S174020_Pierce_HeLa_Protein_Digest_Std.raw" ~ 36,
-                            filename == "20180220_13_S174020_Pierce_HeLa_Protein_Digest_Std.raw" ~ 18,
-                            filename == "20180220_16_S174020_Pierce_HeLa_Protein_Digest_Std.raw" ~ 18)
+    mutate(TopN = case_when(filename == "04_S174020" ~ 36,
+                            filename == "05_S174020" ~ 72,
+                            filename == "07_S174020" ~ 36,
+                            filename == "08_S174020" ~ 72,
+                            filename == "09_S174020" ~ 18,
+                            filename == "11_S174020" ~ 72,
+                            filename == "12_S174020" ~ 36,
+                            filename == "13_S174020" ~ 18,
+                            filename == "16_S174020" ~ 18)
     ) %>% 
-    mutate(Replicate = case_when(filename == "20180220_04_S174020_Pierce_HeLa_Protein_Digest_Std.raw" ~ "R1",
-                                 filename == "20180220_05_S174020_Pierce_HeLa_Protein_Digest_Std.raw" ~ "R1",
-                                 filename == "20180220_07_S174020_Pierce_HeLa_Protein_Digest_Std.raw" ~ "R2",
-                                 filename == "20180220_08_S174020_Pierce_HeLa_Protein_Digest_Std.raw" ~ "R2",
-                                 filename == "20180220_09_S174020_Pierce_HeLa_Protein_Digest_Std.raw" ~ "R1",
-                                 filename == "20180220_11_S174020_Pierce_HeLa_Protein_Digest_Std.raw" ~ "R3",
-                                 filename == "20180220_12_S174020_Pierce_HeLa_Protein_Digest_Std.raw" ~ "R3",
-                                 filename == "20180220_13_S174020_Pierce_HeLa_Protein_Digest_Std.raw" ~ "R2",
-                                 filename == "20180220_16_S174020_Pierce_HeLa_Protein_Digest_Std.raw" ~ "R3")
+    mutate(Replicate = case_when(filename == "04_S174020" ~ "R1",
+                                 filename == "05_S174020" ~ "R1",
+                                 filename == "07_S174020" ~ "R2",
+                                 filename == "08_S174020" ~ "R2",
+                                 filename == "09_S174020" ~ "R1",
+                                 filename == "11_S174020" ~ "R3",
+                                 filename == "12_S174020" ~ "R3",
+                                 filename == "13_S174020" ~ "R2",
+                                 filename == "16_S174020" ~ "R3")
     ) %>% 
     mutate(Filetag = paste(TopN, Replicate, sep = "_")) %>% 
     ungroup()
@@ -1689,25 +1689,25 @@ PlotMassHeatmap <- function(x, method='trellis', bins = 80){ #rename to mass.hea
 #' @return a ggplot opbject
 .technote_application_figure_5 <- function(x){
   res <- x %>% 
-  mutate(TopN = case_when(filename == "20180220_04_S174020_Pierce_HeLa_Protein_Digest_Std.raw" ~ 36,
-                          filename == "20180220_05_S174020_Pierce_HeLa_Protein_Digest_Std.raw" ~ 72,
-                          filename == "20180220_07_S174020_Pierce_HeLa_Protein_Digest_Std.raw" ~ 36,
-                          filename == "20180220_08_S174020_Pierce_HeLa_Protein_Digest_Std.raw" ~ 72,
-                          filename == "20180220_09_S174020_Pierce_HeLa_Protein_Digest_Std.raw" ~ 18,
-                          filename == "20180220_11_S174020_Pierce_HeLa_Protein_Digest_Std.raw" ~ 72,
-                          filename == "20180220_12_S174020_Pierce_HeLa_Protein_Digest_Std.raw" ~ 36,
-                          filename == "20180220_13_S174020_Pierce_HeLa_Protein_Digest_Std.raw" ~ 18,
-                          filename == "20180220_16_S174020_Pierce_HeLa_Protein_Digest_Std.raw" ~ 18)
-  ) %>% 
-    mutate(Replicate = case_when(filename == "20180220_04_S174020_Pierce_HeLa_Protein_Digest_Std.raw" ~ "R1",
-                                 filename == "20180220_05_S174020_Pierce_HeLa_Protein_Digest_Std.raw" ~ "R1",
-                                 filename == "20180220_07_S174020_Pierce_HeLa_Protein_Digest_Std.raw" ~ "R2",
-                                 filename == "20180220_08_S174020_Pierce_HeLa_Protein_Digest_Std.raw" ~ "R2",
-                                 filename == "20180220_09_S174020_Pierce_HeLa_Protein_Digest_Std.raw" ~ "R1",
-                                 filename == "20180220_11_S174020_Pierce_HeLa_Protein_Digest_Std.raw" ~ "R3",
-                                 filename == "20180220_12_S174020_Pierce_HeLa_Protein_Digest_Std.raw" ~ "R3",
-                                 filename == "20180220_13_S174020_Pierce_HeLa_Protein_Digest_Std.raw" ~ "R2",
-                                 filename == "20180220_16_S174020_Pierce_HeLa_Protein_Digest_Std.raw" ~ "R3")
+    mutate(TopN = case_when(filename == "04_S174020" ~ 36,
+                            filename == "05_S174020" ~ 72,
+                            filename == "07_S174020" ~ 36,
+                            filename == "08_S174020" ~ 72,
+                            filename == "09_S174020" ~ 18,
+                            filename == "11_S174020" ~ 72,
+                            filename == "12_S174020" ~ 36,
+                            filename == "13_S174020" ~ 18,
+                            filename == "16_S174020" ~ 18)
+    ) %>% 
+    mutate(Replicate = case_when(filename == "04_S174020" ~ "R1",
+                                 filename == "05_S174020" ~ "R1",
+                                 filename == "07_S174020" ~ "R2",
+                                 filename == "08_S174020" ~ "R2",
+                                 filename == "09_S174020" ~ "R1",
+                                 filename == "11_S174020" ~ "R3",
+                                 filename == "12_S174020" ~ "R3",
+                                 filename == "13_S174020" ~ "R2",
+                                 filename == "16_S174020" ~ "R3")
     ) %>% 
     mutate(Filetag = paste(TopN, Replicate, sep = "_")) %>% 
     ungroup()

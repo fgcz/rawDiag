@@ -3,10 +3,10 @@
 
 \usepackage[T1]{fontenc} % Use modern font encodings
 
-\author{Christian Trachsel \& Tobias Kockmann \& Christian Panse}
+\author{Christian Trachsel, Tobias Kockmann, Christian Panse}
 \title{\pkg{rawDiag}: an R Package for Diagnostic Plots of Mass Spectrometry Raw Data}
 
-\Plainauthor{Christian Trachsel \& Tobias Kockmann \& Christian Panse}
+\Plainauthor{Christian Trachsel, Tobias Kockmann, Christian Panse}
 
 \Plaintitle{Diagnostoc plots}
 
@@ -30,7 +30,7 @@ but for large datasets, a server infrastructure might be beneficial.
 }
 
 \Address{
-  Christian Trachsel \& Tobias Kockmann \& Christian Panse\\
+  Christian Trachsel. Tobias Kockmann, Christian Panse\\
   Functional Genomics Center Zurich\\
   Swiss Federal Institute of Technology in Zurich~\texttt{|}~University of Zurich\\
   Winterthurerstr. 190, CH-8057 Zurich, Switzerland\\
@@ -62,7 +62,7 @@ chararcteristics as result.
 These visualizations are helpful for the optimization of the instrument method
 towards the sample at hand.
 
-Our R package reads as input from the instrument raw data and keeps the data 
+Our R package~citet{R} reads as input from the instrument raw data and keeps the data 
 in a \code{data.frame} object where each row represents a scan event and each
 column contains LC-MS/MS run parameters. The data is organiced in a way to work 
 with the principle described in \cite{Wickham2014}.
@@ -127,7 +127,7 @@ Pleas note, the raw data are available trough
 
 load sample data:
 <<>>=
-data(WU163763)
+data(WU163763 )
 stopifnot(is.rawDiag(WU163763))
 @
 
@@ -146,9 +146,11 @@ extract the following information out of the mass spectrometric meassurement.
 We use R for the implementation and read the data using the pipe command as it
 can be seen in the following code snippet:
 
-<<eval = FALSE>>=
+<<eval = TRUE>>=
 raw <- file.path(path.package(package = "rawDiag"), "extdata", 'sample.raw')
 system.time(RAW <- read.raw(file = raw))
+summary.rawDiag(RAW)
+length(RAW$scanNumber)
 @
 
 \subsection{Reading the Open Proteomics Standard Files}
@@ -162,7 +164,7 @@ file.
 <<>>=
 library(mzR); 
 
-mzML <- "20180220_04_S174020_Pierce_HeLa_Protein_Digest_Std_5000_5010.mzML"
+mzML <- "04_S174020_5000_5010.mzML"
 mzML <- file.path(path.package(package = "rawDiag"), "extdata", mzML)
 system.time(RAW <- rawDiag:::as.rawDiag.mzR(openMSfile(mzML)))
 summary.rawDiag(RAW)
@@ -182,11 +184,11 @@ per used method, we will have overplotting issues. Therefore we first filter
 the data for a single injectionper method.
 
 <<label=filter, eval=TRUE>>=
-  library(tidyverse)
+library(tidyverse)
 df <- dplyr::filter(WU163763, 
-  filename == "20180220_04_S174020_Pierce_HeLa_Protein_Digest_Std.raw" |
-  filename == "20180220_05_S174020_Pierce_HeLa_Protein_Digest_Std.raw" |
-  filename == "20180220_09_S174020_Pierce_HeLa_Protein_Digest_Std.raw")
+  filename == "04_S174020" |
+  filename == "05_S174020" |
+  filename == "09_S174020")
 @
 
 Now to the actual walk through. Assuming we have a starting method we want to
@@ -287,16 +289,16 @@ using between one singe and eight CPUs in parallel.
 
 The boxplot below displays the result.
 
-<<label=benchmark-time, eval = TRUE, fig = TRUE, width = 4, height =4, echo = FALSE, include = FALSE>>=
+<<label=benchmark-time, eval = TRUE, fig = TRUE, width = 8, height =4, echo = FALSE, include = FALSE>>=
 rawDiag:::.technote_benchmark_figure_1() 
 @
-<<label=benchmark-throuput, eval = TRUE, fig = TRUE, width = 4, height = 4, echo = FALSE, include = FALSE>>=
+<<label=benchmark-throuput, eval = TRUE, fig = TRUE, width = 8, height = 4, echo = FALSE, include = FALSE>>=
 rawDiag:::.technote_benchmark_figure_2()
 @
 
 \begin{figure}
-\includegraphics[width=0.49\columnwidth]{primer-benchmark-time}
-\includegraphics[width=0.49\columnwidth]{primer-benchmark-throuput}
+\includegraphics[width=0.99\columnwidth]{primer-benchmark-time}
+\includegraphics[width=0.99\columnwidth]{primer-benchmark-throuput}
 
 \caption{Benchmark -- The left plot shows the overall logarithmic 
 scaled runtime of 128 raw files.  The graphic on the right side shows 
