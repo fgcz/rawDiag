@@ -1,12 +1,8 @@
 FROM bioconductor/devel_proteomics2
 
 LABEL version="1.0"
-LABEL description="This file illustrates \
-how to compile CS code using the \
-ThermoRawFileReadera library and use it \
-as commandline programm."
-
-MAINTAINER Christian Panse <Christian.Panse@gmail.com>
+LABEL description="This docker image is for the shiny demo only."
+MAINTAINER Christian Panse <cp@fgcz.ethz.ch>
 
 RUN apt-get install libxml2 -y
 ADD install.R /tmp
