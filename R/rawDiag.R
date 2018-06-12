@@ -505,7 +505,7 @@ PlotTicBasepeak <- function(x, method = 'trellis'){
       facet_wrap(filename ~ Type, scales = "free", ncol = 2) +
       labs(title = "TIC and Base-Peak plot") +
       labs(subtitle = "Plotting TIC intensity and base peak intensity against retention time") +
-      labs(x = " Retention Time [min]", y = "Intensity Counts [arb. unit]") +
+      labs(x = "Retention Time [min]", y = "Intensity Counts [arb. unit]") +
       scale_x_continuous(breaks = scales::pretty_breaks(10)) +
       scale_y_continuous(breaks = scales::pretty_breaks(8)) +
       theme_light() 
@@ -1087,10 +1087,14 @@ PlotScanFrequency <- function(x, method = 'trellis'){
     
     figure <- ggplot(res, aes_string(x = "Time", y = "Frequency")) +
       geom_line() +
-      facet_wrap(~filename+ Type) +
-      scale_y_continuous(breaks = scales::pretty_breaks(16))
-    
+      facet_grid(filename ~ Type) +
+      scale_y_continuous(breaks = scales::pretty_breaks(6))+
+      labs(title = "Ms2 Scan Frequency Plot") +
+      labs(subtitle = "Plotting number of ms2 per second against retention time") +
+      labs(x = "Retention Time [min]", y = "Ms2 frequency [Hz]") +
+      theme_light() 
     return(figure)  
+    
   }else if (method == 'violin'){
     res <- x %>% 
       dplyr::ungroup() %>% 
@@ -1099,9 +1103,13 @@ PlotScanFrequency <- function(x, method = 'trellis'){
       dplyr::filter_at(vars("Type"), any_vars(. == "ms2"))
     
     figure <- ggplot(res, aes_string(x = "filename", y = "Counts")) +
-      geom_violin()
+      geom_violin() +
+      labs(title = "Ms2 Scan Frequency Plot") +
+      labs(subtitle = "Plotting number of ms2 per second against retention time") +
+      labs(x = "Filename", y = "Ms2 frequency [Hz]") +
+      theme_light() 
+    return(figure) 
     
-    return(figure)  
   }else if (method =='overlay'){
     res <- x %>% 
       dplyr::ungroup() %>% 
@@ -1110,8 +1118,12 @@ PlotScanFrequency <- function(x, method = 'trellis'){
     figure <- ggplot(res, aes_string(x = "Time", y = "Frequency", colour = "Type")) +
       facet_wrap(~filename) +
       geom_line() +
-      theme_light() +
-      theme(legend.position = "top")
+      scale_y_continuous(breaks = scales::pretty_breaks(10))+
+      labs(title = "Ms2 Scan Frequency Plot") +
+      labs(subtitle = "Plotting number of ms2 per second against retention time") +
+      labs(x = "Retention Time [min]", y = "Ms2 frequency [Hz]") +
+      theme_light() 
+      #theme(legend.position = "top")
     
     return(figure)  
   }else{NULL}
