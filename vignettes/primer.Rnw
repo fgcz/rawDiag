@@ -3,10 +3,10 @@
 
 \usepackage[T1]{fontenc} % Use modern font encodings
 
-\author{Christian Trachsel \& Tobias Kockmann \& Christian Panse}
+\author{Christian Trachsel, Tobias Kockmann, Christian Panse}
 \title{\pkg{rawDiag}: an R Package for Diagnostic Plots of Mass Spectrometry Raw Data}
 
-\Plainauthor{Christian Trachsel \& Tobias Kockmann \& Christian Panse}
+\Plainauthor{Christian Trachsel, Tobias Kockmann, Christian Panse}
 
 \Plaintitle{Diagnostoc plots}
 
@@ -30,7 +30,7 @@ but for large datasets, a server infrastructure might be beneficial.
 }
 
 \Address{
-  Christian Trachsel \& Tobias Kockmann \& Christian Panse\\
+  Christian Trachsel, Tobias Kockmann, Christian Panse\\
   Functional Genomics Center Zurich\\
   Swiss Federal Institute of Technology in Zurich~\texttt{|}~University of Zurich\\
   Winterthurerstr. 190, CH-8057 Zurich, Switzerland\\
