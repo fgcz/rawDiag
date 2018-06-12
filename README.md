@@ -13,7 +13,7 @@ for Windows/Linux/MacOSX platforms
 
 ### 1.2 The New Raw File Reader for Thermo Fisher Scientific Instruments
 
-Due to license reason, we currently can not distribute Thermo Fisher Scientific software with the *rawDiag* package (we hope that this will change soon).
+Due to license reason, we currently not allowed to distribute Thermo Fisher Scientific software with the *rawDiag* package (we hope that this will change soon).
 The *New RawFileReader from Thermo Fisher Scientific* (see http://planetorbitrap.com/rawfilereader)
 has to be downloaded and installed to use the R function `read.raw`.
 
