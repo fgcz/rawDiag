@@ -162,7 +162,7 @@ file.
 <<>>=
 library(mzR); 
 
-mzML <- "20180220_04_S174020_Pierce_HeLa_Protein_Digest_Std_5000_5010.mzML"
+mzML <- "04_S174020_5000_5010.mzML"
 mzML <- file.path(path.package(package = "rawDiag"), "extdata", mzML)
 system.time(RAW <- rawDiag:::as.rawDiag.mzR(openMSfile(mzML)))
 summary.rawDiag(RAW)
@@ -184,9 +184,9 @@ the data for a single injectionper method.
 <<label=filter, eval=TRUE>>=
   library(tidyverse)
 df <- dplyr::filter(WU163763, 
-  filename == "20180220_04_S174020_Pierce_HeLa_Protein_Digest_Std.raw" |
-  filename == "20180220_05_S174020_Pierce_HeLa_Protein_Digest_Std.raw" |
-  filename == "20180220_09_S174020_Pierce_HeLa_Protein_Digest_Std.raw")
+  filename == "04_S174020" |
+  filename == "05_S174020" |
+  filename == "09_S174020")
 @
 
 Now to the actual walk through. Assuming we have a starting method we want to
