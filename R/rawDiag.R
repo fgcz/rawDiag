@@ -959,40 +959,50 @@ PlotLockMassCorrection <- function(x, method='trellis'){
     figure <- ggplot(res, aes_string(x = "StartTime" , y = "LMCorrection")) +
       geom_hline(yintercept = c(-5,5), colour = "red3", linetype = "longdash") +
       geom_line(size = 0.3) +
-      geom_line(stat = "smooth", method= "gam", formula = y ~ s(x, bs ="cs"), colour = "deepskyblue3", se = FALSE) +
-      labs(title = "Lock mass correction plot", subtitle = "Plotting lock mass correction value over time") +
+      geom_line(stat = "smooth", method= "gam", 
+                formula = y ~ s(x, bs ="cs"), 
+                colour = "deepskyblue3", se = FALSE) +
+      labs(title = "Lock mass correction plot") +
+      labs(subtitle = "Plotting lock mass correction value versus retention time") +
       labs(x = "Retention Time [min]", y = "Lock Mass Correction [ppm]") +
       scale_x_continuous(breaks = scales::pretty_breaks(8)) +
       scale_y_continuous(breaks = scales::pretty_breaks(8), limits = c(-10,10)) +
       facet_wrap(~filename)+
       theme_light()
     return(figure)
+    
   }else if(method == 'violin'){
     res <- x %>% 
       dplyr::filter(MSOrder == "Ms")
     figure <- ggplot(res, aes_string(x = "filename", y = "LMCorrection")) +
       geom_hline(yintercept = c(-5,5), colour = "red3", linetype = "longdash") +
       geom_violin()+
+      labs(title = "Lock mass correction plot") +
+      labs(subtitle = "Plotting the time resolved lock mass correction density for each mass spectrometr run") +
+      labs(x = "Filename", y = "Lock Mass Correction [ppm]") +
       theme_light() +
       theme(axis.text.x = element_text(angle = 90))
     return(figure)
+    
   }else if (method == 'overlay'){
     res <- x %>% 
       dplyr::filter(MSOrder == "Ms")
     figure <- ggplot(res, aes_string(x = "StartTime" , y = "LMCorrection", colour = "filename")) +
       geom_hline(yintercept = c(-5,5), colour = "red3", linetype = "longdash") +
       geom_line(size = 0.3) +
-      geom_line(stat = "smooth", method= "gam", formula = y ~ s(x, bs ="cs"), colour = "deepskyblue3", se = FALSE) +
-      labs(title = "Lock mass correction plot", subtitle = "Plotting lock mass correction value over time") +
+      geom_line(stat = "smooth", method= "gam", 
+                formula = y ~ s(x, bs ="cs"), 
+                colour = "deepskyblue3", se = FALSE) +
+      labs(title = "Lock mass correction plot") +
+      labs(subtitle = "Plotting lock mass correction value over time") +
       labs(x = "Retention Time [min]", y = "Lock Mass Correction [ppm]") +
       scale_x_continuous(breaks = scales::pretty_breaks(8)) +
       scale_y_continuous(breaks = scales::pretty_breaks(8), limits = c(-10,10)) +
       theme_light()
     return(figure)
-  }else{NULL}}
-
-
-
+    
+  }else{NULL}
+}
 
 #' cycle.load plot
 #'
@@ -1026,6 +1036,7 @@ PlotCycleLoad <- function(x, method = 'trellis'){ #old name ms2.distribution
       labs(x = "Retention Time [min]", y = "Number of Ms2 per Ms1 [counts]") +
       theme_light()
     return(figure)
+    
   }else if(method == 'violin'){
     MS2 <- x %>% 
       dplyr::filter(MSOrder == "Ms2") %>% 
@@ -1042,10 +1053,11 @@ PlotCycleLoad <- function(x, method = 'trellis'){ #old name ms2.distribution
       geom_violin() +
       coord_cartesian(ylim = c(0, max(res$n)+1)) +
       labs(title = "Time resolved number of Ms2 scans") +
-      labs(subtitle = "Plotting the number of Ms2 per Ms1 scan versus retention time") +
+      labs(subtitle = "Plotting the duty cycle resolved Ms2 density for each mass spectrometry run") +
       labs(x = "Retention Time [min]", y = "Number of Ms2 per Ms1 [counts]") +
       theme_light()
     return(figure)
+    
   }else if (method == 'overlay'){
     MS2 <- x %>% 
       dplyr::filter(MSOrder == "Ms2") %>% 
@@ -1068,7 +1080,9 @@ PlotCycleLoad <- function(x, method = 'trellis'){ #old name ms2.distribution
       theme_light() +
       theme(legend.position = "top")
     return(figure)
-  }else{NULL}}
+  
+  }else{NULL}
+}
 
 
 #mods for cycle based plots and prescans
@@ -1088,7 +1102,8 @@ PlotScanFrequency <- function(x, method = 'trellis'){
     figure <- ggplot(res, aes_string(x = "Time", y = "Frequency")) +
       geom_line() +
       facet_grid(filename ~ Type) +
-      scale_y_continuous(breaks = scales::pretty_breaks(6))+
+      scale_x_continuous(breaks = scales::pretty_breaks(8))+
+      scale_y_continuous(breaks = scales::pretty_breaks(8))+
       labs(title = "Ms2 Scan Frequency Plot") +
       labs(subtitle = "Plotting number of ms2 per second against retention time") +
       labs(x = "Retention Time [min]", y = "Ms2 frequency [Hz]") +
@@ -1105,7 +1120,7 @@ PlotScanFrequency <- function(x, method = 'trellis'){
     figure <- ggplot(res, aes_string(x = "filename", y = "Counts")) +
       geom_violin() +
       labs(title = "Ms2 Scan Frequency Plot") +
-      labs(subtitle = "Plotting number of ms2 per second against retention time") +
+      labs(subtitle = "Plotting the time resolved Ms2 density for each mass spectrometry run") +
       labs(x = "Filename", y = "Ms2 frequency [Hz]") +
       theme_light() 
     return(figure) 
@@ -1118,12 +1133,13 @@ PlotScanFrequency <- function(x, method = 'trellis'){
     figure <- ggplot(res, aes_string(x = "Time", y = "Frequency", colour = "Type")) +
       facet_wrap(~filename) +
       geom_line() +
-      scale_y_continuous(breaks = scales::pretty_breaks(10))+
+      scale_x_continuous(breaks = scales::pretty_breaks(8))+
+      scale_y_continuous(breaks = scales::pretty_breaks(8))+
       labs(title = "Ms2 Scan Frequency Plot") +
       labs(subtitle = "Plotting number of ms2 per second against retention time") +
       labs(x = "Retention Time [min]", y = "Ms2 frequency [Hz]") +
       theme_light() 
-      #theme(legend.position = "top")
+      theme(legend.position = "top")
     
     return(figure)  
   }else{NULL}
