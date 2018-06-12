@@ -357,7 +357,7 @@ allows the generation of pdf reports.
 \label{figure:viz}
 \end{figure}
 
-<<echo=FALSE>>=
+<<overview, echo=FALSE>>=
 rv <- rawDiag:::.overview(prefix="graphics/rawDiag")
 @
 
@@ -415,7 +415,7 @@ rawDiag:::.technote_benchmark_figure_1()
 rawDiag:::.technote_benchmark_figure_2()
 @
 
-<<echo=FALSE>>=
+<<benchmark, echo=FALSE>>=
 data(benchmark)
   
 b.Linux$IO.throuput <- sum(unique(b.Linux$nrow)) / b.Linux$overall.runtime 
@@ -531,7 +531,7 @@ visualization styles is depicted in Figure~\ref{figure:viz}.
 
 
 \subsection{Use case -- Optimize data dependent analysis}
-
+\label{section:aplication} 
 Starting from an initial method template based on the work of Kelstrup et al.,\cite{pmid29183128} 
 we analyzed 1 $\mu$g of a commercial tryptic HeLa digest on a Q-Exactive HF-X 
 instrument using a classical shotgun heuristics. Subsequently, the 
@@ -559,7 +559,7 @@ Sequest through Proteome~Discoverer agains a human database applying standard se
 library(tidyverse)
 data(WU163763)
 
-WU163763 <- filter(WU163763, filename != "20180220_03_S174020_Pierce_HeLa_Protein_Digest_Std.raw") 
+#df <- filter(WU163763, filename != "03_S174020") 
 
 load(file.path(path.package(package = "rawDiag"),
                file.path("extdata", "WU163763_PD.RData")))
@@ -637,7 +637,7 @@ To our knowledge the only alternative tool that is able to extract and visualize
 \section{Conclusion}
 In this manuscript, we presented \rawDiag~an R package to visualize characteristics of LC-MS measurements. Through its diagnostic plots, \rawDiag~supports scientists during empirical method optimization by providing a rational base for choosing appropriate data acquisition parameters. The software is interactive and easy to operate through an R shiny GUI application, even for users without prior R knowledge. More advanced users can fully customize the appearance of the visualizations by executing their own code from the R command line. This also enables \rawDiag~to be customized and implemented into more complex environments, e.g., data analysis pipelines embedded into LIMS systems.
 In its current implementation, the software is tailored towards the Thermo Fisher Scientific raw file format, but its architecture allows easy adaptation towards other mass spectrometry data formats. An interesting showcase would be the novel Bruker tdf 2.0 format (introduced for the timsTOF Pro), where scan metadata is not ``hidden'' in proprietary binary files, but stored in an open SQLite database directly accessible to R.
-In the future, we plan to extend \rawDiag~by allowing users to link additional metadata not originally logged by the instrument software (derived metadata), but created offline by external tools. A simple, but very useful example, is to scan metadata created by search engines. These typically links scans to similarity scores, peptide assignments, and their corresponding probabilities. This would allow visualizing assignment rates and score distributions across injections. Having the peptide assignments at hand will open the door for chained metadata usage, for instance by linking a scan over the amino acid sequence of the identified peptide to physicochemical properties like hydrophobicity, iRT scores, or MW. Such derived metadata can then be compared to primary metadata like empirical mass or RT. Linking primary and derived metadata will also clear the way to big data applications similar to MassIVE\footnote{\url{https://massive.ucsd.edu/ProteoSAFe/static/massive.jsp}, March 2018} but bypassing the necessary conversion to open data formats like mzML. This is beneficial since the conversion process does not preserve all useful primary metadata.
+In the future, we plan to extend \rawDiag~by allowing users to link additional metadata not originally logged by the instrument software (derived metadata), but created offline by external tools. A simple, but very useful example, is to scan metadata created by search engines. These typically links scans to similarity scores, peptide assignments, and their corresponding probabilities. This would allow visualizing assignment rates and score distributions across injections. Having the peptide assignments at hand will open the door for chained metadata usage, for instance by linking a scan over the amino acid sequence of the identified peptide to physicochemical properties like hydrophobicity, iRT scores, or MW. Such derived metadata can then be compared to primary metadata like empirical mass or RT. Linking primary and derived metadata will also clear the way to big data applications similar to MassIVE (\url{https://massive.ucsd.edu}, March 2018) but bypassing the necessary conversion to open data formats like mzML. This is beneficial since the conversion process does not preserve all useful primary metadata.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% The "Acknowledgement" section can be given in all manuscript
@@ -650,7 +650,13 @@ In the future, we plan to extend \rawDiag~by allowing users to link additional m
 The work has been supported by ETH Zurich and University of Zurich.
 
 \begin{acknowledgement}
-The authors would like to thank Jim Shofstahl for his great support regarding the new Thermo Fisher RawFileReader library. Additionally, we would like to thank the two reviewers for their time to read our manuscript and their constructive and valuable input towards it. Further thank goes to Jay Tracy and our colleagues at the FGCZ for proofreading our manuscript. Last we would like to thank Lilly for her support with the graphical design of the package sticker. 
+The authors thank Jim Shofstahl for his support regarding the
+{\em New Thermo Fisher RawFileReader} library.
+We thank Sven Brehmer from Bruker Daltonics for the discussions of timsTOF file
+format. We thank Lilly van de Venn for the package sticker design.
+We thank our colleagues at the Functional Genomics Center Zurich, the Swiss
+Federal Institute of Technology Zurich and the University of Zurich for the
+support of our work.
 \end{acknowledgement}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -661,8 +667,12 @@ The authors would like to thank Jim Shofstahl for his great support regarding th
 
 The package vignette as well as the R package itself, a Dockerfile which build
 the entire architecture from scratch, is accessible through a git repository
-under the following URL: \url{https://github.com/protViz/rawDiag}.
+under the following URL: \url{https://github.com/fgcz/rawDiag}.
 
+The data used in section \ref{section:aplication} are available on the MassIVE
+\url{ftp://massive.ucsd.edu/MSV000082389/raw/rawDiag/raw/}, through the 
+lab information managment system bfabric~\cite{bfabric} \url{https://fgcz-bfabric.uzh.ch} Sample ID 174020, or 
+as data set of the package as \texttt{WU163763}.
 
 A demo system including all data shown in this manuscript is available through
 \url{http://fgcz-ms-shiny.uzh.ch:8080/rawDiag-demo/}.
@@ -674,7 +684,7 @@ A demo system including all data shown in this manuscript is available through
 %% Notice that the class file automatically sets \bibliographystyle
 %% and also names the section correctly.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\nocite{msdata,mzR,SIMPATIQCO}
+\nocite{msdata,mzR,SIMPATIQCO,bfabric}
 \bibliography{rawDiag}
 
 \end{document}

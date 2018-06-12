@@ -263,9 +263,9 @@ library(rawDiag)
 data("WU163763"); df <- WU163763
 @
 <<label = gsub, echo=FALSE>>=
-df$filename <- gsub("_Pierce_HeLa_Protein_Digest_Std.raw", "", 
-  gsub("20180220_", "", 
-  df$filename))
+#df$filename <- gsub("_Pierce_HeLa_Protein_Digest_Std.raw", "", 
+#  gsub("20180220_", "", 
+#  df$filename))
 @
 
 \subsection*{Sample Data}
