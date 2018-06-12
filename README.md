@@ -67,8 +67,8 @@ an interactive shiny example
 # install.packages("shiny")
 # install.packages("DT")
 library(shiny)
-rawDiag_shiny <- system.file("shiny", "demo", package = "rawDiag")
-shiny::runApp(rawDiag_shiny, display.mode = "normal")
+rawDiag_shiny <- system.file('shiny', 'demo', package = 'rawDiag')
+shiny::runApp(rawDiag_shiny, display.mode = 'normal')
 ```
 ## 4. Instructions for use
 
