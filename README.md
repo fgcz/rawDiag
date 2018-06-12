@@ -29,6 +29,7 @@ apt-get update \
   && gacutil -i lib/ThermoFisher.CommonCore.RawFileReader.dll \
   && echo $?
 ```
+the global assembly cache utility registers the libraries in your mono system.
 
 ### 1.3 [Open File Standards](http://www.psidev.info/)
 support through the Bioconductor [mzR](http://bioconductor.org/packages/mzR/) package. 
