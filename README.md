@@ -70,6 +70,17 @@ library(shiny)
 rawDiag_shiny <- system.file('shiny', 'demo', package = 'rawDiag')
 shiny::runApp(rawDiag_shiny, display.mode = 'normal')
 ```
+
+running via docker
+
+```
+ docker run -it -p 8787:8787 cpanse/rawdiag R -e "library(shiny); \
+   rawDiag_shiny <- system.file('shiny', 'demo', package = 'rawDiag'); \
+   shiny::runApp(rawDiag_shiny, display.mode = 'normal', port=8787, host='0.0.0.0')"
+```
+
+connect with your web browser to http://yourdockerhostname:8787
+
 ## 4. Instructions for use
 
 read the vignettes.
