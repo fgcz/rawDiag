@@ -4,9 +4,10 @@
 \alias{read.raw}
 \title{mass spec reader function}
 \usage{
-read.raw(file, mono = FALSE, exe = file.path(path.package(package =
-  "rawDiag"), "exec/fgcz_raw.exe"), mono_path = "", rawDiag = TRUE,
-  argv = "qc", method = "thermo", ssh = FALSE)
+read.raw(file, mono = if (Sys.info()["sysname"] \%in\% c("Darwin", "Linux"))
+  TRUE else FALSE, exe = file.path(path.package(package = "rawDiag"),
+  "exec/fgcz_raw.exe"), mono_path = "", rawDiag = TRUE, argv = "qc",
+  method = "thermo", ssh = FALSE)
 }
 \arguments{
 \item{file}{the name of the Thermo Fisher Scietific raw file which the data

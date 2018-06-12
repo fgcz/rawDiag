@@ -281,7 +281,7 @@ read.tdf <- function(filename){
 #'
 #' @examples
 #' read.raw
-read.raw <- function(file, mono = FALSE, 
+read.raw <- function(file, mono = if(Sys.info()['sysname'] %in% c("Darwin", "Linux")) TRUE else FALSE, 
                      exe = file.path(path.package(package = "rawDiag"),
                                      "exec/fgcz_raw.exe"),  
                      mono_path = "",

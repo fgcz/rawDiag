@@ -148,7 +148,7 @@ can be seen in the following code snippet:
 
 <<eval = TRUE>>=
 raw <- file.path(path.package(package = "rawDiag"), "extdata", 'sample.raw')
-system.time(RAW <- read.raw(file = raw, mono = TRUE))
+system.time(RAW <- read.raw(file = raw))
 summary.rawDiag(RAW)
 length(RAW$scanNumber)
 @
