@@ -1373,7 +1373,8 @@ PlotMassHeatmap <- function(x, method='trellis', bins = 80){ #rename to mass.hea
   theme(legend.position = "top") +
     theme(title = element_text(size = 24)) +
     theme(axis.title = element_text(size = 14)) +
-    theme(legend.text = element_text(size = 10))
+    theme(legend.text = element_text(size = 8)) +
+    theme(legend.title = element_text(size = 10, face = "bold"))
   
   gp
   
@@ -1410,7 +1411,11 @@ PlotMassHeatmap <- function(x, method='trellis', bins = 80){ #rename to mass.hea
     labs(x = "number of used processes", y = "processing frequency [Hz]", 
          subtitle='IO throughput') +
     theme_light() +
-    theme(legend.position = "top")
+    theme(legend.position = "top") +
+    theme(title = element_text(size = 24)) +
+    theme(axis.title = element_text(size = 14)) +
+    theme(legend.text = element_text(size = 8)) +
+    theme(legend.title = element_text(size = 10, face = "bold"))
   
   gp
   
