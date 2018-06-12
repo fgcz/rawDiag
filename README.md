@@ -17,8 +17,8 @@ Due to license reason, we currently not allowed to distribute Thermo Fisher Scie
 The *New RawFileReader from Thermo Fisher Scientific* (see http://planetorbitrap.com/rawfilereader)
 has to be separately downloaded and installed in order to be able to use the R function `read.raw`.
 
-#### on Linux 
-(Debian) system run the following code snippet once you have downloaded the libraries:
+on Linux 
+(Debian) system run the following code snippet once you have downloaded the libraries (expect ThermoRawFileReader_linux.4.0.22.nupkg in /tmp):
 ```{sh}
 apt-get update \
   && apt-get install mono-complete vim less unzip r-base -y \
@@ -29,15 +29,9 @@ apt-get update \
   && gacutil -i lib/ThermoFisher.CommonCore.RawFileReader.dll \
   && echo $?
 ```
-#### on Apple
-
-```{sh}
-#
-```
-
 
 ### 1.3 [Open File Standards](http://www.psidev.info/)
-support through Bioconductor [mzR](http://bioconductor.org/packages/mzR/). 
+support through the Bioconductor [mzR](http://bioconductor.org/packages/mzR/) package. 
 
 ## 2. Installation guide
 
@@ -45,13 +39,15 @@ please note: due to the data size (>=40MB) download can take a while
 ```{r}
 # install.packages("devtools")
 library("devtools")
-devtools::install_github("fgcz/rawDiag", build_vignettes = TRUE)
+devtools::install_github("fgcz/rawDiag", build_vignettes = FALSE)
 ```
+
+or request a source package from the authors.
 
 ## 3. Demonstration
 
-
 ### 3.1 R commandline code snippet
+
 "Hello; World!" example on the R command line
 
 ```{r}
