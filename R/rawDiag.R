@@ -490,7 +490,7 @@ ScanFrequMovingOver <- function(x){
 #' @import ggplot2
 #' @importFrom ggplot2 facet_wrap geom_violin scale_y_continuous facet_grid aes_string theme_light geom_line stat_summary
 #' @export PlotTicBasepeak
-PlotTicBasepeak <- function(x, method='trellis'){
+PlotTicBasepeak <- function(x, method = 'trellis'){
   if (method == 'trellis'){
     df <- x %>% 
       dplyr::filter_at(vars("MSOrder"), any_vars( . == "Ms")) %>% 
@@ -500,7 +500,7 @@ PlotTicBasepeak <- function(x, method='trellis'){
     
     df$Type <- factor(df$Type, levels = c("TIC", "Base_Peak"))
     
-    figure <- ggplot(df,aes_string(x= "StartTime", y = "Intensity")) +
+    figure <- ggplot(df,aes_string(x = "StartTime", y = "Intensity")) +
       geom_line(size = 0.3) +
       facet_wrap(filename ~ Type, scales = "free", ncol = 2) +
       labs(title = "TIC and Base-Peak plot") +
@@ -509,10 +509,9 @@ PlotTicBasepeak <- function(x, method='trellis'){
       scale_x_continuous(breaks = scales::pretty_breaks(10)) +
       scale_y_continuous(breaks = scales::pretty_breaks(8)) +
       theme_light() 
-    
     return(figure)
-  }else if(method =='violine'){
     
+  }else if(method =='violin'){
     df <- x %>% 
       dplyr::filter_at(vars("MSOrder"), any_vars( . == "Ms")) %>% 
       dplyr::select_at(vars("StartTime", "TIC", "BasePeakIntensity", "filename")) %>% 
@@ -521,15 +520,15 @@ PlotTicBasepeak <- function(x, method='trellis'){
     df$Type <- factor(df$Type, levels = c("TIC", "Base_Peak"))
     
     figure <- ggplot(df, aes_string(x = "filename", y = "Intensity")) + 
-      geom_violin()  +
-      facet_grid(Type~., scales = "free")+
+      geom_violin() +
+      facet_grid(Type~., scales = "free") +
       stat_summary(fun.y = mean , geom = "point", colour = "red") +
       scale_y_continuous(breaks = scales::pretty_breaks(8)) +
       theme_light() +
       theme(axis.text.x = element_text(angle = 90))
     return(figure)
-  }else if (method  == 'overlay'){
     
+  }else if (method  == 'overlay'){
     df <- x %>% 
       dplyr::filter_at(vars("MSOrder"), any_vars( . == "Ms")) %>% 
       dplyr::select_at(vars("StartTime", "TIC", "BasePeakIntensity", "filename")) %>% 
@@ -543,11 +542,9 @@ PlotTicBasepeak <- function(x, method='trellis'){
       theme_light() +
       theme(legend.position="top")
     return(figure)
-  }else{
-    NULL
-  }
+    
+  }else{NULL}
 }
-
 
 #' cycle time
 #' 
@@ -558,7 +555,7 @@ PlotTicBasepeak <- function(x, method='trellis'){
 #' @aliases cycle.time.violin cycle.time.overlay
 #' @export PlotCycleTime
 #' @import dplyr
-PlotCycleTime <- function(x, method='trellis'){
+PlotCycleTime <- function(x, method = 'trellis'){
   if (method == 'trellis'){
     df <- calc.cycle.time(x = x)
     
@@ -573,6 +570,7 @@ PlotCycleTime <- function(x, method='trellis'){
       theme_light() + 
       facet_grid(filename~., scales = "free")
     return(figure)
+    
   }else if (method == 'violin'){
     df <- calc.cycle.time(x=x)
     dots <- df %>%
@@ -588,6 +586,7 @@ PlotCycleTime <- function(x, method='trellis'){
       theme(axis.text.x=element_blank(), legend.position = "top")
     # theme(axis.text.x = element_text(angle = 90))
     return(figure)
+    
   } else if(method == 'overlay'){
     df <- calc.cycle.time(x=x)
     
@@ -598,7 +597,9 @@ PlotCycleTime <- function(x, method='trellis'){
       theme_light() +
       theme(legend.position="top")
     return(figure)
-  }else{NULL}}
+    
+  }else{NULL}
+}
 
 #' mz distribution
 #'
@@ -1366,9 +1367,13 @@ PlotMassHeatmap <- function(x, method='trellis', bins = 80){ #rename to mass.hea
   coord_trans( y = "log10") +
   scale_colour_manual(values = c("cornflowerblue", "magenta")) + 
   scale_y_continuous(breaks = c(90, 120, 180, 240, 480, 600, 900, 1800, 3600, 5400)) +
-  labs(x = "number of used processes", y = "overall  time [in seconds] of read.raw",
+  labs(x = "number of used processes", y = "overall runtime [sec]",
         subtitle='overall runtime') +
-  theme_light()
+  theme_light() +
+  theme(legend.position = "top") +
+    theme(title = element_text(size = 24)) +
+    theme(axis.title = element_text(size = 14)) +
+    theme(legend.text = element_text(size = 10))
   
   gp
   
@@ -1402,9 +1407,10 @@ PlotMassHeatmap <- function(x, method='trellis', bins = 80){ #rename to mass.hea
     coord_trans( y = "log10") +
     scale_colour_manual(values = c("cornflowerblue", "magenta")) + 
     scale_y_continuous(breaks = c(500, 1000, 2000, 4000, 8000, 16000, 32000, 64000)) +
-    labs(x = "number of used processes", y = "IO throughput  [number of scan info / s]", 
+    labs(x = "number of used processes", y = "processing frequency [Hz]", 
          subtitle='IO throughput') +
-    theme_light() 
+    theme_light() +
+    theme(legend.position = "top")
   
   gp
   
