@@ -89,7 +89,8 @@ shinyServer(function(input, output, session) {
     message(file.path(values$filesystemRoot, input$root))
     
     f <- list.files(file.path("/scratch/cpanse/",input$root))
-    f[grep("raw$", f)]
+    f[grep("raw$", f) & file.exists(f)]
+    
   })
   
   
@@ -99,10 +100,8 @@ shinyServer(function(input, output, session) {
 # ----Source----  
   output$sourceFilesystem <- renderUI({
     if (input$source == 'filesystem'){
-   
-      
       tagList(
-        selectInput('root', 'root:', values$filesystemDataDir, multiple = FALSE),
+        selectInput('root', 'root:', values$filesystemDataDir,  multiple = FALSE),
         htmlOutput('rawfile')
         )
     } 
@@ -168,6 +167,7 @@ shinyServer(function(input, output, session) {
     on.exit(progress$close())
     
     if (input$source == 'filesystem'){
+     
       rf <- file.path(values$filesystemRoot, file.path(input$root, input$rawfile))
       
       rv <- plyr::rbind.fill(mclapply(rf,

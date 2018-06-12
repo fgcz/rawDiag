@@ -280,7 +280,11 @@ read.tdf <- function(filename){
 #' @export read.raw
 #'
 #' @examples
-#' read.raw
+#' rawfile <- file.path(path.package(package = "rawDiag"),
+#'   "extdata", 'sample.raw')
+#' system.time(RAW <- read.raw(file = rawfile))
+#' summary.rawDiag(RAW)
+#' 
 read.raw <- function(file, mono = if(Sys.info()['sysname'] %in% c("Darwin", "Linux")) TRUE else FALSE, 
                      exe = file.path(path.package(package = "rawDiag"),
                                      "exec/fgcz_raw.exe"),  

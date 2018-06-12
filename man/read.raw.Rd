@@ -47,7 +47,10 @@ this function is a generic adapter function for
   \code{MONO_PATH} enviroment.
 }
 \examples{
-read.raw
+rawfile <- file.path(path.package(package = "rawDiag"),
+  "extdata", 'sample.raw')
+system.time(RAW <- read.raw(file = rawfile))
+summary.rawDiag(RAW)
 }
 \references{
 \itemize{

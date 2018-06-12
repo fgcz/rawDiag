@@ -138,7 +138,7 @@ names(WU163763)
 
 \subsection{Using The New RawFileReader}
 
-The function \code{read.raw} uses the .Net assembly \citep{RawFileReader} based executable to directly extract the information out of the mass spectrometric meassurement file. The \proclang{C#}
+The function \code{read.raw} uses the .Net assembly \citep{RawFileReader} based executable to directly extract the information out of the mass spectrometric meassurement file. The \proglang{C\#}
 source code as well as the compiler and linker options for a linux build is provided as a docker recipe (see \texttt{inst/docker/Dockerfile}. We use R for the implementation and read the data using the pipe command
 
 The following code snippet demonstrates the use of the \code{read.raw} function to extract data from an example raw file:
@@ -262,7 +262,7 @@ In order to check if the instrument is still abel to collect an appropriate amou
 
 \section{Benchmark}
 \label{section:bench}
-As described in \citet{trachselJPR} we performed a benchmark on different plattforms using a larger data set and the following code snippet.
+As described in \citet{TrachselJPR} we performed a benchmark on different plattforms using a larger data set and the following code snippet.
 <<eval = FALSE>>= 
 library(parallel)
 
@@ -292,7 +292,7 @@ rawDiag:::.technote_benchmark_figure_1()
 rawDiag:::.technote_benchmark_figure_2()
 @
 
-\begin{figure}[H]
+\begin{figure}
 \centering
 \includegraphics[width=0.49\columnwidth]{primer-benchmark-time}
 \includegraphics[width=0.49\columnwidth]{primer-benchmark-throuput}
