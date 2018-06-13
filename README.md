@@ -44,12 +44,23 @@ Register the .Net assembly in your system similar to a Linux installation
 
 **or** 
 
-After installing the rawDiag package put the .Net assemblies (dll files) into the same directory as the fgcz_raw.exe which can be found in the exec folder of the rawDiag package.
+After installing the rawDiag package put the .Net assemblies (dll files) into the same directory as the `fgcz_raw.exe` which can be found in the exec folder of the rawDiag package.
 
+### 1.3 Versions the software has been tested on
 
+|plattform|plattform version|R version|
+| :------- |---------------:| -------:|
+|Linux     | Debian 9 | 3.5.0 |
+|[dockerhub](https://hub.docker.com/r/cpanse/rawdiag) | bioconductor/devel_proteomics2| NA |
+|Windows   | 7 | 3.4.1 |
+|Windows   | 10 | 3.5.0 |
+|Windows   |  | |
+|MacOSX    | 10.13.5 (17F77)|3.4.2|
+|MacOSX    | 10.11.6 (15G20015)|3.4.3 |
 
 ## 2. Installation guide
 
+### 2.1. Instructions
 To ensure the proper function of this R package please check if all the requirements are fullfilled prior to using it.
 
 #### all OS
@@ -64,6 +75,11 @@ devtools::install_github("fgcz/rawDiag", build_vignettes = FALSE)
 ```
 
 **if your installation does not work with the above mentioned instructions, you can request a source package from the authors**.
+
+### 2.2. Typical install time on a "normal" desktop computer
+
+* requirements: 1 to 30 minutes; one minute if you are a C# and R developer
+* the rawDiag package through github: 10 minutes 
 
 ## 3. Demonstration
 

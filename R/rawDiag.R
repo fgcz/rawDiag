@@ -286,8 +286,7 @@ read.tdf <- function(filename){
 #' summary.rawDiag(RAW)
 #' 
 read.raw <- function(file, mono = if(Sys.info()['sysname'] %in% c("Darwin", "Linux")) TRUE else FALSE, 
-                     exe = file.path(path.package(package = "rawDiag"),
-                                     "exec/fgcz_raw.exe"),  
+                     exe = file.path(path.package(package = "rawDiag"), "exec", "fgcz_raw.exe"),  
                      mono_path = "",
                      rawDiag = TRUE,
                      argv = "qc",
@@ -302,6 +301,9 @@ read.raw <- function(file, mono = if(Sys.info()['sysname'] %in% c("Darwin", "Lin
     return(.read.thermo.raw.ssh(file))
   }
   else if (method == "thermo"){
+
+    stopifnot(file.exists(exe))
+
     # message(paste("start", Sys.time(), sep = ":"))
     cmd <- paste(exe, file, argv)
     
