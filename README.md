@@ -46,7 +46,13 @@ Register the .Net assembly in your system similar to a Linux installation
 
 After installing the rawDiag package put the .Net assemblies (dll files) into the same directory as the fgcz_raw.exe which can be found in the exec folder of the rawDiag package.
 
+### 1.3 Versions the software has been tested on
 
+|plattform|version|
+| :------- |-----:|
+|Linux | Debian 9 |
+|Windows | |
+|MacOSX| 10.13.5 (17F77)|
 
 ## 2. Installation guide
 
