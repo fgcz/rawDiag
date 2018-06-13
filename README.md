@@ -86,7 +86,7 @@ rawDiag_shiny <- system.file('shiny', 'demo', package = 'rawDiag')
 shiny::runApp(rawDiag_shiny, display.mode = 'normal')
 ```
 
-### 3.3 An interactive shiny example running on  your docker enviroment
+### 3.3 An interactive shiny example running on your docker enviroment
 
 source: [dockerhub](https://hub.docker.com/r/cpanse/rawdiag/)
 
