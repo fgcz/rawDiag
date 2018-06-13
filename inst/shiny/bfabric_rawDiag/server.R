@@ -49,7 +49,8 @@ shinyServer(function(input, output, session) {
                            RDataData = c("WU163763"))
   
 
-  
+  # $filesystemDataDir)
+  # values$filesystemDataDir <- values$filesystemDataDir[dir.exists(F)]
   
   output$tabs <- renderUI({
   
