@@ -51,7 +51,7 @@ After installing the rawDiag package put the .Net assemblies (dll files) into th
 |plattform|plattform version|R version|
 | :------- |---------------:| -------:|
 |Linux     | Debian 9 | 3.5.0 |
-|[dockerhub](https://hub.docker.com/r/cpanse/rawdiag)] | bioconductor/devel_proteomics2| NA |
+|[dockerhub](https://hub.docker.com/r/cpanse/rawdiag) | bioconductor/devel_proteomics2| NA |
 |Windows   | 7 | 3.4.1 |
 |Windows   | 10 | 3.5.0 |
 |Windows   |  | |
