@@ -502,7 +502,7 @@ visualization styles is depicted in Figure~\ref{figure:viz}.
 
 
 \subsection{Use case -- Optimize data dependent analysis}
-\label{section:aplication} 
+\label{section:application} 
 Starting from an initial method template based on the work of Kelstrup et al.,\cite{pmid29183128} 
 we analyzed 1 $\mu$g of a commercial tryptic HeLa digest on a Q-Exactive HF-X 
 instrument using a classical shotgun heuristics. Subsequently, the 
@@ -632,24 +632,16 @@ Federal Institute of Technology Zurich and the University of Zurich for the
 support of our work.
 \end{acknowledgement}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% The same is true for Supporting Information, which should use the
-%% suppinfo environment.
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{suppinfo}
-
-The package vignette as well as the R package itself, a Dockerfile which build
-the entire architecture from scratch, is accessible through a git repository
-under the following URL: \url{https://github.com/fgcz/rawDiag}.
-
-The data used in section \ref{section:aplication} are available on the MassIVE
-\url{ftp://massive.ucsd.edu/MSV000082389/raw/rawDiag/raw/}, through the 
-lab information managment system bfabric~\cite{bfabric} \url{https://fgcz-bfabric.uzh.ch} Sample ID 174020, or 
+The package vignette as well as the R package itself, a Dockerfile which build the entire architecture from scratch is accessible through a git repository under the following URL: \url{https://github.com/fgcz/rawDiag}.
+An automatic build of the provided docker recipe is visible through \url{https://hub.docker.com/r/cpanse/rawdiag/}.
+The data used in section \ref{section:application} are available on the MassIVE
+\url{ftp://massive.ucsd.edu/MSV000082389/raw/rawDiag/raw/}, through the
+lab information managment system bfabric~\cite{bfabric} \url{https://fgcz-bfabric.uzh.ch} Sample ID 174020, or
 as data set of the package as \texttt{WU163763}.
 
 A demo system including all data shown in this manuscript is available through
 \url{http://fgcz-ms-shiny.uzh.ch:8080/rawDiag-demo/}.
-
 \end{suppinfo}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
