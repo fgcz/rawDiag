@@ -332,6 +332,7 @@ plots illustrate that both systems, server, and laptop, can analyze
 \label{figure:benchmark}
 \end{figure}
 
+\newpage
 \section{Session information}
 An overview of the package versions used to produce this document are shown
 below.
@@ -341,7 +342,7 @@ below.
 toLatex(sessionInfo())
 @
 
-
+\newpage
 \bibliography{rawDiag}
 
 
