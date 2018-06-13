@@ -7,14 +7,15 @@ an R package supporting rational LC-MS method optimization for bottom-up proteom
 ## 1. System Requirements  
 for Windows/Linux/MacOSX platforms
 
-- https://www.mono-project.com/ (>4.0.22)
 
-### 1.1 The R System
+### 1.1. R and mono
 
+- https://www.mono-project.com/ (>4.0.22) for (Linux and MacOSX)
 - R (>3.4.0)
 - install https://CRAN.R-project.org/package=devtools
+- if you want support for [Open File Standards](http://www.psidev.info/) install [mzR](http://bioconductor.org/packages/mzR/) package. 
 
-### 1.2 The New Raw File Reader for Thermo Fisher Scientific Instruments
+### 1.2. The New RawFileReader .Net assembly from Thermo Fisher Scientific
 
 Due to licensing reasons, we currently not allowed to distribute Thermo Fisher Scientific software with the *rawDiag* package (we hope that this will change soon).
 The *New RawFileReader from Thermo Fisher Scientific* (see http://planetorbitrap.com/rawfilereader)
@@ -34,8 +35,7 @@ apt-get update \
 ```
 the global assembly cache utility registers the libraries in your mono system.
 
-### 1.3 [Open File Standards](http://www.psidev.info/)
-support through the Bioconductor [mzR](http://bioconductor.org/packages/mzR/) package. 
+
 
 ## 2. Installation guide
 
