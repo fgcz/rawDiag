@@ -102,6 +102,6 @@ Christian Trachsel, Christian Panse, Tobias Kockmann, Witold Eryk Wolski, Jonas 
 bioRxiv 304485; doi: https://doi.org/10.1101/304485
 (manuscript submitted to Journal of Proteome Research; **pr-2018-001736**).
 
-- ftp://massive.ucsd.edu/MSV000082389/raw/rawDiag/raw/
+- [MassIVE MSV000082389](https://massive.ucsd.edu/ProteoSAFe/dataset.jsp?task=b231e78d674345798ebe50e46a9a3a93)
 
 - [ASMS 2018 poster as PDF(1.8M, md5=dab9388c1a465d931e9d2345119a2827)](http://fgcz-ms.uzh.ch/~cpanse/ASMS2018_ID291250.pdf)
