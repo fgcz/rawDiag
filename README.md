@@ -50,11 +50,11 @@ After installing the rawDiag package put the .Net assemblies (dll files) into th
 
 ## 2. Installation guide
 
-Please make sure you fullfill all above mentioned requirements for your operation system prior to installing the R package!
+To ensure the proper function of this R package please check if all the requirements are fullfilled prior to using it.
 
 #### all OS
 
-the following code downloads and installs the R package from the Github with out the required third party .dll files:
+the following code downloads and installs the R package from the Github without the required third party .dll files:
 
 please note: due to the data size (>=40MB) download can take a while
 ```{r}
