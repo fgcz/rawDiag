@@ -40,7 +40,7 @@ the global assembly cache utility registers the libraries in your mono system.
 
 #### on MacOSX
 
-register the .Net assemblies (dll files) or put them into the same directory as the fgcz_raw.exe.
+put the .Net assemblies (dll files) into the same directory as the fgcz_raw.exe which can be found in the exec folder of the rawDiag package.
 
 
 
