@@ -625,6 +625,8 @@ The authors thank Jim Shofstahl for his support regarding the
 {\em New Thermo Fisher RawFileReader} library.
 We thank Sven Brehmer from Bruker Daltonics for the discussions of timsTOF file
 format. We thank Lilly van de Venn for the package sticker design.
+Two anonymous reviewers and editor Susan T. Weintraub have made numerous suggestions
+and recommendations leading to a much improved presentation of the work.
 We thank our colleagues at the Functional Genomics Center Zurich, the Swiss
 Federal Institute of Technology Zurich and the University of Zurich for the
 support of our work.

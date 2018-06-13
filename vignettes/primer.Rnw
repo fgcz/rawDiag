@@ -76,11 +76,13 @@ package calls a \proglang{C\#} executable that generates the required
 \code{data.frame} on the fly directly from a
 raw file using the {\em New RawFileReader} .Net assembly \citep{RawFileReader}.
 However, any other mass spectrometry data format is also supported via the open 
-standards using the R package \pkg{mzR} \citep{mzR} which requires
-a conversion of the data prior to loading. 
+standards using the R package \pkg{mzR} \citep{mzR}. This requires
+a conversion of the data prior to loading into the R session with the addapter function 
+\code{as.rawDiag.mzR}. Examples for reading data is explained in section~\ref{section:read} of this
+vignette.
 A number of R helper functions reshape and subset the data and pass the desired
 data-frames to \pkg{ggplot2} \citep{Hadley2009} for visualization. 
-Trellis plots help to compare result
+Different kinds of visualizations (Trellis-like, violin plots, overlay plots) help to compare result
 between different runs. Plots can be inspected interactively running the
 software as an R shiny instance. Additionally, pdf reports can be generated
 using a customizable \pkg{rmarkdown} file.
@@ -89,12 +91,10 @@ Processing speed of the software on modern laptop infrastructure is sufficient
 to provide the user with
 results a few minutes after the mass spectrometry data was acquired (a single
 file containing $\approx 80'000$ individual
-spectra is processed in less than 50 sec). 
-For the analysis of larger data sets, 
-computing on a server deployed installation is recommended.
+spectra is processed in less than 50 sec on a todays MacBook). A large scale performance Benchmark can be found in section~\ref{section:bench}.
 
 All necessary steps can be done with the R command line or by using the shiny
-application on any modern computer.
+application.
  
 The diagnostic visualization are peptide ID free and rely on data logged by the 
 instrument directly in the raw data file. This makes the software slim and fast
@@ -103,16 +103,10 @@ pipeline.
 
 \section{Getting started} 
 
-look into for documentation
+help can be found by checking the documentation
 
 <<eval=FALSE>>=
 help(package="rawDiag")
-@
-
-browse the package's vignette files
-
-<<eval=FALSE>>=
-browseVignettes('rawDiag')
 @
 
 attach the package
@@ -121,6 +115,7 @@ library(rawDiag)
 @
 
 \section{Getting the Data}
+\label{section:read}
 
 \subsection{Utility Functions}
 
@@ -143,17 +138,25 @@ names(WU163763)
 
 \subsection{Using The New RawFileReader}
 
-The function \code{read.raw} uses the \citep{RawFileReader} to 
-extract the following information out of the mass spectrometric meassurement.
+The function \code{read.raw} uses the .Net assembly \citep{RawFileReader} based executable to directly extract the information out of the mass spectrometric meassurement file. The \proglang{C\#}
+source code as well as the compiler and linker options for a linux build is provided as a docker recipe (see \texttt{inst/docker/Dockerfile}. We use R for the implementation and read the data using the pipe command
 
+The following code snippet demonstrates the use of the \code{read.raw} function to extract data from an example raw file:
 
-We use R for the implementation and read the data using the pipe command as it
-can be seen in the following code snippet:
+<<eval = TRUE>>=
+rawfile <- file.path(path.package(package = "rawDiag"),
+                     "extdata", 'sample.raw')
+system.time(RAW <- read.raw(file = rawfile))
+summary.rawDiag(RAW)
+@
+
+Additional information can be found using the R man pages. 
 
 <<eval = FALSE>>=
-raw <- file.path(path.package(package = "rawDiag"), "extdata", 'sample.raw')
-system.time(RAW <- read.raw(file = raw))
+?read.raw
 @
+
+
 
 \subsection{Reading the Open Proteomics Standard Files}
 
@@ -258,15 +261,9 @@ In order to check if the instrument is still abel to collect an appropriate amou
 
 
 \section{Benchmark}
-
-We performed a benchmark using the following command on a  
-Intel(R) Xeon(R) CPU E5-2698 v3 @ 2.30GHz system having
-64 processors and running Debian 8.
-We read 517533 scans information from eight raw files using the adapter
-function \code{read.raw}.
-
+\label{section:bench}
+As described in \citet{TrachselJPR} we performed a benchmark on different plattforms using a larger data set and the following code snippet.
 <<eval = FALSE>>= 
-#R
 library(parallel)
 
 f <- list.files()
@@ -285,20 +282,18 @@ b.Linux <- b
 save(b.Linux, file='benchmark.RData')
 @
   
-Here, five times a set
-of eight raw files were read into the R environment 
-using between one singe and eight CPUs in parallel.
 
-The boxplot below displays the result.
-
-<<label=benchmark-time, eval = TRUE, fig = TRUE, width = 4, height =4, echo = FALSE, include = FALSE>>=
+The used data are shipped with the \pkg{rawDiag} package (also availabel through proteomeXchange PXD006932) and the performance metrics
+are visulized in Figures~\ref{figure:benchmark}.
+<<label=benchmark-time, eval = TRUE, fig = TRUE, width = 6, height =5, echo = FALSE, include = FALSE>>=
 rawDiag:::.technote_benchmark_figure_1() 
 @
-<<label=benchmark-throuput, eval = TRUE, fig = TRUE, width = 4, height = 4, echo = FALSE, include = FALSE>>=
+<<label=benchmark-throuput, eval = TRUE, fig = TRUE, width = 6, height = 5, echo = FALSE, include = FALSE>>=
 rawDiag:::.technote_benchmark_figure_2()
 @
 
 \begin{figure}
+\centering
 \includegraphics[width=0.49\columnwidth]{primer-benchmark-time}
 \includegraphics[width=0.49\columnwidth]{primer-benchmark-throuput}
 

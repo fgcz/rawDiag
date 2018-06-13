@@ -91,19 +91,22 @@ shinyServer(function(input, output, session) {
     
     f <- list.files(file.path("/scratch/cpanse/",input$root))
     f[grep("raw$", f)]
+    
   })
   
   
   output$rawfile <- renderUI({
+    if(length(getRawfiles()) > 0){
     selectInput('rawfile', 'rawfile:', getRawfiles(), multiple = TRUE)
+    }else{
+      helpText("no files available")
+    }
   })
 # ----Source----  
   output$sourceFilesystem <- renderUI({
     if (input$source == 'filesystem'){
-   
-      
       tagList(
-        selectInput('root', 'root:', values$filesystemDataDir, multiple = FALSE),
+        selectInput('root', 'root:', values$filesystemDataDir,  multiple = FALSE),
         htmlOutput('rawfile')
         )
     } 
@@ -119,8 +122,10 @@ shinyServer(function(input, output, session) {
       if (require("bfabricShiny")){
        bfabricInput("bfabric8")
       }
-    }else{
+    }else if(input$source == 'package'){
         actionButton("load", "load")
+    }else if(input$source == 'filesystem' & length(getRawfiles()) > 0){
+      actionButton("load", "load")
     }
   })
   
@@ -169,6 +174,7 @@ shinyServer(function(input, output, session) {
     on.exit(progress$close())
     
     if (input$source == 'filesystem'){
+     
       rf <- file.path(values$filesystemRoot, file.path(input$root, input$rawfile))
       
       rv <- plyr::rbind.fill(mclapply(rf,
@@ -245,6 +251,7 @@ shinyServer(function(input, output, session) {
     if (nrow(rawData()) > 0){
       
       values$gp <- PlotScanTime(rawData(), method = input$plottype)
+      values$gp
     }
   })
   
