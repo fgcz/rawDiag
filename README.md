@@ -44,14 +44,14 @@ Register the .Net assembly in your system similar to a Linux installation
 
 **or** 
 
-After installing the rawDiag package put the .Net assemblies (dll files) into the same directory as the fgcz_raw.exe which can be found in the exec folder of the rawDiag package.
+After installing the rawDiag package put the .Net assemblies (dll files) into the same directory as the `fgcz_raw.exe` which can be found in the exec folder of the rawDiag package.
 
 ### 1.3 Versions the software has been tested on
 
 |plattform|plattform version|R version|
 | :------- |---------------:| -------:|
 |Linux     | Debian 9 | 3.5.0 |
-| (dockerhub)[https://hub.docker.com/r/cpanse/rawdiag/] | bioconductor/devel_proteomics2| NA |
+|[dockerhub](https://hub.docker.com/r/cpanse/rawdiag)] | bioconductor/devel_proteomics2| NA |
 |Windows   | 7 | 3.4.1 |
 |Windows   | 10 | 3.5.0 |
 |Windows   |  | |
