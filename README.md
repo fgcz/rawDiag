@@ -19,7 +19,7 @@ for Windows/Linux/MacOSX platforms with a 64 Bit architecture
 
 Due to licensing reasons, we currently not allowed to distribute Thermo Fisher Scientific software with the *rawDiag* package (we hope that this will change soon).
 The *New RawFileReader from Thermo Fisher Scientific* (see http://planetorbitrap.com/rawfilereader)
-has to be separately downloaded and installed in order to be able to use the R function `read.raw`.
+has to be downloaded and installed separately in order to be able to directly read Thermo raw-files (e.g. use the R function `read.raw`).
 
 #### on Windows
 follow the installation instructions provided by Thermo Fisher Scientific
