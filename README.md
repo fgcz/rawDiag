@@ -55,8 +55,8 @@ After installing the rawDiag package put the .Net assemblies (dll files) into th
 |Windows   | 7 | 3.4.1 |
 |Windows   | 10 | 3.5.0 |
 |Windows   |  | |
-|MacOSX    | 10.13.5 (17F77)|
-|MacOSX    | 10.11.6 |3.4.3 |
+|MacOSX    | 10.13.5 (17F77)|3.4.2|
+|MacOSX    | 10.11.6 (15G20015)|3.4.3 |
 
 ## 2. Installation guide
 
