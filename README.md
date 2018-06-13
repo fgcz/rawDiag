@@ -5,7 +5,7 @@ an R package supporting rational LC-MS method optimization for bottom-up proteom
 "Its raw, fast and colorful!" [(WEW)](https://github.com/wolski)
 
 ## 1. System Requirements  
-for Windows/Linux/MacOSX platforms
+for Windows/Linux/MacOSX platforms with a 64 Bit architecture
 
 
 ### 1.1. R and mono
@@ -21,7 +21,10 @@ Due to licensing reasons, we currently not allowed to distribute Thermo Fisher S
 The *New RawFileReader from Thermo Fisher Scientific* (see http://planetorbitrap.com/rawfilereader)
 has to be separately downloaded and installed in order to be able to use the R function `read.raw`.
 
-on Linux 
+#### on Windows
+follow the installation instructions provided by Thermo Fisher Scientific
+
+#### on Linux 
 (Debian) system run the following code snippet once you have downloaded the libraries (expect ThermoRawFileReader_linux.4.0.22.nupkg in /tmp):
 ```{sh}
 apt-get update \
@@ -35,9 +38,19 @@ apt-get update \
 ```
 the global assembly cache utility registers the libraries in your mono system.
 
+#### on MacOSX
+
+register the .Net assemblies (dll files) or put them into the same directory as the fgcz_raw.exe.
+
 
 
 ## 2. Installation guide
+
+Please make sure you fullfill all above mentioned requirements for your operation system prior to installing the R package!
+
+#### all OS
+
+the following code downloads and installs the R package from the Github with out the required third party .dll files:
 
 please note: due to the data size (>=40MB) download can take a while
 ```{r}
@@ -46,7 +59,7 @@ library("devtools")
 devtools::install_github("fgcz/rawDiag", build_vignettes = FALSE)
 ```
 
-**or request a source package from the authors**.
+**if your installation does not work with the above mentioned instructions, you can request a source package from the authors**.
 
 ## 3. Demonstration
 
