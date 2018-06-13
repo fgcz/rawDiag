@@ -57,6 +57,7 @@ After installing the rawDiag package put the .Net assemblies (dll files) into th
 
 ## 2. Installation guide
 
+### 2.1. Instructions
 To ensure the proper function of this R package please check if all the requirements are fullfilled prior to using it.
 
 #### all OS
@@ -71,6 +72,11 @@ devtools::install_github("fgcz/rawDiag", build_vignettes = FALSE)
 ```
 
 **if your installation does not work with the above mentioned instructions, you can request a source package from the authors**.
+
+### 2.2. Typical install time on a "normal" desktop computer
+
+* requirements: 1 to 30 minutes; one minute if you are a C# and R developer
+* the rawDiag package through github: 10 minutes 
 
 ## 3. Demonstration
 
