@@ -5,19 +5,26 @@ an R package supporting rational LC-MS method optimization for bottom-up proteom
 "Its raw, fast and colorful!" [(WEW)](https://github.com/wolski)
 
 ## 1. System Requirements  
-for Windows/Linux/MacOSX platforms
+for Windows/Linux/MacOSX platforms with a 64 Bit architecture
 
-### 1.1 The R System
+
+### 1.1. R and mono
+
+- https://www.mono-project.com/ (>4.0.22) for (Linux and MacOSX)
 - R (>3.4.0)
 - install https://CRAN.R-project.org/package=devtools
+- if you want support for [Open File Standards](http://www.psidev.info/) install [mzR](http://bioconductor.org/packages/mzR/) package. 
 
-### 1.2 The New Raw File Reader for Thermo Fisher Scientific Instruments
+### 1.2. The New RawFileReader .Net assembly from Thermo Fisher Scientific
 
 Due to licensing reasons, we currently not allowed to distribute Thermo Fisher Scientific software with the *rawDiag* package (we hope that this will change soon).
 The *New RawFileReader from Thermo Fisher Scientific* (see http://planetorbitrap.com/rawfilereader)
-has to be separately downloaded and installed in order to be able to use the R function `read.raw`.
+has to be downloaded and installed separately in order to be able to directly read Thermo raw-files (e.g. use the R function `read.raw`).
 
-on Linux 
+#### on Windows
+follow the installation instructions provided by Thermo Fisher Scientific
+
+#### on Linux 
 (Debian) system run the following code snippet once you have downloaded the libraries (expect ThermoRawFileReader_linux.4.0.22.nupkg in /tmp):
 ```{sh}
 apt-get update \
@@ -31,10 +38,23 @@ apt-get update \
 ```
 the global assembly cache utility registers the libraries in your mono system.
 
-### 1.3 [Open File Standards](http://www.psidev.info/)
-support through the Bioconductor [mzR](http://bioconductor.org/packages/mzR/) package. 
+#### on MacOSX
+
+Register the .Net assembly in your system similar to a Linux installation
+
+**or** 
+
+After installing the rawDiag package put the .Net assemblies (dll files) into the same directory as the fgcz_raw.exe which can be found in the exec folder of the rawDiag package.
+
+
 
 ## 2. Installation guide
+
+To ensure the proper function of this R package please check if all the requirements are fullfilled prior to using it.
+
+#### all OS
+
+the following code downloads and installs the R package from the Github without the required third party .dll files:
 
 please note: due to the data size (>=40MB) download can take a while
 ```{r}
@@ -43,7 +63,7 @@ library("devtools")
 devtools::install_github("fgcz/rawDiag", build_vignettes = FALSE)
 ```
 
-or request a source package from the authors.
+**if your installation does not work with the above mentioned instructions, you can request a source package from the authors**.
 
 ## 3. Demonstration
 
@@ -70,7 +90,7 @@ rawDiag_shiny <- system.file('shiny', 'demo', package = 'rawDiag')
 shiny::runApp(rawDiag_shiny, display.mode = 'normal')
 ```
 
-### 3.3 An interactive shiny example running on  your docker enviroment
+### 3.3 An interactive shiny example running on your docker enviroment
 
 source: [dockerhub](https://hub.docker.com/r/cpanse/rawdiag/)
 
@@ -102,6 +122,6 @@ Christian Trachsel, Christian Panse, Tobias Kockmann, Witold Eryk Wolski, Jonas 
 bioRxiv 304485; doi: https://doi.org/10.1101/304485
 (manuscript submitted to Journal of Proteome Research; **pr-2018-001736**).
 
-- ftp://massive.ucsd.edu/MSV000082389/raw/rawDiag/raw/
+- [MassIVE MSV000082389](https://massive.ucsd.edu/ProteoSAFe/dataset.jsp?task=b231e78d674345798ebe50e46a9a3a93)
 
 - [ASMS 2018 poster as PDF(1.8M, md5=dab9388c1a465d931e9d2345119a2827)](http://fgcz-ms.uzh.ch/~cpanse/ASMS2018_ID291250.pdf)
