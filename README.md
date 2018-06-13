@@ -48,11 +48,12 @@ After installing the rawDiag package put the .Net assemblies (dll files) into th
 
 ### 1.3 Versions the software has been tested on
 
-|plattform|version|
-| :------- |-----:|
-|Linux | Debian 9 |
-|Windows | |
+|plattform|plattform version|R version|
+| :------- |---------------:| -------:|
+|Linux | Debian 9 | 3.5.0 |
+|Windows | | |
 |MacOSX| 10.13.5 (17F77)|
+|MacOSX| 10.11.6 |3.4.3 |
 
 ## 2. Installation guide
 
