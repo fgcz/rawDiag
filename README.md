@@ -50,10 +50,12 @@ After installing the rawDiag package put the .Net assemblies (dll files) into th
 
 |plattform|plattform version|R version|
 | :------- |---------------:| -------:|
-|Linux | Debian 9 | 3.5.0 |
-|Windows 7 | 3.4.2 |
-|MacOSX| 10.13.5 (17F77)|
-|MacOSX| 10.11.6 |3.4.3 |
+|Linux     | Debian 9 | 3.5.0 |
+|Windows   | 7 | 3.4.1 |
+|Windows   | 10 | 3.5.0 |
+|Windows   |  | |
+|MacOSX    | 10.13.5 (17F77)|
+|MacOSX    | 10.11.6 |3.4.3 |
 
 ## 2. Installation guide
 
