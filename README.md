@@ -7,7 +7,10 @@ an R package supporting rational LC-MS method optimization for bottom-up proteom
 ## 1. System Requirements  
 for Windows/Linux/MacOSX platforms
 
+- https://www.mono-project.com/ (>4.0.22)
+
 ### 1.1 The R System
+
 - R (>3.4.0)
 - install https://CRAN.R-project.org/package=devtools
 
