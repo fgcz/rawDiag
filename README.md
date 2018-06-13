@@ -46,7 +46,7 @@ library("devtools")
 devtools::install_github("fgcz/rawDiag", build_vignettes = FALSE)
 ```
 
-*or request a source package from the authors*.
+**or request a source package from the authors**.
 
 ## 3. Demonstration
 
