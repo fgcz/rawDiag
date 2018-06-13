@@ -250,6 +250,7 @@ shinyServer(function(input, output, session) {
     if (nrow(rawData()) > 0){
       
       values$gp <- PlotScanTime(rawData(), method = input$plottype)
+      values$gp
     }
   })
   
