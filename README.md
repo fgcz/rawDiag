@@ -44,7 +44,7 @@ Register the .Net assembly in your system similar to a Linux installation
 
 **or** 
 
-After installing the rawDiag package put the .Net assemblies (dll files) into the same directory as the `fgcz_raw.exe` which can be found in the exec folder of the rawDiag package.
+After installing the rawDiag package put the .Net assemblies (dll files) into the same directory as the `fgcz_raw.exe` which can be found in the exec folder of the rawDiag package. Should you unsure where the package has been placed during installation use the following R command to display your libary path:
 
 ```{r}
 > .libPaths()
