@@ -4,6 +4,10 @@ an R package supporting rational LC-MS method optimization for bottom-up proteom
 
 "Its raw, fast and colorful!" [(WEW)](https://github.com/wolski)
 
+
+**if your installation does not work with the below mentioned instructions, you can request a ready to run R package from the authors**.
+
+
 ## 1. System Requirements  
 for Windows/Linux/MacOSX platforms with a 64 Bit architecture
 
@@ -52,7 +56,6 @@ library("devtools")
 devtools::install_github("fgcz/rawDiag", build_vignettes = FALSE)
 ```
 
-**if your installation does not work with the above mentioned instructions, you can request a source package from the authors**.
 
 ### 2.2. Typical install time on a "normal" desktop computer
 
