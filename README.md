@@ -21,6 +21,8 @@ Due to licensing reasons, we currently not allowed to distribute Thermo Fisher S
 The *New RawFileReader from Thermo Fisher Scientific* (see http://planetorbitrap.com/rawfilereader)
 has to be downloaded and installed separately in order to be able to directly read Thermo raw-files (e.g. use the R function `read.raw`).
 
+To install *the New RawFileReader .Net assembly* follow the installation instructions provided by Thermo Fisher Scientific.
+
 
 ### 1.3 Versions the software has been tested on
 
