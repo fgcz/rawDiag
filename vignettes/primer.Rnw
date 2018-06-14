@@ -44,6 +44,7 @@ but for large datasets, a server infrastructure is beneficial.
 
 \begin{document}
 
+\SweaveOpts{width = 6, height = 5}
 <<echo = FALSE, eval = TRUE>>=
 options(prompt = "R> ", continue = "+  ", width = 70, useFancyQuotes = FALSE)
 library(tidyverse)
@@ -292,7 +293,7 @@ print(gp <- PlotInjectionTime(subset(df, MSOrder %in% "Ms2"),
 
 In order to check, if the instrument is able to collect an appropriate amount of ions for all MS2 scans, we can check the injetion time characteristics for the three runs. From figure~\ref{figure:IT} one can see that the injection time distribution is shiftet towards longer injection times, the more MS2 scans are available. This could could lead to issues with the spectra quality and can be checked by performing a data base search and compare the assignment rate for the three runs. If indeed an issue can be detected, this finding would then be the starting point for the next iteration cycle where we could modify the maximum injection time parameter in order to check if we can further optimize the method.
 
-
+\newpage
 \section{Benchmark}
 \label{section:bench}
 As described in \citet{TrachselJPR} we performed a benchmark on different plattforms using a larger data set and the following code snippet.
@@ -318,7 +319,7 @@ save(b.Linux, file='benchmark.RData')
 
 The used data are shipped with the \pkg{rawDiag} package (also availabel through proteomeXchange PXD006932) and the performance metrics
 are visulized in Figures~\ref{figure:benchmark}.
-<<label=benchmark-time, eval = TRUE, fig = TRUE, width = 6, height =5, echo = FALSE, include = FALSE>>=
+<<label=benchmark-time, eval = TRUE, fig = TRUE, width = 6, height = 5, echo = FALSE, include = FALSE>>=
 rawDiag:::.technote_benchmark_figure_1() 
 @
 <<label=benchmark-throuput, eval = TRUE, fig = TRUE, width = 6, height = 5, echo = FALSE, include = FALSE>>=
