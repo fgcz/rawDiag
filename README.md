@@ -5,7 +5,7 @@ an R package supporting rational LC-MS method optimization for bottom-up proteom
 "Its raw, fast and colorful!" [(WEW)](https://github.com/wolski)
 
 
-**If your installation does not work with the below-mentioned instructions, do not hesitate to request a ready to run R package from the authors via Email, subject "request rawDiag package."**.
+**If your installation does not work with the below-mentioned instructions, do not hesitate to request a ready to run R package from the authors via Email, subject "request rawDiag package."**
 
 
 ## 1. System Requirements  
