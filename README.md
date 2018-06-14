@@ -21,42 +21,6 @@ Due to licensing reasons, we currently not allowed to distribute Thermo Fisher S
 The *New RawFileReader from Thermo Fisher Scientific* (see http://planetorbitrap.com/rawfilereader)
 has to be downloaded and installed separately in order to be able to directly read Thermo raw-files (e.g. use the R function `read.raw`).
 
-#### on Windows
-follow the installation instructions provided by Thermo Fisher Scientific
-
-#### on Linux 
-(Debian) system run the following code snippet once you have downloaded the libraries (expect ThermoRawFileReader_linux.4.0.22.nupkg in /tmp):
-```{sh}
-apt-get update \
-  && apt-get install mono-complete vim less unzip r-base -y \
-  && cd /tmp/ \
-  && unzip /tmp/ThermoRawFileReader_linux.4.0.22.nupkg \
-  && gacutil -i lib/ThermoFisher.CommonCore.BackgroundSubtraction.dll \
-  && gacutil -i lib/ThermoFisher.CommonCore.Data.dll \
-  && gacutil -i lib/ThermoFisher.CommonCore.RawFileReader.dll \
-  && echo $?
-```
-the global assembly cache utility registers the libraries in your mono system.
-
-#### on MacOSX
-
-Register the .Net assembly in your system similar to a Linux installation
-
-**or** 
-
-After installing the rawDiag package put the .Net assemblies (dll files) into the same directory as the `fgcz_raw.exe` which can be found in the exec folder of the rawDiag package. Should you unsure where the package has been placed during installation use the following R command to display your libary path:
-
-```{r}
-> .libPaths()
-[1] "/Library/Frameworks/R.framework/Versions/3.3/Resources/library"
-```
-Knowing the R library path one can now list the execuables installed by RawDiag:
-
-```{sh}
-tobiasko@public-docking-hpx-1240:~ > ls /Library/Frameworks/R.framework/Versions/3.3/Resources/library/rawDiag/exec/
-fgcz_raw.Linux.exe	fgcz_raw.Windows.exe	fgcz_raw.exe
-```
-
 
 ### 1.3 Versions the software has been tested on
 
