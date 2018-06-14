@@ -2,11 +2,7 @@
 
 an R package supporting rational LC-MS method optimization for bottom-up proteomics on multiple OS platforms
 
-<hr>
 
-**If your installation does not work with the below-mentioned instructions, do not hesitate to request a ready to run R package from the authors via Email, subject `request rawDiag package`.**
-
-<hr>
 
 ## 1. System Requirements  
 for Windows/Linux/MacOSX platforms with a 64 Bit architecture
@@ -20,6 +16,9 @@ for Windows/Linux/MacOSX platforms with a 64 Bit architecture
 - if you want support for [Open File Standards](http://www.psidev.info/) install the [mzR](http://bioconductor.org/packages/mzR/) package. 
 
 ### 1.2. The New RawFileReader .Net assembly from Thermo Fisher Scientific
+
+**If your installation does not work with the below-mentioned instructions, do not hesitate to request a ready to run R package from the authors via Email, subject `request rawDiag package`.**
+
 
 Due to licensing reasons, we currently not allowed to distribute Thermo Fisher Scientific software with the *rawDiag* package (we hope that this will change soon).
 The *New RawFileReader from Thermo Fisher Scientific* (see http://planetorbitrap.com/rawfilereader)
