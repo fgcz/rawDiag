@@ -5,8 +5,9 @@
 \title{mass spec reader function}
 \usage{
 read.raw(file, mono = if (Sys.info()["sysname"] \%in\% c("Darwin", "Linux"))
-  TRUE else FALSE, exe = file.path(path.package(package = "rawDiag"),
-  "exec/fgcz_raw.exe"), mono_path = "", rawDiag = TRUE, argv = "qc",
+  TRUE else FALSE, exe = file.path(path.package(package = "rawDiag"), "exec",
+  "fgcz_raw.exe"), mono_path = "", rawDiag = TRUE, argv = "qc",
+  system2_call = if (Sys.info()["sysname"] == "Windows") TRUE else FALSE,
   method = "thermo", ssh = FALSE)
 }
 \arguments{
@@ -25,6 +26,8 @@ are located; default is \code{""} (empty string) ; no MONO_PATH is set.}
 if FALSE the function will return all available columns.}
 
 \item{argv}{argument vector for the adapter.}
+
+\item{system2_call}{calles system2 if TRUE; otherwise it uses a pipe.}
 
 \item{method}{the adapter type. default is 'thermo' which read Thermo Fisher Scietific raw files.}
 
@@ -47,10 +50,17 @@ this function is a generic adapter function for
   \code{MONO_PATH} enviroment.
 }
 \examples{
-rawfile <- file.path(path.package(package = "rawDiag"),
-  "extdata", 'sample.raw')
+(rawfile <- file.path(path.package(package = 'rawDiag'), 'extdata', 'sample.raw'))
 system.time(RAW <- read.raw(file = rawfile))
+dim(RAW)
 summary.rawDiag(RAW)
+PlotScanFrequency(RAW)
+
+# read all dimensions
+dim(RAW)
+RAW <- read.raw(file = rawfile, rawDiag = FALSE)
+dim(RAW)
+
 }
 \references{
 \itemize{

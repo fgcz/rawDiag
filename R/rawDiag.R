@@ -256,6 +256,7 @@ read.tdf <- function(filename){
 #' \code{file.path(path.package(package = "rawDiag"), "exec/fgcz_raw.exe")}
 #' @param argv argument vector for the adapter.
 #' @param method the adapter type. default is 'thermo' which read Thermo Fisher Scietific raw files.
+#' @param system2_call calles system2 if TRUE; otherwise it uses a pipe.
 #' @param ssh boolean, if ssh pipe should be used. defaul is FALSE
 #'@author Christian Panse <cp@fgcz.ethz.ch>, 2017, 2018
 #' @references \itemize{
@@ -280,21 +281,29 @@ read.tdf <- function(filename){
 #' @export read.raw
 #'
 #' @examples
-#' rawfile <- file.path(path.package(package = "rawDiag"),
-#'   "extdata", 'sample.raw')
+#' (rawfile <- file.path(path.package(package = 'rawDiag'), 'extdata', 'sample.raw'))
 #' system.time(RAW <- read.raw(file = rawfile))
+#' dim(RAW)
 #' summary.rawDiag(RAW)
+#' PlotScanFrequency(RAW)
+#' 
+#' # read all dimensions
+#' dim(RAW)
+#' RAW <- read.raw(file = rawfile, rawDiag = FALSE)
+#' dim(RAW)
 #' 
 read.raw <- function(file, mono = if(Sys.info()['sysname'] %in% c("Darwin", "Linux")) TRUE else FALSE, 
                      exe = file.path(path.package(package = "rawDiag"), "exec", "fgcz_raw.exe"),  
                      mono_path = "",
                      rawDiag = TRUE,
                      argv = "qc",
-                     method = "thermo", ssh = FALSE){
+                     system2_call = if(Sys.info()['sysname'] == "Windows") TRUE else FALSE,
+                     method = "thermo",
+                     ssh = FALSE){
   
   rv <- NULL
   if (mono_path != ''){
-    print(Sys.setenv(MONO_PATH = mono_path))
+    message(Sys.setenv(MONO_PATH = mono_path))
   }
     
   if (method == "thermo" && ssh){
@@ -303,6 +312,7 @@ read.raw <- function(file, mono = if(Sys.info()['sysname'] %in% c("Darwin", "Lin
   else if (method == "thermo"){
 
     stopifnot(file.exists(exe))
+    stopifnot(file.exists(file))
 
     # message(paste("start", Sys.time(), sep = ":"))
     cmd <- paste(exe, file, argv)
@@ -313,15 +323,36 @@ read.raw <- function(file, mono = if(Sys.info()['sysname'] %in% c("Darwin", "Lin
     
     message(paste ("executing", cmd, "..."))
     
-    if(rawDiag){
-    rv <- as.rawDiag(read.csv(pipe(cmd), 
-                                sep='\t', stringsAsFactors = FALSE, header = TRUE))
+    if(system2_call){
+      tf <- tempfile()
+      
+      message(paste("system2 is writting to", tf, "..."))
+      
+      if (mono){
+        rvs <- system2("mono", args = c(exe, shQuote(rawfile), "qc"), stdout = tf)
+      }else{
+        rvs <- system2(exe, args = c(shQuote(rawfile), "qc"), stdout = tf)
+      }
+      if (rvs == 0){
+        rv <- read.csv(tf,  sep = "\t",   stringsAsFactors = FALSE, header = TRUE)
+        message(paste("unlinking", tf, "..."))
+        unlink(tf)
+        
+        if(rawDiag){
+          rv <- as.rawDiag(rv)
+        }
+      }
     }else{
-      rv <- read.csv(pipe(cmd), 
-                                sep='\t', stringsAsFactors = FALSE, header = TRUE)
+      
+      if(rawDiag){
+        rv <- as.rawDiag(read.csv(pipe(cmd), 
+                                  sep='\t', stringsAsFactors = FALSE, header = TRUE))
+      }else{
+        rv <- read.csv(pipe(cmd), 
+                       sep='\t', stringsAsFactors = FALSE, header = TRUE)
+      }
     }
   }
-  
   class(rv) <- c(class(rv), 'rawDiag')
   rv
 }

@@ -150,6 +150,14 @@ system.time(RAW <- read.raw(file = rawfile))
 summary.rawDiag(RAW)
 @
 
+reading all parameters
+<<eval = TRUE>>=
+dim(RAW)
+RAW <- read.raw(file = rawfile, rawDiag = FALSE)
+dim(RAW)
+@
+
+
 Additional information can be found using the R man pages. 
 
 <<eval = FALSE>>=
