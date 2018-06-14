@@ -2,6 +2,7 @@
 
 an R package supporting rational LC-MS method optimization for bottom-up proteomics on multiple OS platforms
 
+<hr>
 **If your installation does not work with the below-mentioned instructions, do not hesitate to request a ready to run R package from the authors via Email, subject `request rawDiag package`.**
 
 
