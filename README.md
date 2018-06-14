@@ -12,7 +12,7 @@ an R package supporting rational LC-MS method optimization for bottom-up proteom
 for Windows/Linux/MacOSX platforms with a 64 Bit architecture
 
 
-### 1.1. R and mono
+### 1.1. .NET Framework and R
 
 - https://www.mono-project.com/ (>4.0.22) for (Linux and MacOSX) or .NET Framework 4.5 or higher (Windows)
 - R (>3.4.0)
