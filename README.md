@@ -17,7 +17,7 @@ for Windows/Linux/MacOSX platforms with a 64 Bit architecture
 - https://www.mono-project.com/ (>4.0.22) for (Linux and MacOSX)
 - R (>3.4.0)
 - install https://CRAN.R-project.org/package=devtools
-- if you want support for [Open File Standards](http://www.psidev.info/) install [mzR](http://bioconductor.org/packages/mzR/) package. 
+- if you want support for [Open File Standards](http://www.psidev.info/) install the [mzR](http://bioconductor.org/packages/mzR/) package. 
 
 ### 1.2. The New RawFileReader .Net assembly from Thermo Fisher Scientific
 
