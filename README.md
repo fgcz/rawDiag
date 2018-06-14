@@ -44,17 +44,29 @@ Register the .Net assembly in your system similar to a Linux installation
 
 **or** 
 
-After installing the rawDiag package put the .Net assemblies (dll files) into the same directory as the `fgcz_raw.exe` which can be found in the exec folder of the rawDiag package.
+After installing the rawDiag package put the .Net assemblies (dll files) into the same directory as the `fgcz_raw.exe` which can be found in the exec folder of the rawDiag package. Should you unsure where the package has been placed during installation use the following R command to display your libary path:
+
+```{r}
+> .libPaths()
+[1] "/Library/Frameworks/R.framework/Versions/3.3/Resources/library"
+```
+Knowing the R library path one can now list the execuables installed by RawDiag:
+
+```{sh}
+tobiasko@public-docking-hpx-1240:~ > ls /Library/Frameworks/R.framework/Versions/3.3/Resources/library/rawDiag/exec/
+fgcz_raw.Linux.exe	fgcz_raw.Windows.exe	fgcz_raw.exe
+```
+
 
 ### 1.3 Versions the software has been tested on
 
 |plattform|plattform version|R version|
 | :------- |---------------:| -------:|
 |Linux     | Debian 9 | 3.5.0 |
-|[dockerhub](https://hub.docker.com/r/cpanse/rawdiag) | bioconductor/devel_proteomics2| NA |
+|[dockerhub](https://hub.docker.com/r/cpanse/rawdiag) | bioconductor/devel_proteomics2| 2017-12-31 r73996 |
 |Windows   | 7 | 3.4.1 |
 |Windows   | 10 | 3.5.0 |
-|Windows   |  | |
+|Windows   | Server 2012 R2 x64 | 3.4.4|
 |MacOSX    | 10.13.5 (17F77)|3.4.2|
 |MacOSX    | 10.11.6 (15G20015)|3.4.3 |
 
