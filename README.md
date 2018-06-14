@@ -43,7 +43,7 @@ To install *the New RawFileReader .Net assembly* follow the installation instruc
 ## 2. Installation guide
 
 ### 2.1. Instructions
-To ensure the proper function of this R package please check if all the requirements are fullfilled prior to using it.
+To ensure the proper function of this R package please check if all the [requirements](README.md#1-system-requirements) are fullfilled prior to using it.
 
 #### all OS
 
