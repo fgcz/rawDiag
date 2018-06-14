@@ -54,7 +54,7 @@ After installing the rawDiag package put the .Net assemblies (dll files) into th
 |[dockerhub](https://hub.docker.com/r/cpanse/rawdiag) | bioconductor/devel_proteomics2| 2017-12-31 r73996 |
 |Windows   | 7 | 3.4.1 |
 |Windows   | 10 | 3.5.0 |
-|Windows   |  | |
+|Windows   | Server 2012 R2 x64 | 3.4.4|
 |MacOSX    | 10.13.5 (17F77)|3.4.2|
 |MacOSX    | 10.11.6 (15G20015)|3.4.3 |
 
