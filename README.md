@@ -50,6 +50,13 @@ After installing the rawDiag package put the .Net assemblies (dll files) into th
 > .libPaths()
 [1] "/Library/Frameworks/R.framework/Versions/3.3/Resources/library"
 ```
+Knowing the R library path one can now list the execuables installed by RawDiag:
+
+```{sh}
+tobiasko@public-docking-hpx-1240:~ > ls /Library/Frameworks/R.framework/Versions/3.3/Resources/library/rawDiag/exec/
+fgcz_raw.Linux.exe	fgcz_raw.Windows.exe	fgcz_raw.exe
+```
+
 
 ### 1.3 Versions the software has been tested on
 
