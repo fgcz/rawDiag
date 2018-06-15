@@ -635,13 +635,13 @@ support of our work.
 \end{acknowledgement}
 
 \begin{suppinfo}
-The package vignette as well as the R package itself, a Dockerfile which build the entire architecture from scratch is accessible through a git repository under the following URL: \url{https://github.com/fgcz/rawDiag}.
+The package vignette \citep{rawDiag} as well as the R package itself,
+a Dockerfile which build the entire architecture from scratch is accessible through a git repository under the following URL: \url{https://github.com/fgcz/rawDiag}.
 An automatic build of the provided docker recipe is visible through \url{https://hub.docker.com/r/cpanse/rawdiag/}.
 The data used in section \ref{section:application} are available on the MassIVE
 \url{ftp://massive.ucsd.edu/MSV000082389/raw/rawDiag/raw/}, through the
 lab information managment system bfabric~\cite{bfabric} \url{https://fgcz-bfabric.uzh.ch} Sample ID 174020, or
 as data set of the package as \texttt{WU163763}.
-
 A demo system including all data shown in this manuscript is available through
 \url{http://fgcz-ms-shiny.uzh.ch:8080/rawDiag-demo/}.
 \end{suppinfo}
