@@ -188,7 +188,7 @@ RAW$scanNumber
 \section{Usage}
 
 In the following section we demonstrate how the software can be used for the
-optimization of an LC-MS/MS method. 
+optimization of one parameter in an LC-MS/MS method. 
 
 This data was recorded to investigate the optimal number of MS2 scans between
 two consecutive MS1 scans on a Q-Exactive HF-X mass spectrometer injecting a
@@ -221,11 +221,15 @@ The first parameter we want to check is the TIC or base peak. With this plot we 
 see if the data was recorded properly and if the signal response of the sample
 is the same over the three injections.
 
+\begin{figure}
 <<label=TIC, fig = TRUE, echo=TRUE, include=TRUE, warnings=TRUE>>=
 print(gp <- PlotTicBasepeak(df, method = "overlay"))
 @
+\caption{TIC and Base Peak Plot -- This plot shows the overlay of the total ion chromatogram (TIC) and the base peak chromatogram of the three used mass spectrometry runs. In all three injections, the TIC and base peak response is close to identical which indicated that both the liquid chromatography as well as the mass spectrometry signal response for the three measurements was similar.}
+\label{figure:TIC}
+\end{figure}
 
-signal response and chromatography is ok for the three injections as they are almost identical. As next point,
+As shown in Figure~\ref{figure:TIC}, the signal response and chromatography is ok for the three injections as they are almost identical. This indicates a stable chromatography and an similar signal response of the three measurements. This behaviour is the pre-requisit for comparing the three runs with each other. In case of large deviations, affected runs would need to be excluded from further analysis or the data set should be re-analyzed. As next point,
 we want to check the actual cycle time
 of the injections. Please note, we also make use of the
 grammar of graphics \citep{Hadley2009}
@@ -239,16 +243,17 @@ statement after the initial call of the plot function.
 <<label=PlotCycleTime, fig = TRUE, echo=TRUE, include=TRUE, warnings=TRUE>>=
 print(gp <- PlotCycleTime(df, method = "trellis") +
   facet_wrap(~ filename, ncol =1))
+#This code produces the following plot
 @
 \caption{Cycle Time Plot -- This plot displays the empirical cycle time for each recorded duty cycle in a method as a dot plot. The blue line represents a fitted trend using a gam model. The red dashed line is indicating the 95th quantile.}
 \label{figure:cycletime}
 \end{figure} 
 
  
-In Figure~\ref{fig:cycle} we can see the the cycle time for the top 18 method (file: 09\_S174020) is
+In Figure~\ref{figure:cycletime} we can see the the cycle time for the top 18 method (file: 09\_S174020) is
 arround 0.6 seconds during the elution phase of the peptides.
-The red dashed line indicates the calculated cycle time. As already mentioned,
-with this method we produce too many MS1 data points. The cycle time of the top
+The red dashed line in this plot indicates the 95th quantile. As initially mentioned,
+the generic starting method is producing too many MS1 data points under the used chromatography settings. This is verified by the empirical cycle time.  The cycle time of the top
 36 (file: 04\_S174020) and top 72 (file: 05\_S174020) methods respectively
 have cycle times of 1.1 second and 2 seconds respectively. With the used
 chromatography we produce $\approx$20-30 MS1 point for the top 36 and
