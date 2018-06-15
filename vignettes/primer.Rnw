@@ -2,6 +2,7 @@
 \documentclass[nojss]{jss}
 
 \usepackage[T1]{fontenc} % Use modern font encodings
+\usepackage{listings}
 
 \author{Christian Trachsel, Tobias Kockmann, Christian Panse}
 \title{\pkg{rawDiag}: an R Package for Diagnostic Plots of Mass Spectrometry Raw Data}
@@ -348,7 +349,41 @@ plots illustrate that both systems, server, and laptop, can analyze
 \label{figure:benchmark}
 \end{figure}
 
-\newpage
+\section{Developer notes}
+\subsection{Build R package}
+
+
+To build the R package including the vignettes files requires the Thermo dll-files~\citep{RawFileReader} have to be placed next to the executable \texttt{fgcz\_raw.exe} in the package's \texttt{exec} directory prior to the build process.
+
+
+A code snippet on how to register the .Net assemblies on a Linux system is shown below:
+
+
+\begin{lstlisting}[breaklines=true, language=R, tabsize=2,numbers=left, basicstyle= \ttfamily\scriptsize,caption={code snippet register .Net assemblies.}, numbersep=5pt, linerange={1-40}, label={cs:reg}]
+cd /tmp/ \
+  && unzip /tmp/ThermoRawFileReader_linux.4.0.22.nupkg \
+  && gacutil -i lib/ThermoFisher.CommonCore.BackgroundSubtraction.dll \
+  && gacutil -i lib/ThermoFisher.CommonCore.Data.dll \
+  && gacutil -i lib/ThermoFisher.CommonCore.RawFileReader.dll
+\end{lstlisting}
+
+
+An example of how to compile and link the \proglang{C\#} code for the \code{read.raw} wrapper function accessing Thermo instrument files on a Linux platform using the mono enviroment is shown below.
+
+
+\begin{lstlisting}[breaklines=true, language=R, tabsize=2,numbers=left, basicstyle= \ttfamily\scriptsize,caption={compile and link \proglang{C\#} code on Linux.}, numbersep=5pt, linerange={1-40}, label={cs:msc}]
+mcs /out:fgcz_raw.exe \
+  fgcz_raw.cs /r:lib/ThermoFisher.CommonCore.Data.dll \
+  /r:lib/ThermoFisher.CommonCore.MassPrecisionEstimator.dll \
+  /r:lib/ThermoFisher.CommonCore.RawFileReader.dll /target:exe 
+\end{lstlisting}
+
+
+\subsection{Known issues}
+\begin{itemize}
+\item the \code{system2} function on windows R version 3.5.0 is not writting into a file. 
+\end{itemize}
+
 \section{Session information}
 An overview of the package versions used to produce this document are shown
 below.
@@ -357,8 +392,6 @@ below.
 toLatex(sessionInfo())
 @
 
-\newpage
 \bibliography{rawDiag}
-
 
 \end{document}
