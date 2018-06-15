@@ -4,18 +4,18 @@ an R package supporting rational LC-MS method optimization for bottom-up proteom
 
 
 
-## 1. System Requirements  
+## 1 System Requirements  
 for Windows/Linux/MacOSX platforms with a 64 Bit architecture
 
 
-### 1.1. .NET Framework and R
+### 1.1 .NET Framework and R
 
 - https://www.mono-project.com/ (>4.0.22) for (Linux and MacOSX) or .NET Framework 4.5 or higher (Windows)
 - R (>3.4.0)
 - install https://CRAN.R-project.org/package=devtools
 - if you want support for [Open File Standards](http://www.psidev.info/) install the [mzR](http://bioconductor.org/packages/mzR/) package. 
 
-### 1.2. The New RawFileReader .Net assembly from Thermo Fisher Scientific
+### 1.2 The New RawFileReader .Net assembly from Thermo Fisher Scientific
 
 **If your installation does not work with the below-mentioned instructions, do not hesitate to request a ready to run R package from the authors via Email, subject `request rawDiag package`.**
 
@@ -27,9 +27,9 @@ has to be downloaded and installed separately in order to be able to directly re
 To install *the New RawFileReader .Net assembly* follow the installation instructions provided by Thermo Fisher Scientific.
 
 
-### 1.3 Versions the software has been tested on
+### 1.3 Platforms and versions the software has been tested on
 
-|plattform|plattform version|R version|note|
+|platform|platform version|R version|note|
 | :------- |---------------:| -------:|:------- |
 |Linux| Debian 8 |  3.4.3 | [Demo system](http://fgcz-ms-shiny.uzh.ch:8080/bfabric_rawDiag/)|
 |Linux     | Debian testing | 3.5.0 | CP |
@@ -38,11 +38,12 @@ To install *the New RawFileReader .Net assembly* follow the installation instruc
 |Windows   | 10 x64| 3.4.4 |CP virtual box|
 |Windows   | Server 2012 R2 x64 | 3.4.4|CP|
 |MacOSX    | 10.13.5 (17F77)|3.4.2|CP|
+|MacOSX    | 10.13.4 (17E202)|3.4.4|CP|
 |MacOSX    | 10.11.6 (15G20015)|3.4.3 |JG|
 
-## 2. Installation guide
+## 2 Installation guide
 
-### 2.1. Instructions
+### 2.1 Instructions
 To ensure the proper function of this R package please check if all the [requirements](README.md#1-system-requirements) are fullfilled prior to using it.
 
 #### all OS
@@ -57,12 +58,12 @@ devtools::install_github("fgcz/rawDiag", build_vignettes = FALSE)
 ```
 
 
-### 2.2. Typical install time on a "normal" desktop computer
+### 2.2 Typical install time on a "normal" desktop computer
 
-* requirements: 1 to 30 minutes; one minute if you are a C# and R developer
+* Thermo RawFileReader dll: 1sec to 30 minutes
 * the rawDiag package through github: 10 minutes 
 
-## 3. Demonstration
+## 3 Demonstration
 
 ### 3.1 R commandline code snippet
 
@@ -79,6 +80,7 @@ PlotMassDistribution(PXD006932_Exp3A_HeLa_1ug_60min_7500_02)
 
 ### 3.2 An interactive shiny example
 
+#### in your local R shell
 ```{r}
 # install.packages("shiny")
 # install.packages("DT")
@@ -87,7 +89,7 @@ rawDiag_shiny <- system.file('shiny', 'demo', package = 'rawDiag')
 shiny::runApp(rawDiag_shiny, display.mode = 'normal')
 ```
 
-### 3.3 An interactive shiny example running on your docker enviroment
+#### using the docker image
 
 source: [dockerhub](https://hub.docker.com/r/cpanse/rawdiag/)
 
@@ -98,9 +100,25 @@ docker pull cpanse/rawdiag \
    shiny::runApp(rawDiag_shiny, display.mode = 'normal', port=8787, host='0.0.0.0')"
 ```
 
-connect with your web browser to http://yourdockerhostname:8787
+connect with your web browser to `http://yourdockerhostname:8787`
 
-## 4. Instructions for use
+### 3.3 using the `read.raw` method
+
+taken from the `?read.raw` man page.
+```{r}
+(rawfile <- file.path(path.package(package = 'rawDiag'), 'extdata', 'sample.raw'))
+system.time(RAW <- read.raw(file = rawfile))
+ 
+summary.rawDiag(RAW)
+PlotScanFrequency(RAW)
+     
+dim(RAW)
+# now  read all dimensions
+RAW <- read.raw(file = rawfile, rawDiag = FALSE)
+dim(RAW)
+```
+
+## 4 Instructions for use
 
 read the vignettes.
 
@@ -110,7 +128,7 @@ browseVignettes('rawDiag')
 
 the documentation of the function is available through the R man pages.
 
-## 5. Useful Links
+## 5 Useful Links
 - http://planetorbitrap.com/rawfilereader
 - [screen recording (3:02 minutes, size 47MB, no audio track)](http://fgcz-ms.uzh.ch/~cpanse/PAPERS/pr-2018-001736.mov)
 - [shiny demo on our compute server](http://fgcz-ms-shiny.uzh.ch:8080/rawDiag-demo/)
