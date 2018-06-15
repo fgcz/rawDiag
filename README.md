@@ -31,6 +31,7 @@ To install *the New RawFileReader .Net assembly* follow the installation instruc
 
 |plattform|plattform version|R version|
 | :------- |---------------:| -------:|
+|[Linux](http://fgcz-ms-shiny.uzh.ch:8080/bfabric_rawDiag/)| Debian 8 |  3.4.3 |
 |Linux     | Debian 9 | 3.5.0 |
 |[dockerhub](https://hub.docker.com/r/cpanse/rawdiag) | bioconductor/devel_proteomics2| 2017-12-31 r73996 |
 |Windows   | 7 | 3.4.1 |
