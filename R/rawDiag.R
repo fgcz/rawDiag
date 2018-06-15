@@ -411,7 +411,7 @@ fillNAgaps <- function(x) {
 #'
 #' @return calculates the MS1 master scan number of an MS2 scan and populates the MasterScanNumber
 #' with it
-CalculatioMasterScan <- function(x){
+.CalculatioMasterScan <- function(x){
   
   res <- x %>% 
     mutate(MasterScanNumber = dplyr::case_when(MSOrder == "Ms" ~ scanNumber)) %>%  
@@ -1175,9 +1175,9 @@ PlotScanFrequency <- function(x, method = 'trellis'){
       facet_grid(filename ~ Type) +
       scale_x_continuous(breaks = scales::pretty_breaks(8))+
       scale_y_continuous(breaks = scales::pretty_breaks(8))+
-      labs(title = "Ms2 Scan Frequency Plot") +
-      labs(subtitle = "Plotting number of ms2 per second against retention time") +
-      labs(x = "Retention Time [min]", y = "Ms2 frequency [Hz]") +
+      labs(title = "MS2 Scan Frequency Plot") +
+      labs(subtitle = "Plotting number of MS2 per second against retention time") +
+      labs(x = "Retention Time [min]", y = "MS2 frequency [Hz]") +
       theme_light() 
     return(figure)  
     
@@ -1190,9 +1190,9 @@ PlotScanFrequency <- function(x, method = 'trellis'){
     
     figure <- ggplot(res, aes_string(x = "filename", y = "Counts")) +
       geom_violin() +
-      labs(title = "Ms2 Scan Frequency Plot") +
-      labs(subtitle = "Plotting the time resolved Ms2 density for each mass spectrometry run") +
-      labs(x = "Filename", y = "Ms2 frequency [Hz]") +
+      labs(title = "MS2 Scan Frequency Plot") +
+      labs(subtitle = "Plotting the time resolved MS2 density for each mass spectrometry run") +
+      labs(x = "Filename", y = "MS2 frequency [Hz]") +
       theme_light() +
       theme(axis.text.x = element_text(angle = 90))
     return(figure) 
@@ -1207,9 +1207,9 @@ PlotScanFrequency <- function(x, method = 'trellis'){
       geom_line() +
       scale_x_continuous(breaks = scales::pretty_breaks(8))+
       scale_y_continuous(breaks = scales::pretty_breaks(8))+
-      labs(title = "Ms2 Scan Frequency Plot") +
-      labs(subtitle = "Plotting number of ms2 per second against retention time") +
-      labs(x = "Retention Time [min]", y = "Ms2 frequency [Hz]") +
+      labs(title = "MS2 Scan Frequency Plot") +
+      labs(subtitle = "Plotting number of MS2 per second against retention time") +
+      labs(x = "Retention Time [min]", y = "MS2 frequency [Hz]") +
       theme_light() +
       theme(legend.position = "top")
     return(figure)
