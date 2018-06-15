@@ -11,7 +11,8 @@ a Windows/Linux/MacOSX x64 platform
 
 ### 1.1 .NET Framework and R
 
-- https://www.mono-project.com/ (>4.0.22) for (Linux and MacOSX) or .NET Framework 4.5.1 or higher (Windows)
+- https://www.mono-project.com/ (>4.0.22) for (Linux and MacOSX)
+- .NET Framework 4.5.1 or higher (Windows)
 - R (>3.4.0)
 - install https://CRAN.R-project.org/package=devtools
 - if you want support for [Open File Standards](http://www.psidev.info/) install the [mzR](http://bioconductor.org/packages/mzR/) package. 
