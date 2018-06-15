@@ -79,6 +79,7 @@ PlotMassDistribution(PXD006932_Exp3A_HeLa_1ug_60min_7500_02)
 
 ### 3.2 An interactive shiny example
 
+#### in your local R shell
 ```{r}
 # install.packages("shiny")
 # install.packages("DT")
@@ -87,7 +88,7 @@ rawDiag_shiny <- system.file('shiny', 'demo', package = 'rawDiag')
 shiny::runApp(rawDiag_shiny, display.mode = 'normal')
 ```
 
-### 3.3 An interactive shiny example running on your docker enviroment
+#### using the docker image
 
 source: [dockerhub](https://hub.docker.com/r/cpanse/rawdiag/)
 
@@ -99,6 +100,22 @@ docker pull cpanse/rawdiag \
 ```
 
 connect with your web browser to `http://yourdockerhostname:8787`
+
+### 3.3 using the `read.raw` method
+
+taken from the `?read.raw` man page.
+```{r}
+(rawfile <- file.path(path.package(package = 'rawDiag'), 'extdata', 'sample.raw'))
+system.time(RAW <- read.raw(file = rawfile))
+ 
+summary.rawDiag(RAW)
+PlotScanFrequency(RAW)
+     
+dim(RAW)
+# now  read all dimensions
+RAW <- read.raw(file = rawfile, rawDiag = FALSE)
+dim(RAW)
+```
 
 ## 4. Instructions for use
 
