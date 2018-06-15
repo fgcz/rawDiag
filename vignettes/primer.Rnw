@@ -130,7 +130,7 @@ data(WU163763)
 stopifnot(is.rawDiag(WU163763))
 @
 
-<<>>=
+<<WU163763>>=
 data("WU163763")
 is.rawDiag(WU163763)
 names(WU163763)
@@ -143,7 +143,7 @@ source code as well as the compiler and linker options for a linux build is prov
 
 The following code snippet demonstrates the use of the \code{read.raw} function to extract data from a tiny example raw file:
 
-<<eval = TRUE>>=
+<<RawFileReader, eval = TRUE>>=
 rawfile <- file.path(path.package(package = "rawDiag"),
                      "extdata", 'sample.raw')
 system.time(RAW <- read.raw(file = rawfile))
@@ -151,7 +151,7 @@ summary.rawDiag(RAW)
 @
 
 reading all parameters
-<<eval = TRUE>>=
+<<RawFileReader2, eval = TRUE>>=
 dim(RAW)
 RAW <- read.raw(file = rawfile, rawDiag = FALSE)
 dim(RAW)
@@ -164,8 +164,6 @@ Additional information can be found using the R man pages.
 ?read.raw
 @
 
-
-
 \subsection{Reading the Open Proteomics Standard Files}
 
 The package also ships with an adapter function \code{as.rawDiag.mzR}
@@ -174,7 +172,7 @@ which enables the support of open file standards through using the Bioconductor
 
 The demonstration is shown using the code snippet below by using a tiny mzML
 file.
-<<>>=
+<<mzR>>=
 library(mzR); 
 
 mzML <- "04_S174020_5000_5010.mzML"
@@ -190,7 +188,7 @@ RAW$scanNumber
 In the following section we demonstrate how the software can be used for the
 optimization of one parameter in an LC-MS/MS method. For this we load the data included in the package:
 
-<<>>=
+<<usage>>=
 data(WU163763)
 stopifnot(is.rawDiag(WU163763))
 @
@@ -284,10 +282,22 @@ print(gp <- PlotInjectionTime(subset(df, MSOrder %in% "Ms2"),
 
 From figure~\ref{figure:IT} one can see that the injection time distribution is shiftet towards longer injection times, the more MS2 scans are available. This behaviour is kind of expected, since the instrument is picking more lower abundat ions to fill all the available MS2 slots in the top 36 and top 72 methods. From the plot itself the distribution indicated that the top 72 method is still operating in a acceptable range. 
 
-At this point, we can now performe a database search with the three files to check if we identify more peptide and proteins with the two optimized methods. We can also use this additional data to check if the quality of the spectrs is starting to decrease and if further optimizations are required on the mehtods. All the described steps executed on the command line in an R session can also be performed in an interactive Shiny environment. To start the Shiny application 
+At this point, we can now performe a database search with the three files to check if we identify more peptide and proteins with the two optimized methods. We can also use this additional data to check if the quality of the spectrs is starting to decrease and if further optimizations are required on the mehtods. All the described steps executed on the command line in an R session can also be performed in an interactive Shiny environment.
+To start the Shiny application (see Figure~\ref{figure:shiny}) type the following into your R shell:
 
-...Here comes CP's part.....
+<<shiny, eval=FALSE>>=
+# install.packages("shiny"); install.packages("DT")
+library(shiny)
+rawDiag_shiny <- system.file('shiny', 'demo', package = 'rawDiag')
+shiny::runApp(rawDiag_shiny, display.mode = 'normal')
+@
 
+\begin{figure}
+\centering
+\includegraphics[width=1.0\columnwidth]{graphics/rawDiag_shiny}
+\caption{Running the \pkg{rawDiag} shiny application.}
+\label{figure:shiny}
+\end{figure}
 
 
 \newpage
@@ -342,7 +352,6 @@ plots illustrate that both systems, server, and laptop, can analyze
 \section{Session information}
 An overview of the package versions used to produce this document are shown
 below.
-
 
 <<sessioninfo, results=tex, echo=FALSE>>=
 toLatex(sessionInfo())

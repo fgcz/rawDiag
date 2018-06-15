@@ -222,7 +222,8 @@ using a \texttt{C\#} programmed executable,
 based on the platform-independent New RawFileReader .Net 
 assembly\cite{RawFileReader}. 
 A Docker recipe for the entire build process of the \texttt{C\#}
-based executable also ships with the R package. Additionally, the open file standards  
+based executable also ships with the R package.
+Additionally, the open file standards  
 can be loaded into the R environment using the R package mzR~\cite{mzR, msdata} in combination with 
 the S3 adapter function \code{as.rawDiag.mzR}. We there by provide support for vendor file formats which 
 do not have a native reading function so far.
