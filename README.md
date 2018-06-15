@@ -23,7 +23,7 @@ a Windows/Linux/MacOSX x64 platform
 
 Due to licensing reasons, we currently not allowed to distribute Thermo Fisher Scientific software with the *rawDiag* package (we hope that this will change soon).
 The [New RawFileReader from Thermo Fisher Scientific](http://planetorbitrap.com/rawfilereader)
-has to be downloaded and installed separately in order to be able to directly read Thermo raw-files (e.g. use the R function `read.raw`).
+has to be downloaded and installed separately in order to be able to directly read Thermo raw-files (by using the R function `read.raw`).
 
 To install *the New RawFileReader .Net assembly* follow the installation instructions provided by Thermo Fisher Scientific.
 
