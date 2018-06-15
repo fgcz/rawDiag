@@ -98,7 +98,7 @@ docker pull cpanse/rawdiag \
    shiny::runApp(rawDiag_shiny, display.mode = 'normal', port=8787, host='0.0.0.0')"
 ```
 
-connect with your web browser to http://yourdockerhostname:8787
+connect with your web browser to `http://yourdockerhostname:8787`
 
 ## 4. Instructions for use
 
