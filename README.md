@@ -5,12 +5,13 @@ an R package supporting rational LC-MS method optimization for bottom-up proteom
 
 
 ## 1 System Requirements  
-for Windows/Linux/MacOSX platforms with a 64 Bit architecture
+
+a Windows/Linux/MacOSX x64 platform 
 
 
 ### 1.1 .NET Framework and R
 
-- https://www.mono-project.com/ (>4.0.22) for (Linux and MacOSX) or .NET Framework 4.5 or higher (Windows)
+- https://www.mono-project.com/ (>4.0.22) for (Linux and MacOSX) or .NET Framework 4.5.1 or higher (Windows)
 - R (>3.4.0)
 - install https://CRAN.R-project.org/package=devtools
 - if you want support for [Open File Standards](http://www.psidev.info/) install the [mzR](http://bioconductor.org/packages/mzR/) package. 
@@ -21,10 +22,10 @@ for Windows/Linux/MacOSX platforms with a 64 Bit architecture
 
 
 Due to licensing reasons, we currently not allowed to distribute Thermo Fisher Scientific software with the *rawDiag* package (we hope that this will change soon).
-The *New RawFileReader from Thermo Fisher Scientific* (see http://planetorbitrap.com/rawfilereader)
-has to be downloaded and installed separately in order to be able to directly read Thermo raw-files (e.g. use the R function `read.raw`).
+The [New RawFileReader from Thermo Fisher Scientific](http://planetorbitrap.com/rawfilereader)
+has to be downloaded and installed separately in order to be able to directly read Thermo raw-files (by using the R function `read.raw`).
 
-To install *the New RawFileReader .Net assembly* follow the installation instructions provided by Thermo Fisher Scientific.
+To install [the New RawFileReader .Net assembly](http://planetorbitrap.com/rawfilereader) follow the installation instructions provided by Thermo Fisher Scientific.
 
 
 ### 1.3 Platforms and versions the software has been tested on
@@ -37,9 +38,11 @@ To install *the New RawFileReader .Net assembly* follow the installation instruc
 |Windows   | 7 | 3.4.1 |CT|
 |Windows   | 10 x64| 3.4.4 |CP virtual box|
 |Windows   | Server 2012 R2 x64 | 3.4.4|CP|
+|Windows   | 10 x64 | 3.4.3 | WEW |
+|Windows   | 10 x64 | R Open 3.5.0 | WEW |
 |MacOSX    | 10.13.5 (17F77)|3.4.2|CP|
-|MacOSX    | 10.13.4 (17E202)|3.4.4|CP|
 |MacOSX    | 10.11.6 (15G20015)|3.4.3 |JG|
+|MacOSX    | 10.13.4 (17E202)|3.4.4|CP|
 
 ## 2 Installation guide
 
@@ -128,7 +131,7 @@ browseVignettes('rawDiag')
 
 the documentation of the function is available through the R man pages.
 
-## 5 Useful Links
+## 5 Useful links
 - http://planetorbitrap.com/rawfilereader
 - [screen recording (3:02 minutes, size 47MB, no audio track)](http://fgcz-ms.uzh.ch/~cpanse/PAPERS/pr-2018-001736.mov)
 - [shiny demo on our compute server](http://fgcz-ms-shiny.uzh.ch:8080/rawDiag-demo/)
