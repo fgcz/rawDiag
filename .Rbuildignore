@@ -1,0 +1,8 @@
+^.*\.Rproj$
+^\.Rproj\.user$
+^.*_config.yml$
+^.*.travis.yml$
+^.*LICENSE$
+^.*vignettes/rawDiag.Rnw$
+^.*vignettes/ASMS2018_ID291250.Rnw$
+
