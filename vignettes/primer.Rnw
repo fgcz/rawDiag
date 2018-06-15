@@ -188,13 +188,16 @@ RAW$scanNumber
 \section{Usage}
 
 In the following section we demonstrate how the software can be used for the
-optimization of one parameter in an LC-MS/MS method. 
+optimization of one parameter in an LC-MS/MS method. For this we load the data included in the package:
 
-This data was recorded to investigate the optimal number of MS2 scans between
-two consecutive MS1 scans on a Q-Exactive HF-X mass spectrometer injecting a
-commercial HeLa digest. Since the data was recorded in triplicate 
-per used method, we will have overplotting issues. Therefore we first filter
-the data for a single injection per method.
+<<>>=
+data(WU163763)
+stopifnot(is.rawDiag(WU163763))
+@
+
+This was recorded to investigate the optimal number of MS2 scans between
+two consecutive MS1 scans on a Q-Exactive HF-X mass spectrometer. A commercially available HeLa digest was measured with a generic starting method and two modified methods. Each method was analyzed three times in randomized order. For demonstration purposes, we first filter the data for a single injection per method, which reduces potential overplotting issues at the same time. The filtering is done with the following code snippet:
+
 
 <<label=filter, eval=TRUE>>=
   library(tidyverse)
@@ -204,17 +207,15 @@ df <- dplyr::filter(WU163763,
   filename == "09_S174020")
 @
 
-Assume we have a generic starting method which we want to
-optimize. This method is  performing 18 MS2 scans for each MS1 scan. With the
-given transient lenght from the used instrument we can calculate
+Our generic starting method is performing 18 MS2 scans for each MS1 scan. With the
+known time needed for a single scan on the used instrument we can calculate
 the cycle time (time required to scan one MS1 and 18 MS2 scans).
 In our case we find the cycle time to be
 $\approx$ 0.6 second. For a 120 min chromatography with expected peak width of
 20-30 seconds, this would result in 30-50 MS1 points per peak. In other words
 the instrument would spend too much time recording MS1 compared 
-to MS2. Therefore we addapted the methods to perform 36 and 72 MS2 scans
-respectively. After the data has been recorded with these two new methods
-we can visualize and analyse the results with the dignostic
+to MS2. The hypothesis for an optimized method is that we need to give the instrument the opportunity to performe more MS2 scan between two MS1 scans. Therefore we addapted the methods to perform 36 and 72 MS2 scans
+respectively. Inorder to check the effect of these modifications, data needs to be recorded with the three methods. After the data is recorded we can visualize and analyse the results with the dignostic
 plots of this package.
 
 The first parameter we want to check is the TIC or base peak. With this plot we can
@@ -229,12 +230,12 @@ print(gp <- PlotTicBasepeak(df, method = "overlay"))
 \label{figure:TIC}
 \end{figure}
 
-As shown in Figure~\ref{figure:TIC}, the signal response and chromatography is ok for the three injections as they are almost identical. This indicates a stable chromatography and an similar signal response of the three measurements. This behaviour is the pre-requisit for comparing the three runs with each other. In case of large deviations, affected runs would need to be excluded from further analysis or the data set should be re-analyzed. As next point,
-we want to check the actual cycle time
-of the injections. Please note, we also make use of the
+As shown in Figure~\ref{figure:TIC}, the signal response and chromatography is ok for the three injections as they are almost identical. This indicates a stable chromatography and an similar signal response of the three measurements. This behaviour is the pre-requisit for comparing the three runs with each other. In case of large deviations, affected runs would need to be excluded from further analysis or the data set should be re-analyzed. 
+As next point, we want to check the actual cycle time
+of the three measurements. Please note, here we also make use of the
 grammar of graphics \citep{Hadley2009}
 implementation of \pkg{ggplot2} by modifiying the plot appearance on the fly. 
-Here we move grey box indicating the faceting labels from the standard position on the right side 
+We move grey box indicating the faceting labels from the standard position on the right side 
 of to the top. This is achieved by adding the additional
 \code{facet\_wrap}
 statement after the initial call of the plot function.
@@ -243,60 +244,51 @@ statement after the initial call of the plot function.
 <<label=PlotCycleTime, fig = TRUE, echo=TRUE, include=TRUE, warnings=TRUE>>=
 print(gp <- PlotCycleTime(df, method = "trellis") +
   facet_wrap(~ filename, ncol =1))
-#This code produces the following plot
 @
 \caption{Cycle Time Plot -- This plot displays the empirical cycle time for each recorded duty cycle in a method as a dot plot. The blue line represents a fitted trend using a gam model. The red dashed line is indicating the 95th quantile.}
 \label{figure:cycletime}
 \end{figure} 
 
- 
 In Figure~\ref{figure:cycletime} we can see the the cycle time for the top 18 method (file: 09\_S174020) is
-arround 0.6 seconds during the elution phase of the peptides.
-The red dashed line in this plot indicates the 95th quantile. As initially mentioned,
-the generic starting method is producing too many MS1 data points under the used chromatography settings. This is verified by the empirical cycle time.  The cycle time of the top
+arround 0.6 seconds during the elution phase of the peptides. This is in good agreemnet with our theoretically calculated value. The red dashed line in this plot indicates the 95th quantile. As initially mentioned,
+the generic starting method is producing too many MS1 data points under the used chromatography settings. This is verified by the empirical cycle time. The cycle time of the top
 36 (file: 04\_S174020) and top 72 (file: 05\_S174020) methods respectively
 have cycle times of 1.1 second and 2 seconds respectively. With the used
 chromatography we produce $\approx$20-30 MS1 point for the top 36 and
-$\approx$10-15 MS1 points for the top 72 method. This is a better value
-compared to the initial method since the instrument is spending more time to generate fragment
-spectra which should ultimately lead to more peptide and protein identifications.
+$\approx$10-15 MS1 points for the top 72 method per chromatographic feature. The value from the top 72 mehtod is is a better value compared to the value of the initial method. 10-15 MS1 data points are considered as a good balance between time spent on MS1 and MS2 scans and allow a deep sampling of the peptides in the sample. 
 The next thing to check is if the instrument is actually using the available
 MS2 capacity. For this, we plot the cycle load (the actually performed MS2 scans
 for each MS1 scan).
 
-<<label=PlotCycleLoad, fig = TRUE, echo=TRUE, include=FALSE, warnings=TRUE>>=
+\begin{figure} 
+<<label=PlotCycleLoad, fig = TRUE, echo=TRUE, include=TRUE, warnings=TRUE>>=
 print(gp <- PlotCycleLoad(df, method = "trellis"))
 @
-
-\begin{figure}
-\includegraphics[width=0.89\columnwidth]{primer-PlotCycleLoad}
-
-\caption{Cycle load plot -- The plot shows the injection time density of each mass spectrometry file as a violin plot. The higher the maximum number of MS2 scans is in the method, the more the density is shifted towards the maximum injection time value.
+\caption{Cycle load plot -- The plot shows number of MS2 scans performed after each MS1 scan. The value should be at or close to the maximum during the main peptide elution phase. In all three mehtods this is the case. If the value would be lower, this would indicate that the method is not well addapted towards a) the sample complexity or b) the amount of sample injected.
 }
- 
 \label{figure:cycleload}
 \end{figure}
 
+From Figure~\ref{figure:cycleload}, we can see that all methods actually use the maximum available number of MS2 scans during the main peptide elution phase. The blue line is representing the trend as a fitted gam model. The fact that the top 72 method uses all the available MS2 slots, indicates that the two other methods are not optimally analyzing the investigated sample. The complexity is too high for these two methods and after selecting the precursors for MS2 fragmentationt at any give time during the peptide elution, there are still many other potential candidates available which are not fragmented. However, we can not endless increase the amount of MS2 scans, since we want to maintain a certain cycle time. In order to have more than 72 MS2 scans we would need to switch to shorter individual scans. But this would limit the amount of time the instrument has to collect the ions needed for each individual scan. A to low amount for this parameter (injection time on Orbitrap instruments) would lead to bad fragmentation spectra quality and as a direct result to a lower amount of identified peptides. To check if the three used mehtods are still operating in an acceptable injection time regime, we use the \code{PlotInjectionTime} function. 
 
-
-From the plot, we can see that all mehtods actually use the maximum available number of MS2 scans during the main peptide elution phase. The blue line is representing the trend as a fitted gam model.
-
-<<label=PlotInjectionTime, fig = TRUE, echo=TRUE, include=FALSE, warnings=TRUE>>=
+\begin{figure}
+<<label=PlotInjectionTime, fig = TRUE, echo=TRUE, include=TRUE, warnings=TRUE>>=
 print(gp <- PlotInjectionTime(subset(df, MSOrder %in% "Ms2"), 
     method = "violin") 
   )
 @
-
-\begin{figure}
-\includegraphics[width=0.89\columnwidth]{primer-PlotInjectionTime}
-
 \caption{Injection Time Plot -- The plot shows the injection time density of each mass spectrometry file as a violin plot. The higher the maximum number of MS2 scans is in the method, the more the density is shifted towards the maximum injection time value.
 }
- 
 \label{figure:IT}
 \end{figure}
 
-In order to check, if the instrument is able to collect an appropriate amount of ions for all MS2 scans, we can check the injetion time characteristics for the three runs. From figure~\ref{figure:IT} one can see that the injection time distribution is shiftet towards longer injection times, the more MS2 scans are available. This could could lead to issues with the spectra quality and can be checked by performing a data base search and compare the assignment rate for the three runs. If indeed an issue can be detected, this finding would then be the starting point for the next iteration cycle where we could modify the maximum injection time parameter in order to check if we can further optimize the method.
+From figure~\ref{figure:IT} one can see that the injection time distribution is shiftet towards longer injection times, the more MS2 scans are available. This behaviour is kind of expected, since the instrument is picking more lower abundat ions to fill all the available MS2 slots in the top 36 and top 72 methods. From the plot itself the distribution indicated that the top 72 method is still operating in a acceptable range. 
+
+At this point, we can now performe a database search with the three files to check if we identify more peptide and proteins with the two optimized methods. We can also use this additional data to check if the quality of the spectrs is starting to decrease and if further optimizations are required on the mehtods. All the described steps executed on the command line in an R session can also be performed in an interactive Shiny environment. To start the Shiny application 
+
+...Here comes CP's part.....
+
+
 
 \newpage
 \section{Benchmark}
