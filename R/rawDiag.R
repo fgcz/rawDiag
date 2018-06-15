@@ -559,7 +559,7 @@ PlotTicBasepeak <- function(x, method = 'trellis'){
     figure <- ggplot(df, aes_string(x = "filename", y = "Intensity")) + 
       geom_violin() +
       facet_grid(Type~., scales = "free") +
-      stat_summary(fun.y = mean , geom = "point", colour = "red") +
+      #stat_summary(fun.y = mean , geom = "point", colour = "red") +
       scale_y_continuous(breaks = scales::pretty_breaks(8)) +
       labs(title = "TIC and Base-Peak plot") +
       labs(subtitle = "Plotting the TIC and base peak density for all mass spectrometry runs") +
@@ -607,11 +607,12 @@ PlotCycleTime <- function(x, method = 'trellis'){
     figure <- ggplot(df, aes_string(x = "StartTime", y = "CycleTime")) + 
       geom_point(shape = ".") +
       geom_line(stat = "smooth", method = "gam", formula = y ~ s(x, bs= "cs"), colour = "deepskyblue3", se = FALSE) +
-      labs(title = "Cycle time plot", subtitle = "Caclulated cycle time vs retention time") +
-      labs(x = "Retention Time [min]", y = "Cycle Time [sec]") +
-      geom_hline(aes_string(yintercept = "quan", group = "filename"), colour = "red3", linetype = "longdash")+
       scale_x_continuous(breaks = scales::pretty_breaks(8)) +
       scale_y_continuous(breaks = scales::pretty_breaks(8)) +
+      labs(title = "Cycle time plot") +
+      labs(subtitle = "Plotting the caclulated cycle time of each cycle vs retention time") +
+      labs(x = "Retention Time [min]", y = "Cycle Time [sec]") +
+      geom_hline(aes_string(yintercept = "quan", group = "filename"), colour = "red3", linetype = "longdash")+
       theme_light() + 
       facet_grid(filename~., scales = "free")
     return(figure)
@@ -622,14 +623,17 @@ PlotCycleTime <- function(x, method = 'trellis'){
       dplyr::select_at(vars("filename", "quan")) %>% 
       distinct()
     
-    figure <- ggplot(df, aes_string(x = "filename", y = "CycleTime", colour = "filename")) + 
+    figure <- ggplot(df, aes_string(x = "filename", y = "CycleTime")) + 
       geom_violin()  +
-      stat_summary(fun.y = mean , geom = "point", colour = "red") +
-      geom_point(data = dots, aes_string(x = "filename", y = "quan"), colour = "black")+
+      #stat_summary(fun.y = mean , geom = "point", colour = "red") +
+      #geom_point(data = dots, aes_string(x = "filename", y = "quan"), colour = "black")+
       scale_y_continuous(breaks = scales::pretty_breaks(8)) +
+      labs(title = "Cycle time plot") +
+      labs(subtitle = "Plotting the cycle time density of all mass spectrometry runs") +
+      labs(x = "Filename", y = "Cycle Time [sec]") +
       theme_light() +
-      theme(axis.text.x=element_blank(), legend.position = "top")
-    # theme(axis.text.x = element_text(angle = 90))
+      #theme(axis.text.x=element_blank(), legend.position = "top")
+      theme(axis.text.x = element_text(angle = 90))
     return(figure)
     
   } else if(method == 'overlay'){
@@ -638,7 +642,11 @@ PlotCycleTime <- function(x, method = 'trellis'){
     figure <- ggplot(df, aes_string(x = "StartTime", y = "CycleTime", colour = "filename")) + 
       geom_point(size = 0.5) +
       geom_line(aes_string(group = "filename", colour = "filename"), stat = "smooth", method = "gam", formula = y ~ s(x, bs= "cs"), se = FALSE) +
+      scale_x_continuous(breaks = scales::pretty_breaks(8)) +
       scale_y_continuous(breaks = scales::pretty_breaks(8)) +
+      labs(title = "Cycle time plot") +
+      labs(subtitle = "Plotting the caclulated cycle time of each cycle vs retention time") +
+      labs(x = "Retention Time [min]", y = "Cycle Time [sec]") +
       theme_light() +
       theme(legend.position="top")
     return(figure)
@@ -677,10 +685,10 @@ PlotMzDistribution <- function(x, method='trellis'){
     
     figure <- ggplot(df, aes_string(x = "filename", y = "PrecursorMass")) + 
       geom_violin() +
-      stat_summary(fun.y = max , geom = "point", colour = "red") +
+      #stat_summary(fun.y = max , geom = "point", colour = "red") +
       scale_y_continuous(breaks = scales::pretty_breaks(8)) +
       labs(title = "Retention Time to m/z correlation plot") +
-      labs(subtitle = "Plotting the prcursor m/z value density of all mass spectrometry runs") +
+      labs(subtitle = "Plotting the precursor m/z value density of all mass spectrometry runs") +
       labs(x = "Filename", y = "Presursor m/z value [Da]") +
       theme_light() +
       theme(axis.text.x = element_text(angle = 90))
@@ -691,12 +699,12 @@ PlotMzDistribution <- function(x, method='trellis'){
       dplyr::filter(MSOrder == "Ms2")
     
     figure <- ggplot(df, aes_string(x = "StartTime", y = "PrecursorMass", colour = "filename")) + 
-      geom_point(size = 0.5) +
-      #geom_line(stat = "smooth",
-      #          method = "gam",
-      #          formula = y ~ s(x, bs= "cs"),
-      #          size = 1.1, alpha = 0.6,
-      #          colour = "deepskyblue3", se = FALSE) +
+      geom_point(size = 0.5, alpha = 0.3) +
+      geom_line(stat = "smooth",
+                method = "gam",
+                formula = y ~ s(x, bs= "cs"),
+                size = 1.1,
+                se = FALSE) +
       scale_x_continuous(breaks = scales::pretty_breaks(8)) +
       scale_y_continuous(breaks = scales::pretty_breaks(8)) +
       labs(title = "Retention Time to m/z correlation plot") +
@@ -748,7 +756,7 @@ PlotMassDistribution <- function(x, method = 'trellis'){
     figure <- ggplot(res, aes_string(x = "deconv", fill = "ChargeState", colour = "ChargeState")) +
       geom_histogram(binwidth = 100, alpha = .3, position = "identity") +
       labs(title = "Precursor mass to charge frequency plot ") +
-      labs(subtitle = "Plotting frequency of precursor masses for each charge state") +
+      labs(subtitle = "Plotting chrage state resolved frequency of precursor masses") +
       labs(x = "Precursor neutral mass [Da]", y = "Frequency [counts]") +
       labs(fill = "Charge State", colour = "Charge State") +
       scale_x_continuous(breaks = scales::pretty_breaks(8)) +
@@ -768,10 +776,10 @@ PlotMassDistribution <- function(x, method = 'trellis'){
     figure <- ggplot(res, aes_string(x = "ChargeState", y = "deconv", fill = "filename")) +
       geom_violin() +
       #geom_histogram(binwidth = 100, alpha = .3, position = "identity") +
-      labs(title = "Precursor mass to charge frequency plot ") +
-      labs(subtitle = "Plotting frequency of precursor masses for each charge state") +
+      labs(title = "Precursor mass to charge density plot ") +
+      labs(subtitle = "Plotting the charge state resolved precursor masse density for each mass spectrometry run") +
       labs(x = "Charge State ", y = "Neutral Mass [Da]") +
-      labs(fill = "Charge State", colour = "Charge State") +
+      #labs(fill = "Charge State", colour = "Charge State") +
       #scale_x_continuous(breaks = scales::pretty_breaks(8)) +
       theme_light() +
       theme(legend.position = "top")
@@ -789,10 +797,9 @@ PlotMassDistribution <- function(x, method = 'trellis'){
       geom_line(stat = "density") +
       #geom_density(aes(y= ..density.. )) + with base line along x axis with density value y= 0
       #geom_histogram(binwidth = 100, alpha = .3, position = "identity") +
-      labs(title = "Precursor mass to charge frequency plot ") +
-      labs(subtitle = "Plotting frequency of precursor masses for each charge state") +
-      labs(x = "Precursor mass [neutral mass]", y = "Frequency [counts]") +
-      labs(fill = "Charge State", colour = "Charge State") +
+      labs(title = "Precursor mass density plot ") +
+      labs(subtitle = "Plotting the precursor masse density for each mass spectrometry run") +
+      labs(x = "Precursor mass [neutral mass]", y = "Density") +
       scale_x_continuous(breaks = scales::pretty_breaks(12)) +
       coord_cartesian(xlim = c(min(res$deconv), 10000)) +
       theme_light() +
@@ -920,7 +927,7 @@ PlotScanTime <- function(x, method='trellis'){
     figure <- ggplot(res, aes_string(x = "filename", y = "ElapsedScanTimesec")) +
       geom_violin()  +
       facet_grid(MSOrder + MassAnalyzer~., scales = "free") +
-      stat_summary(fun.y = max , geom = "point", colour = "red") +
+      #stat_summary(fun.y = max , geom = "point", colour = "red") +
       scale_y_continuous(breaks = scales::pretty_breaks(8)) +
       labs(title = "Scan time plot") +
       labs(subtitle = "Plotting the retention time resolved elapsed scan time density for each mass spectrometry run") +
@@ -989,7 +996,7 @@ PlotInjectionTime <- function(x, method='trellis'){
     
   }else if(method == 'overlay'){
     figure <- ggplot(x, aes_string(x = "StartTime", y = "IonInjectionTimems", colour = "filename")) +
-      geom_point(size = 0.5) +
+      geom_point(size = 0.5, alpha = 0.1) +
       geom_line(aes_string(group = "filename", colour = "filename"),
                 stat = "smooth",
                 method = "gam",
@@ -1094,9 +1101,9 @@ PlotCycleLoad <- function(x, method = 'trellis'){ #old name ms2.distribution
       scale_y_continuous(breaks = scales::pretty_breaks(8)) +
       scale_x_continuous(breaks = scales::pretty_breaks(8)) +
       coord_cartesian(ylim = c(0, max(res$n)+1)) +
-      labs(title = "Time resolved number of Ms2 scans") +
-      labs(subtitle = "Plotting the number of Ms2 per Ms1 scan versus retention time") +
-      labs(x = "Retention Time [min]", y = "Number of Ms2 per Ms1 [counts]") +
+      labs(title = "Time resolved number of MS2 scans") +
+      labs(subtitle = "Plotting the number of MS2 per MS1 scan versus retention time") +
+      labs(x = "Retention Time [min]", y = "Number of MS2 per MS1 [counts]") +
       theme_light()
     return(figure)
     
@@ -1115,9 +1122,9 @@ PlotCycleLoad <- function(x, method = 'trellis'){ #old name ms2.distribution
     figure <- ggplot(res, aes_string(x = "filename", y = "n")) +
       geom_violin() +
       coord_cartesian(ylim = c(0, max(res$n)+1)) +
-      labs(title = "Time resolved number of Ms2 scans") +
-      labs(subtitle = "Plotting the duty cycle resolved Ms2 density for each mass spectrometry run") +
-      labs(x = "Retention Time [min]", y = "Number of Ms2 per Ms1 [counts]") +
+      labs(title = "Time resolved number of MS2 scans") +
+      labs(subtitle = "Plotting the duty cycle resolved MS2 density for each mass spectrometry run") +
+      labs(x = "Retention Time [min]", y = "Number of MS2 per MS1 [counts]") +
       theme_light() +
       theme(axis.text.x = element_text(angle = 90))
     return(figure)
@@ -1138,9 +1145,9 @@ PlotCycleLoad <- function(x, method = 'trellis'){ #old name ms2.distribution
       scale_y_continuous(breaks = scales::pretty_breaks(8)) +
       scale_x_continuous(breaks = scales::pretty_breaks(8)) +
       coord_cartesian(ylim = c(0, max(res$n)+1)) +
-      labs(title = "Time resolved number of Ms2 scans") +
-      labs(subtitle = "Plotting the number of Ms2 per Ms1 scan versus retention time") +
-      labs(x = "Retention Time [min]", y = "Number of Ms2 per Ms1 [counts]") +
+      labs(title = "Time resolved number of MS2 scans") +
+      labs(subtitle = "Plotting the number of MS2 per MS1 scan versus retention time") +
+      labs(x = "Retention Time [min]", y = "Number of MS2 per MS1 [counts]") +
       theme_light() +
       theme(legend.position = "top")
     return(figure)
@@ -1195,18 +1202,18 @@ PlotScanFrequency <- function(x, method = 'trellis'){
       dplyr::ungroup() %>% 
       ScanFrequMovingOver(.)
     
-    figure <- ggplot(res, aes_string(x = "Time", y = "Frequency", colour = "Type")) +
-      facet_wrap(~filename) +
+    figure <- ggplot(res, aes_string(x = "Time", y = "Frequency", colour = "filename")) +
+      facet_wrap(~Type) +
       geom_line() +
       scale_x_continuous(breaks = scales::pretty_breaks(8))+
       scale_y_continuous(breaks = scales::pretty_breaks(8))+
       labs(title = "Ms2 Scan Frequency Plot") +
       labs(subtitle = "Plotting number of ms2 per second against retention time") +
       labs(x = "Retention Time [min]", y = "Ms2 frequency [Hz]") +
-      theme_light() 
+      theme_light() +
       theme(legend.position = "top")
+    return(figure)
     
-    return(figure)  
   }else{NULL}
 }
 

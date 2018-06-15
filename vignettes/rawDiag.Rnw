@@ -501,7 +501,6 @@ implemented plot functions can be found in Table~\ref{table:functions} and the f
 visualization styles is depicted in Figure~\ref{figure:viz}. 
 
 
-
 \subsection{Use case -- Optimize data dependent analysis}
 \label{section:application} 
 Starting from an initial method template based on the work of Kelstrup et al.,\cite{pmid29183128} 
