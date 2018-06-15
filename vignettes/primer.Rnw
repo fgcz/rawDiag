@@ -5,7 +5,7 @@
 \usepackage{listings}
 
 \author{Christian Trachsel, Tobias Kockmann, Christian Panse}
-\title{\pkg{rawDiag}: an R Package for Diagnostic Plots of Mass Spectrometry Raw Data}
+\title{An Introduction to the \pkg{rawDiag} R Package}
 
 \Plainauthor{Christian Trachsel, Tobias Kockmann, Christian Panse}
 
@@ -140,7 +140,7 @@ names(WU163763)
 \subsection{Using The New RawFileReader}
 
 The function \code{read.raw} uses the .Net assembly \citep{RawFileReader} based executable to directly extract the information out of the mass spectrometry meassurement file. The \proglang{C\#}
-source code as well as the compiler and linker options for a linux build is provided as a docker recipe (see \texttt{inst/docker/Dockerfile}. We use R for the implementation and read the data using the pipe command
+source code as well as the compiler and linker options for a Linux build is provided as a docker recipe (see \texttt{inst/docker/Dockerfile}. We use R for the implementation and read the data using the pipe command
 
 The following code snippet demonstrates the use of the \code{read.raw} function to extract data from a tiny example raw file:
 
@@ -168,11 +168,10 @@ Additional information can be found using the R man pages.
 \subsection{Reading the Open Proteomics Standard Files}
 
 The package also ships with an adapter function \code{as.rawDiag.mzR}
-which enables the support of open file standards through using the Bioconductor 
-\pkg{mzR} package \cite{mzR}.
+which enables the support of open file standards by using the Bioconductor 
+\pkg{mzR} package \citep{mzR}.
 
-The demonstration is shown using the code snippet below by using a tiny mzML
-file.
+The following example code shows the access on a mzML file.
 <<mzR>>=
 library(mzR); 
 
@@ -281,9 +280,9 @@ print(gp <- PlotInjectionTime(subset(df, MSOrder %in% "Ms2"),
 \label{figure:IT}
 \end{figure}
 
-From figure~\ref{figure:IT} one can see that the injection time distribution is shiftet towards longer injection times, the more MS2 scans are available. This behaviour is kind of expected, since the instrument is picking more lower abundat ions to fill all the available MS2 slots in the top 36 and top 72 methods. From the plot itself the distribution indicated that the top 72 method is still operating in a acceptable range. 
+From Figure~\ref{figure:IT} one can see that the injection time distribution is shiftet towards longer injection times, the more MS2 scans are available. This behaviour is kind of expected, since the instrument is picking more lower abundat ions to fill all the available MS2 slots in the top 36 and top 72 methods. From the plot itself the distribution indicated that the top 72 method is still operating in a acceptable range. 
 
-At this point, we can now performe a database search with the three files to check if we identify more peptide and proteins with the two optimized methods. We can also use this additional data to check if the quality of the spectrs is starting to decrease and if further optimizations are required on the mehtods. All the described steps executed on the command line in an R session can also be performed in an interactive Shiny environment.
+At this point, we can now perform a database search with the three files to check if we identify more peptide and proteins with the two optimized methods. We can also use this additional data to check if the quality of the spectrs is starting to decrease and if further optimizations are required on the mehtods. All the described steps executed on the command line in an R session can also be performed in an interactive Shiny environment.
 To start the Shiny application (see Figure~\ref{figure:shiny}) type the following into your R shell:
 
 <<shiny, eval=FALSE>>=
@@ -304,7 +303,7 @@ shiny::runApp(rawDiag_shiny, display.mode = 'normal')
 \newpage
 \section{Benchmark}
 \label{section:bench}
-As described in \citet{TrachselJPR} we performed a benchmark on different plattforms using a larger data set and the following code snippet.
+As described in \citet{TrachselJPR} we performed a benchmark on different plattforms using a larger data set by the following code snippet.
 <<eval = FALSE>>= 
 library(parallel)
 
@@ -325,8 +324,8 @@ save(b.Linux, file='benchmark.RData')
 @
   
 
-The used data are shipped with the \pkg{rawDiag} package (also availabel through proteomeXchange PXD006932) and the performance metrics
-are visulized in Figures~\ref{figure:benchmark}.
+We performed the benchmark using the proteomeXchange PXD006932 data set.
+The performance metrics are visulized in Figures~\ref{figure:benchmark}.
 <<label=benchmark-time, eval = TRUE, fig = TRUE, width = 6, height = 5, echo = FALSE, include = FALSE>>=
 rawDiag:::.technote_benchmark_figure_1() 
 @
@@ -381,7 +380,7 @@ mcs /out:fgcz_raw.exe \
 
 \subsection{Known issues}
 \begin{itemize}
-\item the \code{system2} function on windows R version 3.5.0 is not writting into a file. 
+\item the used \code{system2} function on windows R version 3.5.0 is not writting into a file. 
 \end{itemize}
 
 \section{Session information}
