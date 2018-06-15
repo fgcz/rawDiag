@@ -75,11 +75,10 @@ devtools::install_github("fgcz/rawDiag", build_vignettes = FALSE)
 
 ```{r}
 library(rawDiag)
-load(file.path(path.package(package = "rawDiag"),
-                 file.path("extdata", "PXD006932_Exp3A_smp.RData")))
-                 
-PlotPrecursorHeatmap(PXD006932_Exp3A_HeLa_1ug_60min_7500_02)
-PlotMassDistribution(PXD006932_Exp3A_HeLa_1ug_60min_7500_02)
+data(WU163763)
+PlotScanFrequency(WU163763, method='overlay')
+PlotPrecursorHeatmap(WU163763)
+PlotMassDistribution(WU163763
 ```
 
 ### 3.2 An interactive shiny example
