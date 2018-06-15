@@ -5,7 +5,8 @@ an R package supporting rational LC-MS method optimization for bottom-up proteom
 
 
 ## 1 System Requirements  
-for Windows/Linux/MacOSX platforms with a 64 Bit architecture
+
+a Windows/Linux/MacOSX x64 platform 
 
 
 ### 1.1 .NET Framework and R
