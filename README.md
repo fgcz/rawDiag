@@ -38,6 +38,7 @@ To install *the New RawFileReader .Net assembly* follow the installation instruc
 |Windows   | 10 x64| 3.4.4 |CP virtual box|
 |Windows   | Server 2012 R2 x64 | 3.4.4|CP|
 |MacOSX    | 10.13.5 (17F77)|3.4.2|CP|
+|MacOSX    | 10.13.4 (17E202)|3.4.4|CP|
 |MacOSX    | 10.11.6 (15G20015)|3.4.3 |JG|
 
 ## 2 Installation guide
