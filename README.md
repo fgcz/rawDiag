@@ -4,18 +4,18 @@ an R package supporting rational LC-MS method optimization for bottom-up proteom
 
 
 
-## 1. System Requirements  
+## 1 System Requirements  
 for Windows/Linux/MacOSX platforms with a 64 Bit architecture
 
 
-### 1.1. .NET Framework and R
+### 1.1 .NET Framework and R
 
 - https://www.mono-project.com/ (>4.0.22) for (Linux and MacOSX) or .NET Framework 4.5 or higher (Windows)
 - R (>3.4.0)
 - install https://CRAN.R-project.org/package=devtools
 - if you want support for [Open File Standards](http://www.psidev.info/) install the [mzR](http://bioconductor.org/packages/mzR/) package. 
 
-### 1.2. The New RawFileReader .Net assembly from Thermo Fisher Scientific
+### 1.2 The New RawFileReader .Net assembly from Thermo Fisher Scientific
 
 **If your installation does not work with the below-mentioned instructions, do not hesitate to request a ready to run R package from the authors via Email, subject `request rawDiag package`.**
 
@@ -40,9 +40,9 @@ To install *the New RawFileReader .Net assembly* follow the installation instruc
 |MacOSX    | 10.13.5 (17F77)|3.4.2|CP|
 |MacOSX    | 10.11.6 (15G20015)|3.4.3 |JG|
 
-## 2. Installation guide
+## 2 Installation guide
 
-### 2.1. Instructions
+### 2.1 Instructions
 To ensure the proper function of this R package please check if all the [requirements](README.md#1-system-requirements) are fullfilled prior to using it.
 
 #### all OS
@@ -57,12 +57,12 @@ devtools::install_github("fgcz/rawDiag", build_vignettes = FALSE)
 ```
 
 
-### 2.2. Typical install time on a "normal" desktop computer
+### 2.2 Typical install time on a "normal" desktop computer
 
 * requirements: 1 to 30 minutes; one minute if you are a C# and R developer
 * the rawDiag package through github: 10 minutes 
 
-## 3. Demonstration
+## 3 Demonstration
 
 ### 3.1 R commandline code snippet
 
@@ -117,7 +117,7 @@ RAW <- read.raw(file = rawfile, rawDiag = FALSE)
 dim(RAW)
 ```
 
-## 4. Instructions for use
+## 4 Instructions for use
 
 read the vignettes.
 
