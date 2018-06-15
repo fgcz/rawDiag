@@ -60,7 +60,7 @@ devtools::install_github("fgcz/rawDiag", build_vignettes = FALSE)
 
 ### 2.2 Typical install time on a "normal" desktop computer
 
-* requirements: 1 to 30 minutes; one minute if you are a C# and R developer
+* Thermo RawFileReader dll: 1sec to 30 minutes
 * the rawDiag package through github: 10 minutes 
 
 ## 3 Demonstration
