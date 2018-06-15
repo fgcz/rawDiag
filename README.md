@@ -27,9 +27,9 @@ has to be downloaded and installed separately in order to be able to directly re
 To install *the New RawFileReader .Net assembly* follow the installation instructions provided by Thermo Fisher Scientific.
 
 
-### 1.3 Versions the software has been tested on
+### 1.3 Platforms and versions the software has been tested on
 
-|plattform|plattform version|R version|note|
+|platform|platform version|R version|note|
 | :------- |---------------:| -------:|:------- |
 |Linux| Debian 8 |  3.4.3 | [Demo system](http://fgcz-ms-shiny.uzh.ch:8080/bfabric_rawDiag/)|
 |Linux     | Debian testing | 3.5.0 | CP |
