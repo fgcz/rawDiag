@@ -128,7 +128,7 @@ browseVignettes('rawDiag')
 
 the documentation of the function is available through the R man pages.
 
-## 5. Useful Links
+## 5 Useful Links
 - http://planetorbitrap.com/rawfilereader
 - [screen recording (3:02 minutes, size 47MB, no audio track)](http://fgcz-ms.uzh.ch/~cpanse/PAPERS/pr-2018-001736.mov)
 - [shiny demo on our compute server](http://fgcz-ms-shiny.uzh.ch:8080/rawDiag-demo/)
