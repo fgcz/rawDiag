@@ -522,8 +522,9 @@ scans during the main peptide elution phase, comparing the methods to the initia
 As a concomitant effect the average cycle load (number of MS2 scans per cycle) increased from 10 ("Top18") to 16 and 21 
 ("Top36" and "Top72", respectively). These optimized methods not only showed better run characteristics but
 ultimately also resulted in more peptide and protein 
-identifications as shown in Figure~\ref{figure:application}C and \ref{figure:application}D. (Data searched by 
-Sequest through Proteome~Discoverer agains a human database applying standard search parameters and filtered for high confidence)
+identifications as shown in Figure~\ref{figure:application}C and \ref{figure:application}D. For database searches, Proteome~Discoverer was used to with the following search settings: Data was searched against the human Uniprot reference proteome using SEQUEST HT 
+(tryptic enzyme specificity incl. 2 missed cleavages, precursor mass tolerance: 20 ppm, fragment mass tolerance: 0.5 Da, Carbamidomethyl as static modification, Dynamic Modifications: Methionine oxidation, N-terminal protein acetylation). Resulting identifications were filtered to 1\% peptide FDR using Percolator.
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %\SweaveInput{technote_application.Rnw}

@@ -156,7 +156,7 @@ as.rawDiag <- function(object){
 #' @return an \code{\link{rawDiag}} object
 #' @author Christian Panse <cp@fgcz.ethz.ch>, Witold E.Wolski <wew@fgcz.ethz.ch>
 #' @export as.rawDiag.mzR
-#' @example 
+#' @example
 #' 
 #' 
 #' \dontrun{
@@ -411,7 +411,7 @@ fillNAgaps <- function(x) {
 #'
 #' @return calculates the MS1 master scan number of an MS2 scan and populates the MasterScanNumber
 #' with it
-.CalculatioMasterScan <- function(x){
+CalculatioMasterScan <- function(x){
   
   res <- x %>% 
     mutate(MasterScanNumber = dplyr::case_when(MSOrder == "Ms" ~ scanNumber)) %>%  
