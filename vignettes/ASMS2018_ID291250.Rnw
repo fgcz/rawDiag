@@ -216,7 +216,9 @@ The software versions are: R 3.4.3, mzR 2.8.1, and ThermoRawFileReader 4.0.22.
 
 
 <<echo=FALSE>>=
-rv <- rawDiag:::.overview(prefix="graphics/rawDiag")
+data(WU163763)
+WU <- WU163763[WU163763$filename %in% unique(WU163763$filename)[1:2], ]
+rv <- rawDiag:::PlotAll(WU, prefix="graphics/rawDiag")
 @
 
 \begin{table}[H]

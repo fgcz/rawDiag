@@ -53,7 +53,7 @@ this function is a generic adapter function for
 (rawfile <- file.path(path.package(package = 'rawDiag'), 'extdata', 'sample.raw'))
 system.time(RAW <- read.raw(file = rawfile))
 dim(RAW)
-summary.rawDiag(RAW)
+summary(RAW)
 PlotScanFrequency(RAW)
 
 # read all dimensions

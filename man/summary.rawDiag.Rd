@@ -4,10 +4,12 @@
 \alias{summary.rawDiag}
 \title{rawDiag Summaries}
 \usage{
-\method{rawDiag}{summary}(object)
+summary.rawDiag(object, ...)
 }
 \arguments{
 \item{object}{a \code{\link{data.frame}} fullfilling the \code{\link{is.rawDiag}} column naming criteria.}
+
+\item{...}{additional arguments affecting the summary produced.}
 }
 \value{
 a \code{data.frame}

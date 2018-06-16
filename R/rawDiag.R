@@ -64,7 +64,6 @@
 #' @param object any R object.
 #' @aliases rawDiag
 #' @return a boolean
-#' @import magrittr
 #' @import tidyverse
 #' @importFrom stats na.omit quantile
 #' @export is.rawDiag
@@ -163,7 +162,7 @@ as.rawDiag <- function(object){
 #'    mzML <- "04_S174020_5000_5010.mzML"
 #'    mzML <- file.path(path.package(package = "rawDiag"), "extdata", mzML)
 #'    system.time(RAW <- rawDiag:::as.rawDiag.mzR(openMSfile(mzML)))
-#'    summary.rawDiag(RAW)
+#'    summary(RAW)
 #'    RAW$scanNumber
 #' }
 #' 
@@ -285,7 +284,7 @@ read.tdf <- function(filename){
 #' (rawfile <- file.path(path.package(package = 'rawDiag'), 'extdata', 'sample.raw'))
 #' system.time(RAW <- read.raw(file = rawfile))
 #' dim(RAW)
-#' summary.rawDiag(RAW)
+#' summary(RAW)
 #' PlotScanFrequency(RAW)
 #' 
 #' # read all dimensions
@@ -360,12 +359,12 @@ read.raw <- function(file, mono = if(Sys.info()['sysname'] %in% c("Darwin", "Lin
 
 #' rawDiag Summaries
 #'
+#' @param ... additional arguments affecting the summary produced.
 #' @param object a \code{\link{data.frame}} fullfilling the \code{\link{is.rawDiag}} column naming criteria.
-#' @aliases summary.rawDiag
+#' 
 #' @return a \code{data.frame}
-#' @export summary.rawDiag 
-#' @method rawDiag summary
-summary.rawDiag <- function(object){
+#' @exportMethod summary.rawDiag
+summary.rawDiag <- function(object, ...){
   table(object$filename, object$MSOrder)
 }
 # ----Colors----
@@ -1318,7 +1317,7 @@ PlotMassHeatmap <- function(x, method='trellis', bins = 80){ #rename to mass.hea
                                              tMS2 = 35/1000), 
                func = 'rough', R=15000))
   
-  stopifnot(require(lattice))
+  #stopifnot(require(lattice))
   cv <- 1-1:7/10
   t<-trellis.par.get("strip.background")
   t$col<-(rgb(cv,cv,cv))
@@ -1355,16 +1354,19 @@ PlotMassHeatmap <- function(x, method='trellis', bins = 80){ #rename to mass.hea
 
 
 # ----ASMS2018 poster Figures----
-#' Title
-#'
+
+#' generates a list of all available plot outputs
+#' @param x a \code{\link{data.frame}} fullfilling the \code{\link{is.rawDiag}} column naming criteria.
 #' @param prefix 
+#' @param pngsave default is TRUE
+#' @param resolution number of pixels in png file, default is 240
 #' @importFrom grDevices dev.off png rgb
-.overview <- function(prefix="primer"){
-  
-  data(WU163763)
-  WU <- WU163763
-  WU <- WU[WU$filename %in% unique(WU$filename)[1:2], ]
-  
+#' @examples 
+#' data(WU163763)
+#' WU <- WU163763[WU163763$filename %in% unique(WU163763$filename)[1:2], ]
+#' rv <- PlotAll(x = WU, savepng = FALSE)
+PlotAll <- function(x, prefix = "primer", savepng = TRUE, resolution = 240){
+  WU <- x
   lapply(ls("package:rawDiag")[grepl("Plot", ls("package:rawDiag"))], 
          function(fn){
            lapply(c('trellis', 'violin', 'overlay'), function(a){
@@ -1392,9 +1394,10 @@ PlotMassHeatmap <- function(x, method='trellis', bins = 80){ #rename to mass.hea
                  theme(strip.background = element_blank()) +
                  theme(strip.text = element_blank())
                if (!is.null(gp)){
-                 png(pngFileName, 240, 240)
+                 if(savepng){
+                 png(pngFileName, resolution, resolution)
                  print(gp)
-                 dev.off()}
+                 dev.off()}else{print(gp)}}
              }
            })}
          
@@ -1402,9 +1405,9 @@ PlotMassHeatmap <- function(x, method='trellis', bins = 80){ #rename to mass.hea
 }
 
 #' ASMS_benchmark_figure_1
+
 #' @return xyplot
 .ASMS_benchmark_figure_1 <- function(){
-  library(lattice)
   data(benchmark)
   cv <- 1 - 2:7/10
   t <- trellis.par.get("strip.background")
@@ -1433,10 +1436,9 @@ PlotMassHeatmap <- function(x, method='trellis', bins = 80){ #rename to mass.hea
 }
 
 #' ASMS_benchmark_figure_2
-#'
+
 #' @return xyplot
 .ASMS_benchmark_figure_2 <- function(){
-  library(lattice)
   data(benchmark)
   cv <- 1 - 2:7 / 10
   t <- trellis.par.get("strip.background")
@@ -1718,7 +1720,7 @@ PlotMassHeatmap <- function(x, method='trellis', bins = 80){ #rename to mass.hea
 #' technote's application figure 5
 #'
 #' @param x 
-#'
+#' @importFrom magrittr %>%
 #' @return a ggplot opbject
 .technote_application_figure_5 <- function(x){
   res <- x %>% 
@@ -1861,12 +1863,14 @@ PlotMassHeatmap <- function(x, method='trellis', bins = 80){ #rename to mass.hea
 }
 
 # ----Benchmark----
-#' benchmar read.raw
-#'
+#' benchmark read.raw
+#' 
 #' @param f 
 #' @param maxncpu 
 #' @param exe 
 #' @param rdata 
+#' @details benchmarks the \code{read.raw} function's IO.
+#' @references \url{http://planetorbitrap.com/rawfilereader#.WyThDK3QPmE}
 #' @import parallel
 #' @return a nested list object.
 #' @examples
@@ -1877,7 +1881,7 @@ PlotMassHeatmap <- function(x, method='trellis', bins = 80){ #rename to mass.hea
 .benchmark <- function(f, maxncpu = c(16, 32, 64), 
                        exe = "~/RiderProjects/fgcz-raw/bin/Debug/fgcz_raw.exe", 
                        rdata = tempfile(fileext = ".RData")){
-  if(require(parallel)){
+  if(TRUE){
     benchmark.rawDiag  <- lapply(maxncpu, 
                                  function(ncpu){
                                    ostart <- Sys.time()
@@ -1912,7 +1916,7 @@ PlotMassHeatmap <- function(x, method='trellis', bins = 80){ #rename to mass.hea
 
 .benchmark.mzR <- function(f, maxncpu = c(16, 32, 64), 
                            rdata = tempfile(fileext = ".RData")){
-  if(require(parallel)){
+  if(TRUE){
     benchmark.rawDiag  <- lapply(maxncpu, 
      function(ncpu){
        ostart <- Sys.time()

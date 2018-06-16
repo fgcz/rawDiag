@@ -148,7 +148,7 @@ The following code snippet demonstrates the use of the \code{read.raw} function 
 rawfile <- file.path(path.package(package = "rawDiag"),
                      "extdata", 'sample.raw')
 system.time(RAW <- read.raw(file = rawfile))
-summary.rawDiag(RAW)
+summary(RAW)
 @
 
 reading all parameters
@@ -167,7 +167,7 @@ Additional information can be found using the R man pages.
 
 \subsection{Reading the Open Proteomics Standard Files}
 
-The package also ships with an adapter function \code{as.rawDiag.mzR}
+The package also ships with an adapter function \code{rawDiag:::as.rawDiag.mzR}
 which enables the support of open file standards by using the Bioconductor 
 \pkg{mzR} package \citep{mzR}.
 
@@ -178,7 +178,7 @@ library(mzR);
 mzML <- "04_S174020_5000_5010.mzML"
 mzML <- file.path(path.package(package = "rawDiag"), "extdata", mzML)
 system.time(RAW <- rawDiag:::as.rawDiag.mzR(openMSfile(mzML)))
-summary.rawDiag(RAW)
+summary(RAW)
 RAW$scanNumber
 @
 

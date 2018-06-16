@@ -330,7 +330,9 @@ allows the generation of pdf reports.
 \end{figure}
 
 <<overview, echo=FALSE>>=
-rv <- rawDiag:::.overview(prefix="graphics/rawDiag")
+data(WU163763)
+WU <- WU163763[WU163763$filename %in% unique(WU163763$filename)[1:2], ]
+rv <- rawDiag:::PlotAll(WU, prefix="graphics/rawDiag")
 @
 
 \newcommand{\G}[1]{
