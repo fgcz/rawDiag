@@ -3,7 +3,7 @@
 ^.*_config.yml$
 ^.*.travis.yml$
 ^.*LICENSE$
-^.*vignettes/rawDiag.Rnw$
+#^.*vignettes/rawDiag.Rnw$
 ^.*vignettes/ASMS2018_ID291250.Rnw$
 ^.*inst/extdata/PXD006932_Exp3A_smp.RData$
 ^.*inst/extdata/PXD006932_Exp3A.RData$

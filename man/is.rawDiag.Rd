@@ -2,6 +2,7 @@
 % Please edit documentation in R/rawDiag.R
 \name{is.rawDiag}
 \alias{is.rawDiag}
+\alias{rawDiag}
 \title{Is an Object from a rawDiag class?}
 \usage{
 is.rawDiag(object)

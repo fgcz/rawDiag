@@ -1,5 +1,8 @@
 \name{benchmark}
 \alias{benchmark}
+\alias{b.Linux}
+\alias{b.Apple}
+\alias{X.Linux}
 \docType{data}
 \title{
 benchmark 

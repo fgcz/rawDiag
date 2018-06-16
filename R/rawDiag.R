@@ -62,8 +62,10 @@
 #' Is an Object from a rawDiag class?
 #'
 #' @param object any R object.
-#'
+#' @aliases rawDiag
 #' @return a boolean
+#' @import magrittr
+#' @import tidyverse
 #' @importFrom stats na.omit quantile
 #' @export is.rawDiag
 is.rawDiag <- function(object){
@@ -152,20 +154,19 @@ as.rawDiag <- function(object){
 #' mzR reader method
 #'
 #' @param object an mzR object
-#'
+#' @aliases as.rawDiag.mzR 
 #' @return an \code{\link{rawDiag}} object
 #' @author Christian Panse <cp@fgcz.ethz.ch>, Witold E.Wolski <wew@fgcz.ethz.ch>
 #' @export as.rawDiag.mzR
-#' @example
-#' 
-#' 
-#' \dontrun{
-#' library(mzR); 
-#' library(rawDiag)
-#' mzML <- "20180220_04_S174020_Pierce_HeLa_Protein_Digest_Std_5000_5010.mzML"
-#' mzML <- file.path(path.package(package = "rawDiag"), "extdata", mzML)
-#' RAW <- rawDiag:::as.rawDiag.mzR(openMSfile(mzML))
+#' @examples
+#' if(require(mzR)){
+#'    mzML <- "04_S174020_5000_5010.mzML"
+#'    mzML <- file.path(path.package(package = "rawDiag"), "extdata", mzML)
+#'    system.time(RAW <- rawDiag:::as.rawDiag.mzR(openMSfile(mzML)))
+#'    summary.rawDiag(RAW)
+#'    RAW$scanNumber
 #' }
+#' 
 as.rawDiag.mzR <- function(object){
   #time.start <- Sys.time()
   runInfo <- runInfo(object)
@@ -212,7 +213,7 @@ as.rawDiag.mzR <- function(object){
 
 #' Reading Bruker tdf files
 #'
-#' @param filea filename if the tdf file
+#' @param filename filename if the tdf file
 #'
 #' @return a rawDiagobject
 #' @import RSQLite
@@ -359,9 +360,9 @@ read.raw <- function(file, mono = if(Sys.info()['sysname'] %in% c("Darwin", "Lin
 
 #' rawDiag Summaries
 #'
-#' @param object  a \code{\link{data.frame}} fullfilling the \code{\link{is.rawDiag}} column naming criteria.
-#'
-#' @return a table.
+#' @param object a \code{\link{data.frame}} fullfilling the \code{\link{is.rawDiag}} column naming criteria.
+#' @aliases summary.rawDiag
+#' @return a \code{data.frame}
 #' @export summary.rawDiag 
 #' @method rawDiag summary
 summary.rawDiag <- function(object){
@@ -1352,7 +1353,12 @@ PlotMassHeatmap <- function(x, method='trellis', bins = 80){ #rename to mass.hea
   p
 }
 
-# ----TechNote Figs----
+
+# ----ASMS2018 poster Figures----
+#' Title
+#'
+#' @param prefix 
+#' @importFrom grDevices dev.off png rgb
 .overview <- function(prefix="primer"){
   
   data(WU163763)
@@ -1396,7 +1402,6 @@ PlotMassHeatmap <- function(x, method='trellis', bins = 80){ #rename to mass.hea
 }
 
 #' ASMS_benchmark_figure_1
-#'
 #' @return xyplot
 .ASMS_benchmark_figure_1 <- function(){
   library(lattice)
@@ -1455,7 +1460,7 @@ PlotMassHeatmap <- function(x, method='trellis', bins = 80){ #rename to mass.hea
          },
          scales=list(y = list(log=TRUE, at=c(500,1000,2000,4000,8000,16000,32000,64000, 1280000))))
 }
-
+# ----JPR TechNote Figures----
 .technote_benchmark_figure_1 <- function(){
   data(benchmark)
   
@@ -1477,19 +1482,6 @@ PlotMassHeatmap <- function(x, method='trellis', bins = 80){ #rename to mass.hea
     theme(legend.title = element_text(size = 10, face = "bold"))
   
   gp
-  
-  #gp <- ggplot(rbind(b.Linux, b.Apple, X.Linux), aes(y=overall.runtime, x=ncpu,
-  #                                                   group=ncpu), 
-  #             color=method) + 
-  #  coord_trans(y = "log10") +
-  #  scale_y_continuous(breaks = c(90, 120, 180, 240, 480, 600, 900, 1800, 3600, 1800 + 3600)) +
-  #  stat_summary(fun.y = mean, geom = "line", aes( group = 1)) + #colour = "deepskyblue2") +
-  #  geom_boxplot() +
-  #  labs(x = "number of used processes", y = "overall  time [in seconds] of read.raw",
-  #       subtitle='overall runtime') +
-  #  theme_light()
-  
-  #gp + facet_grid( .  ~ system * method ) 
 }
 
 .technote_benchmark_figure_2 <- function(){
@@ -1518,71 +1510,7 @@ PlotMassHeatmap <- function(x, method='trellis', bins = 80){ #rename to mass.hea
     theme(legend.title = element_text(size = 10, face = "bold"))
   
   gp
-  
-  #gp <- ggplot(rbind(b.Linux, b.Apple, X.Linux), aes(y=IO.throuput, x=ncpu, group=ncpu)) + 
-  #  stat_summary(fun.y = mean, geom = "line", aes( group = 1)) + #, colour = "deepskyblue2") +
-  #  geom_boxplot() +
-  #  coord_trans(y = "log10") +
-  #  scale_y_continuous(breaks = c(500, 1000, 2000, 4000, 8000, 16000, 32000, 64000)) +
-  #  labs(x = "number of used processes", y = "IO throughput  [number of scan info / s]", 
-  #       subtitle='IO throughput') +
-  #  theme_light() 
-  # coord_trans(y = "log10") +
-  #  scale_y_continuous(breaks = c(0.1, 0.25, 0.5, 1.0, 1.25)) +
-  
-  # annotate("text", x = 40, y = 0.20, label = paste("max throughput =", round(max(b.Linux$IO.throuput), 2), "GBytes/s")) +
-  #  annotate("text", x = 40, y = 0.15, label = paste("min throughput =", round(min(b.Linux$IO.throuput), 2), "GBytes/s"))
-  
-  #gp + facet_grid( .  ~ system * method)
 }
-#remove
-.technote_example_figure_1 <- function(x){
-  res <- precursor.heatmap(x)  
-  
-  res +
-    labs(title = "A)", subtitle = "") +
-    labs(x = "Time [min] ", y = "Precursor Mass [m/z]") +
-    theme(title = element_text(size = 36)) +
-    theme(axis.title = element_text(size = 20)) +
-    theme(axis.text.x = element_text(face="bold", size=14)) +
-    theme(axis.text.y = element_text(face="bold", size=14)) +
-    theme(axis.line = element_line(size = 1)) +
-    theme(panel.grid.major = element_line(colour = "gray"))
-
-}
-
-#remove
-.technote_example_figure_2 <- function(x){
-  res <- .charge.states(x)  
-  
-  res +
-    labs(title = "B)", subtitle = "") +
-    labs(x = "Precursor charge state", y = "Percentag [%]") +
-    theme(title = element_text(size = 36)) +
-    theme(axis.title = element_text(size = 20)) +
-    theme(axis.text.x = element_text(face="bold", size=14)) +
-    theme(axis.text.y = element_text(face="bold", size=14)) +
-    theme(axis.line = element_line(size = 1)) +
-    theme(panel.grid.major = element_line(colour = "gray"))
-  
-}
-
-#remove
-.technote_example_figure_3 <- function(x, theme_title_element_text_size = 15){
-  res <- .cycle.time(x)  
-  
-  res +
-    labs(title = "C)", subtitle = "") +
-    labs(x = "Time [min]", y = "Cycle Time [sec]") +
-    theme(title = element_text(size = theme_title_element_text_size)) +
-    theme(axis.title = element_text(size = 20)) +
-    theme(axis.text.x = element_text(face="bold", size=14)) +
-    theme(axis.text.y = element_text(face="bold", size=14)) +
-    theme(axis.line = element_line(size = 1)) +
-    theme(panel.grid.major = element_line(colour = "gray"))
-  
-}
-
 
 .technote_application_figure_2 <- function(x){
   MS2 <- x %>% 
@@ -1910,7 +1838,7 @@ PlotMassHeatmap <- function(x, method='trellis', bins = 80){ #rename to mass.hea
   res <- x %>% dplyr::filter_at(vars("MSOrder"), any_vars(. == "Ms2")) %>% 
     dplyr::select_at(vars("ChargeState", "PrecursorMass", "filename"))
   
-  res$deconv <-  round((res$PrecursorMass -1.00782)* res$ChargeState, 0)
+  res$deconv <-  round((res$PrecursorMass -1.00782) * res$ChargeState, 0)
   
   res <- dplyr::mutate_at(res, vars("ChargeState"), funs(factor(.)))
   
@@ -1932,17 +1860,6 @@ PlotMassHeatmap <- function(x, method='trellis', bins = 80){ #rename to mass.hea
   return(figure)
 }
 
-# ----Load data----
-
-#' WU163763
-#' @description a data set generated from reading \url{https://fgcz-bfabric.uzh.ch/bfabric/userlab/show-workunit.html?id=163763}.
-#' @return a \code{\link{data.frame}} fullfilling the \code{\link{is.rawDiag}} column naming criteria.
-#' @export getWU163763
-getWU163763 <- function(){
-  data(WU163763)
-  return(WU163763)
-}
-
 # ----Benchmark----
 #' benchmar read.raw
 #'
@@ -1950,7 +1867,7 @@ getWU163763 <- function(){
 #' @param maxncpu 
 #' @param exe 
 #' @param rdata 
-#' @importFrom parallel mclapply
+#' @import parallel
 #' @return a nested list object.
 #' @examples
 #' \dontrun{
@@ -1994,32 +1911,32 @@ getWU163763 <- function(){
 }
 
 .benchmark.mzR <- function(f, maxncpu = c(16, 32, 64), 
-                       rdata = tempfile(fileext = ".RData")){
+                           rdata = tempfile(fileext = ".RData")){
   if(require(parallel)){
     benchmark.rawDiag  <- lapply(maxncpu, 
-                                 function(ncpu){
-                                   ostart <- Sys.time()
-                                   r <- do.call('rbind',  
-                                                mclapply(f, function(file){
-                                                  
-                                                  start <- Sys.time()
-                                                  
-						  S <- as.rawDiag.mzR(openMSfile(file))
-                                                  
-                                                  end <- Sys.time()
-                                                  
-                                                  rv <- data.frame(file = file, 
-                                                                   runtime = end - start,
-                                                                   nrow  =nrow(S))
-                                                  rv
-                                                }, mc.cores = ncpu))
-                                   
-                                   r$ncpu <- ncpu
-                                   r$start.time <-  ostart
-                                   r$end.time <- Sys.time()
-                                   
-                                   return(r)
-                                 })
+     function(ncpu){
+       ostart <- Sys.time()
+       r <- do.call('rbind',  
+                    mclapply(f, function(file){
+                      
+                      start <- Sys.time()
+                      
+                      S <- as.rawDiag.mzR(openMSfile(file))
+                      
+                      end <- Sys.time()
+                      
+                      rv <- data.frame(file = file, 
+                                       runtime = end - start,
+                                       nrow  =nrow(S))
+                      rv
+                    }, mc.cores = ncpu))
+       
+       r$ncpu <- ncpu
+       r$start.time <-  ostart
+       r$end.time <- Sys.time()
+       
+       return(r)
+     })
     
     message(paste("writting result to", rdata, "..."))
     save(benchmark.rawDiag, file=rdata) 
@@ -2027,172 +1944,3 @@ getWU163763 <- function(){
     return(benchmark.rawDiag)
   }
 }
-
-# ----Superfluously?----
-
-#TODO: use position dodge for step plot? -> plot obsolete!
-.charge_state_quantiles <- function(x){
-  res <- x %>% 
-    dplyr::filter(MSOrder == "Ms2") %>% 
-    dplyr::select(ChargeState, filename) %>% 
-    dplyr::group_by(filename) %>% 
-    dplyr::mutate_at(vars(ChargeState), funs(steps = cume_dist(.))) %>% 
-    dplyr::group_by(ChargeState) %>% 
-    dplyr::do(unique(.))
-  # zero <- data.frame(ChargeState = 0, steps = 0)
-  #res <- dplyr::bind_rows(zero, res)
-  xbreaks <- res$ChargeState
-  
-  figure <- ggplot(res, aes_string(x = "ChargeState", y = "steps")) +
-    geom_step(colour = "deepskyblue2", size = 1.3, alpha = 0.3) +
-    geom_point(shape = 18, colour = "black") +
-    geom_hline(yintercept = 0.95, colour = "red3", linetype = "longdash") +
-    geom_text(aes_string(label = signif("steps", 3)), vjust = -0.5, hjust = 1) +
-    scale_y_continuous(breaks = scales::pretty_breaks(10)) +
-    scale_x_continuous(breaks = xbreaks) +
-    labs(title = "Cumulative charge state percentage plot") +
-    labs(x = "Charge States", y = "Percent [%]") +
-    theme_light() +
-    theme(legend.position = "top")
-  return(figure)
-}
-
-.ms2_frequency <- function(x){
-  NoMS2 <- x %>% 
-    dplyr::filter(MSOrder == "Ms") %>% 
-    dplyr::count() %>% 
-    dplyr::rename(Counts = n) %>% 
-    dplyr::pull()
-  res <- x %>% 
-    dplyr::filter(MSOrder == "Ms2") %>% 
-    dplyr::count(MasterScanNumber) %>% 
-    dplyr::count(n) %>% 
-    dplyr::rename(NumberOfMS2Scans = n, Counts = nn) %>% 
-    rbind(c(0, NoMS2 -sum(.$Counts))) %>% 
-    dplyr::arrange(NumberOfMS2Scans) %>% 
-    dplyr::mutate(percentage = signif((100/sum(Counts) * Counts), 2))
-  xbreaks <- res$NumberOfMS2Scans
-  if(max(res$NumberOfMS2Scans >=25)){
-    res <- res %>% 
-      dplyr::bind_cols(parts = unlist(cut(.$NumberOfMS2Scans, breaks = c(-1,25,50,75,100))))
-    levels(res$parts) <- list("1-25" = levels(res$parts)[1], 
-                              "26-50" = levels(res$parts)[2], 
-                              "51-75" = levels(res$parts)[3], 
-                              "76-100" = levels(res$parts)[4]) 
-    res <- res %>% 
-      dplyr::select(NumberOfMS2Scans, Counts, percentage) %>% 
-      dplyr::mutate(parts = as.factor("ALL")) %>% 
-      dplyr::bind_rows(res) %>% 
-      dplyr::mutate(x_min = case_when(parts == "ALL" ~ 1,
-                                      parts == "1-25" ~ 1,
-                                      parts == "26-50" ~ 26,
-                                      parts == "51-75" ~ 51,
-                                      parts == "76-100" ~ 76)) %>% 
-      dplyr::mutate(x_max = case_when(parts == "ALL" ~ max(res$NumberOfMS2Scans),
-                                      parts == "1-25" ~ 25,
-                                      parts == "26-50" ~ 50,
-                                      parts == "51-75" ~ 75,
-                                      parts == "76-100" ~ 100))
-    res$parts <- factor(res$parts, levels = c("ALL", "1-25", "26-50", "51-75", "76-100"))  
-    
-    figure <- ggplot(res, aes_string(x = "NumberOfMS2Scans", y = "percentage")) + 
-      geom_bar(stat = "identity", fill = "deepskyblue2") + 
-      geom_text(aes_string(label = "Counts"), vjust=-0.3, size=3.5) + 
-      facet_wrap(~parts, scales = "free", nrow = 5, ncol = 1) +
-      ylim(0, max(res$percentage+5)) + 
-      geom_blank(aes_string(x = "x_min")) +
-      geom_blank(aes_string(x = "x_max"))
-  } else {
-    figure <- ggplot(res, aes_string(x = "NumberOfMS2Scans", y = "percentage")) +
-      geom_bar(stat = "identity", fill = "deepskyblue2") +
-      geom_text(aes_string(label = "Counts"), vjust=-0.3, size=3.5)
-  }
-  figure +
-    scale_x_continuous(breaks = xbreaks) +
-    labs(title = "Cycle load plot") +
-    labs(subtitle = "Plotting the number of MS2 scans associated with each MS1 scan") +
-    labs(x = "Number of MS2 associated with an MS1 scan", y = "Percentage [%]") +
-    theme_light()
-}
-
-.ms_data_points <- function(x){
-  binSize <- 15
-  binNumber <- ceiling(nrow(x) / binSize)
-  binVector <- rep(1:binNumber, each = binSize)
-  res <- x %>% 
-    dplyr::filter(MSOrder == "Ms") %>% 
-    dplyr::select(StartTime) %>% 
-    dplyr::mutate(CycleTime = (dplyr::lead(StartTime) - StartTime)*60) %>% 
-    dplyr::filter(!is.na(CycleTime)) %>% 
-    dplyr::mutate("10sec" = floor(10/CycleTime)) %>% 
-    dplyr::mutate("20sec" = floor(20/CycleTime)) %>% 
-    dplyr::mutate("30sec" = floor(30/CycleTime)) %>% 
-    dplyr::select(StartTime, "10sec", "20sec", "30sec") %>% 
-    dplyr::mutate(Bins = binVector[1:nrow(.)]) %>% 
-    dplyr::group_by(Bins) %>% 
-    dplyr::summarise_all(funs(mean)) %>% 
-    dplyr::mutate_at(c("10sec","20sec","30sec"), funs(floor)) %>% 
-    tidyr::gather("PeakWidthAtBaseline", "Points", 3:5)
-  
-  figure <- ggplot(res, aes_string(x = "StartTime", y = "Points", colour = "PeakWidthAtBaseline")) +
-    geom_point(size = 0.3) +
-    scale_colour_manual(values = c("red3", "darkorchid3", "deepskyblue3")) +
-    scale_y_continuous(breaks = scales::pretty_breaks((n = 20))) + 
-    scale_x_continuous(breaks = scales::pretty_breaks((n = 8))) +
-    labs(title ="Point Over Chromatographic Peak") + 
-    labs(subtitle = "Plotting the number of Ms data points over different preselected chromatographic peak widths") +
-    labs(x = "Retention Time", y = "Points over Peak") +
-    labs(colour = "Peak width") +
-    theme_light()
-  return(figure)
-}
-
-
-
-.overview_ <- function(prefix="primer"){
-  
-  data(WU163763)
-  WU <- WU163763
-  WU <- WU[WU$filename %in% unique(WU$filename)[1:2], ]
-  
-  lapply(ls("package:rawDiag")[grepl("Plot", ls("package:rawDiag"))], 
-           function(fn){
-             lapply(c('trellis', 'violin', 'overlay'), function(a){
-               pngFileName <- paste(paste(prefix, fn, a, sep='-'), "png", sep='.')
-               
-               message(pngFileName)
-               
-               if (!file.exists(pngFileName)){
-                 gp <- get(fn)(WU, a)  +
-                   theme(legend.position = 'none') + 
-                   theme(axis.line=element_blank(),
-                         axis.text.x=element_blank(),
-                         axis.text.y=element_blank(),
-                         axis.ticks=element_blank(),
-                         axis.title.x=element_blank(),
-                         axis.title.y=element_blank(),
-                         legend.position="none",
-                         panel.background=element_blank(),
-                         panel.border=element_blank(),
-                         panel.grid.major=element_blank(),
-                         panel.grid.minor=element_blank(),
-                         plot.background=element_blank()) +
-                   theme(plot.title = element_blank()) +
-                   theme(plot.subtitle = element_blank()) +
-                   theme(strip.background = element_blank()) +
-                   theme(strip.text = element_blank())
-                 if (!is.null(gp)){
-                   png(pngFileName, 240, 240)
-                   print(gp)
-                   dev.off()}
-               }
-             })}
-           
-  )
-  
-}
-
-
-#labs.title=element_blank(),
-#labs(title = "Precursor mass to charge frequency plot ") +
-#  labs(subtitle = "Plotting frequency of precursor masses for each charge state") +

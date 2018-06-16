@@ -10,7 +10,7 @@
 \item{object}{a \code{\link{data.frame}} fullfilling the \code{\link{is.rawDiag}} column naming criteria.}
 }
 \value{
-a table.
+a \code{data.frame}
 }
 \description{
 rawDiag Summaries

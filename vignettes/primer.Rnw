@@ -294,7 +294,7 @@ shiny::runApp(rawDiag_shiny, display.mode = 'normal')
 
 \begin{figure}
 \centering
-\includegraphics[width=1.0\columnwidth]{graphics/rawDiag_shiny}
+\includegraphics[width=1.0\columnwidth]{rawDiag_shiny}
 \caption{Running the \pkg{rawDiag} shiny application.}
 \label{figure:shiny}
 \end{figure}
