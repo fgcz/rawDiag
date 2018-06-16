@@ -65,7 +65,10 @@
 #' @aliases rawDiag
 #' @return a boolean
 #' @import tidyverse
+#' @author Christian Panse <cp@fgcz.ethz.ch>
 #' @importFrom stats na.omit quantile
+#' @importFrom magrittr %>%
+#' @importFrom utils data packageVersion
 #' @export is.rawDiag
 is.rawDiag <- function(object){
   cn <- .getDesiredColNames()
@@ -82,7 +85,7 @@ is.rawDiag <- function(object){
 #' Force an Object to Belong to a Class \code{rawDiag}
 #'
 #' @param object any R object.
-#'
+#' @author Christian Panse <cp@fgcz.ethz.ch>, 2018
 #' @return a \code{data.frame} having the column names defined in 
 #' \code{rawDiag:::.getDesiredColNames}.
 #' 
@@ -155,7 +158,7 @@ as.rawDiag <- function(object){
 #' @param object an mzR object
 #' @aliases as.rawDiag.mzR 
 #' @return an \code{\link{rawDiag}} object
-#' @author Christian Panse <cp@fgcz.ethz.ch>, Witold E.Wolski <wew@fgcz.ethz.ch>
+#' @author Christian Panse <cp@fgcz.ethz.ch>, Witold E.Wolski <wew@fgcz.ethz.ch>, 2018
 #' @export as.rawDiag.mzR
 #' @examples
 #' if(require(mzR)){
@@ -213,7 +216,7 @@ as.rawDiag.mzR <- function(object){
 #' Reading Bruker tdf files
 #'
 #' @param filename filename if the tdf file
-#'
+#' @author Witold E. Wolski, Christian Panse <wew,cp@fgcz.ethz.ch>, 2018
 #' @return a rawDiagobject
 #' @import RSQLite
 #' @export read.tdf
@@ -225,7 +228,7 @@ as.rawDiag.mzR <- function(object){
 #' 1  1      827.5638  828.0039       827.5638      1   623.2419      3239      3
 #' 2  2      727.6347  727.9152       727.6347      1   682.1215      2610      3
 #' 
-#' 
+#' @note this is work in progress
 read.tdf <- function(filename){
   con <- dbConnect(RSQLite::SQLite(), filename)
   rv <- dbGetQuery(con, "SELECT * FROM Precursors a INNER JOIN Frames b on a.id == b.id;");
@@ -363,7 +366,8 @@ read.raw <- function(file, mono = if(Sys.info()['sysname'] %in% c("Darwin", "Lin
 #' @param object a \code{\link{data.frame}} fullfilling the \code{\link{is.rawDiag}} column naming criteria.
 #' 
 #' @return a \code{data.frame}
-#' @exportMethod summary.rawDiag
+#' @method summary rawDiag
+#' @export summary.rawDiag
 summary.rawDiag <- function(object, ...){
   table(object$filename, object$MSOrder)
 }
@@ -405,12 +409,9 @@ fillNAgaps <- function(x) {
   return(res)
 }
 
-#' Calculate Master Scan Number
-#'
-#' @param x a \code{\link{data.frame}} fullfilling the \code{\link{is.rawDiag}} column naming criteria.
-#'
-#' @return calculates the MS1 master scan number of an MS2 scan and populates the MasterScanNumber
-#' with it
+# Calculate Master Scan Number
+# calculates the MS1 master scan number of an MS2 scan 
+# and populates the MasterScanNumber with it
 .CalculatioMasterScan <- function(x){
   
   res <- x %>% 
@@ -1275,7 +1276,7 @@ PlotMassHeatmap <- function(x, method='trellis', bins = 80){ #rename to mass.hea
   gp
 }
 
-# ----Letter Figs----
+# ----JPR Letter Figures----
 .letter_figure1 <- function(){
   exactScanSpeedEst <- 
     function(nMS1 = 1, tMS1 = 138/1000 , nMS2 = 18 , tMS2 = 24/1000){ 
@@ -1355,16 +1356,18 @@ PlotMassHeatmap <- function(x, method='trellis', bins = 80){ #rename to mass.hea
 
 # ----ASMS2018 poster Figures----
 
-#' generates a list of all available plot outputs
+#' PlotAll applies all available rawDiag plot functions to a given rawDiag object
 #' @param x a \code{\link{data.frame}} fullfilling the \code{\link{is.rawDiag}} column naming criteria.
-#' @param prefix 
-#' @param pngsave default is TRUE
+#' @param prefix filename prefix if plots a writting to a png file
+#' @param savepng default is TRUE
 #' @param resolution number of pixels in png file, default is 240
 #' @importFrom grDevices dev.off png rgb
+#' @author Christian Panse <cp@fgcz.ethz.ch>, 2018
+#' @references Table 1 in \url{https://doi.org/10.1101/304485} 
 #' @examples 
 #' data(WU163763)
 #' WU <- WU163763[WU163763$filename %in% unique(WU163763$filename)[1:2], ]
-#' rv <- PlotAll(x = WU, savepng = FALSE)
+#' rv <- rawDiag:::PlotAll(x = WU, savepng = FALSE)
 PlotAll <- function(x, prefix = "primer", savepng = TRUE, resolution = 240){
   WU <- x
   lapply(ls("package:rawDiag")[grepl("Plot", ls("package:rawDiag"))], 
@@ -1404,9 +1407,7 @@ PlotAll <- function(x, prefix = "primer", savepng = TRUE, resolution = 240){
   )
 }
 
-#' ASMS_benchmark_figure_1
 
-#' @return xyplot
 .ASMS_benchmark_figure_1 <- function(){
   data(benchmark)
   cv <- 1 - 2:7/10
@@ -1435,9 +1436,7 @@ PlotAll <- function(x, prefix = "primer", savepng = TRUE, resolution = 240){
          scales=list(y = list(log = TRUE, at=c(1, 30, 60, 120, 180, 300, 600, 1800, 3600, 3600 * 1.5))))
 }
 
-#' ASMS_benchmark_figure_2
-
-#' @return xyplot
+#
 .ASMS_benchmark_figure_2 <- function(){
   data(benchmark)
   cv <- 1 - 2:7 / 10
@@ -1614,11 +1613,6 @@ PlotAll <- function(x, prefix = "primer", savepng = TRUE, resolution = 240){
   return(figure)
 }
 
-#' technote's application figure 3
-#'
-#' @param x 
-#'
-#' @return a ggplot opbject
 .technote_application_figure_3 <- function(x){
   res <- x %>% 
     dplyr::select_at(vars("proteins", "peptides", "TopN")) %>% 
@@ -1646,11 +1640,6 @@ PlotAll <- function(x, prefix = "primer", savepng = TRUE, resolution = 240){
     theme(panel.grid.major = element_line(colour = "gray")) 
 } 
 
-#' technote's application figure 3
-#'
-#' @param x 
-#'
-#' @return a ggplot opbject
 .technote_application_figure_4 <- function(x, y){
   x <- x %>% 
     mutate(TopN = case_when(filename == "04_S174020" ~ 36,
@@ -1717,11 +1706,7 @@ PlotAll <- function(x, prefix = "primer", savepng = TRUE, resolution = 240){
     theme(panel.grid.major = element_line(colour = "gray"))
 } 
 
-#' technote's application figure 5
-#'
-#' @param x 
-#' @importFrom magrittr %>%
-#' @return a ggplot opbject
+
 .technote_application_figure_5 <- function(x){
   res <- x %>% 
     mutate(TopN = case_when(filename == "04_S174020" ~ 36,
@@ -1863,23 +1848,25 @@ PlotAll <- function(x, prefix = "primer", savepng = TRUE, resolution = 240){
 }
 
 # ----Benchmark----
-#' benchmark read.raw
+#' benchmark of \code{read.raw} 
 #' 
-#' @param f 
-#' @param maxncpu 
-#' @param exe 
-#' @param rdata 
-#' @details benchmarks the \code{read.raw} function's IO.
+#' @param f set of files
+#' @param maxncpu maximal number of cores used for the benchmark
+#' @param exe the executable for reading the rawfiles
+#' @param rdata file extrention of the tempfile
+#' @description benchmarks the \code{read.raw} function's IO. This 
+#' function has been used for generating \link{benchmark} data set.
 #' @references \url{http://planetorbitrap.com/rawfilereader#.WyThDK3QPmE}
-#' @import parallel
+#' @importFrom parallel mclapply
+#' @author Christian Panse <cp@fgcz.ethz.ch>, 2017, 2018
 #' @return a nested list object.
 #' @examples
 #' \dontrun{
-#' f <- f[grep("raw$",f<-list.files())]
-#' .benchmark(f, maxncpu = 8, exe='~/bin/fgcz_raw.exe', mono=TRUE, rdata='/tmp/b2.RData')
+#'  f <- f[grep("raw$",f<-list.files())]
+#'  benchmark_raw(f, maxncpu = 8, exe='~/bin/fgcz_raw.exe', mono=TRUE, rdata='/tmp/b2.RData')
 #' }
-.benchmark <- function(f, maxncpu = c(16, 32, 64), 
-                       exe = "~/RiderProjects/fgcz-raw/bin/Debug/fgcz_raw.exe", 
+benchmark_raw <- function(f, maxncpu = c(16, 32, 64), 
+                       exe = file.path(path.package(package = "rawDiag"), "exec", "fgcz_raw.exe"), 
                        rdata = tempfile(fileext = ".RData")){
   if(TRUE){
     benchmark.rawDiag  <- lapply(maxncpu, 
@@ -1914,7 +1901,7 @@ PlotAll <- function(x, prefix = "primer", savepng = TRUE, resolution = 240){
   }
 }
 
-.benchmark.mzR <- function(f, maxncpu = c(16, 32, 64), 
+benchmark_mzR <- function(f, maxncpu = c(16, 32, 64), 
                            rdata = tempfile(fileext = ".RData")){
   if(TRUE){
     benchmark.rawDiag  <- lapply(maxncpu, 

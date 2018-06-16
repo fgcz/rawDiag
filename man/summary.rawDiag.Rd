@@ -4,7 +4,7 @@
 \alias{summary.rawDiag}
 \title{rawDiag Summaries}
 \usage{
-summary.rawDiag(object, ...)
+\method{summary}{rawDiag}(object, ...)
 }
 \arguments{
 \item{object}{a \code{\link{data.frame}} fullfilling the \code{\link{is.rawDiag}} column naming criteria.}

@@ -11,27 +11,13 @@
             citecolor = blue,
             anchorcolor = blue]{hyperref}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Place any additional packages needed here.  Only include packages
-%% which are essential, to avoid problems later.
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \usepackage{chemformula} % Formula subscripts using \ch{}
 \usepackage[T1]{fontenc} % Use modern font encodings
 \usepackage{tabularx}
 \usepackage{makecell}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% If issues arise when submitting your manuscript, you may want to
-%% un-comment the next line.  This provides information on the
-%% version of every file you have used.   
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%\listfiles
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Place any additional macros here.  Please use \newcommand* where
-%% possible, and avoid layout-changing macros (which are not used
-%% when typesetting).
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newcommand*\mycommand[1]{\texttt{\emph{#1}}}
 \newcommand*\code[1]{\texttt{\emph{#1}}}
 
@@ -62,27 +48,16 @@ University of Zurich\\Winterthurerstr. 190, CH-8057 Zurich, SWITZERLAND}
 \affiliation{\fgcz}
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% The document title should be given as usual. Some journals require
-%% a running title from the author: this should be supplied as an
-%% optional argument to \title.
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \title[\rawDiag]
   {\rawDiag~--~an R package supporting rational LC-MS method optimization for bottom-up proteomics}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Some journals require a list of abbreviations or keywords to be
-%% supplied. These should be set up here, and will be printed after
-%% the title and author information, if needed.
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\abbreviations{IR,NMR,UV}
-\keywords{mass-spectrometry, R-package, platform-independent,
-method-optimization, reproducible research, quality-control, visualization}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% The manuscript does not need to include \maketitle, which is
-%% executed automatically.
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\abbreviations{IR,NMR,UV}
+
+\keywords{mass-spectrometry, R-package, multi-platform,
+method-optimization, reproducible research, quality-control,
+visualization}
+
 \begin{document}
 
 <<echo = FALSE, eval = TRUE>>=
@@ -95,39 +70,12 @@ stopifnot(packageVersion('rawDiag') >= '0.0.1')
 
 \graphicspath{{./graphics/}}
 \SweaveOpts{concordance = TRUE, prefix.string = graphics/rawDiag}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% The "tocentry" environment can be used to create an entry for the
-%% graphical table of contents. It is given here as some journals
-%% require that it is printed as part of the abstract page. It will
-%% be automatically moved as appropriate.
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{tocentry}
-
-%Some journals require a graphical entry for the Table of Contents.
-%This should be laid out ``print ready'' so that the sizing of the
-%text is correct.
-
-%Inside the \texttt{tocentry} environment, the font used is Helvetica
-%8\,pt, as required by \emph{Journal of the American Chemical
-%Society}.
-
-%The surrounding frame is 9\,cm by 3.5\,cm, which is the maximum
-%permitted for  \emph{Journal of the American Chemical Society}
-%graphical table of content entries. The box will not resize if the
-%content is too big: instead it will overflow the edge of the box.
-
-%This box and the associated title will always be printed on a
-%separate page at the end of the document.
 
 \includegraphics[height=3.5cm,keepaspectratio]{39515832-84b561ea-4dfb-11e8-9411-276bc6fb71d6}
 
 \end{tocentry}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% The abstract environment will automatically gobble the contents
-%% if an abstract is not used by the target journal.
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{abstract}
 Optimizing methods for liquid chromatography coupled to mass spectrometry (LC-MS) is a non-trivial task. Here we present \rawDiag, a software tool supporting rational method optimization by providing MS operator-tailored diagnostic plots of scan level metadata.
 \rawDiag~is implemented as R package and can be executed on the command line, or through a graphical user interface (GUI) for less experienced users. The code runs platform independent and can process a hundred raw files in less than three minutes on current consumer hardware as we show by our benchmark.  In order to demonstrate the functionality of our package, we included a real-world example taken from our daily core facility business.
@@ -349,11 +297,6 @@ rv <- rawDiag:::PlotAll(WU, prefix="graphics/rawDiag")
 \hline
 function name  & trellis & overlay & violin & description\\
 \hline
-%\code{read.raw}          &&&& reads mass spectrometric measurement file.\\
-%\code{is.rawDiag}      &&&& tests if an object is an \code{rawDiag} S3 class.\\
-%\code{as.rawDiag}      &&&& coerces an object to a \code{rawDiag} S3 class object.\\
-%\code{summary.rawDiag}      &&&& provides a summary.\\
-%\hline
 \code{PlotChargeState}    &\G{PlotChargeState-trellis}       &\G{PlotChargeState-overlay}       &        -                         & displays charge state distributions as biologist-friendly bar charts as absolute counts.\cite{pmid24645190}\\
 \code{PlotCycleLoad}         &\G{PlotCycleLoad-trellis}   &\G{PlotCycleLoad-overlay}   &\G{PlotCycleLoad-violin}& displays duty cycle load (number of MS2 scans per duty cycle) as a function of retention time (RT) (scatter plots) or its marginal distribution (violin).\\
 \code{PlotCycleTime}         &\G{PlotCycleTime-trellis}         &\G{PlotCycleTime-overlay}         &\G{PlotCycleTime-violin}        & displays cycle time with respect to RT (scatter plots) or its marginal distribution (violin). A smooth curve graphs the trend. The maximum is indicated by a red dashed line.\\
@@ -378,7 +321,7 @@ Marginal distribution plots for discrete response variables are not supported.
 }
 \label{table:functions}
 \end{table}
-%%%%%%%%%%%%
+
 
 \subsection{Evaluation}
 
@@ -527,13 +470,10 @@ identifications as shown in Figure~\ref{figure:application}C and \ref{figure:app
 (tryptic enzyme specificity incl. 2 missed cleavages, precursor mass tolerance: 20 ppm, fragment mass tolerance: 0.5 Da, Carbamidomethyl as static modification, Dynamic Modifications: Methionine oxidation, N-terminal protein acetylation). Resulting identifications were filtered to 1\% peptide FDR using Percolator.
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%\SweaveInput{technote_application.Rnw}
+
 <<label=usecase1_data, echo=FALSE>>=
 library(tidyverse)
 data(WU163763)
-
-#df <- filter(WU163763, filename != "03_S174020") 
 
 load(file.path(path.package(package = "rawDiag"),
                file.path("extdata", "WU163763_PD.RData")))
@@ -559,11 +499,11 @@ DescValues <- searchResults %>%
 <<label=usecase1, eval = TRUE, fig = TRUE, width = 6, height = 6, echo = FALSE, include = FALSE>>=
 rawDiag:::.technote_application_figure_1(WU163763)
 @
-% , pdf=FALSE, png=TRUE
+
 <<label=usecase2, eval = TRUE, fig = TRUE, width = 6, height = 6, echo = FALSE, include = FALSE>>=
 rawDiag:::.technote_application_figure_2(WU163763) 
-
 @
+
 <<label=usecase3, eval = TRUE, fig = TRUE, width = 6, height = 4, echo = FALSE, include = FALSE>>=
 rawDiag:::.technote_application_figure_3(searchResults)
 @
@@ -588,10 +528,9 @@ rawDiag:::.technote_application_figure_5(WU163763)
 \textbf{B)} Number of MS2 scans for each scan cycle for "Top18" (blue), "Top36" (green) and "Top72" (orange).
 \textbf{C)} Number of Proteins (orange) and peptides (blue) for the different TopN settings (note: number of peptides is divided by 10 in this plot due to scaling reasons).
 \textbf{D)} Number of PSM (blue) and MS2 scans (orange) for the different TopN settings.
-\textbf{E)} Time spent on MS1 (blue) and MS2 (orange) for the different TopN settings. Time range for calculation is the elution phase of the peptides between 15-70 min. }
+\textbf{E)} Time spent on MS1 (blue) and MS2 (orange) for the different TopN settings. Time range for calculation is the elution phase of the peptides between 15-70 min.}
 \label{figure:application}
 \end{figure}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 Interestingly, the number of peptide spectrum matches (PSM) is decreasing in the "Top72" method 
 compared with the "Top36". Based on this one could formulate a new 
@@ -607,17 +546,10 @@ injection time to increase the spectra quality.
 To our knowledge the only alternative tool that is able to extract and visualize metadata from raw files on single scan granularity  is rawMeat (Vast Scientific). Unfortunately, it was discontinued years ago and built on the meanwhile outdated MSFileReader libraries from Thermo Fisher Scientific (MS Windows only). This implies that it does not fully support the latest generation of qOrbi instruments. Other loosely related tools \cite{pmid28802010, pmid25798920, pmid29324744, pmid27700092} are tailored towards longitudinal data recording and serve the purpose of quality control\cite{SIMPATIQCO} (monitoring of instrument performance) rather than method optimization. 
 
 
-
 \section{Conclusion}
 In this manuscript, we presented \rawDiag~an R package to visualize characteristics of LC-MS measurements. Through its diagnostic plots, \rawDiag~supports scientists during empirical method optimization by providing a rational base for choosing appropriate data acquisition parameters. The software is interactive and easy to operate through an R shiny GUI application, even for users without prior R knowledge. More advanced users can fully customize the appearance of the visualizations by executing their own code from the R command line. This also enables \rawDiag~to be customized and implemented into more complex environments, e.g., data analysis pipelines embedded into LIMS systems.
 In its current implementation, the software is tailored towards the Thermo Fisher Scientific raw file format, but its architecture allows easy adaptation towards other mass spectrometry data formats. An interesting showcase would be the novel Bruker tdf 2.0 format (introduced for the timsTOF Pro), where scan metadata is not ``hidden'' in proprietary binary files, but stored in an open SQLite database directly accessible to R.
 In the future, we plan to extend \rawDiag~by allowing users to link additional metadata not originally logged by the instrument software (derived metadata), but created offline by external tools. A simple, but very useful example, is to scan metadata created by search engines. These typically links scans to similarity scores, peptide assignments, and their corresponding probabilities. This would allow visualizing assignment rates and score distributions across injections. Having the peptide assignments at hand will open the door for chained metadata usage, for instance by linking a scan over the amino acid sequence of the identified peptide to physicochemical properties like hydrophobicity, iRT scores, or MW. Such derived metadata can then be compared to primary metadata like empirical mass or RT. Linking primary and derived metadata will also clear the way to big data applications similar to MassIVE (\url{https://massive.ucsd.edu}, March 2018) but bypassing the necessary conversion to open data formats like mzML. This is beneficial since the conversion process does not preserve all useful primary metadata.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% The "Acknowledgement" section can be given in all manuscript
-%% classes.  This should be given within the "acknowledgement"
-%% environment, which will make the correct section or running title.
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 \section{Funding Sources}
@@ -647,12 +579,5 @@ A demo system including all data shown in this manuscript is available through
 \url{http://fgcz-ms-shiny.uzh.ch:8080/rawDiag-demo/}.
 \end{suppinfo}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% The appropriate \bibliography command should be placed here.
-%% Notice that the class file automatically sets \bibliographystyle
-%% and also names the section correctly.
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\nocite{msdata,mzR,SIMPATIQCO,bfabric}
 \bibliography{rawDiag}
-
 \end{document}

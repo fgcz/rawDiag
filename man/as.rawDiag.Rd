@@ -16,3 +16,6 @@ a \code{data.frame} having the column names defined in
 \description{
 Force an Object to Belong to a Class \code{rawDiag}
 }
+\author{
+Christian Panse <cp@fgcz.ethz.ch>, 2018
+}

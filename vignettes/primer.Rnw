@@ -148,7 +148,7 @@ The following code snippet demonstrates the use of the \code{read.raw} function 
 rawfile <- file.path(path.package(package = "rawDiag"),
                      "extdata", 'sample.raw')
 system.time(RAW <- read.raw(file = rawfile))
-summary(RAW)
+summary.rawDiag(RAW)
 @
 
 reading all parameters
@@ -178,7 +178,7 @@ library(mzR);
 mzML <- "04_S174020_5000_5010.mzML"
 mzML <- file.path(path.package(package = "rawDiag"), "extdata", mzML)
 system.time(RAW <- rawDiag:::as.rawDiag.mzR(openMSfile(mzML)))
-summary(RAW)
+summary.rawDiag(RAW)
 RAW$scanNumber
 @
 
@@ -310,7 +310,7 @@ library(parallel)
 f <- list.files()
 f <- f[grep("raw$", f)]
 
-b <- lapply(1, function(x){.benchmark(f,
+b <- lapply(1, function(x){rawDiag:::benchmark_raw(f,
   exe="~/RiderProjects/fgcz-raw/bin/Debug/fgcz_raw.exe")})
 
 b <- plyr::rbind.fill(lapply(b, plyr::rbind.fill))

@@ -16,3 +16,6 @@ a boolean
 \description{
 Is an Object from a rawDiag class?
 }
+\author{
+Christian Panse <cp@fgcz.ethz.ch>
+}
