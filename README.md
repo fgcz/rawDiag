@@ -31,6 +31,8 @@ To install [the New RawFileReader .Net assembly](http://planetorbitrap.com/rawfi
 
 ### 1.3 Platforms and versions the software has been tested on
 
+The package has been tested on the following systems running R in R Studio:
+
 |platform|platform version|R version|note|
 | :------- |---------------:| -------:|:------- |
 |Linux| Debian 8 |  3.4.3 | [Demo system](http://fgcz-ms-shiny.uzh.ch:8080/bfabric_rawDiag/)|
