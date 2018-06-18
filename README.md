@@ -31,7 +31,7 @@ To install [the New RawFileReader .Net assembly](http://planetorbitrap.com/rawfi
 
 ### 1.3 Platforms and versions the software has been tested on
 
-The package has been tested on the following systems running R in R Studio:
+The package has been tested on the following systems using R in R Studio:
 
 |platform|platform version|R version|note|
 | :------- |---------------:| -------:|:------- |
