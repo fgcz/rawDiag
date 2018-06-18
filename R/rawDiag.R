@@ -1474,13 +1474,13 @@ PlotAll <- function(x, prefix = "primer", savepng = TRUE, resolution = 240){
   scale_colour_manual(values = c("cornflowerblue", "magenta")) + 
   scale_y_continuous(breaks = c(90, 120, 180, 240, 480, 600, 900, 1800, 3600, 5400)) +
   labs(x = "number of used processes", y = "overall runtime [sec]",
-        subtitle='overall runtime') +
+        subtitle='A') +
   theme_light() +
   theme(legend.position = "top") +
     theme(title = element_text(size = 24)) +
     theme(axis.title = element_text(size = 14)) +
-    theme(legend.text = element_text(size = 8)) +
-    theme(legend.title = element_text(size = 10, face = "bold"))
+    theme(legend.text = element_text(size = 9)) +
+    theme(legend.title = element_text(size = 9, face = "bold"))
   
   gp
 }
@@ -1502,13 +1502,13 @@ PlotAll <- function(x, prefix = "primer", savepng = TRUE, resolution = 240){
     scale_colour_manual(values = c("cornflowerblue", "magenta")) + 
     scale_y_continuous(breaks = c(500, 1000, 2000, 4000, 8000, 16000, 32000, 64000)) +
     labs(x = "number of used processes", y = "processing frequency [Hz]", 
-         subtitle='IO throughput') +
+         subtitle='B') +
     theme_light() +
     theme(legend.position = "top") +
     theme(title = element_text(size = 24)) +
     theme(axis.title = element_text(size = 14)) +
-    theme(legend.text = element_text(size = 8)) +
-    theme(legend.title = element_text(size = 10, face = "bold"))
+    theme(legend.text = element_text(size = 9)) +
+    theme(legend.title = element_text(size = 9, face = "bold"))
   
   gp
 }
