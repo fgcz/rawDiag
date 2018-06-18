@@ -35,7 +35,7 @@ The package has been tested on the following systems using R in R Studio:
 
 |platform|platform version|R version|note|
 | :------- |---------------:| -------:|:------- |
-|Linux| Debian 8 |  3.4.3 | [Demo system](http://fgcz-ms-shiny.uzh.ch:8080/bfabric_rawDiag/)|
+|Linux| Debian 8 (jessie) |  3.4.3 | [Demo system](http://fgcz-ms-shiny.uzh.ch:8080/bfabric_rawDiag/)|
 |Linux     | Debian testing | 3.5.0 | CP |
 |Linux| bioconductor/devel_proteomics2| 2017-12-31 r73996 | [dockerhub](https://hub.docker.com/r/cpanse/rawdiag/builds/) no RawFileReader support |
 |Windows   | 7 x64| 3.4.1 |CT|
