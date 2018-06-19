@@ -148,12 +148,13 @@ spectrum-related metadata (see Table 1 for details).
 
 \subsection{Architecture}
 
-\rawDiag~acts as an interface to vendor specific software libraries 
-that are able to access the spectrum-level metadata contained in a 
-MS measurement. The package provides support for R 
-command line, interactivity through R shiny and pdf report generation 
-using R markdown. A schematic overview of the architecture can be seen in 
-Figure~\ref{figure:arch}.
+The layered design of \rawDiag~is one of its architectural key features.
+The input layer allows fast reading of massive data by directly applying the vendor libraries, e.g., for Thermo Fisher Scientific raw files \cite{RawFileReader}.
+The processing layer provides auxiliary functionalities such as selecting, filtering and aggregation.
+The plotting functions implemented in the processing layer provide the most frequently used visualizations in the MS field. The design of these plots based on the Grammar of Graphics \cite{Wilkinson2005} allow quick and easy redesign of them if needed.
+Being implemented as R package\cite{R} it provides support for R
+command line, interactivity through R shiny and pdf report generation
+using R markdown. Figure~\ref{figure:arch} graphs a schematic overview of the architecture.
 
 \subsection{Implementation}
 
