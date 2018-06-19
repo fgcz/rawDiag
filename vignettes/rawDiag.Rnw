@@ -505,25 +505,29 @@ overview at a single glance.
 
 \subsection{Use case example}
 \label{section:application} 
-Starting from an initial method template described by Kelstrup et al.,\cite{pmid29183128} 
-we analyzed 1 $\mu$g of a commercial tryptic HeLa digest on a Q-Exactive HF-X 
-instrument using classical shotgun heuristics. Subsequently, the 
-resulting raw data was mined using \rawDiag. Inspection of the 
-cycle time plot (not shown) suggested that analysis time was not optimally 
-distributed between the different scan levels (precursor and fragment 
-ions) under the applied chromatographic conditions. To test this hypothesis, we ramped the parameter 
-controlling the number of dependent scans per instrument cycle (TopN), in two 
-steps and applied the resulting methods by analyzing the same material 
-in technical triplicates. Visualization applying \rawDiag~confirmed 
-that all three methods exploit the maximum number of dependent scans (18, 
-36 and 72) during the separation phase of the gradient (see Figure~\ref{figure:application}B). Concurrently, 
-the MS2 scan speed increased from $\approx$30 to $\approx$36 and $\approx$38 Hz, respectively
-(see Figure~\ref{figure:application}A). Using the modified methods, the instrument is spending 5 and 10 min more time on MS2 
-scans during the main peptide elution phase, comparing the methods to the initial ``Top18'' method (see Figure~\ref{figure:application}E). 
-These optimized methods not only showed better run characteristics but
-ultimately also resulted in more peptide and protein 
-identifications, as shown in Figure~\ref{figure:application}C and \ref{figure:application}D. For database searches, Proteome~Discoverer with search settings described in the experimental procedures section. 
 
+Starting from an initial method template described by Kelstrup et al.,\cite{pmid29183128}
+we analyzed 1 $\mu$g of a commercial tryptic HeLa digest on a Q-Exactive
+HF-X instrument using classical shotgun heuristics. Subsequently, the
+resulting raw data was mined using \rawDiag. Inspection of the cycle
+time plot (not shown) suggested that the distribution of analysis time
+is suboptimal
+between the different scan levels (precursor and fragment ions) under
+the applied chromatographic conditions. To test this hypothesis, we
+ramped the parameter controlling the number of dependent scans per
+instrument cycle (TopN), in two steps and tested the two resulting
+methods by analyzing the same material in technical triplicates.
+Visualization applying \rawDiag~confirmed that all three methods
+exploit the maximum number of dependent scans (18, 36 and 72) during
+the separation phase of the gradient (see Figure~\ref{figure:application}B). Concurrently,
+the MS2 scan speed increased from $\approx$30 to $\approx$36 and $\approx$38, respectively
+(see Figure~\ref{figure:application}A). In the modified methods, the instrument is spending 5
+and 10 min more time on MS2 scans
+during the main peptide elution phase, comparing the methods to the
+initial ``Top18'' method (see Figure~\ref{figure:application}E). The optimized methods not only
+showed better run characteristics but ultimately also resulted in more
+peptide and protein identifications, as shown in Figure~\ref{figure:application}C and \ref{figure:application}D. For database searches, Proteome Discoverer with search settings described
+in the experimental procedures section.
 
 <<label=usecase1_data, echo=FALSE>>=
 library(tidyverse)
@@ -586,10 +590,27 @@ rawDiag:::.technote_application_figure_5(WU163763)
 \label{figure:application}
 \end{figure}
 
-Interestingly, the number confident of peptide spectrum matches (PSM) is reaching a plateau phase in the ``Top72'' method 
-compared with the ``Top36'' (``Top36'' has a slightly hihger number of significat psm than ``Top72''). One potential explanation for this finding can be the quality of the recorded spectra. Due to the fact that the ``Top72'' method is sampling the precursors in our sample to such a deep degree, the injection time to prepare the ion packages for many low abundant species might be too low. This low amount of ions for fragmentation can influence the quality of the resulting fragment spectrum and hence lead to a non assigned spectrum. Since we still acquire much more MS2 spectra compared to the ``Top36'' method this is not yet seen in the number of significant peptide and protein hits (more spectra in general lead to more peptide and protein assignments) but indicates a suboptimal usage of the instrument. This finding could lead directly to a further refinement circle of the method.
-New methods could be designed where the number of MS2 scans is reduced and concomitant the injection time parameter for MS2 scans is increased. Care should be taken to keep the cycle time of the methods constant. These new designed methods together with the ``Top72'' method would then be reanalyzed and again the data can be visualized to check if a method is fullfilling the MS operators requrements or if new parameters need optimization. 
-
+Interestingly, the number confident of peptide-spectrum matches (PSM)
+is reaching a plateau phase in the ``Top72'' method compared with the
+``Top36'' (``Top36'' has a slightly higher number of significant PSM than
+``Top72''). One potential explanation for this finding can be the
+quality of the recorded spectra. Since the ``Top72'' method is sampling
+the precursors in our sample to such a deep degree, the injection time
+to prepare
+the ion packages for many low abundant species might be too low. This
+low amount of ions for fragmentation can influence the quality of the
+resulting fragment spectrum and hence lead to a non assigned spectrum.
+Since we still acquire much more MS2 spectra compared to the ”Top36”
+method, this is not yet seen in the number of significant peptide and
+protein hits (more spectra in general lead to more peptide and protein
+assignments) but
+indicates a suboptimal usage of the instrument. This finding could
+lead directly to a further refinement circle of the method. Hence
+reducing the number of MS2 scans and increasing the injection time
+parameter at the same time, could further improve the method. Care
+should be taken to keep the cycle time of the methods constant. By
+acquiring data with the newly designed methods and comparing them with
+the ”Top72” method using rawDiag this new hypothesis could be tested.
 
 \subsection{Related work}
 To our knowledge the only alternative tool that is able to extract and visualize metadata from raw files on single scan granularity  is rawMeat (Vast Scientific). Unfortunately, it was discontinued years ago and built on the outdated MSFileReader libraries from Thermo Fisher Scientific (MS Windows only). This means that it does not fully support the latest generation of qOrbi instruments. Other loosely related tools \cite{pmid28802010, pmid25798920, pmid29324744, pmid27700092} are tailored towards longitudinal data recording and serve the purpose of quality control\cite{SIMPATIQCO} (monitoring of instrument performance) rather than method optimization. 
