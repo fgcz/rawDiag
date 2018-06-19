@@ -610,7 +610,7 @@ reducing the number of MS2 scans and increasing the injection time
 parameter at the same time, could further improve the method. Care
 should be taken to keep the cycle time of the methods constant. By
 acquiring data with the newly designed methods and comparing them with
-the ”Top72” method using rawDiag this new hypothesis could be tested.
+the ``Top72'' method using rawDiag this new hypothesis could be tested.
 
 \subsection{Related work}
 To our knowledge the only alternative tool that is able to extract and visualize metadata from raw files on single scan granularity  is rawMeat (Vast Scientific). Unfortunately, it was discontinued years ago and built on the outdated MSFileReader libraries from Thermo Fisher Scientific (MS Windows only). This means that it does not fully support the latest generation of qOrbi instruments. Other loosely related tools \cite{pmid28802010, pmid25798920, pmid29324744, pmid27700092} are tailored towards longitudinal data recording and serve the purpose of quality control\cite{SIMPATIQCO} (monitoring of instrument performance) rather than method optimization. 
