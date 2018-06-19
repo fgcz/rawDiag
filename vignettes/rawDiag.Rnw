@@ -79,46 +79,62 @@ stopifnot(packageVersion('rawDiag') >= '0.0.1')
 \end{tocentry}
 
 \begin{abstract}
-Optimizing methods for liquid chromatography coupled to mass spectrometry (LC-MS) is a non-trivial task. Here we present \rawDiag, a software tool supporting rational method optimization by providing MS operator-tailored diagnostic plots of scan level metadata.
-\rawDiag~is implemented as an R package and can be executed on the R command line, or through a graphical user interface (GUI) for less experienced users. The code runs platform independent and can process a hundred raw files in less than three minutes on current consumer hardware, as we show in our benchmark. In order to demonstrate the functionality of our package we included a real-world example taken from our daily core facility business.
+Optimizing methods for liquid chromatography coupled to mass
+spectrometry (LC-MS) is a non-trivial task. Here we present \rawDiag,
+a software tool supporting rational method optimization by providing
+MS operator-tailored diagnostic plots of scan level metadata.
+\rawDiag~is implemented as an R package and can be executed on the R
+command line, or through a graphical user interface (GUI) for less
+experienced users. The code runs platform independent and can process
+a hundred raw files in less than three minutes on current consumer
+hardware, as we show in our benchmark. As a demonstration of the
+functionality of our package, we included a real-world example taken
+from our daily core facility business.
 \end{abstract}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Introduction}
-Over the last decade, liquid chromatography coupled to mass 
-spectrometry (LC-MS) has evolved into the method of choice in the 
-field of proteomics \cite{Cox2011, Mallick2010, Bensimon2012}. During a typical bottom up LC-MS 
-measurement, a complex mixture of analytes is separated by a liquid 
-chromatography system that is connected to a mass spectrometer (MS) through 
-an ion source interface. The analytes which elute from the chromatography system  over time are 
-converted into a beam of ions in this interface and the MS records from this ion 
-beam a series of mass spectra containing detailed information on the 
-analyzed sample \cite{Savaryn2016, Matthiesen2013}. As raw data are considered the mass spectra and their metadata, usually recorded in a vendor specific binary format. During a 
-measurement, the mass spectrometer applies internal heuristics which enables the instrument to 
-adapt to sample properties (sample complexity, amount of ions, etc.) in near real time. Still, method 
-parameters controlling these heuristics need to be set prior to the 
-measurement. For an optimal measurement result, a carefully balanced 
-set of parameters is required, but their complex interactions with each other make LC-MS method 
-optimization a challenging task.
+Over the last decade, liquid chromatography coupled with mass
+spectrometry (LC-MS) has evolved into the method of choice in the
+field of proteomics \cite{Cox2011, Mallick2010, Bensimon2012}. During a typical bottom up LC-MS measurement, a
+complex mixture of analytes is separated by a liquid chromatography
+system coupled to a mass spectrometer (MS) through an ion source
+interface.
+This interface converts the analytes which elute from the
+chromatography system over time into a beam of ions.  The MS records
+from this ion beam a series of mass spectra containing detailed
+information on the analyzed sample \cite{Savaryn2016, Matthiesen2013}. The resulting raw data consists of
+the mass spectra and their metadata, typically recorded in a vendor
+specific binary format.
+During a measurement, the mass spectrometer applies internal
+heuristics which enables the instrument to adapt to sample properties,
+e.g., sample complexity, amount of ions in near real time. Still,
+method parameters controlling these heuristics need to be set before
+the
+measurement. Optimal measurement results require a careful balancing
+of instrument parameters, but their complex interactions with each
+other make LC-MS method optimization
+a challenging task.
 
-Here we present \rawDiag, a platform independent software tool 
-implemented in R that supports LC-MS operators during the process of 
-empirical method optimization. Our work builds on the ideas of the 
-discontinued software ``rawMeat'' (vastScientific). Our application is currently 
-tailored towards spectral data acquired on Thermo Fisher Scientific 
-instruments (raw format), with a special focus on Orbitrap mass 
-analysers (Exactive or Fusion instruments). These instruments are 
-heavily used in the field of bottom-up proteomics in order to analyse 
-complex peptide mixtures derived from enzymatic digests of 
+Here we present \rawDiag, a platform independent software tool
+implemented in R that supports LC-MS operators during the process of
+empirical method optimization. Our work builds on the ideas of the
+discontinued software `rawMeat` (vastScientific). Our application
+is currently tailored towards spectral data acquired on Thermo Fisher
+Scientific instruments (raw format), with a particular focus on
+Orbitrap mass analyzers (Exactive or Fusion instruments). These
+instruments are heavily used in the field of bottom-up proteomics to
+analyze complex peptide mixtures derived from enzymatic digests of
 proteomes.\\
-\rawDiag~is meant to run post MS acquisition,  
-optimally as interactive R shiny application and produces a series of diagnostic 
-plots visualizing the impact of method parameter choices on the acquired data 
-across injections. If static reports are required, pdf files can be 
-generated using R markdown.\\ 
 
-In this manuscript we 
-present the architecture and implementation of our tool. We provide example plots,
-show how plots can be redesigned to meet different requirements and discuss the application based on a typical use case.
+\rawDiag~is meant to run after MS acquisition, optimally as
+interactive R shiny application and produces a series of diagnostic
+plots visualizing the impact of method parameter choices on the
+acquired data across injections. If static reports are required, pdf
+files can be generated using R markdown.
+In this manuscript, we present the architecture and implementation of
+our tool. We provide example plots, show how plots can be redesigned
+to meet different requirements and discuss the application based on a
+typical use case.\\
 
 \begin{figure}
  \includegraphics[width=1.0\columnwidth]{rawDiagR2}
@@ -152,33 +168,31 @@ using R markdown. Figure~\ref{figure:arch} graphs a schematic overview of the ar
 
 \subsection{Implementation}
 
-The entire software is implemented as an R package providing a full 
-documentation and includes example data. All diagnostic plots are 
-generated by R~\cite{R} functions using the ggplot2 \cite{Hadley2009} graphical 
-system, based on ``The Grammar of Graphics'' \cite{Wilkinson2005}. The 
-package ships with an adapter function \code{read.raw} which returns 
-an R \code{data.frame} object \cite{Wickham2014} from the raw data input file. In its current 
-implementation, the adapter function \code{read.raw} is used for directly
-reading Thermo Fisher Scientific raw files,
-using a \texttt{C\#} programmed executable,
-based on the platform-independent New RawFileReader .Net 
-assembly\cite{RawFileReader}. 
-A Docker recipe for the entire build process of the \texttt{C\#}
-based executable ships with the R package.
-Additionally, the open file standards  
-can be loaded into the R environment using the R package \textbf{\texttt{mzR}}~\cite{mzR, msdata} in combination with 
-the S3 adapter function \code{as.rawDiag.mzR}. We thereby provide support for vendor file formats which 
-do not have a native reading function so far. To avoid writing to the disk, the extracted information is directly fed into an R 
-session using the \code{pipe} command.
-
-Since in general more than one MS file is loaded and visualized, the adapter function 
-supports multiprocessor infrastructure through the \textbf{\texttt{parallel}} R package.
-In order to be flexible with the entire variety of 
-instruments we implemented the two utility functions 
-\code{is.rawDiag} and \code{as.rawDiag}. While the 
-\code{is.rawDiag} function checks if the input object 
-fulfills the requirements of the package's diagnostic plot functions, 
-the \code{as.rawDiag} method coerce the object into the required data strucuture if needed.
+The software implementation as an R package provides full
+documentation and includes example data. The R~\cite{R} functions which
+generate the diagnostic plots use the ggplot2 \cite{Hadley2009} graphical system, based
+on “The Grammar of Graphics” \cite{Wilkinson2005}.  The package ships with an adapter
+function \code{read.raw} which returns a tidy R \code{data.frame} object \cite{Wickham2014} from the raw
+data
+input file. In its current implementation, the adapter function
+\code{read.raw} is used for directly reading Thermo Fisher Scientific raw
+files, utilizing a \texttt{C\#} programmed executable, based on the
+platform-independent New RawFileReader.Net assembly \cite{RawFileReader}. A Docker recipe
+for the entire
+build process of the \texttt{C\#} based executable ships with the R package.
+Additionally, the open file standards can be loaded into the R
+environment using the R package \textbf{\texttt{mzR}}~\cite{mzR, msdata} in combination with the S3 adapter
+function \code{as.rawDiag.mzR}. We thereby provide support for vendor file
+formats which do not have a native reading function. To avoid writing to the disk, the extracted information is directly fed into an R session using the \code{pipe} command.
+Since in general more than one MS file is loaded and visualized, the
+adapter function supports multiprocessor infrastructure through the
+\textbf{\texttt{parallel}} R package. To be flexible with the whole variety of
+instruments we implemented the two utility functions \code{is.rawDiag} and
+\code{as.rawDiag}. While the \code{is.rawDiag} function checks if the input
+object
+fulfills the requirements of the package’s diagnostic plot functions,
+the \code{as.rawDiag} method coerce the object into the required data
+structure if needed.
 
 \subsection{Performance evaluation}
 
@@ -195,8 +209,13 @@ data(benchmark)
 b.Linux$IO.throuput <- sum(unique(b.Linux$nrow)) / b.Linux$overall.runtime 
 @
 
-We performed a benchmark of the import layer of our R package with a large data set on two different test systems. The performance is defined as the number of spectra information which the software can extract from the raw file and load into an R session per second. This information throughput benchmark was performed as a function of the used processes. The two test systems used were a Linux server and an Apple MacBock Pro. Their detailed hardware specifications are listed 
-in Table~\ref{table:specs}.
+We performed a benchmark of our R package with a large dataset on two
+different test systems. We measured the number of spectra information
+which the software can extract from the raw file and load into an R
+session per second as a function of the parallel executed processes.
+The two test systems used were a Linux server and an Apple MacBock
+Pro. Table~\ref{table:specs} lists the detailed hardware specifications of the two
+systems.
 
 \begin{table}
 \centering
@@ -225,69 +244,47 @@ ThermoRawFileReader vers. & 4.0.22 & 4.0.22\\
 \caption{\label{table:specs}Summary of the hardware specifications.}
 \end{table}
 
-As benchmark data, we downloaded the raw files described in 
-\cite{pmid29183128} and available through 
-\href{http://proteomecentral.proteomexchange.org/cgi/GetDataset?ID=PXD006932}{proteomeXchange PXD006932} on our filesystem. 
-For the benchmark we limited the input to \Sexpr{length(unique(b.Linux$nrow))} files, 
-corresponding to two times the available number of processor cores of 
-the Linux system. The data has an overall file size of 
-\Sexpr{round(sum(unique(b.Linux$file.size)) / 1024^3)} GB and 
-contains \Sexpr{format(sum(unique(b.Linux$nrow)), scientific=FALSE, big.mark = "'")}
-individual mass spectra in total.
-For performance evaluation of the open file standard implementation\cite{mzR}, 
-we converted the raw files into mzML files using ProteoWizard version 3.0.11252
-64-bit on Windows 10. 
-The benchmark was performed starting with the highest amount of cores in order to avoid caching issues. The number of available CPUs was successively reduced. For each number of processes the data extraction was run five times.
-
-%The best performance on our system is achieved by using
-%\Sexpr{min(b.Linux$ncpu [b.Linux$IO.throuput == max(b.Linux$IO.throuput)])}
-%CPUs having an performance of reading
-%\Sexpr{format(round(max(b.Linux$IO.throuput)), scientific = FALSE, big.mark = "'")} scan informations per second.
-
-%\begin{figure}
-
-%\includegraphics[width=0.49\columnwidth]{rawDiag-benchmark-time}
-%\includegraphics[width=0.49\columnwidth]{rawDiag-benchmark-throuput}
-
-%\caption{Benchmark -- The left plot shows the overall logarithmic 
-%scaled runtime of 128 raw files. The graphic on the right side shows 
-%the derived IO throughput thereof as scan information per second. The 
-%plots illustrate that both systems, server and laptop, can analyze 
-%95GB of instrument data within less than three minutes when reading directly from the raw files. The performance evaluation of the open standard input was only possible on the server system due to processor overheating on the laptop. 
-%}
- 
-%\label{figure:benchmark}
-%\end{figure}
+As benchmark data, we downloaded the raw files described in \cite{pmid29183128} and
+available through \href{http://proteomecentral.proteomexchange.org/cgi/GetDataset?ID=PXD006932}{proteomeXchange PXD006932} on our filesystem. For the
+benchmark we limited the input to \Sexpr{length(unique(b.Linux$nrow))} files, corresponding to two
+times the available number of processor cores of the Linux
+system. The data has an overall file size of \Sexpr{round(sum(unique(b.Linux$file.size)) / 1024^3)} GB and contains
+\Sexpr{format(sum(unique(b.Linux$nrow)), scientific=FALSE, big.mark = "'")} individual mass spectra in total. For performance evaluation
+of to the open file standard implementation\cite{mzR}, we converted the raw
+files into mzML files using ProteoWizard version 3.0.11252 64-bit on
+Windows 10. The benchmark was performed starting with the highest
+amount of cores to avoid caching issues.
+For each number of processes, we extracted the data five times.
 
 \subsection{Visualization}
 
-This package is providing several plot functions tailored 
-towards MS data. A list of the implemented 
-plot functions with a short description 
-can be found in Table~\ref{table:functions}.
-An inherent problem of visualizing 
-data is the fact that depending on the data at hand certain 
-visualizations lose their usefulness (e.g. overplotting in scatter 
-plot if too many data points are present). To address this 
-problem, we implemented most of the plot functions in different 
-versions inspired by the work of Cleveland\cite{Cleveland93}, Sarkar\cite{RSarkar2008} and Wickham\cite{Wickham2014,Hadley2009}. The 
-data can be displayed in trellis plot manner using the faceting 
-functionality of ggplot2 (see Figure~\ref{figure:viz}A). Alternatively,
-overplotting using color coding (Figure~\ref{figure:viz}B) or violin plots based on 
-descriptive statistics values (Figure~\ref{figure:viz}C) can 
-be chosen. This allows the user to interactively change the appearance 
-of the plots based on the situation at hand (e.g. a large number of 
-files are best visualized by violin plots giving the user an idea 
-about the distribution of the data points). Based on this a smaller 
-subset of files can be selected and visualized with another technique. \\
-To benefit from the grammar of graphics (changing individual plot layers e.g., adapt y-axis scaling, change axis labels, 
-add title or subtitles) each of the implemented plot functions always returns 
-the \code{ggplot} object. Due to the implementation of this design 
-pattern those \code{ggplot} objects can be further altered by adding new 
-layers, allowing a customization of the plots if needed. 
-The following R code snippet produces the three plots shown in Figure~\ref{figure:viz} 
-and demonstrates the described feature of modifying an existing \code{ggplot} object
-by eliminating the legend in the last two plots.
+This package is providing several plot functions tailored towards MS
+data. Table~\ref{table:functions} lists of the implemented plot functions with a short
+description. An inherent problem of visualizing data is the fact that
+depending on the data at hand specific visualizations lose their
+usefulness (e.g., overplotting in scatter plot if too many data points
+are
+present). To address this problem, we implemented most of the plot
+functions in different versions inspired by the work of Cleveland\cite{Cleveland93}, Sarkar\cite{RSarkar2008} and Wickham\cite{Wickham2014,Hadley2009}. The data can be displayed in trellis plot manner
+using the faceting functionality of ggplot2 (see Figure~\ref{figure:viz}A).
+Alternatively, overplotting using color coding (Figure~\ref{figure:viz}B) or violin
+plots based on descriptive statistics values (Figure~\ref{figure:viz}C) can be
+chosen, which allows the user to interactively change the appearance
+of the plots based on the situation at hand. For instance,  a large
+number of files are best
+visualized by violin plots giving the user an idea about the
+distribution of the data points.
+Based on this a smaller subset of files can be selected and visualized
+with another technique.\\
+To benefit from the grammar of graphics, which
+enables changing individual plot layers, (e.g., adapt y-axis scaling,
+change axis labels, add title or subtitles), each of the implemented
+plot functions always returns the \code{ggplot} object. This design pattern
+allows the customization of the plots if needed. The following R code
+snippet produces the three plots shown in Figure~\ref{figure:viz} and demonstrates
+the described feature of modifying an existing \code{ggplot} object by
+eliminating
+the legend in the last two plots.
 
 <<label=color, echo = FALSE>>=
 color.vector <- c("#08306B", #"#6BAED6",
@@ -425,8 +422,7 @@ The plots illustrate that both systems, server and laptop, can analyze
 \label{figure:benchmark}
 \end{figure}
 
-The idea of the package is to provide the user with diagnostic plots a
-short time after the MS raw data is acquired. To test if our software
+For fast method optimization, processing time between the end of the MS acquisition and the resulting visualizations should be short. To test if our software
 is fast enough for this task, we performed a benchmark analysis. In
 panel A of Figure~\ref{figure:benchmark} the overall runtime dependency of the number of
 used CPUs is depicted. We derived the processing frequency as spectra
@@ -566,8 +562,33 @@ To our knowledge the only alternative tool that is able to extract and visualize
 
 
 \section{Conclusion}
-In this manuscript, we present \rawDiag~an R package to visualize characteristics of LC-MS measurements. Through its diagnostic plots, \rawDiag~supports scientists during empirical method optimization by providing a rational base for choosing appropriate data acquisition parameters. The software is fast, interactive and easy to operate through an R shiny GUI application, even for users without prior R knowledge. More advanced users can fully customize the appearance of the visualizations by executing their own code from the R command line. This also enables \rawDiag~to be customized and implemented into more complex environments, e.g., data analysis pipelines embedded into a LIMS systems. In its current implementation, the software is tailored towards the Thermo Fisher Scientific raw file format, but its architecture allows easy adaptation towards other MS data formats. An interesting showcase would be the novel Bruker tdf 2.0 format (introduced for the timsTOF Pro), where scan data is stored in an SQLite databse directly accessible to R. As future work, \rawDiag~could be extended to link additinal metadata not stored in the raw files. One example could be scan metadata generated by database search engienes (e.g., peptide sequences, identification scores, etc.). Such additional data would allow the visualization of assignment rates and score distributions across injections. By linking primary and derived metadata, the nature of \rawDiag~could be changed from a simple diagnostic tool to an application that allows big data analysis similar to MassIVE (\url{https://massive.ucsd.edu}, March 2018) but with the possibility to bypassing the currently necessary conversion to open data formats like mzML.
 
+In this manuscript, we present \rawDiag~an R package to visualize
+characteristics of LC-MS measurements. Through its diagnostic plots,
+\rawDiag~supports scientists during empirical method optimization by
+providing a rational base for choosing appropriate data acquisition
+parameters. The software is fast, interactive and easy to operate
+through an R shiny GUI application, even for users without prior R
+knowledge. More advanced users can fully customize the appearance of
+the visualizations by executing code from the R command line.
+Therefore, the integration of \rawDiag~into more complex environments,
+e.g., data analysis pipelines embedded into LIMS systems, is possible.
+
+Currently, the software can directly read from the Thermo Fisher
+Scientific raw file format, but its architecture allows for adaptation
+towards other MS data formats. An exciting showcase would be the novel
+Bruker tdf 2.0 format (introduced for the timsTOF Pro), which stores
+scan data in an SQLite database directly accessible to R. Future
+extensions of \rawDiag~would be accessing additional metadata not
+stored in the raw files such as scan metadata generated by database
+search engines, e.g., peptide sequences or identification scores. Such
+additional data would allow the visualization of assignment rates and
+score distributions across injections. By linking primary and derived
+metadata, the nature of \rawDiag~would change from a simple diagnostic
+tool to an application that
+allows big data analysis similar to MassIVE (\url{https://massive.ucsd.edu}, March 2018)
+but with the possibility of bypassing the currently
+necessary conversion to open data formats like mzML.
 
 \section{Funding Sources}
 The work has been supported by ETH Zurich and University of Zurich.
