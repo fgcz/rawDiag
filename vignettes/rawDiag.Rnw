@@ -358,7 +358,6 @@ rv <- rawDiag:::PlotAll(WU, prefix="graphics/rawDiag")
 \IfFileExists{graphics/rawDiag-#1.png}{\parbox[c]{1.5cm}{\includegraphics[width=1.5cm, height=1.5cm]{graphics/rawDiag-#1}}}{-}
 }
 
-
 \begin{table}
 \centering
 \begin{scriptsize}
@@ -368,18 +367,18 @@ rv <- rawDiag:::PlotAll(WU, prefix="graphics/rawDiag")
 \hline
 function name  & trellis & overlay & violin & description\\
 \hline
-\code{PlotChargeState}    &\G{PlotChargeState-trellis}       &\G{PlotChargeState-overlay}       &        -                         & displays charge state distributions as biologist-friendly bar charts as absolute counts.\cite{pmid24645190}\\
-\code{PlotCycleLoad}         &\G{PlotCycleLoad-trellis}   &\G{PlotCycleLoad-overlay}   &\G{PlotCycleLoad-violin}& displays duty cycle load (number of MS2 scans per duty cycle) as a function of retention time (RT) (scatter plots) or its marginal distribution (violin).\\
-\code{PlotCycleTime}         &\G{PlotCycleTime-trellis}         &\G{PlotCycleTime-overlay}         &\G{PlotCycleTime-violin}        & displays cycle time with respect to RT (scatter plots) or its marginal distribution (violin). A smooth curve graphs the trend. The maximum is indicated by a red dashed line.\\
-\code{PlotInjectionTime}     &\G{PlotInjectionTime-trellis}&\G{PlotInjectionTime-overlay}     &\G{PlotInjectionTime-violin}           & displays injection time as a function  of RT. A smooth curve graphs the trend. The maximum is indicated by a red dashed line.\\
-\code{PlotLockMassCorrection}      &\G{PlotLockMassCorrection-trellis}      &\G{PlotLockMassCorrection-overlay}      &\G{PlotLockMassCorrection-violin}     & graphs the lock mass deviations along RT (note: this example data were acquired with lock mass correction).\\
-\code{PlotMassDistribution}  &\G{PlotMassDistribution-trellis}  &\G{PlotMassDistribution-overlay}  &\G{PlotMassDistribution-violin} & displays mass distribution using color coding according to charge state (trellis) or file (overlay, violin).\\
-\code{PlotMassHeatmap}       &\G{PlotMassHeatmap-trellis}                    & \G{PlotMassHeatmap-overlay}                                   & -                                 & draws a computer scientist-friendly hexagon binned heatmap of the peak count charge deconvoluted mass along RT.\\
-\code{PlotMzDistribution}    &\G{PlotMzDistribution-trellis}&\G{PlotMzDistribution-overlay}& \G{PlotMzDistribution-violin}& a scatter plot of m/z versus RT on MS1 level (no density; with overplotting.). violin display the marginal m/z distribution of each file.\\
-\code{PlotPrecursorHeatmap}  &\G{PlotPrecursorHeatmap-trellis}            & \G{PlotPrecursorHeatmap-overlay}                                   & -                                 & according to \code{PlotMassHeatmap}  but displaying convoluted data.\\
-\code{PlotScanFrequency}     &\G{PlotScanFrequency-trellis}     &\G{PlotScanFrequency-overlay}     &\G{PlotScanFrequency-violin}    & graphs scan frequency versus RT or scan frequency marginal distribution for violin.\\
-\code{PlotScanTime}         &\G{PlotScanTime-trellis}          &\G{PlotScanTime-overlay}          &\G{PlotScanTime-violin}         & plots scan time as function of RT for each MSn level. A smooth curve displays the trend.\\
-\code{PlotTicBasepeak}      &\G{PlotTicBasepeak-trellis}       &\G{PlotTicBasepeak-overlay}       &\G{PlotTicBasepeak-violin}      & displays the total ion  chromatogram (TIC) and the base peak chromatogram.\\
+\code{PlotChargeState}    &\G{PlotChargeState-trellis}       &\G{PlotChargeState-overlay}       &        -                         & Shown is the charge state distributions as bar charts with absolute counts.\\
+\code{PlotCycleLoad}         &\G{PlotCycleLoad-trellis}   &\G{PlotCycleLoad-overlay}   &\G{PlotCycleLoad-violin}& Shown is the number of MS2 scans MS1 as a function of retention time (RT) (scatter plots) or its density (violin).\\
+\code{PlotCycleTime}         &\G{PlotCycleTime-trellis}         &\G{PlotCycleTime-overlay}         &\G{PlotCycleTime-violin}        & Graphs the time difference between two consecutive MS1 scans (cycle time) with respect to RT (scatter plots) or its density (violin). A smooth curve graphs the trend. The 95th percentile is indicated by a red dashed line.\\
+\code{PlotInjectionTime}     &\G{PlotInjectionTime-trellis}&\G{PlotInjectionTime-overlay}     &\G{PlotInjectionTime-violin}           & Displays the injection time as a function  of RT. A smooth curve graphs the trend. The maximum is indicated by a red dashed line.\\
+\code{PlotLockMassCorrection}      &\G{PlotLockMassCorrection-trellis}      &\G{PlotLockMassCorrection-overlay}      &\G{PlotLockMassCorrection-violin}     & Graphs the lock mass deviations along RT (note: this example data were acquired without lock mass correction).\\
+\code{PlotMassDistribution}  &\G{PlotMassDistribution-trellis}  &\G{PlotMassDistribution-overlay}  &\G{PlotMassDistribution-violin} & Shown is the mass distribution with respect to charge state (trellis) or filenames (overlay, violin).\\
+\code{PlotMassHeatmap}       &\G{PlotMassHeatmap-trellis}                    & \G{PlotMassHeatmap-overlay}                                   & -                                 & Draws a hexagon binned heatmap of the charge deconvoluted mass along RT.\\
+\code{PlotMzDistribution}    &\G{PlotMzDistribution-trellis}&\G{PlotMzDistribution-overlay}& \G{PlotMzDistribution-violin}& a Scatter plot of m/z versus RT on MS1 level (no density; with overplotting.). Violin display the m/z density in each file.\\
+\code{PlotPrecursorHeatmap}  &\G{PlotPrecursorHeatmap-trellis}            & \G{PlotPrecursorHeatmap-overlay}                                   & -                                 & According to \code{PlotMassHeatmap}but displaying convoluted data (acutal m/z values).\\
+\code{PlotScanFrequency}     &\G{PlotScanFrequency-trellis}     &\G{PlotScanFrequency-overlay}     &\G{PlotScanFrequency-violin}    & graphs scan frequency versus RT or the scan frequency density for violin.\\
+\code{PlotScanTime}         &\G{PlotScanTime-trellis}          &\G{PlotScanTime-overlay}          &\G{PlotScanTime-violin}         & Plots scan time as function of RT for each MSn level. A smooth curve displays the trend. A solid red line indicates the transient time of the Orbitrap analyzer.\\
+\code{PlotTicBasepeak}      &\G{PlotTicBasepeak-trellis}       &\G{PlotTicBasepeak-overlay}       &\G{PlotTicBasepeak-violin}      & Displays the total ion  chromatogram (TIC) and the base peak chromatogram.\\
 \hline
 \hline
 \end{tabularx}
@@ -388,7 +387,6 @@ function name  & trellis & overlay & violin & description\\
 The \rawDiag~cheatsheet lists the functions of the package using a subset of the provided  `WU163763` dataset.
 Each thumbnail gives an impression of the plot function's result. 
 The column names `trellis,' `overlay' and `violin'  were given as method attribute.
-Marginal distribution plots for discrete response variables are not supported.
 }
 \label{table:functions}
 \end{table}
