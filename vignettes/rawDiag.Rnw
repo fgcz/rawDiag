@@ -519,7 +519,7 @@ that all three methods exploit the maximum number of dependent scans (18,
 36 and 72) during the separation phase of the gradient (see Figure~\ref{figure:application}B). Concurrently, 
 the MS2 scan speed increased from $\approx$30 to $\approx$36 and $\approx$38 Hz, respectively
 (see Figure~\ref{figure:application}A). Using the modified methods, the instrument is spending 5 and 10 min more time on MS2 
-scans during the main peptide elution phase, comparing the methods to the initial "Top18" method (see Figure~\ref{figure:application}E). 
+scans during the main peptide elution phase, comparing the methods to the initial ``Top18'' method (see Figure~\ref{figure:application}E). 
 These optimized methods not only showed better run characteristics but
 ultimately also resulted in more peptide and protein 
 identifications, as shown in Figure~\ref{figure:application}C and \ref{figure:application}D. For database searches, Proteome~Discoverer with search settings described in the experimental procedures section. 
@@ -578,17 +578,17 @@ rawDiag:::.technote_application_figure_5(WU163763)
  \includegraphics[width=0.32\columnwidth]{rawDiag-usecase3}
  \includegraphics[width=0.32\columnwidth]{rawDiag-usecase4}
  \includegraphics[width=0.32\columnwidth]{rawDiag-usecase5}
-\caption{\textbf{A)}~Moving average of the scan speed of triplicate measurements of "Top18" (blue), "Top36" (green) and "Top72" (orange).
-\textbf{B)} Number of MS2 scans for each scan cycle for "Top18" (blue), "Top36" (green) and "Top72" (orange).
+\caption{\textbf{A)}~Moving average of the scan speed of triplicate measurements of ``Top18'' (blue), ``Top36'' (green) and ``Top72'' (orange).
+\textbf{B)} Number of MS2 scans for each scan cycle for ``Top18'' (blue), ``Top36'' (green) and ``Top72'' (orange).
 \textbf{C)} Number of Proteins (orange) and peptides (blue) for the different TopN settings (note: number of peptides is divided by 10 in this plot due to scaling reasons).
 \textbf{D)} Number of PSM (blue) and MS2 scans (orange) for the different TopN settings.
 \textbf{E)} Time spent on MS1 (blue) and MS2 (orange) for the different TopN settings. Time range for calculation is the elution phase of the peptides between 15-70 min.}
 \label{figure:application}
 \end{figure}
 
-Interestingly, the number confident of peptide spectrum matches (PSM) is reaching a plateau phase in the "Top72" method 
-compared with the "Top36" ("Top36" has a slightly hihger number of significat psm than "Top72"). One potential explanation for this finding can be the quality of the recorded spectra. Due to the fact that the "Top72" method is sampling the precursors in our sample to such a deep degree, the injection time to prepare the ion packages for many low abundant species might be too low. This low amount of ions for fragmentation can influence the quality of the resulting fragment spectrum and hence lead to a non assigned spectrum. Since we still acquire much more MS2 spectra compared to the "Top36" method this is not yet seen in the number of significant peptide and protein hits (more spectra in general lead to more peptide and protein assignments) but indicates a suboptimal usage of the instrument. This finding could lead directly to a further refinement circle of the method.
-New methods could be designed where the number of MS2 scans is reduced and concomitant the injection time parameter for MS2 scans is increased. Care should be taken to keep the cycle time of the methods constant. These new designed methods together with the "Top72" method would then be reanalyzed and again the data can be visualized to check if a method is fullfilling the MS operators requrements or if new parameters need optimization. 
+Interestingly, the number confident of peptide spectrum matches (PSM) is reaching a plateau phase in the ``Top72'' method 
+compared with the ``Top36'' (``Top36'' has a slightly hihger number of significat psm than ``Top72''). One potential explanation for this finding can be the quality of the recorded spectra. Due to the fact that the ``Top72'' method is sampling the precursors in our sample to such a deep degree, the injection time to prepare the ion packages for many low abundant species might be too low. This low amount of ions for fragmentation can influence the quality of the resulting fragment spectrum and hence lead to a non assigned spectrum. Since we still acquire much more MS2 spectra compared to the ``Top36'' method this is not yet seen in the number of significant peptide and protein hits (more spectra in general lead to more peptide and protein assignments) but indicates a suboptimal usage of the instrument. This finding could lead directly to a further refinement circle of the method.
+New methods could be designed where the number of MS2 scans is reduced and concomitant the injection time parameter for MS2 scans is increased. Care should be taken to keep the cycle time of the methods constant. These new designed methods together with the ``Top72'' method would then be reanalyzed and again the data can be visualized to check if a method is fullfilling the MS operators requrements or if new parameters need optimization. 
 
 
 \subsection{Related work}
