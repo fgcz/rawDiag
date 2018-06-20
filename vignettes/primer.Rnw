@@ -1,4 +1,4 @@
-%\VignetteIndexEntry{A quick tour of rawDiag}
+%\VignetteIndexEntry{A quick tour through rawDiag}
 \documentclass[nojss]{jss}
 
 \usepackage{thumbpdf,lmodern}
@@ -6,11 +6,11 @@
 \usepackage[T1]{fontenc} % Use modern font encodings
 \usepackage{listings}
 
-\author{Christian Trachsel\\Functional Genomics Center Zurich
+\author{Christian Trachsel\\FGCZ
   \And 
-  Tobias Kockmann\\Functional Genomics Center Zurich
+  Tobias Kockmann\\FGCZ
   \And
-  Christian Panse\\Functional Genomics Center Zurich}
+  Christian Panse\\FGCZ}
 \title{An Introduction to the \pkg{rawDiag} R Package}
 
 \Plainauthor{Christian Trachsel, Tobias Kockmann, Christian Panse}
