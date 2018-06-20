@@ -1,15 +1,12 @@
-%\VignetteIndexEntry{JPR pr-2018-001736}
+%\VignetteIndexEntry{JPR pr-2018-001736R1}
 \documentclass[journal=jprobs,manuscript=article]{achemso}
 \setkeys{acs}{articletitle=true}
 \setkeys{acs}{doi = true}
 \SectionNumbersOn
 
 \usepackage[T1]{fontenc} % Use modern font encodings
-\usepackage[colorlinks = true,
-            linkcolor = blue,
-            urlcolor  = blue,
-            citecolor = blue,
-            anchorcolor = blue]{hyperref}
+\usepackage[colorlinks = false]{hyperref}
+%\usepackage[colorlinks = false, linkcolor = black, urlcolor  = black, citecolor = black]{hyperref}
 
 
 \usepackage{chemformula} % Formula subscripts using \ch{}
@@ -341,7 +338,7 @@ pdf reports.
 \includegraphics[width=0.49\columnwidth,keepaspectratio]{rawDiag-visualization_violin}
 
 \caption{Concurrent metadata visualization applying \code{PlotMassDistribution} to nine raw files acquired in DDA mode (sample was 1$\mu$g HeLa digest). The data are available on MassIVE
-\url{ftp://massive.ucsd.edu/MSV000082389/raw/rawDiag/raw/} or
+\url{ftp://massive.ucsd.edu/MSV000082389/} or
 as data set of the \rawDiag package as \texttt{WU163763}. \textbf{A)} method trellis; the mass distribution is plotted as a histogram and the color code represents the charge states the precursors \textbf{B)} method overlay; the mass distribution is graphed as a density function and the color code represents the different raw files. \textbf{C)} method violin; the mass distribution is displayed as a violin plot and the colors indicate the different raw files.}
 
 %facet plot of the mass distribution in relation to the precursor charge from nine raw files. \textbf{B)} Overlay representation of the same mass distributions as density plot but without the charge state information. \textbf{C)} Descriptive plot where the mass distribution is displayed as violin grouped by the charge state for the same nine raw files.}
@@ -482,7 +479,7 @@ Base on these conclusions, a hypothesis for the method optimizations
 can be formulated and data from the optimized methods can be
 visualized in order to check if the method adaptation led in the right
 direction. A use case example of this process will be discussed in the
-following paragraph.\\
+following paragraph.
 
 To be flexible towards different situations, where a single
 visualization technique might lose its usability. Most plot functions
@@ -600,7 +597,7 @@ to prepare
 the ion packages for many low abundant species might be too low. This
 low amount of ions for fragmentation can influence the quality of the
 resulting fragment spectrum and hence lead to a non assigned spectrum.
-Since we still acquire much more MS2 spectra compared to the ”Top36”
+Since we still acquire much more MS2 spectra compared to the ``Top36''
 method, this is not yet seen in the number of significant peptide and
 protein hits (more spectra in general lead to more peptide and protein
 assignments) but
@@ -645,8 +642,22 @@ allows big data analysis similar to MassIVE (\url{https://massive.ucsd.edu}, Mar
 but with the possibility of bypassing the currently
 necessary conversion to open data formats like mzML.
 
+\section{Availability}
+The package vignette \citep{rawDiag} as well as the R package itself,
+a Dockerfile which builds the entire architecture from scratch is accessible through a git repository under the following URL: \url{https://github.com/fgcz/rawDiag}.
+An automatic build of the provided docker recipe is visible through \url{https://hub.docker.com/r/cpanse/rawdiag/}.
+The data used in section \ref{section:application} are available on the MassIVE
+\url{ftp://massive.ucsd.edu/MSV000082389/}, through the
+lab information managment system bfabric~\cite{bfabric} \url{https://fgcz-bfabric.uzh.ch} Sample ID 174020, or
+as data set of the package as \texttt{WU163763}.
+A demo system including all data shown in this manuscript is available through
+\url{http://fgcz-ms-shiny.uzh.ch:8080/rawDiag-demo/}.
+
 \section{Funding Sources}
 The work has been supported by ETH Zurich and University of Zurich.
+
+\section{Conflict of interest}
+The authors declare no competing financial interest.
 
 \begin{acknowledgement}
 The authors thank Jim Shofstahl for his support regarding the
@@ -660,17 +671,6 @@ Federal Institute of Technology Zurich and the University of Zurich for the
 support of our work.
 \end{acknowledgement}
 
-\begin{suppinfo}
-The package vignette \citep{rawDiag} as well as the R package itself,
-a Dockerfile which builds the entire architecture from scratch is accessible through a git repository under the following URL: \url{https://github.com/fgcz/rawDiag}.
-An automatic build of the provided docker recipe is visible through \url{https://hub.docker.com/r/cpanse/rawdiag/}.
-The data used in section \ref{section:application} are available on the MassIVE
-\url{ftp://massive.ucsd.edu/MSV000082389/raw/rawDiag/raw/}, through the
-lab information managment system bfabric~\cite{bfabric} \url{https://fgcz-bfabric.uzh.ch} Sample ID 174020, or
-as data set of the package as \texttt{WU163763}.
-A demo system including all data shown in this manuscript is available through
-\url{http://fgcz-ms-shiny.uzh.ch:8080/rawDiag-demo/}.
-\end{suppinfo}
 
 \bibliography{rawDiag}
 \end{document}
