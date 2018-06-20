@@ -4,7 +4,11 @@
 \usepackage[T1]{fontenc} % Use modern font encodings
 \usepackage{listings}
 
-\author{Christian Trachsel, Tobias Kockmann, Christian Panse}
+\author{Christian Trachsel\\Functional Genomics Center Zurich
+  \And 
+  Tobias Kockmann\\Functional Genomics Center Zurich
+  \And
+  Christian Panse\\Functional Genomics Center Zurich}
 \title{An Introduction to the \pkg{rawDiag} R Package}
 
 \Plainauthor{Christian Trachsel, Tobias Kockmann, Christian Panse}
