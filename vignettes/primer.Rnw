@@ -1,6 +1,8 @@
 %\VignetteIndexEntry{A quick tour of rawDiag}
 \documentclass[nojss]{jss}
 
+\usepackage{thumbpdf,lmodern}
+
 \usepackage[T1]{fontenc} % Use modern font encodings
 \usepackage{listings}
 
