@@ -245,6 +245,121 @@ read.tdf <- function(filename){
   as.rawDiag(rv)
 }
 
+#' Extracts XIC of a given mass vector
+#'
+#' @param rawfile 
+#' @param masses 
+#' @param tol 
+#' @param mono 
+#' @param exe 
+#'
+#' @return list of XICs
+#' @export readXICs 
+readXICs <- function(rawfile, 
+                      masses,
+                      tol = 10,
+                      mono = if(Sys.info()['sysname'] %in% c("Darwin", "Linux")) TRUE else FALSE,
+                      exe = file.path(path.package(package = "rawDiag"), "exec", "fgcz_raw.exe")){
+  
+  # TODO(cp): replace asap we have an R .Net binding similar as Rcpp
+  # the current solution writting and reading from a file is pain-of-the-art
+  tfi <- tempfile()
+  tfo <- tempfile()
+  tfstdout <- tempfile()
+  
+  cat(masses, file=tfi, sep="\n")
+  
+  cmd <- exe
+  
+  
+  if (mono){
+    rvs <- system2("mono", args = c(shQuote(exe), shQuote(rawfile), "xic", shQuote(tfi), tol, shQuote(tfo)))
+  }else{
+    rvs <- system2(exe, args = c( shQuote(rawfile), "xic", shQuote(tfi), tol, shQuote(tfo)))
+  }
+  
+  source(tfo)
+  unlink(c(tfi, tfo, tfstdout))
+  
+  
+  return(lapply(e$XIC, function(x){class(x) <- c(class(x), 'XIC'); x}))
+}
+
+#' plot extracted ion chromatogram
+#'
+#' @param x 
+#' @param y 
+#' @param ... 
+#'
+#' @return
+#' @export plot.XIC
+plot.XIC <- function(x, y, ...){
+  if(length(x$times) > 0){
+  plot(x$times, x$intensities, type='h', sub=length(x$times), ...)
+  }
+} 
+
+
+#' read scan of scanids
+#'
+#' @param rawfile 
+#' @param scans 
+#' @param mono 
+#' @param exe 
+#'
+#' @return
+#' @export
+#'
+#' @examples
+#'  (rawfile <- file.path(path.package(package = 'rawDiag'), 'extdata', 'sample.raw'))
+#'  S <- rawDiag::readScans(rawfile, 1:10)
+#'  plot(S[[10]])
+#' 
+readScans <- function(rawfile, 
+                       scans,  
+  mono = if(Sys.info()['sysname'] %in% c("Darwin", "Linux")) TRUE else FALSE,
+  exe = file.path(path.package(package = "rawDiag"), "exec", "fgcz_raw.exe")){
+  
+  # TODO(cp): replace asap we have an R .Net binding similar as Rcpp
+  # the current solution writting and reading from a file is pain-of-the-art
+  tfi <- tempfile()
+  tfo <- tempfile()
+  tfstdout <- tempfile()
+  
+  cat(scans, file = tfi, sep="\n")
+  
+  cmd <- exe
+  
+  
+  if (mono){
+    rvs <- system2("mono", args = c(shQuote(exe), shQuote(rawfile), "scans", shQuote(tfi), shQuote(tfo)))
+  }else{
+    rvs <- system2(exe, args = c( shQuote(rawfile), "scans", shQuote(tfi), shQuote(tfo)))
+  }
+  source(tfo)
+  unlink(c(tfi, tfo, tfstdout))
+  
+  
+  return(lapply(e$PeakList, function(x){class(x) <- c(class(x), 'peaklist'); x}))
+}
+
+#' plot a peaklist
+#'
+#' @param x a peaklist 
+#' @param y 
+#' @param ... 
+#'
+#' @return a nested list
+#' @export plot.peaklist
+#'
+#' @examples
+#' S<-rawDiag:::.readScans(rawfile, 1:10)
+#' plot(S[[1]])
+#' 
+plot.peaklist <- function(x, y, ...){
+  plot(x$mZ, x$intensity, type = 'h', main = x$title, xlab = 'm/Z', ylab = 'intensity', ...)
+}
+  
 #' mass spec reader function 
 #'
 #' @importFrom utils read.csv
@@ -308,54 +423,49 @@ read.raw <- function(file, mono = if(Sys.info()['sysname'] %in% c("Darwin", "Lin
   if (mono_path != ''){
     message(Sys.setenv(MONO_PATH = mono_path))
   }
-    
+  
   if (method == "thermo" && ssh){
     return(.read.thermo.raw.ssh(file))
   }
   else if (method == "thermo"){
-
+    
     stopifnot(file.exists(exe))
     stopifnot(file.exists(file))
-
+    
     # message(paste("start", Sys.time(), sep = ":"))
-    cmd <- paste(exe, file, argv)
     
-    if (mono){
-      cmd <- paste("mono", cmd)
-    }
-    
-    message(paste ("executing", cmd, "..."))
     
     if(system2_call){
-      tf <- tempfile()
+      tf <- tempfile(fileext = 'tsv')
+      tfstdout <- tempfile()
       
-      message(paste("system2 is writting to", tf, "..."))
+      message(paste("system2 is writting to tempfile ", tf, "..."))
       
       if (mono){
-        rvs <- system2("mono", args = c(exe, shQuote(rawfile), "qc"), stdout = tf)
+        rvs <- system2("mono", args = c(exe, shQuote(rawfile), "qc", shQuote(tf)), stdout = tfstdout)
       }else{
-        rvs <- system2(exe, args = c(shQuote(rawfile), "qc"), stdout = tf)
+        rvs <- system2(exe, args = c(shQuote(rawfile), "qc", shQuote(tf)), stdout = tfstdout)
       }
       if (rvs == 0){
         rv <- read.csv(tf,  sep = "\t",   stringsAsFactors = FALSE, header = TRUE)
         message(paste("unlinking", tf, "..."))
         unlink(tf)
-        
-        if(rawDiag){
-          rv <- as.rawDiag(rv)
-        }
+        unlink(tfstdout)
       }
     }else{
+      cmd <- paste(exe, file, argv)
       
-      if(rawDiag){
-        rv <- as.rawDiag(read.csv(pipe(cmd), 
-                                  sep='\t', stringsAsFactors = FALSE, header = TRUE))
-      }else{
-        rv <- read.csv(pipe(cmd), 
-                       sep='\t', stringsAsFactors = FALSE, header = TRUE)
-      }
+      if (mono)  cmd <- paste("mono", cmd)
+      
+      
+      message(paste ("executing", cmd, "..."))
+      rv <- read.csv(pipe(cmd), 
+                     sep='\t', stringsAsFactors = FALSE, header = TRUE)
+      
     }
   }
+  
+  if (rawDiag) rv <- as.rawDiag(rv)
   class(rv) <- c(class(rv), 'rawDiag')
   rv
 }
