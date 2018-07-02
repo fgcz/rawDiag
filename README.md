@@ -6,6 +6,12 @@
 an R package supporting rational LC-MS method optimization for bottom-up proteomics on multiple OS platforms
 
 
+main features:
+ 
+1. multiplatform and fast reading through using [The New RawFileReader from Thermo Fisher Scientific](http://planetorbitrap.com/rawfilereader).
+2. uses latest visualization generation through using Rs [ggplot2](https://cran.r-project.org/package=ggplot2) package.
+3. provides R interface to your instrument raw data.
+
 
 ## 1 System Requirements  
 
