@@ -442,9 +442,9 @@ read.raw <- function(file, mono = if(Sys.info()['sysname'] %in% c("Darwin", "Lin
       message(paste("system2 is writting to tempfile ", tf, "..."))
       
       if (mono){
-        rvs <- system2("mono", args = c(exe, shQuote(rawfile), "qc", shQuote(tf)), stdout = tfstdout)
+        rvs <- system2("mono", args = c(exe, shQuote(file), "qc", shQuote(tf)), stdout = tfstdout)
       }else{
-        rvs <- system2(exe, args = c(shQuote(rawfile), "qc", shQuote(tf)), stdout = tfstdout)
+        rvs <- system2(exe, args = c(shQuote(file), "qc", shQuote(tf)), stdout = tfstdout)
       }
       if (rvs == 0){
         rv <- read.csv(tf,  sep = "\t",   stringsAsFactors = FALSE, header = TRUE)
