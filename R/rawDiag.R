@@ -308,11 +308,11 @@ plot.XIC <- function(x, y, ...){
 #' @param exe 
 #'
 #' @return
-#' @export
+#' @export readScans
 #'
 #' @examples
 #'  (rawfile <- file.path(path.package(package = 'rawDiag'), 'extdata', 'sample.raw'))
-#'  S <- rawDiag::readScans(rawfile, 1:10)
+#'  S <- readScans(rawfile, 1:10)
 #'  plot(S[[10]])
 #' 
 readScans <- function(rawfile, 
@@ -353,7 +353,8 @@ readScans <- function(rawfile,
 #' @export plot.peaklist
 #'
 #' @examples
-#' S<-rawDiag:::.readScans(rawfile, 1:10)
+#' (rawfile <- file.path(path.package(package = 'rawDiag'), 'extdata', 'sample.raw'))
+#' S <- readScans(rawfile, 1:10)
 #' plot(S[[1]])
 #' 
 plot.peaklist <- function(x, y, ...){
