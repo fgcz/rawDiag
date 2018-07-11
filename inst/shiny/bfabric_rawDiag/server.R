@@ -385,7 +385,8 @@ shinyServer(function(input, output, session) {
   output$foo = downloadHandler(
     filename = paste("rawDiag.pdf", sep = ''),
     content = function(file) {
-      ggsave(values$gp, file=file,
+      ggsave(values$gp + labs(caption = paste("These plots were generated using the rawDiag R package version", packageVersion('rawDiag'), ". If you are using rawDiag for your work, please cite the following manuscript: C. Trachsel et al. (2018), Journal of Proteome Research doi: 10.1021/acs.jproteome.8b00173", sep = '')),
+             file=file,
              dpi = 600,
              device = "pdf",
              width = 500,
