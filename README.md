@@ -91,7 +91,7 @@ library(rawDiag)
 data(WU163763)
 PlotScanFrequency(WU163763, method='overlay')
 PlotPrecursorHeatmap(WU163763)
-PlotMassDistribution(WU163763
+PlotMassDistribution(WU163763)
 ```
 
 ### 3.2 An interactive shiny example
