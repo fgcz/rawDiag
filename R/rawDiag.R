@@ -625,6 +625,27 @@ ScanFrequMovingOver <- function(x){
   return(res)
 }  
 
+.map.type <- function(x){
+  res <- x %>% 
+    dplyr::mutate(Type = dplyr::case_when(grepl("FTMS [[:punct:]] c NSI Full ms", .$ScanType) == "TRUE" ~ "FT_Full_ms_c",
+                                          grepl("FTMS [[:punct:]] p NSI Full ms", .$ScanType) == "TRUE" ~ "FT_Full_ms_p",
+                                          grepl("FTMS [[:punct:]] c NSI Full lock ms", .$ScanType) == "TRUE" ~ "FT_Full_ms_c",
+                                          grepl("FTMS [[:punct:]] p NSI Full lock ms", .$ScanType) == "TRUE" ~ "FT_Full_ms_p",
+                                          grepl("FTMS [[:punct:]] c NSI d Full ms2", .$ScanType) == "TRUE" ~ "FT_d_Full_ms2_c",
+                                          grepl("FTMS [[:punct:]] p NSI d Full ms2", .$ScanType) == "TRUE" ~ "FT_d_Full_ms2_p",
+                                          grepl("FTMS [[:punct:]] c NSI SIM ms", .$ScanType) == "TRUE" ~ "FT_SIM_ms_c",
+                                          grepl("FTMS [[:punct:]] p NSI SIM ms", .$ScanType) == "TRUE" ~ "FT_SIM_ms_p",
+                                          grepl("FTMS [[:punct:]] p NSI SIM msx ms", .$ScanType) == "TRUE" ~ "FT_msxSIM_ms_p",
+                                          grepl("FTMS [[:punct:]] c NSI SIM msx ms", .$ScanType) == "TRUE" ~ "FT_msxSIM_ms_c",
+                                          grepl("FTMS [[:punct:]] c NSI Full ms2", .$ScanType) == "TRUE" ~ "FT_Full_ms2_c",
+                                          grepl("FTMS [[:punct:]] p NSI Full ms2", .$ScanType) == "TRUE" ~ "FT_Full_ms2_p",
+                                          grepl("ITMS [[:punct:]] c NSI r d Full ms2", .$ScanType) == "TRUE" ~ "IT_Full_ms2_c",
+                                          grepl("ITMS [[:punct:]] p NSI r d Full ms2", .$ScanType) == "TRUE" ~ "IT_Full_ms2_p"
+                                          )
+    )
+  return(res)
+}
+
 # ----Plots----
 
 #' TIC and Base Peak plot function
@@ -640,14 +661,14 @@ ScanFrequMovingOver <- function(x){
 #' @importFrom ggplot2 facet_wrap geom_violin scale_y_continuous facet_grid aes_string theme_light geom_line stat_summary
 #' @export PlotTicBasepeak
 PlotTicBasepeak <- function(x, method = 'trellis'){
+  df <- x %>% 
+    dplyr::filter_at(vars("MSOrder"), any_vars( . == "Ms")) %>% 
+    dplyr::select_at(vars("StartTime", "TIC", "BasePeakIntensity", "filename")) %>% 
+    dplyr::rename_at(vars("BasePeakIntensity"), funs(as.character("Base_Peak"))) %>% 
+    tidyr::gather(key = "Type", value = "Intensity", c("TIC", "Base_Peak"))
+  df$Type <- factor(df$Type, levels = c("TIC", "Base_Peak"))
+  
   if (method == 'trellis'){
-    df <- x %>% 
-      dplyr::filter_at(vars("MSOrder"), any_vars( . == "Ms")) %>% 
-      dplyr::select_at(vars("StartTime", "TIC", "BasePeakIntensity", "filename")) %>% 
-      dplyr::rename_at(vars("BasePeakIntensity"), funs(as.character("Base_Peak"))) %>% 
-      tidyr::gather(key = "Type", value = "Intensity", c("TIC", "Base_Peak"))
-    
-    df$Type <- factor(df$Type, levels = c("TIC", "Base_Peak"))
     
     figure <- ggplot(df,aes_string(x = "StartTime", y = "Intensity")) +
       geom_line(size = 0.3) +
@@ -661,18 +682,12 @@ PlotTicBasepeak <- function(x, method = 'trellis'){
     return(figure)
     
   }else if(method =='violin'){
-    df <- x %>% 
-      dplyr::filter_at(vars("MSOrder"), any_vars( . == "Ms")) %>% 
-      dplyr::select_at(vars("StartTime", "TIC", "BasePeakIntensity", "filename")) %>% 
-      dplyr::rename_at(vars("BasePeakIntensity"), funs(as.character("Base_Peak"))) %>% 
-      tidyr::gather(key = "Type", value = "Intensity", c("TIC", "Base_Peak"))
-    df$Type <- factor(df$Type, levels = c("TIC", "Base_Peak"))
     
     figure <- ggplot(df, aes_string(x = "filename", y = "Intensity")) + 
       geom_violin() +
       facet_grid(Type~., scales = "free") +
       #stat_summary(fun.y = mean , geom = "point", colour = "red") +
-      scale_y_continuous(breaks = scales::pretty_breaks(8)) +
+      scale_y_continuous(trans = scales::log10_trans())+
       labs(title = "TIC and Base-Peak plot") +
       labs(subtitle = "Plotting the TIC and base peak density for all mass spectrometry runs") +
       labs(x = "Filename", y = "Intensity Counts [arb. unit]") +
@@ -681,12 +696,6 @@ PlotTicBasepeak <- function(x, method = 'trellis'){
     return(figure)
     
   }else if (method  == 'overlay'){
-    df <- x %>% 
-      dplyr::filter_at(vars("MSOrder"), any_vars( . == "Ms")) %>% 
-      dplyr::select_at(vars("StartTime", "TIC", "BasePeakIntensity", "filename")) %>% 
-      dplyr::rename_at(vars("BasePeakIntensity"), funs(as.character("Base_Peak"))) %>% 
-      tidyr::gather(key = "Type", value = "Intensity", c("TIC", "Base_Peak"))
-    df$Type <- factor(df$Type, levels = c("TIC", "Base_Peak"))
     
     figure <- ggplot(df, aes_string(x = "StartTime", y = "Intensity", colour = "filename")) +
       geom_line(size = 0.3) +
@@ -855,16 +864,13 @@ PlotMzDistribution <- function(x, method='trellis'){
 #'  PlotMassDistribution(WU163763, method = 'overlay') +
 #'    theme(legend.position = 'none')  
 PlotMassDistribution <- function(x, method = 'trellis'){ 
+  res <- x %>% dplyr::filter_at(vars("MSOrder"), any_vars(. == "Ms2")) %>% 
+    dplyr::select_at(vars("ChargeState", "PrecursorMass", "filename"))
+  res$deconv <-  round((res$PrecursorMass -1.00782) * res$ChargeState, 0)
+  res <- dplyr::mutate_at(res, vars("ChargeState"), funs(factor(.)))
+  
   if (method == 'trellis'){
-    res <- x %>% dplyr::filter_at(vars("MSOrder"), any_vars(. == "Ms2")) %>% 
-      dplyr::select_at(vars("ChargeState", "PrecursorMass", "filename"))
-    
-    res$deconv <-  round((res$PrecursorMass -1.00782) * res$ChargeState, 0)
-    
-    res <- dplyr::mutate_at(res, vars("ChargeState"), funs(factor(.)))
-    
-    ncolor <- length(unique(res$ChargeState))
-    
+
     figure <- ggplot(res, aes_string(x = "deconv", fill = "ChargeState", colour = "ChargeState")) +
       geom_histogram(binwidth = 100, alpha = .3, position = "identity") +
       labs(title = "Precursor mass to charge frequency plot ") +
@@ -878,37 +884,20 @@ PlotMassDistribution <- function(x, method = 'trellis'){
     return(figure)
     
   }else if (method == 'violin'){ #mz.frequency.violin
-    res <- x %>% dplyr::filter_at(vars("MSOrder"), any_vars(. == "Ms2")) %>% 
-      dplyr::select_at(vars("ChargeState", "PrecursorMass", "filename"))
-    
-    res$deconv <-  round((res$PrecursorMass -1.00782)* res$ChargeState, 0)
-    
-    res <- dplyr::mutate_at(res, vars("ChargeState"), funs(factor(.)))
     
     figure <- ggplot(res, aes_string(x = "ChargeState", y = "deconv", fill = "filename")) +
       geom_violin() +
-      #geom_histogram(binwidth = 100, alpha = .3, position = "identity") +
       labs(title = "Precursor mass to charge density plot ") +
       labs(subtitle = "Plotting the charge state resolved precursor masse density for each mass spectrometry run") +
       labs(x = "Charge State ", y = "Neutral Mass [Da]") +
-      #labs(fill = "Charge State", colour = "Charge State") +
-      #scale_x_continuous(breaks = scales::pretty_breaks(8)) +
       theme_light() +
       theme(legend.position = "top")
-    #facet_wrap(~filename)
     return(figure)
     
   }else if (method == 'overlay'){ #mz.frequency.overlay
-    res <-  x %>% 
-      dplyr::filter_at(vars("MSOrder"), any_vars(. == "Ms2")) %>% 
-      dplyr::select_at(vars("ChargeState", "PrecursorMass", "filename")) %>% 
-      dplyr::mutate("deconv" = round((PrecursorMass -1.00782)*ChargeState, 0)) %>% 
-      dplyr::mutate_at(vars("ChargeState"), funs(factor(.)))
     
     figure <- ggplot(res, aes_string(x = "deconv", colour = "filename")) +
       geom_line(stat = "density") +
-      #geom_density(aes(y= ..density.. )) + with base line along x axis with density value y= 0
-      #geom_histogram(binwidth = 100, alpha = .3, position = "identity") +
       labs(title = "Precursor mass density plot ") +
       labs(subtitle = "Plotting the precursor masse density for each mass spectrometry run") +
       labs(x = "Precursor mass [neutral mass]", y = "Density") +
@@ -916,7 +905,6 @@ PlotMassDistribution <- function(x, method = 'trellis'){
       coord_cartesian(xlim = c(min(res$deconv), 10000)) +
       theme_light() +
       theme(legend.position = "top")
-    #facet_wrap(~filename)
     return(figure)
     
   }else{NULL}
@@ -1010,13 +998,18 @@ PlotChargeState <- function(x, method='trellis'){
 #' @export PlotScanTime
 #' @import tidyr
 PlotScanTime <- function(x, method='trellis'){
-  if(method == 'trellis'){
-    res <- x %>% 
-      dplyr::mutate(ElapsedScanTimesec = ElapsedScanTimesec * 1000)
+  res <- x %>% 
+    dplyr::mutate(ElapsedScanTimesec = ElapsedScanTimesec * 1000) %>% 
+    dplyr::select_at(vars("StartTime", "ScanType", "ElapsedScanTimesec", "filename", "MassAnalyzer", "MSOrder", "transient")) %>% 
+    na.omit()
+  
+  res <- .map.type(res)
+  
+   if(method == 'trellis'){
     
     figure <- ggplot(res, aes_string(x = "StartTime", y = "ElapsedScanTimesec")) +
       geom_point(shape = ".") +
-      facet_grid(filename ~ MSOrder + MassAnalyzer) +
+      facet_grid(filename ~ Type) +
       geom_line(stat = "smooth", method = "gam",
                 formula = y~s(x), colour = "deepskyblue3", se = FALSE) +
       labs(title = "Scan time plot") +
@@ -1049,7 +1042,7 @@ PlotScanTime <- function(x, method='trellis'){
     return(figure)
     
   }else if (method == 'overlay'){
-    figure <- ggplot(x, aes_string(x = "StartTime", y = "ElapsedScanTimesec", colour = "filename")) +
+    figure <- ggplot(res, aes_string(x = "StartTime", y = "ElapsedScanTimesec", colour = "filename")) +
       geom_point(size = 0.5) +
       geom_line(aes_string(group = "filename", colour = "filename"), stat = "smooth", method = "gam", formula = y ~ s(x, bs= "cs"), se = FALSE) +
       facet_grid(~ MSOrder + MassAnalyzer, scales = "free") +
