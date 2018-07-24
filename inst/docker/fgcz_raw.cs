@@ -7,6 +7,7 @@
 /// 2018-04-24 Zurich, Switzerland
 /// 2018-06-04 San Diego, CA, USA added xic option
 /// 2018-06-28 added xic and scan option
+/// 2018-07-24 bugfix
  
 using System;
 using System.Collections.Generic;
@@ -391,7 +392,7 @@ namespace FGCZ_Raw
         {
             // This local variable controls if the AnalyzeAllScans method is called
             bool analyzeScans = false;
-            string rawDiagVersion = "0.0.5";
+            string rawDiagVersion = "0.0.10";
 
             // Get the memory used at the beginning of processing
             Process processBefore = Process.GetCurrentProcess();
