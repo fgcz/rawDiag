@@ -2,7 +2,7 @@
 /// see URL http://planetorbitrap.com/rawfilereader#.WjkqIUtJmL4
 /// the ThermoFisher library has to be manual downloaded and installed
 /// Please read the License document
-/// Witold Wolski <wew@fgcz.ethz.ch> and Christian Panse <cp@fgcz.ethz.ch
+/// Witold Wolski <wew@fgcz.ethz.ch> and Christian Panse <cp@fgcz.ethz.ch> and Christian Trachsel
 /// 2017-09-25 Zurich, Switzerland
 /// 2018-04-24 Zurich, Switzerland
 /// 2018-06-04 San Diego, CA, USA added xic option
