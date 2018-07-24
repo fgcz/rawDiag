@@ -7,7 +7,6 @@
 /// 2018-04-24 Zurich, Switzerland
 /// 2018-06-04 San Diego, CA, USA added xic option
 /// 2018-06-28 added xic and scan option
-/// 2018-07-24 added scantype
  
 using System;
 using System.Collections.Generic;
@@ -19,6 +18,7 @@ using System.Collections;
 //using System.Diagnostics.Eventing;
 //using System.Data.Common;
 using System.Linq;
+using System.Runtime.DesignerServices;
 //using System.Runtime.InteropServices.WindowsRuntime;
 //using System.Xml.Schema;
 //using System.Runtime.InteropServices;
@@ -260,10 +260,11 @@ namespace FGCZExtensions
                     var centroidStream = rawFile.GetCentroidStream(scanNumber, false);
                     var scanTrailer = rawFile.GetTrailerExtraInformation(scanNumber);
                     var scanEvent = rawFile.GetScanEventForScanNumber(scanNumber);
-                    var reaction0 = scanEvent.GetReaction(0);
                     
                     try
                     {
+                        var reaction0 = scanEvent.GetReaction(0);
+                        Console.WriteLine("try");
                         var idx_PEPMASS = trailerFields
                             .Select((item, index) => new
                             {
@@ -286,8 +287,9 @@ namespace FGCZExtensions
                     }
                     catch
                     {
-                        pepmass = -1;
-                        basepeakIntensity = -1;
+                        Console.WriteLine("catch");
+                        pepmass = -1.0;
+                        basepeakIntensity = -1.0;
                         charge = "NA";
                     }
 
@@ -389,7 +391,7 @@ namespace FGCZ_Raw
         {
             // This local variable controls if the AnalyzeAllScans method is called
             bool analyzeScans = false;
-            string rawDiagVersion = "0.0.9";
+            string rawDiagVersion = "0.0.5";
 
             // Get the memory used at the beginning of processing
             Process processBefore = Process.GetCurrentProcess();
