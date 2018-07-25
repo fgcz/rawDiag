@@ -1,0 +1,11 @@
+citHeader("To cite rawDiag in publications, please use:")
+
+citEntry(entry = "article",
+  author = "Trachsel, C.  and Panse, C.  and Kockmann, T.  and Wolski, W. E.  and Grossmann, J.  and Schlapbach, R.",
+  title = "{raw{D}iag: {A}n {R} {P}ackage {S}upporting {R}ational {L}{C}-{M}{S} {M}ethod {O}ptimization for {B}ottom-up {P}roteomics}",
+  Journal = "J. Proteome Res.",
+  year = "2018",
+  month="Jul",
+  url = "http://fgcz-ms-shiny.uzh.ch:8080/rawDiag-demo/. " ,
+  textVersion = "Trachsel, C. Et al. rawDiag: An R Package Supporting Rational LC-MS Method Optimization for Bottom-up Proteomics, 2018."
+)
