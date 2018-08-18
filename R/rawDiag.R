@@ -271,7 +271,6 @@ readXICs <- function(rawfile,
   
   cmd <- exe
   
-  
   if (mono){
     rvs <- system2("mono", args = c(shQuote(exe), shQuote(rawfile), "xic", shQuote(tfi), tol, shQuote(tfo)))
   }else{
@@ -280,7 +279,6 @@ readXICs <- function(rawfile,
   
   source(tfo)
   unlink(c(tfi, tfo, tfstdout))
-  
   
   return(lapply(e$XIC, function(x){class(x) <- c(class(x), 'XIC'); x}))
 }
@@ -332,7 +330,6 @@ readScans <- function(rawfile,
   
   cmd <- exe
   
-  
   if (mono){
     rvs <- system2("mono", args = c(shQuote(exe), shQuote(rawfile), "scans", shQuote(tfi), shQuote(tfo)))
   }else{
@@ -340,7 +337,6 @@ readScans <- function(rawfile,
   }
   source(tfo)
   unlink(c(tfi, tfo, tfstdout))
-  
   
   return(lapply(e$PeakList, function(x){class(x) <- c(class(x), 'peaklist'); x}))
 }

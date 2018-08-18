@@ -1,7 +1,7 @@
 Package: rawDiag
 Type: Package
 Title: Diagnostic Plots for Mass Spectrometry Data
-Version: 0.0.10
+Version: 0.0.11
 Authors@R: c(person("Christian", "Panse", email = "cp@fgcz.ethz.ch", role = c("aut", "cre"), comment = c(ORCID = "0000-0003-1975-3064")),
 	person("Christian", "Trachsel", email = "Christian.Trachsel@fgcz.ethz.ch", role = "aut", "cre"))
 Author: Christian Trachsel [aut, cre]
@@ -14,7 +14,7 @@ Imports: ggplot2 (>= 2.2.1),
 	hexbin,
 	magrittr,
 	parallel,
-	protViz,
+	protViz (>= 0.3.1),
 	RSQLite,
 	scales,
 	tidyr,

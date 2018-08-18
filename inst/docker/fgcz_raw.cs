@@ -265,7 +265,6 @@ namespace FGCZExtensions
                     try
                     {
                         var reaction0 = scanEvent.GetReaction(0);
-                        Console.WriteLine("try");
                         var idx_PEPMASS = trailerFields
                             .Select((item, index) => new
                             {
