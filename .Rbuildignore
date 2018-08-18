@@ -6,7 +6,6 @@
 ^.*vignettes/ASMS2018_ID291250.Rnw$
 ^.*vignettes/rawDiag.Rnw$
 ^.*vignettes/FGCZ_poster.Rnw$
+^.*vignettes/.*Rmd$
 ^.*inst/extdata/PXD006932_Exp3A_smp.RData$
 ^.*inst/extdata/PXD006932_Exp3A.RData$
-
-
