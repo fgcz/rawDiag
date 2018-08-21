@@ -65,6 +65,46 @@ To ensure the proper function of this R package please check if all the [require
 
 #### all OS
 
+```{r}
+#R
+  
+# System Requirements
+pkgs <- c( 'devtools'
+  'dplyr',
+  'ggplot2',
+  'hexbin',
+  'magrittr',
+  'parallel',
+  'protViz',
+  'rmarkdown',
+  'RSQLite',
+  'scales',
+  'shiny',
+  'tidyr',
+  'tidyverse')
+pkgs <- pkgs[(!pkgs %in% unique(installed.packages()[,'Package']))]
+if(length(pkgs) > 0){install.packages(pkgs)}
+
+# Installation
+install.packages('http://fgcz-ms.uzh.ch/~cpanse/rawDiag_0.0.10.tar.gz')
+
+# Testing
+library(rawDiag)
+(rawfile <- file.path(path.package(package = 'rawDiag'), 'extdata', 'sample.raw'))
+system.time(RAW <- read.raw(file = rawfile))
+dim(RAW)
+summary.rawDiag(RAW)
+PlotScanFrequency(RAW)
+
+# read all dimensions
+dim(RAW)
+RAW <- read.raw(file = rawfile, rawDiag = FALSE)
+dim(RAW)
+
+R.version.string; Sys.info()[c('sysname', 'version')]
+```
+#### all OS from source
+
 the following code downloads and installs the R package from the Github without the required third party .dll files:
 
 please note: due to the data size (>=40MB) download can take a while
