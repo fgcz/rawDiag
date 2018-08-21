@@ -84,14 +84,18 @@ PlotScanFrequency(RAW)
 dim(RAW)
 RAW <- read.raw(file = rawfile, rawDiag = FALSE)
 dim(RAW)
-
-R.version.string; Sys.info()[c('sysname', 'version')]
 ```
+
+2.2. If you have problems
 
 **If your installation does not work with the below-mentioned instructions, do not hesitate to request a ready to run R package from the authors via [Email, SUBJECT `request rawDiag package`](mailto:cp@fgcz.ethz.ch?SUBJECT=request%20current%20rawDiag%20package).**
 
+Please include the output of the `sessInfo()` command line call.
+```{r}
+sessionInfo()
+```
 
-### 2.2 Install from GitHub (only for developers)
+### 2.3 Install from GitHub (only for developers)
 
 the following code downloads and installs the R package from the Github without the required third party .dll files:
 please note: due to the data size (>=40MB) download can take a while
@@ -107,7 +111,7 @@ has to be downloaded and installed separately in order to be able to directly re
 
 To install [the New RawFileReader .Net assembly](http://planetorbitrap.com/rawfilereader) follow the installation instructions provided by Thermo Fisher Scientific.
 
-### 2.3 Typical install time on a "normal" desktop computer
+### 2.4 Typical install time on a "normal" desktop computer
 
 * Thermo RawFileReader dll: 1sec to 30 minutes
 * the rawDiag package through github: 10 minutes 
