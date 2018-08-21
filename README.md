@@ -13,11 +13,20 @@ main features:
 3. provides an R interface to your instrument raw data.
 4. ships with an example [shiny application](http://fgcz-ms-shiny.uzh.ch:8080/bfabric_rawDiag/).
 
-## 1 System Requirements  
+## 1 Requirements  
+
+### 1.1 Thermo License agreement
+
+If you accept the Thermo License agreement
+
+https://github.com/fgcz/rawDiag/blob/master/inst/docker/ThermoRawFileReader/RawFileReaderLicense.doc
+
+
+### 1.2 System Requirements  
 
 a Windows/Linux/MacOSX x64 platform 
 
-### 1.1 .NET Framework and R
+.NET Framework and R
 
 - https://www.mono-project.com/ (>4.0.22) for (Linux and MacOSX)
 - .NET Framework 4.5.1 or higher (Windows)
@@ -25,30 +34,15 @@ a Windows/Linux/MacOSX x64 platform
 - install https://CRAN.R-project.org/package=devtools
 - if you want support for [Open File Standards](http://www.psidev.info/) install the [mzR](http://bioconductor.org/packages/mzR/) package. 
 
-### 1.2 Platforms and versions the software has been tested on
-
-The package [JPR.R1](https://github.com/fgcz/rawDiag/tree/JPR.R1) release has been tested on the following platforms using [RStudio](https://www.rstudio.com/):
-
-|platform|platform version|R version|note|
-| :------- |:--------------|:------|:------- |
-|Linux| Debian 8 (jessie) |  3.4.3 | [Demo system](http://fgcz-ms-shiny.uzh.ch:8080/bfabric_rawDiag/)|
-|Linux     | Debian 10 ([buster](https://www.debian.org/releases/testing/releasenotes)) | 3.5.0 | CP |
-|Linux| bioconductor/devel_proteomics2| 2017-12-31 r73996 | [dockerhub](https://hub.docker.com/r/cpanse/rawdiag/builds/) no RawFileReader support |
-|Windows   | 7 x64| 3.4.1 |CT|
-|Windows   | 10 x64| 3.4.4 |CP virtual box|
-|Windows   | Server 2012 R2 x64 | 3.4.4|CP|
-|Windows   | 10 x64 | 3.4.3 | WEW |
-|Windows   | 10 x64 | R Open 3.5.0 | WEW |
-|MacOSX    | 10.13.5 (17F77)|3.4.2|CP|
-|MacOSX    | 10.11.6 (15G20015)|3.4.3 |JG|
-|MacOSX    | 10.13.4 (17E202)|3.4.4|CP|
 
 ## 2 Installation guide
 
-To ensure the proper function of this R package please check if all the [requirements](README.md#1-system-requirements) are fullfilled prior to using it.
+To ensure the proper function of this R package please check 
+if all the [requirements](README.md#1-system-requirements) are 
+fullfilled prior to using it. 
 
 ### 2.1 Install 
-
+run R
 ```{r}
 #R
   
@@ -86,7 +80,7 @@ RAW <- read.raw(file = rawfile, rawDiag = FALSE)
 dim(RAW)
 ```
 
-2.2. If you have problems
+### 2.2. If you have problems
 
 **If your installation does not work with the below-mentioned instructions, do not hesitate to request a ready to run R package from the authors via [Email, SUBJECT `request rawDiag package`](mailto:cp@fgcz.ethz.ch?SUBJECT=request%20current%20rawDiag%20package).**
 
@@ -115,6 +109,25 @@ To install [the New RawFileReader .Net assembly](http://planetorbitrap.com/rawfi
 
 * Thermo RawFileReader dll: 1sec to 30 minutes
 * the rawDiag package through github: 10 minutes 
+
+### 2.5 Platforms and versions the software has been tested on
+
+The package [JPR.R1](https://github.com/fgcz/rawDiag/tree/JPR.R1) release has been tested on the following platforms using [RStudio](https://www.rstudio.com/):
+
+|platform|platform version|R version|note|
+| :------- |:--------------|:------|:------- |
+|Linux| Debian 8 (jessie) |  3.4.3 | [Demo system](http://fgcz-ms-shiny.uzh.ch:8080/bfabric_rawDiag/)|
+|Linux     | Debian 10 ([buster](https://www.debian.org/releases/testing/releasenotes)) | 3.5.0 | CP |
+|Linux| bioconductor/devel_proteomics2| 2017-12-31 r73996 | [dockerhub](https://hub.docker.com/r/cpanse/rawdiag/builds/) no RawFileReader support |
+|Windows   | 7 x64| 3.4.1 |CT|
+|Windows   | 10 x64| 3.4.4 |CP virtual box|
+|Windows   | Server 2012 R2 x64 | 3.4.4|CP|
+|Windows   | 10 x64 | 3.4.3 | WEW |
+|Windows   | 10 x64 | R Open 3.5.0 | WEW |
+|MacOSX    | 10.13.5 (17F77)|3.4.2|CP|
+|MacOSX    | 10.11.6 (15G20015)|3.4.3 |JG|
+|MacOSX    | 10.13.4 (17E202)|3.4.4|CP|
+
 
 ## 3 Demonstration
 
