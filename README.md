@@ -17,10 +17,7 @@ main features:
 
 ### 1.1 Thermo License agreement
 
-If you accept the Thermo License agreement
-
-https://github.com/fgcz/rawDiag/blob/master/inst/docker/ThermoRawFileReader/RawFileReaderLicense.doc
-
+accept the [Thermo Fisher RawFileReader License agreement](https://github.com/fgcz/rawDiag/blob/master/inst/docker/ThermoRawFileReader/RawFileReaderLicense.doc)
 
 ### 1.2 System Requirements  
 
