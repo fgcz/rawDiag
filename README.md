@@ -63,12 +63,12 @@ The package [JPR.R1](https://github.com/fgcz/rawDiag/tree/JPR.R1) release has be
 ### 2.1 Instructions
 To ensure the proper function of this R package please check if all the [requirements](README.md#1-system-requirements) are fullfilled prior to using it.
 
-#### all OS
+#### Install 
 
 ```{r}
 #R
   
-# System Requirements
+# R package requirements
 pkgs <- c( 'devtools',
   'dplyr',
   'ggplot2',
@@ -85,10 +85,10 @@ pkgs <- c( 'devtools',
 pkgs <- pkgs[(!pkgs %in% unique(installed.packages()[,'Package']))]
 if(length(pkgs) > 0){install.packages(pkgs)}
 
-# Installation
+# Installation of rawDiag
 install.packages('http://fgcz-ms.uzh.ch/~cpanse/rawDiag_0.0.10.tar.gz')
 
-# Testing
+# Testing - "Hello, world!"
 library(rawDiag)
 (rawfile <- file.path(path.package(package = 'rawDiag'), 'extdata', 'sample.raw'))
 system.time(RAW <- read.raw(file = rawfile))
@@ -103,17 +103,17 @@ dim(RAW)
 
 R.version.string; Sys.info()[c('sysname', 'version')]
 ```
-#### all OS from source
+
+#### Install from GitHub
 
 the following code downloads and installs the R package from the Github without the required third party .dll files:
-
 please note: due to the data size (>=40MB) download can take a while
+
 ```{r}
 # install.packages("devtools")
 library("devtools")
 devtools::install_github("fgcz/rawDiag", build_vignettes = FALSE)
 ```
-
 
 ### 2.2 Typical install time on a "normal" desktop computer
 
