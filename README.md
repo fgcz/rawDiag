@@ -13,12 +13,9 @@ main features:
 3. provides an R interface to your instrument raw data.
 4. ships with an example [shiny application](http://fgcz-ms-shiny.uzh.ch:8080/bfabric_rawDiag/).
 
-
-
 ## 1 System Requirements  
 
 a Windows/Linux/MacOSX x64 platform 
-
 
 ### 1.1 .NET Framework and R
 
@@ -28,19 +25,7 @@ a Windows/Linux/MacOSX x64 platform
 - install https://CRAN.R-project.org/package=devtools
 - if you want support for [Open File Standards](http://www.psidev.info/) install the [mzR](http://bioconductor.org/packages/mzR/) package. 
 
-### 1.2 The New RawFileReader .Net assembly from Thermo Fisher Scientific
-
-**If your installation does not work with the below-mentioned instructions, do not hesitate to request a ready to run R package from the authors via [Email, SUBJECT `request rawDiag package`](mailto:cp@fgcz.ethz.ch?SUBJECT=request%20current%20rawDiag%20package).**
-
-
-Due to licensing reasons, we currently not allowed to distribute Thermo Fisher Scientific software with the *rawDiag* package (we hope that this will change soon).
-The [New RawFileReader from Thermo Fisher Scientific](http://planetorbitrap.com/rawfilereader)
-has to be downloaded and installed separately in order to be able to directly read Thermo raw-files (by using the R function `read.raw`).
-
-To install [the New RawFileReader .Net assembly](http://planetorbitrap.com/rawfilereader) follow the installation instructions provided by Thermo Fisher Scientific.
-
-
-### 1.3 Platforms and versions the software has been tested on
+### 1.2 Platforms and versions the software has been tested on
 
 The package [JPR.R1](https://github.com/fgcz/rawDiag/tree/JPR.R1) release has been tested on the following platforms using [RStudio](https://www.rstudio.com/):
 
@@ -104,7 +89,10 @@ dim(RAW)
 R.version.string; Sys.info()[c('sysname', 'version')]
 ```
 
-#### Install from GitHub
+**If your installation does not work with the below-mentioned instructions, do not hesitate to request a ready to run R package from the authors via [Email, SUBJECT `request rawDiag package`](mailto:cp@fgcz.ethz.ch?SUBJECT=request%20current%20rawDiag%20package).**
+
+
+#### Install from GitHub (only for developers)
 
 the following code downloads and installs the R package from the Github without the required third party .dll files:
 please note: due to the data size (>=40MB) download can take a while
@@ -114,6 +102,14 @@ please note: due to the data size (>=40MB) download can take a while
 library("devtools")
 devtools::install_github("fgcz/rawDiag", build_vignettes = FALSE)
 ```
+### 1.2 The New RawFileReader .Net assembly from Thermo Fisher Scientific
+
+
+The [New RawFileReader from Thermo Fisher Scientific](http://planetorbitrap.com/rawfilereader)
+has to be downloaded and installed separately in order to be able to directly read Thermo raw-files (by using the R function `read.raw`).
+
+To install [the New RawFileReader .Net assembly](http://planetorbitrap.com/rawfilereader) follow the installation instructions provided by Thermo Fisher Scientific.
+
 
 ### 2.2 Typical install time on a "normal" desktop computer
 
