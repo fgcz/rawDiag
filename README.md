@@ -69,7 +69,7 @@ To ensure the proper function of this R package please check if all the [require
 #R
   
 # System Requirements
-pkgs <- c( 'devtools'
+pkgs <- c( 'devtools',
   'dplyr',
   'ggplot2',
   'hexbin',
