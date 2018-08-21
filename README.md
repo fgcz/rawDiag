@@ -79,7 +79,7 @@ dim(RAW)
 
 ### 2.2. If you have problems
 
-**If your installation does not work with the below-mentioned instructions, do not hesitate to request a ready to run R package from the authors via [Email, SUBJECT `request rawDiag package`](mailto:cp@fgcz.ethz.ch?SUBJECT=request%20current%20rawDiag%20package).**
+**If your installation does not work with the below-mentioned instructions, do not hesitate to request a ready to run R package from the authors via [Email, SUBJECT `help request rawDiag package`](mailto:cp@fgcz.ethz.ch?SUBJECT=request%20current%20rawDiag%20package).**
 
 Please include the output of the `sessInfo()` command line call.
 ```{r}
