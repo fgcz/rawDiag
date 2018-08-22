@@ -408,6 +408,23 @@ plot.peaklist <- function(x, y, ...){
 #' dim(RAW)
 #' RAW <- read.raw(file = rawfile, rawDiag = FALSE)
 #' dim(RAW)
+#' \dont{
+#' library(parallel)
+#' library(rawDiag)
+#'
+#' # consider all raw files of your working dir
+#' rawFileNames <- list.files()[grep("raw$", list.files())]
+#' 
+#' # read all the meta data using 4 cores
+#' RAW <- mclapply(rawFileNames, read.raw, mc.cores=4)
+#' # as alternative  \code{lapply} instread of \code{mclapply}
+#'
+#' # concatenate the list data.frames into one single one
+#' RAW <- plyr::rbind.fill(RAW)
+#' 
+#' # have fun
+#' PlotMassDistribution(RAW)
+#'  }                                       
 #' 
 read.raw <- function(file, mono = if(Sys.info()['sysname'] %in% c("Darwin", "Linux")) TRUE else FALSE, 
                      exe = file.path(path.package(package = "rawDiag"), "exec", "fgcz_raw.exe"),  
