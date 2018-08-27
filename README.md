@@ -136,6 +136,26 @@ RAW <- read.raw(file = rawfile, rawDiag = FALSE)
 dim(RAW)
 ```
 
+### 3.4. FAQ
+
+
+#### I would like to load multiple files into a single dataframe to do comparisons; what is the preferred method for doing so? 
+
+```{r}
+library(parallel)
+library(rawDiag)
+
+# consider all raw files of your working dir
+rawFileNames <- list.files()[grep("raw$", list.files())]
+
+# read all the meta data using 4 cores
+RAW <- mclapply(rawFileNames, read.raw, mc.cores=4)
+# as alternative  \code{lapply} instread of \code{mclapply}
+
+# concatenate the list data.frames into one single one
+RAW <- plyr::rbind.fill(RAW)
+```
+
 ## 4 Instructions for use
 
 read the vignettes.
