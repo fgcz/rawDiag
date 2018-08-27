@@ -139,7 +139,7 @@ dim(RAW)
 ### 3.4. FAQ
 
 
-#### I would like to load multiple files into a single dataframe to do comparisons; what is the preferred method for doing so? 
+#### I would like to load multiple files into a single `data.frame` to do comparisons; what is the preferred method for doing so? 
 
 ```{r}
 library(parallel)
