@@ -2,16 +2,43 @@
 % Please edit documentation in R/mgf.R
 \name{mgf}
 \alias{mgf}
-\title{generate a mascot generic file}
+\title{generate a Mascot Generic File (mgf)}
 \usage{
 mgf(rawfilename, mgffilename = paste(sub("\\\\.raw$", "", rawfilename),
-  "mgf", sep = "."))
+  "mgf", sep = "."), FUN = NULL)
 }
 \arguments{
-\item{rawfilename}{}
+\item{rawfilename}{a Thermo Fisher instrument file}
 
-\item{mgffilename}{}
+\item{mgffilename}{a Mascot Generic File}
+
+\item{FUN}{a function applied to each MS2 scan}
+}
+\value{
+
 }
 \description{
-generate a mascot generic file
+generate a Mascot Generic File (mgf)
+}
+\examples{
+(rawfilename <- file.path(path.package(package = 'rawDiag'),
+  'extdata', 'sample.raw'))
+mgf(rawfile, tempfile(fileext = '.mgf'))
+
+# extract only top five higest MS2
+
+top5 <- function(x){
+if(x$mZ > 5){
+  idx <- rev(order(x$intensity))[1:5]
+  x$mZ <- x$mZ[idx]
+  x$intensity <- x$intensity[idx]
+  }
+ x
+}
+
+mgf(rawfile, tempfile(fileext = '.mgf'), FUN=top5)
+
+}
+\author{
+Christian Panse <cp@fgcz.ethz.ch>
 }
