@@ -46,7 +46,7 @@ mgf <- function(rawfilename, mgffilename = paste(sub('\\.raw$', '', rawfilename)
   stopifnot(file.exists(rawfilename))
   metadata <- read.raw(rawfilename)
   scannumberMS2 <- metadata$scanNumber[metadata$MSOrder=='Ms2']
-  message(paste("extracting", length(scannumberMS2, "MS2 scans ..."))
+  message(paste("extracting", length(scannumberMS2, "MS2 scans ...")))
   S <- readScans(rawfile = rawfilename, scans = scannumberMS2)
   peaklist.mgf(S, filename = mgffilename)
 }
