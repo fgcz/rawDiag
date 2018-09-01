@@ -122,6 +122,6 @@
                    APEX.t = APEX.t,
                    APEX.max = APEX.max,
                    APEX.APU = APEX.APU)
-  rv$rawfilename <- basename(rawfilename)
+  rv$rawfilename <- rawfilename
   return(rv)
 }
