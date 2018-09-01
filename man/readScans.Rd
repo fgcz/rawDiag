@@ -4,9 +4,10 @@
 \alias{readScans}
 \title{read scan of scanids}
 \usage{
-readScans(rawfile, scans, mono = if (Sys.info()["sysname"] \%in\% c("Darwin",
-  "Linux")) TRUE else FALSE, exe = file.path(path.package(package =
-  "rawDiag"), "exec", "fgcz_raw.exe"))
+readScans(rawfile, scans, mono = if (Sys.info()["sysname"] \%in\%
+  c("Darwin", "Linux")) TRUE else FALSE,
+  exe = file.path(path.package(package = "rawDiag"), "exec",
+  "fgcz_raw.exe"))
 }
 \arguments{
 \item{rawfile}{}

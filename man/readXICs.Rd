@@ -4,9 +4,10 @@
 \alias{readXICs}
 \title{Extracts XIC of a given mass vector}
 \usage{
-readXICs(rawfile, masses, tol = 10, mono = if (Sys.info()["sysname"] \%in\%
-  c("Darwin", "Linux")) TRUE else FALSE, exe = file.path(path.package(package
-  = "rawDiag"), "exec", "fgcz_raw.exe"))
+readXICs(rawfile, masses, tol = 10, mono = if (Sys.info()["sysname"]
+  \%in\% c("Darwin", "Linux")) TRUE else FALSE,
+  exe = file.path(path.package(package = "rawDiag"), "exec",
+  "fgcz_raw.exe"))
 }
 \arguments{
 \item{rawfile}{}

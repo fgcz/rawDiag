@@ -41,12 +41,21 @@ peaklist.mgf <- function(x, filename, append = TRUE){
 }
 
 
+#' generate a mascot generic file
+#'
+#' @param rawfilename 
+#' @param mgffilename 
+#'
+#' @return
+#' @export mgf
 mgf <- function(rawfilename, mgffilename = paste(sub('\\.raw$', '', rawfilename), "mgf", sep='.')){
   #awfilename <- "/Users/cp/__projects/2018/20180602--glyco/data/20180613_10_CM_Native_t_0_2.raw"
   stopifnot(file.exists(rawfilename))
   metadata <- read.raw(rawfilename)
   scannumberMS2 <- metadata$scanNumber[metadata$MSOrder=='Ms2']
-  message(paste("extracting", length(scannumberMS2, "MS2 scans ...")))
-  S <- readScans(rawfile = rawfilename, scans = scannumberMS2)
-  peaklist.mgf(S, filename = mgffilename)
+  if (length(scannumberMS2)>0){
+    message(paste("extracting", length(scannumberMS2), "MS2 scans ..."))
+    S <- readScans(rawfile = rawfilename, scans = scannumberMS2)
+    peaklist.mgf(S, filename = mgffilename)
+  }else{warning("no MS2 scans found.")}
 }
