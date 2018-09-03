@@ -74,7 +74,7 @@ peaklist.mgf <- function(x, filename, append = TRUE){
 mgf <- function(rawfilename,
                 mgffilename = paste(sub('\\.raw$', '', rawfilename), "mgf", sep='.'),
                 FUN=NULL){
-  #awfilename <- "/Users/cp/__projects/2018/20180602--glyco/data/20180613_10_CM_Native_t_0_2.raw"
+ 
   stopifnot(file.exists(rawfilename))
   metadata <- read.raw(rawfilename)
   scannumberMS2 <- metadata$scanNumber[metadata$MSOrder=='Ms2']
