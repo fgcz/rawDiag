@@ -32,7 +32,7 @@ a Windows/Linux/MacOSX x64 platform
 **If your installation does not work with the below-mentioned instructions, do not hesitate to request a ready to run R package from the authors via [Email, SUBJECT `request rawDiag package`](mailto:cp@fgcz.ethz.ch?SUBJECT=request%20current%20rawDiag%20package).**
 
 
-Due to [licensing reasons](https://github.com/fgcz/rawDiag/files/2306134/FGC-RawFileRdr-v1_text.pdf),
+Due to [licensing reasons](https://github.com/fgcz/rawDiag/blob/master/inst/docker/ThermoRawFileReader/RawFileReaderLicense.doc),
 we currently not allowed to distribute Thermo Fisher Scientific software with the *rawDiag*
 package (we hope that this will change soon).
 The [New RawFileReader from Thermo Fisher Scientific](http://planetorbitrap.com/rawfilereader)
