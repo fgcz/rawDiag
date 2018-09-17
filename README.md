@@ -26,6 +26,7 @@ a Windows/Linux/MacOSX x64 platform
 - R (>3.4.0); please do not use R (3.5.0) on Windows! There is an `system2` issue.
 - install https://CRAN.R-project.org/package=devtools
 - if you want support for [Open File Standards](http://www.psidev.info/) install the [mzR](http://bioconductor.org/packages/mzR/) package. 
+- U.S. language seeting on windows [see issue 33](https://github.com/fgcz/rawDiag/issues/33)
 
 ### 1.2. The New RawFileReader .Net assembly from Thermo Fisher Scientific
 
