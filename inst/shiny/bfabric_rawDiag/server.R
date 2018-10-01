@@ -12,6 +12,7 @@ library(shiny)
 if (!require("bfabricShiny")){
   message("running without bfabricShiny")
 }
+library(protViz)
 library(rawDiag)
 library(parallel)
 library(tidyr)
@@ -77,6 +78,8 @@ shinyServer(function(input, output, session) {
       tabPanel("Cycle Time", list(helpText(" displays cycle time with respect to RT (scatter plots) or its marginal distribution (violin). A smooth curve graphs the trend. The maximum is indicated by a red dashed line."), plotOutput("cycle.time", height = input$graphicsheight))),
       tabPanel("Charge State", list(helpText("displays charge state distributions as biologist-friendly bar charts as absolute counts."), 
                                     plotOutput("charge.state", height = input$graphicsheight))),
+      tabPanel("XICs", list(helpText("displays XICs of given masses."), 
+                                    plotOutput("xic", height = input$graphicsheight))),
       tabPanel("Raw table", DT::dataTableOutput("table")),
       tabPanel("Raw info", DT::dataTableOutput("tableInfo")),
       #sessionInfo
@@ -147,6 +150,18 @@ shinyServer(function(input, output, session) {
     }
   })
 
+  
+  output$XICParameter <- renderUI({
+    if(input$source  %in% c('bfabric', 'filesystem'))
+    {
+      peptideGroup <- c("iRT", "glyco", "msqc1")
+      tagList(h3("XIC Options"),
+              selectInput('XICpepitdes', 'XIC peptides:', peptideGroup, multiple = FALSE),
+              selectInput('XICtol', 'XIC tolerance in ppm:', c(10,15,20,50,100), multiple = FALSE)
+      )       
+    }
+  })
+  
  
   
  
@@ -165,6 +180,120 @@ shinyServer(function(input, output, session) {
     
   })
   
+  
+  
+  queryMass <- reactive({
+    rv <- NA
+    if (input$XICpepitdes == 'glyco'){
+      rv <- c(819.337986666667, 824.669623333333, 830.001263333333, 
+              868.023953333333, 873.355586666667, 873.35559, 878.687223333333,
+              878.68723, 884.018863333333, 922.041553333333, 927.373186666667,
+              927.37319, 932.704823333333, 932.70483, 935.717076666667,
+              938.036463333333, 941.048713333333, 946.380353333333,
+              970.387386666667, 975.719023333333, 976.059153333333,
+              981.050663333333, 981.050663333333, 981.39079, 986.72243,
+              989.734676666667, 995.066313333333, 1000.39795333333,
+              1019.07335333333, 1024.40498666667, 1024.40499, 1029.73662333333,
+              1029.73663, 1035.06826333333, 1043.75227666667, 1049.08391333333,
+              1054.41555333333, 1073.09095333333, 1073.09095333333, 1078.42259,
+              1078.42259, 1083.75423, 1083.75423, 1086.76647666667,
+              1092.09811333333, 1097.42975333333, 1140.78407666667,
+              1146.11571333333, 1151.44735333333, 1170.12275333333, 1175.45439,
+              1180.78603)
+    }else if(input$XICpepitdes == 'msqc1'){
+      rv <- c(985.44, 995.44, 970.59, 978.60,
+              1668.97, 1676.97, 1169.52, 1179.52,
+              1108.65, 1118.66, 1422.72, 1430.72) 
+    }else{
+      rv <- unique((parentIonMass(pepSeq<-as.character(iRTpeptides$peptide)) + 1.008) / 2)
+    }
+    rv
+  })
+  
+  # ----- rawXICData -------
+  
+  extractPeak <- function(XIC, fit=TRUE, dt=0.3, ...){
+    
+    intensities.max <- max(XIC$intensities)
+    
+    max.idx <- which(XIC$intensities == intensities.max)
+    
+    
+    apex.idx <- which((XIC$t[max.idx] - dt) < XIC$t &  XIC$t < (XIC$t[max.idx] + dt))
+    
+    rv <- NA
+    if(length(apex.idx) > 10){
+      x <- XIC$times[apex.idx]  
+      y <- XIC$intensities[apex.idx]
+      rv <- list(times=x, intensities=y, mass = XIC$mass)
+    }
+    else{
+      rv <- list(times=NA, intensities=NA, mass = XIC$mass)
+    }
+    rv
+  }
+  
+  rawXICData  <- reactive({
+    progress <- shiny::Progress$new(session = session, min = 0, max = 1)
+    progress$set(message = paste("extracting XICs"))
+    on.exit(progress$close())
+    
+    
+    if (input$source == 'filesystem'){
+      
+      rf <- unique(file.path(values$filesystemRoot, file.path(input$root, input$rawfile)))
+      
+      rv <- plyr::rbind.fill(mclapply(rf,
+                                      function(file){ 
+                                        
+                                        X <- readXICs(rawfile = file, 
+                                                 masses = queryMass(),
+                                                 tol = input$XICtol,
+                                                 mono=input$usemono
+                                                
+                                                ) 
+                                        X <- lapply(X, extractPeak)
+                                        Y <- lapply(X, function(x){
+                                          if(length(x$times)>1){
+                                            df <- data.frame(time = x$times, intensity = x$intensities, mass=rep(x$mass, length(x$times)));
+                                            return(df)
+                                          }})
+                                        Y <- do.call('rbind', Y)
+                                        Y$filename <- rep(basename(file), nrow(Y))
+                                        as.data.frame(Y)
+                                        }, mc.cores = input$mccores))
+      return(rv)
+    }else if(input$source == 'bfabric'){
+      progress <- shiny::Progress$new(session = session, min = 0, max = 1)
+      progress$set(message = paste("loading XIC data"))
+      on.exit(progress$close())
+      
+      resources <- bf$resources()$relativepath
+      rf <- resources[resources %in% input$relativepath]
+      rf <- file.path("/srv/www/htdocs/", rf)
+      rv <- plyr::rbind.fill(
+        mclapply(rf, function(file){
+          X <- readXICs(rawfile = file, 
+                        masses = queryMass(),
+                        tol = input$XICtol,
+                        mono=input$usemono
+          ) 
+          X <- lapply(X, extractPeak)
+          Y <- lapply(X, function(x){
+            if(length(x$times)>1){
+              df <- data.frame(time = x$times, intensity = x$intensities, mass=rep(x$mass, length(x$times)));
+              return(df)
+            }})
+          Y <- do.call('rbind', Y)
+          Y$filename <- rep(basename(file), nrow(Y))
+          as.data.frame(Y)
+        }, mc.cores = 24))
+      return(rv)
+    }else{NULL}
+    
+  })
+  
+  
  
   # ----- rawData -------
   rawData <- eventReactive(input$load, {
@@ -179,7 +308,8 @@ shinyServer(function(input, output, session) {
       
       rv <- plyr::rbind.fill(mclapply(rf,
                                       function(file){ 
-                                        read.raw(file, mono=input$usemono, exe=input$cmd) },
+                                        read.raw(file,
+                                                 mono=input$usemono, exe=input$cmd) },
                                       mc.cores = input$mccores))}
     else if(input$source == 'package'){
       rv <- NULL
@@ -203,6 +333,36 @@ shinyServer(function(input, output, session) {
     }else{rv <- NULL}
     
     rv
+  })
+  
+  
+  PlotXIC <- function(x, method = 'trellis'){
+    #x$fmass <- as.factor(x$mass)
+    figure <- ggplot(x, aes_string(x = "time", y = "intensity")) +
+      #geom_segment() +
+      geom_line(stat='identity', size = 1, aes_string(group = "filename", colour = "filename")) +
+      facet_wrap(~  x$mass  , scales = "free", ncol = 1) +
+      #scale_x_continuous(breaks = scales::pretty_breaks(8)) +
+      #scale_y_continuous(breaks = scales::pretty_breaks(8)) +
+      labs(title = "XIC plot") +
+      labs(subtitle = "Plotting XIC intensity against retention time") +
+      labs(x = "Retention Time [min]", y = "Intensity Counts [arb. unit]") +
+      theme_light()
+    return(figure)
+  }
+  #---- XIC ----
+  output$xic <- renderPlot({
+    
+    progress <- shiny::Progress$new(session = session, min = 0, max = 1)
+    progress$set(message = "plotting", detail = "XICs")
+    on.exit(progress$close())
+    
+    
+    if (nrow(rawData()) > 0){
+      #helpText("graphs scan frequency versus RT or scan frequency marginal distribution for violin."),
+      values$gp <- PlotXICs(rawXICData(), method = input$plottype)
+      values$gp
+    }
   })
   
   # rawDataInfo----
@@ -354,6 +514,20 @@ shinyServer(function(input, output, session) {
       
     }
   })
+  
+  
+  #---- XIC ----
+  output$xic <- renderPlot({
+    if (nrow(rawXICData()) > 0){
+      
+      progress <- shiny::Progress$new(session = session, min = 0, max = 1)
+      progress$set(message = "plotting", detail = "XICs")
+      on.exit(progress$close())
+      
+      values$gp <- PlotXIC(rawXICData(), method = input$plottype)
+      values$gp
+    }
+  })
 
   output$table<- DT::renderDataTable({
     rawData()
@@ -371,12 +545,17 @@ shinyServer(function(input, output, session) {
     capture.output(sessionInfo())
   })
   
+
+  
+  
   
   #---- downloadPDF ----
   
   output$PDF <- renderUI({
     if(nrow(rawData()) > 0){
       tagList(
+        #h3("XIC"),
+        #actionButton('loadXICs', 'load XICs'),
         h3("PDF"),
         downloadButton('foo'))
     }
@@ -385,6 +564,7 @@ shinyServer(function(input, output, session) {
   output$foo = downloadHandler(
     filename = paste("rawDiag.pdf", sep = ''),
     content = function(file) {
+      print("YEAH PDF")
       ggsave(values$gp + labs(caption = paste("These plots were generated using the rawDiag R package version", packageVersion('rawDiag'), ". If you are using rawDiag for your work, please cite the following manuscript: C. Trachsel et al. (2018), Journal of Proteome Research doi: 10.1021/acs.jproteome.8b00173", sep = '')),
              file=file,
              dpi = 600,

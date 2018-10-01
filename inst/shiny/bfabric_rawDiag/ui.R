@@ -39,6 +39,7 @@ shinyUI(fluidPage(
       htmlOutput("sourceBfabric"),
       hr(),
       htmlOutput("ReaderParameter"),
+      htmlOutput("XICParameter"),
       h3("Graphics Parameter"),
       sliderInput("graphicsheight", "graphicsheight",
                   min = 480, max = 4096,
