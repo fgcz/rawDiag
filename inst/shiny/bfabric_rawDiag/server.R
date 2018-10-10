@@ -80,6 +80,7 @@ shinyServer(function(input, output, session) {
                                     plotOutput("charge.state", height = input$graphicsheight))),
       tabPanel("XICs", list(helpText("displays XICs of given masses."), 
                                     plotOutput("xic", height = input$graphicsheight))),
+      tabPanel("XIC AUC table", DT::dataTableOutput("tableXICAUC")),
       tabPanel("Raw table", DT::dataTableOutput("table")),
       tabPanel("Raw info", DT::dataTableOutput("tableInfo")),
       #sessionInfo
@@ -156,8 +157,17 @@ shinyServer(function(input, output, session) {
     {
       peptideGroup <- c("iRT", "glyco", "msqc1")
       tagList(h3("XIC Options"),
-              selectInput('XICpepitdes', 'XIC peptides:', peptideGroup, multiple = FALSE),
-              selectInput('XICtol', 'XIC tolerance in ppm:', c(10,15,20,50,100), multiple = FALSE)
+              selectInput('XICpepitdes', 'peptides:', peptideGroup,
+                          multiple = FALSE),
+              selectInput('XICtol', 'tolerance in ppm:', c(10, 15, 20, 50, 100),
+                          multiple = FALSE),
+              checkboxInput('XICmainPeak', 'extract main peak',
+                            value = FALSE, width = NULL),
+              selectInput('XICnMinPeaks', 'minimal number of peaks:',
+                          c(5, 10, 20,50),
+                          selected = 10,
+                          multiple = FALSE)
+              
       )       
     }
   })
@@ -183,36 +193,47 @@ shinyServer(function(input, output, session) {
   
   
   queryMass <- reactive({
-    rv <- NA
+    df <- data.frame()
     if (input$XICpepitdes == 'glyco'){
-      rv <- c(819.337986666667, 824.669623333333, 830.001263333333, 
-              868.023953333333, 873.355586666667, 873.35559, 878.687223333333,
-              878.68723, 884.018863333333, 922.041553333333, 927.373186666667,
-              927.37319, 932.704823333333, 932.70483, 935.717076666667,
-              938.036463333333, 941.048713333333, 946.380353333333,
-              970.387386666667, 975.719023333333, 976.059153333333,
-              981.050663333333, 981.050663333333, 981.39079, 986.72243,
-              989.734676666667, 995.066313333333, 1000.39795333333,
-              1019.07335333333, 1024.40498666667, 1024.40499, 1029.73662333333,
-              1029.73663, 1035.06826333333, 1043.75227666667, 1049.08391333333,
-              1054.41555333333, 1073.09095333333, 1073.09095333333, 1078.42259,
-              1078.42259, 1083.75423, 1083.75423, 1086.76647666667,
-              1092.09811333333, 1097.42975333333, 1140.78407666667,
-              1146.11571333333, 1151.44735333333, 1170.12275333333, 1175.45439,
-              1180.78603)
+      df <- data.frame(peptide = c('IgG1_EEQYNSTYR_G0F', 'IgG1_EEQYNSTYR_G1F',
+                                   'IgG1_EEQYNSTYR_G2F', 'IgG1_EEQYNSTYR_A1F',
+                                   'IgG1_EEQYNSTYR_A1F-2', 'IgG1_EEQYNSTYR_G1F+NeuAc', 'IgG1_EEQYNSTYR_A2F', 'IgG1_EEQYNSTYR_G0F+BGlcNAc', 'IgG1_EEQYNSTYR_G1F+BGlcNAc', 'IgG1_EEQYNSTYR_G2F+BGlcNAc', 'IgG1_EEQYNSTYR_A1F+BGlcNAc', 'IgG1_EEQYNSTYR_G1F+NeuAc+bGlcNAc', 'IgG1_EEQYNSTYR_G0', 'IgG1_EEQYNSTYR_G1', 'IgG1_EEQYNSTYR_G2', 'IgG1_EEQYNSTYR_A1', 'IgG1_EEQYNSTYR_G1+NeuAc', 'IgG1_EEQYNSTYR_G1+NeuAc2', 'IgG2/3_EEQFNSTFR_G0F', 'IgG2/3_EEQFNSTFR_G1F', 'IgG2/3_EEQFNSTFR_G2F', 'IgG2/3_EEQFNSTFR_A1F', 'IgG2/3_EEQFNSTFR_A1F-2', 'IgG2/3_EEQFNSTFR_G1F+NeuAc', 'IgG2/3_EEQFNSTFR_A2F', 'IgG2/3_EEQFNSTFR_G0F+BGlcNAc', 'IgG2/3_EEQFNSTFR_G1F+BGlcNAc', 'IgG2/3_EEQFNSTFR_G2F+BGlcNAc', 'IgG2/3_EEQFNSTFR_A1F+BGlcNAc', 'IgG2/3_EEQFNSTFR_G1F+NeuAc+bGlcNAc', 'IgG2/3_EEQFNSTFR_G0', 'IgG2/3_EEQFNSTFR_G1', 'IgG2/3_EEQFNSTFR_G2', 'IgG2/3_EEQFNSTFR_A1', 'IgG2/3_EEQFNSTFR_G1+NeuAc', 'IgG4_EEQFNSTYR_G0F', 'IgG4_EEQFNSTYR_G1F', 'IgG4_EEQFNSTYR_G2F', 'IgG4_EEQFNSTYR_A1F', 'IgG4_EEQFNSTYR_A1F-2', 'IgG4_EEQFNSTYR_G1F+NeuAc', 'IgG4_EEQFNSTYR_A2F', 'IgG4_EEQFNSTYR_G0F+BGlcNAc', 'IgG4_EEQFNSTYR_G1F+BGlcNAc', 'IgG4_EEQFNSTYR_G2F+BGlcNAc', 'IgG4_EEQFNSTYR_A1F+BGlcNAc', 'IgG4_EEQFNSTYR_G1F+NeuAc+bGlcNAc', 'IgG4_EEQFNSTYR_G0', 'IgG4_EEQFNSTYR_G1', 'IgG4_EEQFNSTYR_G2', 'IgG4_EEQFNSTYR_A1', 'IgG4_EEQFNSTYR_G1+NeuAc'),
+                       mZ = c(878.68723,932.70483,986.72243,1083.75423,1083.75423,1029.73663,1180.78603,946.380353333333,1000.39795333333,1054.41555333333,1151.44735333333,1097.42975333333,830.001263333333,884.018863333333,938.036463333333,1035.06826333333,981.050663333333,981.050663333333,868.023953333333,922.041553333333,976.059153333333,1073.09095333333,1073.09095333333,1019.07335333333,1170.12275333333,935.717076666667,989.734676666667,1043.75227666667,1140.78407666667,1086.76647666667,819.337986666667,873.355586666667,927.373186666667,1024.40498666667,970.387386666667,873.35559,927.37319,981.39079,1078.42259,1078.42259,1024.40499,1175.45439,941.048713333333,995.066313333333,1049.08391333333,1146.11571333333,1092.09811333333,824.669623333333,878.687223333333,932.704823333333,1029.73662333333,975.719023333333), peptide=NA, z=NA)
     }else if(input$XICpepitdes == 'msqc1'){
-      rv <- c(985.44, 995.44, 970.59, 978.60,
-              1668.97, 1676.97, 1169.52, 1179.52,
-              1108.65, 1118.66, 1422.72, 1430.72) 
+      
+      peptideSeq <- c('VLDALQAIK', 'GGPFSDSYR', 'SADFTNFDPR',
+                      'AVQQPDGLAVLGIFLK',
+                      'ALIVLAHSER', 'EGHLSPDIVAEQK', 'GYSIFSYATK', 'ESDTSYVSLK',
+                      'FEDENFILK', 'VSFELFADK', 'GAGAFGYFEVTHDITK', 'NLSVEDAAR',
+                      'FSTVAGESGSADTVR', 'TAENFR')
+        
+        
+      df <- data.frame(peptide = peptideSeq, z = 2)
+      df$mZ <- (parentIonMass(as.character(df$peptide)) + 1.008) /  df$z
+      
     }else{
-      rv <- unique((parentIonMass(pepSeq<-as.character(iRTpeptides$peptide)) + 1.008) / 2)
+      # IRT
+      peptideSeq <- c('LGGNEQVTR',
+                      'YILAGVENSK',
+                      'GTFIIDPGGVIR',
+                      'GTFIIDPAAVIR',
+                      'GAGSSEPVTGLDAK',
+                      'TPVISGGPYEYR',
+                      'VEATFGVDESNAK',
+                      'TPVITGAPYEYR',
+                      'DGLDAASYYAPVR',
+                      'ADVTPADFSEWSK',
+                      'LFLQFGAQGSPFLK')
+      df <- data.frame(peptide = peptideSeq, z = 2)
+      df$mZ <- (parentIonMass(as.character(df$peptide)) + 1.008) /  df$z
+     
     }
-    rv
+    df
   })
   
   # ----- rawXICData -------
   
-  extractPeak <- function(XIC, fit=TRUE, dt=0.3, ...){
+  extractPeak <- function(XIC, fit=TRUE, dt=0.3, minPeaks = 10, ...){
     
     intensities.max <- max(XIC$intensities)
     
@@ -222,7 +243,7 @@ shinyServer(function(input, output, session) {
     apex.idx <- which((XIC$t[max.idx] - dt) < XIC$t &  XIC$t < (XIC$t[max.idx] + dt))
     
     rv <- NA
-    if(length(apex.idx) > 10){
+    if(length(apex.idx) > minPeaks){
       x <- XIC$times[apex.idx]  
       y <- XIC$intensities[apex.idx]
       rv <- list(times=x, intensities=y, mass = XIC$mass)
@@ -247,12 +268,19 @@ shinyServer(function(input, output, session) {
                                       function(file){ 
                                         
                                         X <- readXICs(rawfile = file, 
-                                                 masses = queryMass(),
+                                                 masses = queryMass()$mZ,
                                                  tol = input$XICtol,
                                                  mono=input$usemono
-                                                
                                                 ) 
-                                        X <- lapply(X, extractPeak)
+                                        df <- queryMass()
+                                        for (i in 1:length(X)){
+                                          X[[i]]$mass <- paste(df$peptide[i], "| z =", df$z[i], '| mZ =', df$mZ[i], sep  = ' ')
+                                        }
+                                        
+                                        if(input$XICmainPeak){
+                                          X <- lapply(X, extractPeak, minPeaks=input$XICnMinPeaks)
+                                        }
+                                          
                                         Y <- lapply(X, function(x){
                                           if(length(x$times)>1){
                                             df <- data.frame(time = x$times, intensity = x$intensities, mass=rep(x$mass, length(x$times)));
@@ -274,11 +302,17 @@ shinyServer(function(input, output, session) {
       rv <- plyr::rbind.fill(
         mclapply(rf, function(file){
           X <- readXICs(rawfile = file, 
-                        masses = queryMass(),
+                        masses = queryMass()$mZ,
                         tol = input$XICtol,
                         mono=input$usemono
           ) 
-          X <- lapply(X, extractPeak)
+          df <- queryMass()
+          for (i in 1:length(X)){
+            X[[i]]$mass <- paste(df$peptide[i], "| z =", df$z[i], '| mZ =', df$mZ[i], sep  = ' ')
+          }
+          if(input$XICmainPeak){
+            X <- lapply(X, extractPeak, minPeaks=input$XICnMinPeaks)
+          }
           Y <- lapply(X, function(x){
             if(length(x$times)>1){
               df <- data.frame(time = x$times, intensity = x$intensities, mass=rep(x$mass, length(x$times)));
@@ -287,12 +321,116 @@ shinyServer(function(input, output, session) {
           Y <- do.call('rbind', Y)
           Y$filename <- rep(basename(file), nrow(Y))
           as.data.frame(Y)
-        }, mc.cores = 24))
+        }, mc.cores = input$mccores))
       return(rv)
     }else{NULL}
     
   })
   
+  
+  extractMainPeak <- function(XIC, plot=FALSE, fit=FALSE, dt=0.3, nmin =10, ...){
+    
+    intensities.max <- max(XIC$intensities)
+    max.idx <- which(XIC$intensities == intensities.max)
+    apex.idx <- which((XIC$t[max.idx] - dt) < XIC$t &  XIC$t < (XIC$t[max.idx] + dt))
+    
+    AUC <- NA
+    if(length(apex.idx) > nmin){
+      x <- XIC$times[apex.idx]  
+      y <- XIC$intensities[apex.idx]
+      
+      AUC <- sum(diff(x) * (head(y, -1) + tail(y, -1))) / 2
+      
+      if(plot){
+        plot(XIC, ...)
+        abline(v=XIC$t[max.idx], col='red')
+        abline(v=c(min(x), max(x)), col='grey')
+        axis(3, XIC$t[max.idx],  paste("AUC =", round(AUC,2),
+                                       "n =", length(apex.idx)),
+             col='red', lwd=2)
+        
+        plot(x, y, type='h', xlim = c(XIC$t[max.idx] -2*dt, XIC$t[max.idx] + 2*dt))
+        axis(3, XIC$t[max.idx],  paste("AUC =", round(AUC,2),
+                                       "n =", length(apex.idx)),
+             col='red', lwd=2)
+      }
+      
+      # fit 
+      if (fit){
+        peak <- data.frame(logy = log(y), x = x)
+        x.mean <- mean(peak$x)
+        #x.mean <-XIC$t[max.idx]
+        x.sd <- sd(peak$x)
+        peak$xc <- (peak$x - x.mean) 
+        fit <- lm(logy ~ xc + I(xc^2), data = peak)
+        xx <- with(peak, seq(min(xc) - 0.2, max(xc) + 0.2, length = 100))
+        if(plot){
+          abline(v = x.mean, col = rgb(0.1, 0.8, 0.1, alpha = 0.9), lwd = 1)
+          lines((xx + x.mean), exp(predict(fit, data.frame(xc = xx))),
+                col=rgb(0.25, 0.25, 0.25, alpha = 0.3), lwd = 5)
+        }
+        
+      }  
+    }
+    
+    data.frame(mass=XIC$mass, t=XIC$t[max.idx], intensity.max = XIC$intensities[max.idx], AUC=AUC)
+  }
+  
+  rawXICAUCData  <- reactive({
+    progress <- shiny::Progress$new(session = session, min = 0, max = 1)
+    progress$set(message = paste("extracting main peak AUC of XICs"))
+    on.exit(progress$close())
+    
+    if (input$source == 'filesystem'){
+      
+      rf <- unique(file.path(values$filesystemRoot, file.path(input$root, input$rawfile)))
+      
+      rv <- do.call('rbind', lapply(rf,
+                                      function(file){ 
+                                        
+                                        X <- readXICs(rawfile = file, 
+                                                      masses = queryMass()$mZ,
+                                                      tol = input$XICtol,
+                                                      mono=input$usemono
+                                        ) 
+                                        
+                                        df <- queryMass()
+                                        X <- do.call('rbind', lapply(X, extractMainPeak, nmin = input$XICnMinPeaks))
+                                        
+                                        X$peptide <- df$peptide
+                                        X$filename <- basename(file)
+                                        X
+                                        
+                                      }))
+      
+      return(as.data.frame(rv))
+    }else if(input$source == 'bfabric'){
+      progress <- shiny::Progress$new(session = session, min = 0, max = 1)
+      progress$set(message = paste("loading XIC data"))
+      on.exit(progress$close())
+      
+      resources <- bf$resources()$relativepath
+      rf <- resources[resources %in% input$relativepath]
+      rf <- file.path("/srv/www/htdocs/", rf)
+      rv <- plyr::rbind.fill(
+        mclapply(rf, function(file){
+          X <- readXICs(rawfile = file, 
+                        masses = queryMass()$mZ,
+                        tol = input$XICtol,
+                        mono=input$usemono
+          ) 
+          
+          df <- queryMass()
+          X <- do.call('rbind', lapply(X, extractMainPeak, nmin = input$XICnMinPeaks))
+          
+          X$peptide <- df$peptide
+          X$filename <- basename(file)
+          X
+        }, mc.cores = input$mccores))
+      return(rv)
+    }else{NULL}
+    
+  })
   
  
   # ----- rawData -------
@@ -336,21 +474,29 @@ shinyServer(function(input, output, session) {
   })
   
   
-  PlotXIC <- function(x, method = 'trellis'){
+PlotXIC <- function(x, method = 'trellis'){
     #x$fmass <- as.factor(x$mass)
     figure <- ggplot(x, aes_string(x = "time", y = "intensity")) +
       #geom_segment() +
       geom_line(stat='identity', size = 1, aes_string(group = "filename", colour = "filename")) +
-      facet_wrap(~  x$mass  , scales = "free", ncol = 1) +
+      
       #scale_x_continuous(breaks = scales::pretty_breaks(8)) +
       #scale_y_continuous(breaks = scales::pretty_breaks(8)) +
       labs(title = "XIC plot") +
       labs(subtitle = "Plotting XIC intensity against retention time") +
       labs(x = "Retention Time [min]", y = "Intensity Counts [arb. unit]") +
       theme_light()
+    
+    
+    if(input$XICmainPeak){
+      figure <- figure + facet_wrap(~  x$mass  , scales = "free", ncol = 1) 
+    }else{
+      figure <- figure + facet_wrap(~  x$mass  , ncol = 1) 
+    }
     return(figure)
   }
-  #---- XIC ----
+  
+#---- XIC ----
   output$xic <- renderPlot({
     
     progress <- shiny::Progress$new(session = session, min = 0, max = 1)
@@ -533,21 +679,20 @@ shinyServer(function(input, output, session) {
     rawData()
   })
   
+  
   output$tableInfo <- DT::renderDataTable({
    rawDataInfo()
   })
   
-  
+  output$tableXICAUC <- DT::renderDataTable({
+    rawXICAUCData()
+  })
   #---- sessionInfo ----
  
   output$sessionInfo <- renderPrint({
     
     capture.output(sessionInfo())
   })
-  
-
-  
-  
   
   #---- downloadPDF ----
   
