@@ -1,6 +1,14 @@
 \name{NEWS}
 \title{News for Package 'rawDiag'}
 
+\section{Changes until version 0.0.15 (2018-10-16)}{
+  \itemize{
+	  \item added in-silico table 5 of \href{https://www.promega.com/-/media/files/resources/protocols/technical-manuals/101/6-x-5-lc-ms-ms-peptide-reference-mix-protocol.pdf}{6-x-5-lc-ms-ms-peptide-reference-mix-protocol}.
+	  \item added XIC tabs in shiny application.
+  }
+}
+
+
 \section{Changes until version 0.0.8 (2018-07-24)}{
   \itemize{
 	  \item bugfix \url{https://github.com/fgcz/rawDiag/issues/29}.
