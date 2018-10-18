@@ -62,7 +62,7 @@ getPromega6x5mix <- function(){
                    mod = c(6.013809, 5.010161, 4.007678, 0.0, 0.0, 5.010161, 0.0, 5.010161, 0.0, 8.999969),
                    mp2h2p = 509.2739,
                    mass = 1016.533,
-                   abundance = 1e-01
+                   abundance = 1
     )
     
     L[[2]] <- list(sequence = 'VTSGSTSTSR',
