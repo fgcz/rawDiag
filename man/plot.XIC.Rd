@@ -4,15 +4,20 @@
 \alias{plot.XIC}
 \title{plot extracted ion chromatogram}
 \usage{
-plot.XIC(x, y, ...)
+plot.XIC(x, y, method = "plot", ...)
 }
 \arguments{
-\item{x}{}
+\item{x}{an XIC S3 class object}
 
-\item{y}{}
+\item{y}{will be ignored}
 
-\item{...}{}
+\item{method}{plot or ggplot}
+
+\item{...}{passed to the plot function}
+}
+\value{
+plot or ggplot object
 }
 \description{
-plot extracted ion chromatogram
+the defaukt plot function for an XIC object.
 }

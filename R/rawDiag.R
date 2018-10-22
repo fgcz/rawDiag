@@ -245,16 +245,40 @@ read.tdf <- function(filename){
   as.rawDiag(rv)
 }
 
-#' Extracts XIC of a given mass vector
+#' Extracts XICs of a given mass vector
 #'
-#' @param rawfile 
-#' @param masses 
-#' @param tol 
-#' @param mono 
-#' @param exe 
+#' @param rawfile the file name 
+#' @param masses a vector of masses 
+#' @param tol tolerance in ppm
+#' @param mono if the mono enviroment should be used. 
+#' @param exe the exe file user by mono
 #'
-#' @return list of XICs
+#' @return list of XIC objects
 #' @export readXICs 
+#' @examples
+#' # Example 1: extract iRT peptides
+#' iRTpeptide <- c("LGGNEQVTR", "YILAGVENSK", "GTFIIDPGGVIR", "GTFIIDPAAVIR",
+#' "GAGSSEPVTGLDAK", "TPVISGGPYEYR", "VEATFGVDESNAK",
+#' "TPVITGAPYEYR", "DGLDAASYYAPVR", "ADVTPADFSEWSK",
+#' "LFLQFGAQGSPFLK")
+#' 
+#' library(protViz)
+#' # 2Hplus 
+#' (mZ <- (parentIonMass(iRTpeptide) + 1.008) / 2)
+#' 
+#' \dontrun{
+#' rawfile <- "/home/cp/Downloads/20180220_14_autoQC01.raw"
+#'  X <-readXICs(rawfile, masses=mZ)
+#' }
+#' 
+#' 
+#' (rawfile <- file.path(path.package(package = 'rawDiag'), 'extdata', 'sample.raw'))
+#' RAW <- read.raw(rawfile)
+#' 
+#' # not meaning full but proof-of-concept
+#' X <-readXICs(rawfile, masses=unique(RAW$PrecursorMass), tol=1000)
+#' plot(X)
+#' 
 readXICs <- function(rawfile, 
                       masses,
                       tol = 10,
@@ -280,22 +304,125 @@ readXICs <- function(rawfile,
   source(tfo)
   unlink(c(tfi, tfo, tfstdout))
   
-  return(lapply(e$XIC, function(x){class(x) <- c(class(x), 'XIC'); x}))
+  rv <- lapply(e$XIC, 
+               function(x){
+                 class(x) <- c(class(x), 'XIC'); 
+                 x$filename <- basename(rawfile); 
+                 x})
+  
+  class(rv) <- c(class(rv), 'XICs')
+  return(rv)
+}
+
+
+is.XIC <- function(x){
+  if(length(x$times) > 0 && length(x$times) == length(x$intensities)){TRUE}else{FALSE}
 }
 
 #' plot extracted ion chromatogram
+#' @description the defaukt plot function for an XIC object.
 #'
-#' @param x 
-#' @param y 
-#' @param ... 
+#' @param x an XIC S3 class object
+#' @param y will be ignored
+#' @param method plot or ggplot 
+#' @param ...  passed to the plot function
 #'
-#' @return
+#' @return plot or ggplot object
 #' @export plot.XIC
-plot.XIC <- function(x, y, ...){
-  if(length(x$times) > 0){
-  plot(x$times, x$intensities, type='h', sub=length(x$times), ...)
+plot.XIC <- function(x, y, method='plot', zoom=0, ...){
+  if(is.XIC(x)){
+    t.max <- x$times[x$intensities == max(x$intensities, na.rm=TRUE)][1]
+    if(zoom == 0){
+      plot(x$times, 
+           x$intensities,
+           xlab='retention time',
+           ylab='intensity',
+           type='h',
+           
+           main=x$filename,
+           ...)
+    }else{
+      plot(x$times, 
+           x$intensities,
+           xlab='retention time',
+           ylab='intensity',
+           type='h',
+           xlim=c(t.max-zoom,t.max+zoom),
+           main=x$filename,
+           ...)
+      abline(v=t.max, col=rgb(0.5, 0.5, 0.5, alpha = 0.25), lwd=4)
+    }
+    
+    #axis(3, t.max, round(t.max,2))
+   
+    legend("topleft",
+           c(paste("mZ:", x$mass),
+             paste("number of peaks:", length(x$times)),
+             paste("t max:", t.max)
+           )
+    )
   }
 } 
+
+#' plot extracted ion chromatograms
+#'
+#' @param x a list of XIC objects
+#' @param y will be ignroed
+#' @param ... passed to \codeP{plot.XIC}
+#'
+#' @return 
+#' @export plot.XICs
+#' @examples
+#' # Example 1: extract iRT peptides
+#' iRTpeptide <- c("LGGNEQVTR", "YILAGVENSK", "GTFIIDPGGVIR", "GTFIIDPAAVIR",
+#' "GAGSSEPVTGLDAK", "TPVISGGPYEYR", "VEATFGVDESNAK",
+#' "TPVITGAPYEYR", "DGLDAASYYAPVR", "ADVTPADFSEWSK",
+#' "LFLQFGAQGSPFLK")
+#' 
+#' library(protViz)
+#' # 2Hplus 
+#' (mZ <- (parentIonMass(iRTpeptide) + 1.008) / 2)
+#' 
+#' \dontrun{
+#'  rawfile <- "/home/cp/Downloads/20180220_14_autoQC01.raw"
+#'  X <-readXICs(rawfile, masses=mZ)
+#'  plot(X, method='ggplot') + facet_wrap(~mass)
+#'  plot(X, method='ggplot') + facet_wrap(~mass, scales = "free_x")
+#'  
+#' }
+
+
+plot.XICs <- function(x, y, method='ggplot', ...){
+  if(length(x) > 0){
+    if (method == 'ggplot'){
+      df <- do.call('rbind', lapply(x, function(xx){
+        
+        if (is.XIC(xx)){
+          rv <- data.frame(times=xx$times,
+                           intensities=xx$intensities)
+          
+          rv$filename <- xx$filename
+          rv$mass <- as.factor(xx$mass)
+          rv}else{NULL}
+      }
+      ))
+      
+      
+      gp <- ggplot(df, aes_string(x = "times", y = "intensities")) +
+        #geom_segment() +
+        geom_line(stat='identity', size = 1, aes_string(group = "mass", colour = "mass")) +
+        #scale_x_continuous(breaks = scales::pretty_breaks(8)) +
+        #scale_y_continuous(breaks = scales::pretty_breaks(8)) +
+        labs(title = "XIC plot") +
+        labs(subtitle = "Plotting XIC intensity against retention time") +
+        labs(x = "Retention Time [min]", y = "Intensity Counts [arb. unit]")
+      return(gp)
+    }else{
+      lapply(x, plot.XIC, ...)
+    }
+  }
+} 
+
 
 
 #' read scan of scanids
@@ -408,7 +535,7 @@ plot.peaklist <- function(x, y, ...){
 #' dim(RAW)
 #' RAW <- read.raw(file = rawfile, rawDiag = FALSE)
 #' dim(RAW)
-#' \dont{
+#' \dontrun{
 #' library(parallel)
 #' library(rawDiag)
 #'

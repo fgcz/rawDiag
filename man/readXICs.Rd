@@ -2,7 +2,7 @@
 % Please edit documentation in R/rawDiag.R
 \name{readXICs}
 \alias{readXICs}
-\title{Extracts XIC of a given mass vector}
+\title{Extracts XICs of a given mass vector}
 \usage{
 readXICs(rawfile, masses, tol = 10, mono = if (Sys.info()["sysname"]
   \%in\% c("Darwin", "Linux")) TRUE else FALSE,
@@ -10,19 +10,44 @@ readXICs(rawfile, masses, tol = 10, mono = if (Sys.info()["sysname"]
   "fgcz_raw.exe"))
 }
 \arguments{
-\item{rawfile}{}
+\item{rawfile}{the file name}
 
-\item{masses}{}
+\item{masses}{a vector of masses}
 
-\item{tol}{}
+\item{tol}{tolerance in ppm}
 
-\item{mono}{}
+\item{mono}{if the mono enviroment should be used.}
 
-\item{exe}{}
+\item{exe}{the exe file user by mono}
 }
 \value{
-list of XICs
+list of XIC objects
 }
 \description{
-Extracts XIC of a given mass vector
+Extracts XICs of a given mass vector
+}
+\examples{
+# Example 1: extract iRT peptides
+iRTpeptide <- c("LGGNEQVTR", "YILAGVENSK", "GTFIIDPGGVIR", "GTFIIDPAAVIR",
+"GAGSSEPVTGLDAK", "TPVISGGPYEYR", "VEATFGVDESNAK",
+"TPVITGAPYEYR", "DGLDAASYYAPVR", "ADVTPADFSEWSK",
+"LFLQFGAQGSPFLK")
+
+library(protViz)
+# 2Hplus 
+(mZ <- (parentIonMass(iRTpeptide) + 1.008) / 2)
+
+\dontrun{
+rawfile <- "/home/cp/Downloads/20180220_14_autoQC01.raw"
+ X <-readXICs(rawfile, masses=mZ)
+}
+
+
+(rawfile <- file.path(path.package(package = 'rawDiag'), 'extdata', 'sample.raw'))
+RAW <- read.raw(rawfile)
+
+# not meaning full but proof-of-concept
+X <-readXICs(rawfile, masses=unique(RAW$PrecursorMass), tol=1000)
+plot(X)
+
 }

@@ -60,7 +60,7 @@ PlotScanFrequency(RAW)
 dim(RAW)
 RAW <- read.raw(file = rawfile, rawDiag = FALSE)
 dim(RAW)
-\dont{
+\dontrun{
 library(parallel)
 library(rawDiag)
 

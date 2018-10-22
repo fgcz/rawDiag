@@ -7,6 +7,7 @@
     stopifnot(abs((((parentIonMass(x$sequence) + sum(x$mod) + 2 * 1.00794) / 2) - x$mp2h2p) ) < 0.0007)
 }
 
+
 extractPromegaXIC <- function(rawfile, promega = getPromega6x5mix(), tol = 10){
     mZ <- sapply(promega, function(x){ (parentIonMass(x$sequence) + sum(x$mod) + 2 * 1.00794) / 2 })
     abundance <- sapply(promega, function(x){x$abundance})
