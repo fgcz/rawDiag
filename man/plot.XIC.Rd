@@ -4,14 +4,14 @@
 \alias{plot.XIC}
 \title{plot extracted ion chromatogram}
 \usage{
-plot.XIC(x, y, method = "plot", ...)
+plot.XIC(x, y, fit = FALSE, ...)
 }
 \arguments{
 \item{x}{an XIC S3 class object}
 
 \item{y}{will be ignored}
 
-\item{method}{plot or ggplot}
+\item{fit}{\code{TRUE} or \code{FALSE}, if a lm fit should be done}
 
 \item{...}{passed to the plot function}
 }
