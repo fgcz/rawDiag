@@ -315,6 +315,12 @@ readXICs <- function(rawfile,
 }
 
 
+#' check if x is an XIC object
+#'
+#' @param x 
+#'
+#' @return TRUE ot FALSE
+#' @export is.XIC
 is.XIC <- function(x){
   if(length(x$times) > 0 && length(x$times) == length(x$intensities)){TRUE}else{FALSE}
 }
@@ -324,15 +330,17 @@ is.XIC <- function(x){
 #'
 #' @param x an XIC S3 class object
 #' @param y will be ignored
-#' @param method plot or ggplot 
 #' @param ...  passed to the plot function
+#' @param fit \code{TRUE} or \code{FALSE}, if a lm fit should be done
 #'
 #' @return plot or ggplot object
 #' @export plot.XIC
-plot.XIC <- function(x, y, method='plot', zoom=0, ...){
+plot.XIC <- function(x, y, fit=FALSE, ...){
   if(is.XIC(x)){
+    
     t.max <- x$times[x$intensities == max(x$intensities, na.rm=TRUE)][1]
-    if(zoom == 0){
+    
+    if(!fit){
       plot(x$times, 
            x$intensities,
            xlab='retention time',
@@ -342,25 +350,52 @@ plot.XIC <- function(x, y, method='plot', zoom=0, ...){
            main=x$filename,
            ...)
     }else{
-      plot(x$times, 
-           x$intensities,
+      intensities.max <- max(x$intensities)
+      max.idx <- which(x$intensities == intensities.max)[1]
+      
+      hsleft <- max.idx - min(which(sapply(rev(1:(max.idx-1)), function(i){0.1 *intensities.max > x$intensities[i]})))
+      hsright <- max.idx + max(which(sapply((max.idx):length(x$intensities), function(i){0.2 *intensities.max < x$intensities[i]})))
+
+      apex.idx <- hsleft:hsright
+      
+      
+      plot(x$times[apex.idx], 
+           x$intensities[apex.idx],
            xlab='retention time',
            ylab='intensity',
            type='h',
-           xlim=c(t.max-zoom,t.max+zoom),
-           main=x$filename,
-           ...)
+           main=x$filename)
+      
+      peak <- data.frame(logy = log(x$intensities[apex.idx]), x = x$times[apex.idx])
+      x.mean <- mean(peak$x)
+      peak$xc <- (peak$x - x.mean)
+      fm <- lm(logy ~ xc + I(xc^2), data = peak)
+      
+      xx <- with(peak, seq(min(xc) , max(xc), length = 100))
+      
+      lines((xx + x.mean), exp(predict(fm, data.frame(xc = xx))),
+            col=rgb(0.25, 0.25, 0.25, alpha = 0.3), lwd = 5)
+      
       abline(v=t.max, col=rgb(0.5, 0.5, 0.5, alpha = 0.25), lwd=4)
-    }
+   
     
     #axis(3, t.max, round(t.max,2))
-   
+    AUC <- sum(diff(x$times[apex.idx]) * (head(x$intensities[apex.idx], -1) + tail(x$intensities[apex.idx], -1))) / 2
+    
     legend("topleft",
            c(paste("mZ:", x$mass),
              paste("number of peaks:", length(x$times)),
-             paste("t max:", t.max)
-           )
+             paste("t max:", t.max),
+             paste("AUC:", round(AUC), title='fm results')
+           ), cex=0.75, title='peak'
     )
+    
+    print(fm)
+    legend.text<- paste(c(names(fm$coefficients),'r.squared', 'mean'),
+                        round(c(fm$coefficients, summary(fm)$r.squared,mean(peak$x)),3), sep=": ")
+    legend("topright", legend.text, title='model', cex=0.75)
+  
+    }
   }
 } 
 
@@ -368,8 +403,8 @@ plot.XIC <- function(x, y, method='plot', zoom=0, ...){
 #'
 #' @param x a list of XIC objects
 #' @param y will be ignroed
-#' @param ... passed to \codeP{plot.XIC}
-#'
+#' @param ... passed to \code{plot.XIC}
+#' @import ggplot2
 #' @return 
 #' @export plot.XICs
 #' @examples
@@ -384,14 +419,13 @@ plot.XIC <- function(x, y, method='plot', zoom=0, ...){
 #' (mZ <- (parentIonMass(iRTpeptide) + 1.008) / 2)
 #' 
 #' \dontrun{
+#'  library(ggplot2)
 #'  rawfile <- "/home/cp/Downloads/20180220_14_autoQC01.raw"
 #'  X <-readXICs(rawfile, masses=mZ)
 #'  plot(X, method='ggplot') + facet_wrap(~mass)
 #'  plot(X, method='ggplot') + facet_wrap(~mass, scales = "free_x")
 #'  
 #' }
-
-
 plot.XICs <- function(x, y, method='ggplot', ...){
   if(length(x) > 0){
     if (method == 'ggplot'){
@@ -521,7 +555,7 @@ plot.peaklist <- function(x, y, ...){
 #'
 #'   
 #' @return a \code{data.frame}.
-#' 
+#' @aliases XIC, xic
 #' @export read.raw
 #'
 #' @examples

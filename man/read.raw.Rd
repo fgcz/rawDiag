@@ -2,6 +2,8 @@
 % Please edit documentation in R/rawDiag.R
 \name{read.raw}
 \alias{read.raw}
+\alias{XIC,}
+\alias{xic}
 \title{mass spec reader function}
 \usage{
 read.raw(file, mono = if (Sys.info()["sysname"] \%in\% c("Darwin",

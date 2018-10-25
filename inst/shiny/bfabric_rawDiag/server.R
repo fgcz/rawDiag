@@ -31,21 +31,34 @@ shinyServer(function(input, output, session) {
   }
   
 # ----Configuration----  
+  filesystemRoot<- "/scratch/cpanse/"
+  if(!dir.exists(filesystemRoot)){
+    filesystemRoot <-  Sys.getenv('HOME')
+  }
+  
+  filesystemDataDir = c("Downloads", 
+                        "data",
+                        "raw",
+                        "WU163230",
+                        "WU163763",
+                        "PXD006932/Exp3A",
+                        "PXD006932/Exp3B",
+                        "PXD006932/Exp6A",
+                        "PXD006932/Exp6B",
+                        "PXD006932/Exp7A",
+                        "PXD006932/Exp7B",
+                        "PXD006932/Exp8A",
+                        "PXD006932/Exp8B",
+                        "PXD006932/SA"
+  )
+  
+  filesystemDataDir <- filesystemDataDir[dir.exists(file.path(filesystemRoot, filesystemDataDir))]
+  
+  
+  
   values <- reactiveValues(pdfcontent=NULL,
-                           filesystemRoot="/scratch/cpanse/",
-                           filesystemDataDir = c("WU163230",
-                                        "WU163763",
-                                        "PXD006932/Exp3A",
-                                        "PXD006932/Exp3B",
-                                        "PXD006932/Exp6A",
-                                        "PXD006932/Exp6B",
-                                        "PXD006932/Exp7A",
-                                        "PXD006932/Exp7B",
-                                        "PXD006932/Exp8A",
-                                        "PXD006932/Exp8B",
-                                        "PXD006932/SA",
-                                        "p195",
-                                        "cfortes_20180313_300um_WW"),
+                           filesystemRoot=filesystemRoot,
+                           filesystemDataDir = filesystemDataDir,
                            RDataRoot = file.path(path.package(package = "rawDiag"), "extdata"),
                            RDataData = c("WU163763"))
   
@@ -93,7 +106,7 @@ shinyServer(function(input, output, session) {
   getRawfiles <- reactive({
     message(file.path(values$filesystemRoot, input$root))
     
-    f <- list.files(file.path("/scratch/cpanse/",input$root))
+    f <- list.files(file.path(values$filesystemRoot,input$root))
     f[grep("raw$", f)]
     
   })
@@ -106,6 +119,7 @@ shinyServer(function(input, output, session) {
       helpText("no files available")
     }
   })
+  
 # ----Source----  
   output$sourceFilesystem <- renderUI({
     if (input$source == 'filesystem'){
@@ -173,8 +187,6 @@ shinyServer(function(input, output, session) {
   })
   
  
-  
- 
   # ----- RDataSave -------
     
   RDataSave <- observeEvent(input$RDataSave, {
@@ -189,8 +201,6 @@ shinyServer(function(input, output, session) {
     message(fn)
     
   })
-  
-  
   
   queryMass <- reactive({
     df <- data.frame()
@@ -264,7 +274,7 @@ shinyServer(function(input, output, session) {
       
       rf <- unique(file.path(values$filesystemRoot, file.path(input$root, input$rawfile)))
       
-      rv <- plyr::rbind.fill(mclapply(rf,
+      rv <- plyr::rbind.fill(lapply(rf,
                                       function(file){ 
                                         
                                         X <- readXICs(rawfile = file, 
@@ -289,7 +299,7 @@ shinyServer(function(input, output, session) {
                                         Y <- do.call('rbind', Y)
                                         Y$filename <- rep(basename(file), nrow(Y))
                                         as.data.frame(Y)
-                                        }, mc.cores = input$mccores))
+                                        }))
       return(rv)
     }else if(input$source == 'bfabric'){
       progress <- shiny::Progress$new(session = session, min = 0, max = 1)
@@ -441,22 +451,25 @@ shinyServer(function(input, output, session) {
     on.exit(progress$close())
     
     if (input$source == 'filesystem'){
-     
+      progress <- shiny::Progress$new(session = session, min = 0, max = 1)
+      progress$set(message = paste("loading MS data from local computer"))
+      on.exit(progress$close())
+      
       rf <- file.path(values$filesystemRoot, file.path(input$root, input$rawfile))
       
-      rv <- plyr::rbind.fill(mclapply(rf,
+      rv <- plyr::rbind.fill(lapply(rf,
                                       function(file){ 
                                         read.raw(file,
-                                                 mono=input$usemono, exe=input$cmd) },
-                                      mc.cores = input$mccores))}
-    else if(input$source == 'package'){
+                                                 mono=input$usemono, exe=input$cmd) }))
+                                    #  mc.cores = 4))
+      }else if(input$source == 'package'){
       rv <- NULL
       ne <- new.env()
       data("WU163763", envir=ne)
       rv <- ne[[ls(ne)]]
     }else if(input$source == 'bfabric'){
       progress <- shiny::Progress$new(session = session, min = 0, max = 1)
-      progress$set(message = paste("loading MS data"))
+      progress$set(message = paste("loading MS data from bfabric storage"))
       on.exit(progress$close())
       
       resources <- bf$resources()$relativepath
