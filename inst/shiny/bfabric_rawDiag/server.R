@@ -12,6 +12,7 @@ library(shiny)
 if (!require("bfabricShiny")){
   message("running without bfabricShiny")
 }
+
 library(protViz)
 library(rawDiag)
 library(parallel)
@@ -20,22 +21,31 @@ library(rmarkdown)
 library(base64enc)
 library(ggplot2)
 
-# Define server logic required to draw a histogram
+
 shinyServer(function(input, output, session) {
 # ----bfabricShinyModule---- 
   if (require("bfabricShiny")){
- bf <- callModule(bfabric, "bfabric8",
-                applicationid = c(7, 160, 161, 162, 163, 176, 177, 197, 214, 232),
-                 resoucepattern = 'raw$|RAW$',
-                 resourcemultiple = TRUE)
+    bf <- callModule(bfabric, "bfabric8",
+                     applicationid = c(7, 160, 161, 162, 163, 176, 177, 197, 214, 232),
+                     resoucepattern = 'raw$|RAW$',
+                     resourcemultiple = TRUE)
   }
   
 # ----Configuration----  
-  filesystemRoot<- "/scratch/cpanse/"
+  tryCatch({
+    filesystemRoot <- rawDiagfilesystemRoot
+
+  }, error=function(err){
+    filesystemRoot<- Sys.getenv('HOME')
+  })
+  
   if(!dir.exists(filesystemRoot)){
     filesystemRoot <-  Sys.getenv('HOME')
   }
   
+  tryCatch({
+    filesystemDataDir <- rawDiagfilesystemDataDir
+  }, error=function(err){
   filesystemDataDir = c("Downloads", 
                         "data",
                         "raw",
@@ -50,7 +60,7 @@ shinyServer(function(input, output, session) {
                         "PXD006932/Exp8A",
                         "PXD006932/Exp8B",
                         "PXD006932/SA"
-  )
+  )})
   
   filesystemDataDir <- filesystemDataDir[dir.exists(file.path(filesystemRoot, filesystemDataDir))]
   
@@ -169,7 +179,7 @@ shinyServer(function(input, output, session) {
   output$XICParameter <- renderUI({
     if(input$source  %in% c('bfabric', 'filesystem'))
     {
-      peptideGroup <- c("iRT", "glyco", "msqc1")
+      peptideGroup <- c("iRT", "glyco", "msqc1", "promega")
       tagList(h3("XIC Options"),
               selectInput('XICpepitdes', 'peptides:', peptideGroup,
                           multiple = FALSE),
@@ -221,7 +231,13 @@ shinyServer(function(input, output, session) {
       df <- data.frame(peptide = peptideSeq, z = 2)
       df$mZ <- (parentIonMass(as.character(df$peptide)) + 1.008) /  df$z
       
-    }else{
+    }else if (input$XICpepitdes == 'promega'){
+      S <- getPromega6x5mix()
+      df <- data.frame(peptide=sapply(S, function(x){x$sequence}),
+        mZ=sapply(S, function(x){x$mp2h2p}))
+      
+    }
+    else{
       # IRT
       peptideSeq <- c('LGGNEQVTR',
                       'YILAGVENSK',
@@ -488,6 +504,15 @@ shinyServer(function(input, output, session) {
   
   
 PlotXIC <- function(x, method = 'trellis'){
+  
+  autoQCFile <- "/Users/cp/__checkouts/F1000_QC4Life/R/autoQC.R"
+  if (input$XICpepitdes == 'promega' & file.exists(autoQCFile) & require(lattice)){
+    source(autoQCFile)
+    rf <- file.path(values$filesystemRoot, file.path(input$root, input$rawfile))
+   return(lapply(rf[1], flm.autoQC4L, fileprefix=''))
+    #return(plot(0,0))
+  }
+  
     #x$fmass <- as.factor(x$mass)
     figure <- ggplot(x, aes_string(x = "time", y = "intensity")) +
       #geom_segment() +
