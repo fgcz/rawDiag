@@ -31,7 +31,8 @@ shinyServer(function(input, output, session) {
                      resourcemultiple = TRUE)
   }
   
-# ----Configuration----  
+# ----Configuration---- 
+  filesystemRoot<- Sys.getenv('HOME')
   tryCatch({
     filesystemRoot <- rawDiagfilesystemRoot
 
@@ -43,6 +44,7 @@ shinyServer(function(input, output, session) {
     filesystemRoot <-  Sys.getenv('HOME')
   }
   
+  filesystemDataDir <- ''
   tryCatch({
     filesystemDataDir <- rawDiagfilesystemDataDir
   }, error=function(err){
@@ -64,17 +66,11 @@ shinyServer(function(input, output, session) {
   
   filesystemDataDir <- filesystemDataDir[dir.exists(file.path(filesystemRoot, filesystemDataDir))]
   
-  
-  
   values <- reactiveValues(pdfcontent=NULL,
                            filesystemRoot=filesystemRoot,
                            filesystemDataDir = filesystemDataDir,
                            RDataRoot = file.path(path.package(package = "rawDiag"), "extdata"),
                            RDataData = c("WU163763"))
-  
-
-  # $filesystemDataDir)
-  # values$filesystemDataDir <- values$filesystemDataDir[dir.exists(F)]
   
   output$tabs <- renderUI({
   
@@ -134,6 +130,7 @@ shinyServer(function(input, output, session) {
   output$sourceFilesystem <- renderUI({
     if (input$source == 'filesystem'){
       tagList(
+        helpText('define rawDiagfilesystemRoot in your Rprofile'),
         selectInput('root', 'root:', values$filesystemDataDir,  multiple = FALSE),
         htmlOutput('rawfile')
         )
@@ -306,6 +303,7 @@ shinyServer(function(input, output, session) {
                                                 ) 
                                         df <- queryMass()
                                         for (i in 1:length(X)){
+                                          X[[i]]$mZ <- X[[i]]$mass 
                                           X[[i]]$mass <- paste(df$peptide[i], "| z =", df$z[i], '| mZ =', df$mZ[i], sep  = ' ')
                                         }
                                         
@@ -315,7 +313,7 @@ shinyServer(function(input, output, session) {
                                           
                                         Y <- lapply(X, function(x){
                                           if(length(x$times)>1){
-                                            df <- data.frame(time = x$times, intensity = x$intensities, mass=rep(x$mass, length(x$times)));
+                                            df <- data.frame(time = x$times, intensity = x$intensities, mZ=rep(x$mZ, length(x$times)), mass=rep(x$mass, length(x$times)));
                                             return(df)
                                           }})
                                         Y <- do.call('rbind', Y)
@@ -509,14 +507,45 @@ shinyServer(function(input, output, session) {
   })
   
   
-PlotXIC <- function(x, method = 'trellis'){
+.promega.extract.maxpeak <- function(x){
+  P <-(do.call('rbind', lapply(getPromega6x5mix(), function(y){data.frame(abundance=y$abundance, mZ=y$mp2h2p, sequence=y$sequence)})))
+  M <-merge(x, P, by='mZ')
   
-  autoQCFile <- "/Users/cp/__checkouts/F1000_QC4Life/R/autoQC.R"
-  if (input$XICpepitdes == 'promega' & file.exists(autoQCFile) & require(lattice)){
-    source(autoQCFile)
-    rf <- file.path(values$filesystemRoot, file.path(input$root, input$rawfile))
-   return(lapply(rf[1], flm.autoQC4L, fileprefix=''))
-    #return(plot(0,0))
+  MM <- do.call('rbind', lapply(unique(M$filename), function(f){
+    do.call('rbind', lapply(unique(M$sequence), function(z){
+      
+      X <- M[M$filename == f & M$sequence==z & M$abundance==1, ]
+      
+      t.max<-X$time[X$intensity==max(X$intensity)]; 
+      
+      print(t.max)
+      
+      do.call('rbind', lapply(unique(M$abundance), function(abundance){
+        
+        XX <- M[M$filename == f & M$sequence==z & M$abundance==abundance & (t.max - 1) < M$time & M$time < (t.max + 1),]
+        
+        
+        XX[which(XX$intensity == max(XX$intensity)),]
+        
+      }))
+    }))}))
+  
+}
+  
+PlotXIC <- function(x, method = 'trellis'){
+  if (input$XICpepitdes == 'promega'  & require(lattice)){
+    lp <- xyplot(log(intensity,10) ~ log(abundance,10) | substr(sequence,1,6) * substr(filename,5,12), 
+           data=.promega.extract.maxpeak(x),
+           asp=1,
+           panel=function(x,y,...){
+            tryCatch({
+              flm <- lm(y ~ x)
+              panel.abline(flm)
+              print(flm$coefficients)
+            } )
+            panel.xyplot(x,y,...)
+           })
+      return (lp)
   }
   
     #x$fmass <- as.factor(x$mass)
