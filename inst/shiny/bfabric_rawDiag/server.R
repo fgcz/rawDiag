@@ -165,10 +165,16 @@ shinyServer(function(input, output, session) {
                 paste(path.package(package = "rawDiag"), "exec/fgcz_raw.exe", sep="/"))
       cmds <- sapply(cmds, function(x){if(file.exists(x)){x}else{NA}})
       cmds <- cmds[!is.na(cmds)]
+
+      monoFlag <- FALSE
+
+      if(Sys.info()['sysname'] %in% c("Darwin", "Linux")){
+	      monoFlag <- TRUE
+      }
       
       tagList(h3("RawFileReaderOptions"),
               selectInput('cmd', 'cmd:', cmds, multiple = FALSE),
-              checkboxInput("usemono", "Use mono", TRUE),
+              checkboxInput("usemono", "Use mono", monoFlag),
               sliderInput("mccores", "Cores",
                           min = 1, max = 24,
                           value = 12))
