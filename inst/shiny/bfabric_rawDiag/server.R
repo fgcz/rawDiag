@@ -32,37 +32,25 @@ shinyServer(function(input, output, session) {
   }
   
 # ----Configuration---- 
-  filesystemRoot<- Sys.getenv('HOME')
-  tryCatch({
-    filesystemRoot <- rawDiagfilesystemRoot
-
-  }, error=function(err){
-    filesystemRoot<- Sys.getenv('HOME')
-  })
+  filesystemRoot <- NULL
   
-  if(!dir.exists(filesystemRoot)){
-    filesystemRoot <-  Sys.getenv('HOME')
+  message(.GlobalEnv$.rawDiagfilesystemRoot)
+  message(.GlobalEnv$.rawDiagfilesystemDataDir)
+  
+  if(exists(".rawDiagfilesystemRoot")){
+    filesystemRoot <- .GlobalEnv$.rawDiagfilesystemRoot
+  }else{
+    filesystemRoot <- Sys.getenv('HOME')
   }
   
-  filesystemDataDir <- ''
-  tryCatch({
-    filesystemDataDir <- rawDiagfilesystemDataDir
-  }, error=function(err){
-  filesystemDataDir = c("Downloads", 
-                        "data",
-                        "raw",
-                        "WU163230",
-                        "WU163763",
-                        "PXD006932/Exp3A",
-                        "PXD006932/Exp3B",
-                        "PXD006932/Exp6A",
-                        "PXD006932/Exp6B",
-                        "PXD006932/Exp7A",
-                        "PXD006932/Exp7B",
-                        "PXD006932/Exp8A",
-                        "PXD006932/Exp8B",
-                        "PXD006932/SA"
-  )})
+  filesystemDataDir <- NULL
+  if(exists(".rawDiagfilesystemDataDir")){
+    filesystemDataDir <- .GlobalEnv$.rawDiagfilesystemDataDir
+  }else{
+    filesystemDataDir <- c("Documents", "Downloads")
+  }
+  
+
   
   filesystemDataDir <- filesystemDataDir[dir.exists(file.path(filesystemRoot, filesystemDataDir))]
   
@@ -99,9 +87,10 @@ shinyServer(function(input, output, session) {
                                     plotOutput("charge.state", height = input$graphicsheight))),
       tabPanel("XICs", list(helpText("displays XICs of given masses."), 
                                     plotOutput("xic", height = input$graphicsheight))),
-      tabPanel("XIC AUC table", DT::dataTableOutput("tableXICAUC")),
+      tabPanel("XICs table", DT::dataTableOutput("tableXICAUC")),
       tabPanel("Raw table", DT::dataTableOutput("table")),
       tabPanel("Raw info", DT::dataTableOutput("tableInfo")),
+      tabPanel("ABOUT", includeMarkdown("about.md")),
       #sessionInfo
       tabPanel("sessionInfo", verbatimTextOutput("sessionInfo"))
       
@@ -130,8 +119,8 @@ shinyServer(function(input, output, session) {
   output$sourceFilesystem <- renderUI({
     if (input$source == 'filesystem'){
       tagList(
-        helpText('define rawDiagfilesystemRoot in your Rprofile'),
-        selectInput('root', 'root:', values$filesystemDataDir,  multiple = FALSE),
+        #helpText('define rawDiagfilesystemRoot in your Rprofile'),
+        selectInput('root', 'directory:', values$filesystemDataDir,  multiple = FALSE),
         htmlOutput('rawfile')
         )
     } 
@@ -508,40 +497,34 @@ shinyServer(function(input, output, session) {
   
   
 .promega.extract.maxpeak <- function(x){
-  P <-(do.call('rbind', lapply(getPromega6x5mix(), function(y){data.frame(abundance=y$abundance, mZ=y$mp2h2p, sequence=y$sequence)})))
+  P <-(do.call('rbind', lapply(getPromega6x5mix(), function(y){
+    data.frame(abundance=y$abundance, mZ=y$mp2h2p, sequence=y$sequence)})))
   M <-merge(x, P, by='mZ')
-  
-  MM <- do.call('rbind', lapply(unique(M$filename), function(f){
+  df <- do.call('rbind', lapply(unique(M$filename), function(f){
     do.call('rbind', lapply(unique(M$sequence), function(z){
-      
       X <- M[M$filename == f & M$sequence==z & M$abundance==1, ]
-      
       t.max<-X$time[X$intensity==max(X$intensity)]; 
-      
-      print(t.max)
-      
       do.call('rbind', lapply(unique(M$abundance), function(abundance){
-        
         XX <- M[M$filename == f & M$sequence==z & M$abundance==abundance & (t.max - 1) < M$time & M$time < (t.max + 1),]
-        
-        
         XX[which(XX$intensity == max(XX$intensity)),]
-        
       }))
     }))}))
-  
+   df
 }
   
 PlotXIC <- function(x, method = 'trellis'){
   if (input$XICpepitdes == 'promega'  & require(lattice)){
-    lp <- xyplot(log(intensity,10) ~ log(abundance,10) | substr(sequence,1,6) * substr(filename,5,12), 
-           data=.promega.extract.maxpeak(x),
+    df<-.promega.extract.maxpeak(x)
+    sequenceSSRC <- factor(df$sequence, levels= names(sort(ssrc(as.character(unique(df$sequence))))))
+    
+    lp <- xyplot(log(intensity,10) ~ log(abundance,10) | sequenceSSRC * substr(filename,1,18), 
+           data=df,
            asp=1,
            panel=function(x,y,...){
             tryCatch({
               flm <- lm(y ~ x)
               panel.abline(flm)
-              print(flm$coefficients)
+              #print(flm$coefficients)
             } )
             panel.xyplot(x,y,...)
            })
@@ -757,13 +740,24 @@ PlotXIC <- function(x, method = 'trellis'){
    rawDataInfo()
   })
   
+#------- XIC table  ------
   output$tableXICAUC <- DT::renderDataTable({
-    rawXICAUCData()
+    if (input$XICpepitdes == 'promega'){
+      .promega.extract.maxpeak(rawXICData())
+    }else{
+      rawXICAUCData()
+    }
+    
+    
   })
+  
+
+  
+  
   #---- sessionInfo ----
  
   output$sessionInfo <- renderPrint({
-    
+   
     capture.output(sessionInfo())
   })
   

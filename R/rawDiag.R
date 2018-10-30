@@ -2216,3 +2216,45 @@ benchmark_mzR <- function(f, maxncpu = c(16, 32, 64),
   }
 }
 
+
+#' run the package demo 
+#'
+#' @param appDir directory containing the shiny \code{server.R},
+#' @param root default is the home directory.
+#' @param dirlist all directories containg a raw files.
+#' @param ... passed to the \code{\link{runApp}} method.
+#' @return \code{NULL}
+#' @export rawDiagShiny
+#'
+#' @examples
+#' \dontrun{
+#' rawDiagShiny(root="/Users/cp/Downloads", 
+#'   dirlist=unique(dirname(list.files("/Users/cp/Downloads", recursive = TRUE, pattern="*.raw"))))
+#' 
+#' ## run it from the command line
+#' 
+#' # MacOSX and Linux
+#' R -e "library(rawDiag);rawDiagShiny(launch.browser=TRUE)"
+#' 
+#' # Windows
+#' R.exe -e "library(rawDiag);rawDiagShiny(root='D:/Data2Sam/', launch.browser=TRUE)"
+#' }
+rawDiagShiny <- function(appDir = system.file('shiny', 'demo', package = 'rawDiag'), 
+     root = Sys.getenv('HOME'), 
+     dirlist = unique(dirname(list.files(root, recursive = TRUE, pattern="*.raw"))),
+     ...){
+  
+  if (require('shiny')){
+    .GlobalEnv$.rawDiagfilesystemRoot <- root
+    .GlobalEnv$.rawDiagfilesystemDataDir <- dirlist
+    tryCatch({
+      shiny::runApp(appDir, display.mode = 'normal', ...)
+      },
+             error = function(e) e)
+  }else{
+    warning('no shiny package available.')
+  }
+  NULL
+}
+
+
