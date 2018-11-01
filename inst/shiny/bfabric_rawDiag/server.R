@@ -1,11 +1,5 @@
-#
-# This is the server logic of a Shiny web application. You can run the 
-# application by clicking 'Run App' above.
-#
-# Find out more about building applications with Shiny here:
-# 
-#    http://shiny.rstudio.com/
-#
+#R
+# This is the server logic of a rawDiag Shiny web application.
 
 library(shiny)
 
@@ -21,9 +15,8 @@ library(rmarkdown)
 library(base64enc)
 library(ggplot2)
 
-
 shinyServer(function(input, output, session) {
-# ----bfabricShinyModule---- 
+# ----check bfabricShinyModule---- 
   if (require("bfabricShiny")){
     bf <- callModule(bfabric, "bfabric8",
                      applicationid = c(7, 160, 161, 162, 163, 176, 177, 197, 214, 232),
@@ -40,14 +33,18 @@ shinyServer(function(input, output, session) {
   if(exists(".rawDiagfilesystemRoot")){
     filesystemRoot <- .GlobalEnv$.rawDiagfilesystemRoot
   }else{
-    filesystemRoot <- Sys.getenv('HOME')
+    if(dir.exists('/scratch/cpanse')){
+      filesystemRoot <- '/scratch/cpanse'
+    }else{
+      filesystemRoot <- Sys.getenv('HOME')
+    }
   }
   
   filesystemDataDir <- NULL
   if(exists(".rawDiagfilesystemDataDir")){
     filesystemDataDir <- .GlobalEnv$.rawDiagfilesystemDataDir
   }else{
-    filesystemDataDir <- c("Documents", "Downloads")
+    filesystemDataDir <- c("Documents", "Downloads", "WU163230", "WU163763", "autoQC")
   }
   
 
@@ -87,6 +84,8 @@ shinyServer(function(input, output, session) {
                                     plotOutput("charge.state", height = input$graphicsheight))),
       tabPanel("XICs", list(helpText("displays XICs of given masses."), 
                                     plotOutput("xic", height = input$graphicsheight))),
+      tabPanel("QCs", list(helpText("displays quality control plots."), 
+                            plotOutput("qc", height = input$graphicsheight))),
       tabPanel("XICs table", DT::dataTableOutput("tableXICAUC")),
       tabPanel("Raw table", DT::dataTableOutput("table")),
       tabPanel("Raw info", DT::dataTableOutput("tableInfo")),
@@ -249,7 +248,6 @@ shinyServer(function(input, output, session) {
     df
   })
   
-  # ----- rawXICData -------
   
   extractPeak <- function(XIC, fit=TRUE, dt=0.3, minPeaks = 10, ...){
     
@@ -272,81 +270,33 @@ shinyServer(function(input, output, session) {
     rv
   }
   
-  rawXICData  <- reactive({
-    progress <- shiny::Progress$new(session = session, min = 0, max = 1)
-    progress$set(message = paste("extracting XICs"))
-    on.exit(progress$close())
+  .rawXICDataReshape <- function(X, file=NA){
+    df <- queryMass()
+    for (i in 1:length(X)){
+      X[[i]]$mass <- X[[i]]$mass 
+      X[[i]]$sequence <- df$peptide[i]
+      X[[i]]$label <- paste(df$peptide[i], "| z =", df$z[i], '| mZ =', df$mZ[i], sep  = ' ')
+    }
     
+    if(input$XICmainPeak){
+      X <- lapply(X, extractPeak, minPeaks=input$XICnMinPeaks)
+    }
     
-    if (input$source == 'filesystem'){
-      
-      rf <- unique(file.path(values$filesystemRoot, file.path(input$root, input$rawfile)))
-      
-      rv <- plyr::rbind.fill(lapply(rf,
-                                      function(file){ 
-                                        
-                                        X <- readXICs(rawfile = file, 
-                                                 masses = queryMass()$mZ,
-                                                 tol = input$XICtol,
-                                                 mono=input$usemono
-                                                ) 
-                                        df <- queryMass()
-                                        for (i in 1:length(X)){
-                                          X[[i]]$mZ <- X[[i]]$mass 
-                                          X[[i]]$mass <- paste(df$peptide[i], "| z =", df$z[i], '| mZ =', df$mZ[i], sep  = ' ')
-                                        }
-                                        
-                                        if(input$XICmainPeak){
-                                          X <- lapply(X, extractPeak, minPeaks=input$XICnMinPeaks)
-                                        }
-                                          
-                                        Y <- lapply(X, function(x){
-                                          if(length(x$times)>1){
-                                            df <- data.frame(time = x$times, intensity = x$intensities, mZ=rep(x$mZ, length(x$times)), mass=rep(x$mass, length(x$times)));
-                                            return(df)
-                                          }})
-                                        Y <- do.call('rbind', Y)
-                                        Y$filename <- rep(basename(file), nrow(Y))
-                                        as.data.frame(Y)
-                                        }))
-      return(rv)
-    }else if(input$source == 'bfabric'){
-      progress <- shiny::Progress$new(session = session, min = 0, max = 1)
-      progress$set(message = paste("loading XIC data"))
-      on.exit(progress$close())
-      
-      resources <- bf$resources()$relativepath
-      rf <- resources[resources %in% input$relativepath]
-      rf <- file.path("/srv/www/htdocs/", rf)
-      rv <- plyr::rbind.fill(
-        mclapply(rf, function(file){
-          X <- readXICs(rawfile = file, 
-                        masses = queryMass()$mZ,
-                        tol = input$XICtol,
-                        mono=input$usemono
-          ) 
-          df <- queryMass()
-          for (i in 1:length(X)){
-            X[[i]]$mass <- paste(df$peptide[i], "| z =", df$z[i], '| mZ =', df$mZ[i], sep  = ' ')
-          }
-          if(input$XICmainPeak){
-            X <- lapply(X, extractPeak, minPeaks=input$XICnMinPeaks)
-          }
-          Y <- lapply(X, function(x){
-            if(length(x$times)>1){
-              df <- data.frame(time = x$times, intensity = x$intensities, mass=rep(x$mass, length(x$times)));
-              return(df)
-            }})
-          Y <- do.call('rbind', Y)
-          Y$filename <- rep(basename(file), nrow(Y))
-          as.data.frame(Y)
-        }, mc.cores = input$mccores))
-      return(rv)
-    }else{NULL}
+    Y <- lapply(X, function(x){
+      if(length(x$times) > 1){
+        df <- data.frame(sequence = rep(x$sequence, length(x$times)),
+                         time = x$times, 
+                         intensity = x$intensities, 
+                         mass = rep(x$mass, length(x$times)), 
+                         label = rep(x$label, length(x$times)));
+        return(df)
+      }})
     
-  })
-  
-  
+    Y <- do.call('rbind', Y)
+    Y$filename <- rep(basename(file), nrow(Y))
+    as.data.frame(Y)
+  }
+
   extractMainPeak <- function(XIC, plot=FALSE, fit=FALSE, dt=0.3, nmin =10, ...){
     
     intensities.max <- max(XIC$intensities)
@@ -452,12 +402,8 @@ shinyServer(function(input, output, session) {
   })
   
  
-  # ----- rawData -------
+  # ----- read orbitrap metadata -------
   rawData <- eventReactive(input$load, {
-    
-    progress <- shiny::Progress$new(session = session, min = 0, max = 1)
-    progress$set(message = paste("loading MS data"))
-    on.exit(progress$close())
     
     if (input$source == 'filesystem'){
       progress <- shiny::Progress$new(session = session, min = 0, max = 1)
@@ -465,94 +411,127 @@ shinyServer(function(input, output, session) {
       on.exit(progress$close())
       
       rf <- file.path(values$filesystemRoot, file.path(input$root, input$rawfile))
+      rv <- plyr::rbind.fill(lapply(rf, FUN=read.raw,
+                                    mono=input$usemono,
+                                    exe=input$cmd))
       
-      rv <- plyr::rbind.fill(lapply(rf,
-                                      function(file){ 
-                                        read.raw(file,
-                                                 mono=input$usemono, exe=input$cmd) }))
-                                    #  mc.cores = 4))
-      }else if(input$source == 'package'){
+    }else if(input$source == 'package'){
       rv <- NULL
       ne <- new.env()
       data("WU163763", envir=ne)
       rv <- ne[[ls(ne)]]
     }else if(input$source == 'bfabric'){
       progress <- shiny::Progress$new(session = session, min = 0, max = 1)
-      progress$set(message = paste("loading MS data from bfabric storage"))
+      progress$set(message = paste("loading orbitrap metadata from bfabric storage"))
       on.exit(progress$close())
       
       resources <- bf$resources()$relativepath
       rf <- resources[resources %in% input$relativepath]
       rf <- file.path("/srv/www/htdocs/", rf)
       rv <- plyr::rbind.fill(
-        mclapply(rf, function(file){
-          
-          read.raw(file = file,
-                   mono = TRUE)
-        }, mc.cores = 24))
+        mclapply(rf, FUN=read.raw, mono = TRUE , mc.cores = input$mccores))
     }else{rv <- NULL}
     
     rv
   })
-  
-  
-.promega.extract.maxpeak <- function(x){
-  P <-(do.call('rbind', lapply(getPromega6x5mix(), function(y){
-    data.frame(abundance=y$abundance, mZ=y$mp2h2p, sequence=y$sequence)})))
-  M <-merge(x, P, by='mZ')
-  df <- do.call('rbind', lapply(unique(M$filename), function(f){
-    do.call('rbind', lapply(unique(M$sequence), function(z){
-      X <- M[M$filename == f & M$sequence==z & M$abundance==1, ]
-      t.max<-X$time[X$intensity==max(X$intensity)]; 
-      do.call('rbind', lapply(unique(M$abundance), function(abundance){
-        XX <- M[M$filename == f & M$sequence==z & M$abundance==abundance & (t.max - 1) < M$time & M$time < (t.max + 1),]
-        XX[which(XX$intensity == max(XX$intensity)),]
+
+  #  -------  read orbitrap XIC data  ---------
+  rawXICData  <- reactive({
+    progress <- shiny::Progress$new(session = session, min = 0, max = 1)
+    progress$set(message = paste("extracting XICs"))
+    on.exit(progress$close())
+    
+    if (input$source == 'filesystem'){
+      rf <- unique(file.path(values$filesystemRoot, file.path(input$root, input$rawfile)))
+      rv <- plyr::rbind.fill(lapply(rf, function(file){ 
+        X <- readXICs(rawfile = file, 
+                      masses = queryMass()$mZ,
+                      tol = input$XICtol,
+                      mono=input$usemono
+        ) 
+        .rawXICDataReshape(X, file)
       }))
-    }))}))
-   df
-}
-  
-PlotXIC <- function(x, method = 'trellis'){
-  if (input$XICpepitdes == 'promega'  & require(lattice)){
-    df<-.promega.extract.maxpeak(x)
-    sequenceSSRC <- factor(df$sequence, levels= names(sort(ssrc(as.character(unique(df$sequence))))))
-    
-    lp <- xyplot(log(intensity,10) ~ log(abundance,10) | sequenceSSRC * substr(filename,1,18), 
-           data=df,
-           asp=1,
-           panel=function(x,y,...){
-            tryCatch({
-              flm <- lm(y ~ x)
-              panel.abline(flm)
-              #print(flm$coefficients)
-            } )
-            panel.xyplot(x,y,...)
-           })
-      return (lp)
-  }
-  
-    #x$fmass <- as.factor(x$mass)
-    figure <- ggplot(x, aes_string(x = "time", y = "intensity")) +
-      #geom_segment() +
-      geom_line(stat='identity', size = 1, aes_string(group = "filename", colour = "filename")) +
+      return(rv)
+    }else if(input$source == 'bfabric'){
+      progress <- shiny::Progress$new(session = session, min = 0, max = 1)
+      progress$set(message = paste("loading XIC data"))
+      on.exit(progress$close())
       
-      #scale_x_continuous(breaks = scales::pretty_breaks(8)) +
-      #scale_y_continuous(breaks = scales::pretty_breaks(8)) +
-      labs(title = "XIC plot") +
-      labs(subtitle = "Plotting XIC intensity against retention time") +
-      labs(x = "Retention Time [min]", y = "Intensity Counts [arb. unit]") +
-      theme_light()
-    
-    
-    if(input$XICmainPeak){
-      figure <- figure + facet_wrap(~  x$mass  , scales = "free", ncol = 1) 
-    }else{
-      figure <- figure + facet_wrap(~  x$mass  , ncol = 1) 
-    }
-    return(figure)
-  }
+      resources <- bf$resources()$relativepath
+      rf <- resources[resources %in% input$relativepath]
+      rf <- file.path("/srv/www/htdocs/", rf)
+      rv <- plyr::rbind.fill(mclapply(rf, function(file){
+        X <- readXICs(rawfile = file, 
+                      masses = queryMass()$mZ,
+                      tol = input$XICtol,
+                      mono=input$usemono
+        ) 
+        .rawXICDataReshape(X, file)
+      }, 
+      mc.cores = input$mccores))
+      return(rv)
+    }else{NULL}
+  })
   
-#---- XIC ----
+  
+PlotQCs <- function(x){
+  message("plotQCs")
+  if (input$XICpepitdes == 'promega' & require(lattice)){
+ 
+    df <- rawDiag:::.promega.extract.maxpeak(x)
+   
+    #sequenceSSRC <- factor(df$sequence, levels= names(sort(ssrc(as.character(unique(df$sequence))))))
+    
+    lp <- xyplot(log(intensity,10) ~ log(abundance,10) | sequence * substr(filename,1,18), 
+                 data=df,
+                 asp=1,
+                 panel=function(x,y,...){
+                   tryCatch({
+                     flm <- lm(y ~ x)
+                     panel.abline(flm)
+                     #print(flm$coefficients)
+                   } )
+                   panel.xyplot(x,y,...)
+                 })
+    return (lp)
+  }else{
+    return(helpText("not supported yet."))
+  }
+}
+
+PlotXIC <- function(x, method = 'trellis'){
+  #message('write RData')
+  #save(x, file='/tmp/x.RData')
+  
+  x$label <- factor(x$label, levels=levels(x$label)[order(sapply(levels(x$label), function(l){ssrc(strsplit(l, " ")[[1]][1])}))])
+  
+  figure <- ggplot(x, aes_string(x = "time", y = "intensity")) +
+    geom_line(stat='identity', size = 1, aes_string(group = "filename", colour = "filename")) +
+    scale_x_continuous(limits =range(x$time)) +
+    labs(title = "XIC plot") +
+    labs(subtitle = "Plotting XIC intensity against retention time. Facets are ordered by SSRC.") +
+    labs(x = "Retention Time [min]", y = "Intensity Counts [arb. unit]") +
+    theme_light()
+  
+  figure <- figure + facet_wrap(~  x$label, ncol = 1,  scales = "free") 
+  
+  return(figure)
+}
+
+#---- output qc ----
+output$qc <- renderPlot({
+  
+  progress <- shiny::Progress$new(session = session, min = 0, max = 1)
+  progress$set(message = "plotting", detail = "QCs")
+  on.exit(progress$close())
+ 
+  if (nrow(rawXICData()) > 0){
+    values$gp <- PlotQCs(rawXICData())
+    values$gp
+  }
+})
+
+#---- output xic ----
   output$xic <- renderPlot({
     
     progress <- shiny::Progress$new(session = session, min = 0, max = 1)
@@ -717,15 +696,13 @@ PlotXIC <- function(x, method = 'trellis'){
     }
   })
   
-  
   #---- XIC ----
   output$xic <- renderPlot({
+    progress <- shiny::Progress$new(session = session, min = 0, max = 1)
+    progress$set(message = "plotting", detail = "XICs")
+    on.exit(progress$close())
+    
     if (nrow(rawXICData()) > 0){
-      
-      progress <- shiny::Progress$new(session = session, min = 0, max = 1)
-      progress$set(message = "plotting", detail = "XICs")
-      on.exit(progress$close())
-      
       values$gp <- PlotXIC(rawXICData(), method = input$plottype)
       values$gp
     }
@@ -735,7 +712,6 @@ PlotXIC <- function(x, method = 'trellis'){
     rawData()
   })
   
-  
   output$tableInfo <- DT::renderDataTable({
    rawDataInfo()
   })
@@ -743,7 +719,7 @@ PlotXIC <- function(x, method = 'trellis'){
 #------- XIC table  ------
   output$tableXICAUC <- DT::renderDataTable({
     if (input$XICpepitdes == 'promega'){
-      .promega.extract.maxpeak(rawXICData())
+      rawDiag:::.promega.extract.maxpeak(rawXICData())
     }else{
       rawXICAUCData()
     }

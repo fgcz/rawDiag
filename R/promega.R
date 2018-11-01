@@ -1,5 +1,33 @@
 #R
 
+.promega.extract.maxpeak <- function(x){
+  P <- (do.call('rbind', lapply(getPromega6x5mix(), function(y){
+    data.frame(abundance=y$abundance, mZ=y$mp2h2p, sequence=y$sequence)})))
+  M <- merge(x, P, by.x=c('mass', 'sequence'), by.y=c('mZ', 'sequence'))
+  
+  df <- do.call('rbind', lapply(unique(M$filename), function(f){
+    do.call('rbind', lapply(unique(M$sequence), function(z){
+      X <- M[M$filename == f & M$sequence == z & M$abundance == 1, ]
+      
+      if (length(X$intensity) == 0){return(NULL)}
+      intensity.max <- max(X$intensity, na.rm = TRUE)
+      
+      t.max <- X$time[X$intensity == intensity.max]; 
+      
+      do.call('rbind', lapply(unique(M$abundance), function(abundance){
+        XX <- M[M$filename == f & 
+                  M$sequence == z & 
+                  M$abundance == abundance & (t.max - 1) < M$time & 
+                  M$time < (t.max + 1), ]
+        if(nrow(XX)==0){return(NULL)}
+        XX[which(XX$intensity == max(XX$intensity, na.rm = TRUE)),]
+        
+      }))
+    }))
+  }))
+  df$sequence <- factor(df$sequence, levels= names(sort(ssrc(as.character(unique(df$sequence))))))
+  df
+}
 
 .promega6x5mix.sanity.check <- function(x, iontol = 0.01){
     stopifnot(!is.null(x))

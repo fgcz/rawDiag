@@ -53,6 +53,8 @@ browseVignettes('rawDiag')
 the documentation of the function is available through the R man pages.
 
 ## 3. Useful links
+  
+- [github.com/fgcz/rawDiag](https://github.com/fgcz/rawDiag)
 - [reading XIC and Scan information](http://fgcz-ms.uzh.ch/~cpanse/rawDiagXICdemo.pdf)
 - http://planetorbitrap.com/rawfilereader
 - [screen recording (3:02 minutes, size 47MB, no audio track)](http://fgcz-ms.uzh.ch/~cpanse/PAPERS/pr-2018-001736.mov)
