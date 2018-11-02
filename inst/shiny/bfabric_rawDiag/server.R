@@ -473,7 +473,33 @@ shinyServer(function(input, output, session) {
     }else{NULL}
   })
   
-  
+  .iRT.extract.maxpeak <- function(x){
+    df <- do.call('rbind', lapply(unique(x$filename), function(f){
+      do.call('rbind', lapply(unique(x$sequence), function(s){
+        if(nrow(XIC)>0){
+        XIC <- x[x$filename == f & x$sequence == s, ]
+        t <-  XIC$time[XIC$intensity == max(XIC$intensity)][1]
+        data.frame(t=t, peptide =s, filename=f)}else{NULL}
+      }))
+    }))
+    merge(iRTpeptides, df, by='peptide')
+  }
+
+  panel.flm <- function(x, y, ...){
+    tryCatch({
+      
+      flm <- lm(y ~ x)
+      panel.abline(flm)
+      #message(flm$coefficients)
+      
+      panel.text(median(x), flm$coefficients[1], 
+                 toString(round(c(flm$coefficients, summary(flm)$r.squared), 2)),
+                 cex=0.95)
+    } )
+    panel.rug(x = x[is.na(y)],
+              y = y[is.na(x)])
+    panel.xyplot(x,y,...)
+  }
 PlotQCs <- function(x){
   message("plotQCs")
   if (input$XICpepitdes == 'promega' & require(lattice)){
@@ -485,17 +511,20 @@ PlotQCs <- function(x){
     lp <- xyplot(log(intensity,10) ~ log(abundance,10) | sequence * substr(filename,1,18), 
                  data=df,
                  asp=1,
-                 panel=function(x,y,...){
-                   tryCatch({
-                     flm <- lm(y ~ x)
-                     panel.abline(flm)
-                     #print(flm$coefficients)
-                   } )
-                   panel.xyplot(x,y,...)
-                 })
+                 panel=panel.flm)
+    return (lp)
+  }else if(input$XICpepitdes == 'iRT' & require(lattice)){
+ 
+    df <- .iRT.extract.maxpeak(x)
+    lp <- xyplot(t ~ rt | filename,
+                 data=df,
+                 asp=1,
+                 xlab='iRT score',
+                 ylab='retention time [minutes]',
+                 panel=panel.flm)
     return (lp)
   }else{
-    return(helpText("not supported yet."))
+    plot(0,0, ,type='n'); text(0,0,"not supported yet.",cex=6)
   }
 }
 
