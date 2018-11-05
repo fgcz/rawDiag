@@ -476,8 +476,9 @@ shinyServer(function(input, output, session) {
   .iRT.extract.maxpeak <- function(x){
     df <- do.call('rbind', lapply(unique(x$filename), function(f){
       do.call('rbind', lapply(unique(x$sequence), function(s){
-        if(nrow(XIC)>0){
         XIC <- x[x$filename == f & x$sequence == s, ]
+        if(nrow(XIC)>0){
+        
         t <-  XIC$time[XIC$intensity == max(XIC$intensity)][1]
         data.frame(t=t, peptide =s, filename=f)}else{NULL}
       }))
@@ -491,9 +492,11 @@ shinyServer(function(input, output, session) {
       flm <- lm(y ~ x)
       panel.abline(flm)
       #message(flm$coefficients)
-      
-      panel.text(median(x), flm$coefficients[1], 
-                 toString(round(c(flm$coefficients, summary(flm)$r.squared), 2)),
+      #toString(round(c(flm$coefficients, summary(flm)$r.squared), 2)),
+      L <- round(c(flm$coefficients, summary(flm)$r.squared), 2)
+      panel.text(median(x), quantile(y, .9), 
+                 paste(c(bquote(y== .(as.numeric(L[2]))*x - .(as.numeric(L[1]))), bquote(R^2==.(as.numeric(L[3])))), collapse = '; '),
+               
                  cex=0.95)
     } )
     panel.rug(x = x[is.na(y)],
