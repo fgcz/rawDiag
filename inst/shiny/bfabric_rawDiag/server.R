@@ -26,6 +26,7 @@ shinyServer(function(input, output, session) {
   
 # ----Configuration---- 
   filesystemRoot <- NULL
+  bfabricStorageRoot <- '/srv/www/htdocs/'
   
   message(.GlobalEnv$.rawDiagfilesystemRoot)
   message(.GlobalEnv$.rawDiagfilesystemDataDir)
@@ -170,7 +171,7 @@ shinyServer(function(input, output, session) {
   output$XICParameter <- renderUI({
     if(input$source  %in% c('bfabric', 'filesystem'))
     {
-      peptideGroup <- c("iRT", "glyco", "msqc1", "promega")
+      peptideGroup <- c("iRT", "glyco", "msqc1", "promega_6x5")
       tagList(h3("XIC Options"),
               selectInput('XICpepitdes', 'peptides:', peptideGroup,
                           multiple = FALSE),
@@ -222,7 +223,7 @@ shinyServer(function(input, output, session) {
       df <- data.frame(peptide = peptideSeq, z = 2)
       df$mZ <- (parentIonMass(as.character(df$peptide)) + 1.008) /  df$z
       
-    }else if (input$XICpepitdes == 'promega'){
+    }else if (input$XICpepitdes == 'promega_6x5'){
       S <- getPromega6x5mix()
       df <- data.frame(peptide=sapply(S, function(x){x$sequence}),
         mZ=sapply(S, function(x){x$mp2h2p}))
@@ -270,8 +271,8 @@ shinyServer(function(input, output, session) {
     rv
   }
   
-  .rawXICDataReshape <- function(X, file=NA){
-    df <- queryMass()
+  .rawXICDataReshape <- function(X, file=NA, df=NA, XICmainPeak=TRUE){
+    
     for (i in 1:length(X)){
       X[[i]]$mass <- X[[i]]$mass 
       X[[i]]$sequence <- df$peptide[i]
@@ -427,7 +428,7 @@ shinyServer(function(input, output, session) {
       
       resources <- bf$resources()$relativepath
       rf <- resources[resources %in% input$relativepath]
-      rf <- file.path("/srv/www/htdocs/", rf)
+      rf <- file.path(bfabricStorageRoot, rf)
       rv <- plyr::rbind.fill(
         mclapply(rf, FUN=read.raw, mono = TRUE , mc.cores = input$mccores))
     }else{rv <- NULL}
@@ -441,15 +442,24 @@ shinyServer(function(input, output, session) {
     progress$set(message = paste("extracting XICs"))
     on.exit(progress$close())
     
+    
+    # since R 3.5.1 Reactive context was created in one process and accessed from another
+    masses <- queryMass()$mZ
+    tol <- input$XICtol
+    mono <- input$usemono
+    df <- queryMass()
+    XICmainPeak <- input$XICmainPeak
+    
     if (input$source == 'filesystem'){
       rf <- unique(file.path(values$filesystemRoot, file.path(input$root, input$rawfile)))
-      rv <- plyr::rbind.fill(lapply(rf, function(file){ 
+    
+      rv <- plyr::rbind.fill( lapply(rf, function(file){ 
         X <- readXICs(rawfile = file, 
-                      masses = queryMass()$mZ,
-                      tol = input$XICtol,
-                      mono=input$usemono
+                      masses = masses,
+                      tol = tol,
+                      mono=mono
         ) 
-        .rawXICDataReshape(X, file)
+        .rawXICDataReshape(X, file, df=df, XICmainPeak=XICmainPeak)
       }))
       return(rv)
     }else if(input$source == 'bfabric'){
@@ -459,14 +469,15 @@ shinyServer(function(input, output, session) {
       
       resources <- bf$resources()$relativepath
       rf <- resources[resources %in% input$relativepath]
-      rf <- file.path("/srv/www/htdocs/", rf)
+      rf <- file.path(bfabricStorageRoot, rf)
+
       rv <- plyr::rbind.fill(mclapply(rf, function(file){
         X <- readXICs(rawfile = file, 
-                      masses = queryMass()$mZ,
-                      tol = input$XICtol,
-                      mono=input$usemono
+                      masses = masses,
+                      tol = tol,
+                      mono=mono
         ) 
-        .rawXICDataReshape(X, file)
+        .rawXICDataReshape(X, file, df=df, XICmainPeak=XICmainPeak)
       }, 
       mc.cores = input$mccores))
       return(rv)
@@ -505,7 +516,7 @@ shinyServer(function(input, output, session) {
   }
 PlotQCs <- function(x){
   message("plotQCs")
-  if (input$XICpepitdes == 'promega' & require(lattice)){
+  if (input$XICpepitdes == 'promega_6x5' & require(lattice)){
  
     df <- rawDiag:::.promega.extract.maxpeak(x)
    
@@ -750,7 +761,7 @@ output$qc <- renderPlot({
   
 #------- XIC table  ------
   output$tableXICAUC <- DT::renderDataTable({
-    if (input$XICpepitdes == 'promega'){
+    if (input$XICpepitdes == 'promega_6x5'){
       rawDiag:::.promega.extract.maxpeak(rawXICData())
     }else{
       rawXICAUCData()
