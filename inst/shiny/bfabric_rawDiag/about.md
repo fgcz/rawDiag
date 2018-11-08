@@ -1,4 +1,4 @@
-# **rawDiag** 
+# **About rawDiag** 
 
 versionInfo
 
@@ -60,10 +60,4 @@ If you distribute this Software to others, you agree to:
 5.9. Use, duplication or disclosure of this Software by the U.S. Government is subject to the restricted rights applicable to commercial computer software (under FAR 52.227019 and DFARS 252.227-7013 or parallel regulations). The manufacturer for this purpose is Thermo Finnigan LLC, 355 River Oaks Parkway, San Jose, California 95134, U.S.A.
 
 ---
-
-# **References**
-
-Christian Trachsel, Christian Panse, Tobias Kockmann, Witold Eryk Wolski, Jonas Grossmann, Ralph Schlapbach
-*rawDiag - an R package supporting rational LC-MS method optimization for bottom-up proteomics*
-, JPR 17(8), 2018, [DOI:10.1021/acs.jproteome.8b00173](https://doi.org/10.1101/304485).
 
