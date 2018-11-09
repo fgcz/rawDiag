@@ -90,7 +90,9 @@ shinyServer(function(input, output, session) {
       tabPanel("XICs table", DT::dataTableOutput("tableXICAUC")),
       tabPanel("Raw table", DT::dataTableOutput("table")),
       tabPanel("Raw info", DT::dataTableOutput("tableInfo")),
-      tabPanel("ABOUT", includeMarkdown("about.md")),
+      tabPanel("ABOUT", list(titlePanel(paste("About rawDiag - Diagnostic Plots for Mass Spectrometry Data", "version", packageVersion('rawDiag'))), 
+                             includeMarkdown("about.md"))),
+      tabPanel("HELP", includeMarkdown("help.md")),
       #sessionInfo
       tabPanel("sessionInfo", verbatimTextOutput("sessionInfo"))
       

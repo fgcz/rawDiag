@@ -1,7 +1,3 @@
-# **About rawDiag** 
-
-versionInfo
-
 rawDiag includes the following third party software components:
 
 RawFileReader reading tool. Copyright © 2016 by Thermo Fisher Scientific, Inc. All rights reserved.

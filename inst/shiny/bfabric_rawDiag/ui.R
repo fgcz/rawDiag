@@ -22,7 +22,7 @@ if (!require("bfabricShiny")){
 shinyUI(fluidPage(
   
   # Application title
-  titlePanel(paste("rawDiag - Diagnostic Plots for Mass Spectrometry Data", "version", packageVersion('rawDiag'))),
+  #titlePanel(paste("rawDiag - Diagnostic Plots for Mass Spectrometry Data", "version", packageVersion('rawDiag'))),
   
   # Sidebar with a slider input for number of bins 
   sidebarLayout(
