@@ -24,6 +24,7 @@ shinyServer(function(input, output, session) {
                      resourcemultiple = TRUE)
   }
   
+  autoInvalidate <- reactiveTimer(2000)
 # ----Configuration---- 
   filesystemRoot <- NULL
   bfabricStorageRoot <- '/srv/www/htdocs/'
@@ -62,6 +63,8 @@ shinyServer(function(input, output, session) {
   
 # ----tabsetPanel ----
     tabsetPanel(
+      tabPanel("Help", list(titlePanel(paste("Help rawDiag - Diagnostic Plots for Mass Spectrometry Data", "version", packageVersion('rawDiag'))), 
+                             includeMarkdown("help.md"))),
       tabPanel("TIC/Basepeak", list(helpText("displays the total ion  chromatogram (TIC) and the base peak chromatogram."),
                                     plotOutput("tic.basepeak", height = input$graphicsheight))),
       tabPanel("Scan Frequency", list(helpText("graphs scan frequency versus RT or scan frequency marginal distribution for violin."),
@@ -90,11 +93,10 @@ shinyServer(function(input, output, session) {
       tabPanel("XICs table", DT::dataTableOutput("tableXICAUC")),
       tabPanel("Raw table", DT::dataTableOutput("table")),
       tabPanel("Raw info", DT::dataTableOutput("tableInfo")),
-      tabPanel("ABOUT", list(titlePanel(paste("About rawDiag - Diagnostic Plots for Mass Spectrometry Data", "version", packageVersion('rawDiag'))), 
+    
+      tabPanel("About", list(titlePanel(paste("About rawDiag - Diagnostic Plots for Mass Spectrometry Data", "version", packageVersion('rawDiag'))), 
                              includeMarkdown("about.md"))),
-      tabPanel("HELP", includeMarkdown("help.md")),
-      #sessionInfo
-      tabPanel("sessionInfo", verbatimTextOutput("sessionInfo"))
+      tabPanel("Session Info", verbatimTextOutput("sessionInfo"))
       
     )
   })
@@ -110,6 +112,7 @@ shinyServer(function(input, output, session) {
   
   
   output$rawfile <- renderUI({
+    #autoInvalidate()
     if(length(getRawfiles()) > 0){
     selectInput('rawfile', 'rawfile:', getRawfiles(), multiple = TRUE)
     }else{
@@ -119,6 +122,7 @@ shinyServer(function(input, output, session) {
   
 # ----Source----  
   output$sourceFilesystem <- renderUI({
+    
     if (input$source == 'filesystem'){
       tagList(
         #helpText('define rawDiagfilesystemRoot in your Rprofile'),
@@ -177,7 +181,8 @@ shinyServer(function(input, output, session) {
       tagList(h3("XIC Options"),
               selectInput('XICpepitdes', 'peptides:', peptideGroup,
                           multiple = FALSE),
-              selectInput('XICtol', 'tolerance in ppm:', c(10, 15, 20, 50, 100),
+              selectInput('XICtol', 'tolerance in ppm:', c(2, 5, 10, 15, 20, 50, 100),
+	      		  selected=10,
                           multiple = FALSE),
               checkboxInput('XICmainPeak', 'extract main peak',
                             value = FALSE, width = NULL),
@@ -207,6 +212,7 @@ shinyServer(function(input, output, session) {
   })
   
   queryMass <- reactive({
+    message("DEBUG queryMass")
     df <- data.frame()
     if (input$XICpepitdes == 'glyco'){
       df <- data.frame(peptide = c('IgG1_EEQYNSTYR_G0F', 'IgG1_EEQYNSTYR_G1F',
@@ -440,11 +446,11 @@ shinyServer(function(input, output, session) {
 
   #  -------  read orbitrap XIC data  ---------
   rawXICData  <- reactive({
+    
     progress <- shiny::Progress$new(session = session, min = 0, max = 1)
     progress$set(message = paste("extracting XICs"))
     on.exit(progress$close())
-    
-    
+
     # since R 3.5.1 Reactive context was created in one process and accessed from another
     masses <- queryMass()$mZ
     tol <- input$XICtol
@@ -516,12 +522,34 @@ shinyServer(function(input, output, session) {
               y = y[is.na(x)])
     panel.xyplot(x,y,...)
   }
+  
+  lm_eqn <- function(df){
+    m <- lm(t ~ rt, df);
+    eq <- substitute(italic(y) == a + b %.% italic(x)*","~~italic(r)^2~"="~r2, 
+                     list(a = format(coef(m)[1], digits = 2), 
+                          b = format(coef(m)[2], digits = 2), 
+                          r2 = format(summary(m)$r.squared, digits = 3)))
+    as.character(as.expression(eq));                 
+  }
+  
+  lm_eqn_promega <- function(df){
+    m <- lm( log(intensity,10) ~ log(abundance,10), df);
+    eq <- substitute(italic(y) == a + b %.% italic(x)*","~~italic(r)^2~"="~r2, 
+                     list(a = format(coef(m)[1], digits = 2), 
+                          b = format(coef(m)[2], digits = 2), 
+                          r2 = format(summary(m)$r.squared, digits = 3)))
+    as.character(as.expression(eq));                 
+  }
+  
+  
 PlotQCs <- function(x){
+  cbbPalette <- c("#000000", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
+
   message("plotQCs")
   if (input$XICpepitdes == 'promega_6x5' & require(lattice)){
- 
+    
     df <- rawDiag:::.promega.extract.maxpeak(x)
-   
+    
     #sequenceSSRC <- factor(df$sequence, levels= names(sort(ssrc(as.character(unique(df$sequence))))))
     
     lp <- xyplot(log(intensity,10) ~ log(abundance,10) | sequence * substr(filename,1,18), 
@@ -530,8 +558,9 @@ PlotQCs <- function(x){
                  panel=panel.flm)
     return (lp)
   }else if(input$XICpepitdes == 'iRT' & require(lattice)){
- 
+   
     df <- .iRT.extract.maxpeak(x)
+    if (input$plottype == "trellis") {
     lp <- xyplot(t ~ rt | filename,
                  data=df,
                  asp=1,
@@ -539,9 +568,19 @@ PlotQCs <- function(x){
                  ylab='retention time [minutes]',
                  panel=panel.flm)
     return (lp)
+    }else{
+      lp <- xyplot(t ~ rt,
+                   group=filename,
+                   data=df,
+                   asp=1,
+                   xlab='iRT score',
+                   ylab='retention time [minutes]',
+                   panel=panel.flm)
+    }
   }else{
     plot(0,0, ,type='n'); text(0,0,"not supported yet.",cex=6)
   }
+
 }
 
 PlotXIC <- function(x, method = 'trellis'){
@@ -565,7 +604,8 @@ PlotXIC <- function(x, method = 'trellis'){
 
 #---- output qc ----
 output$qc <- renderPlot({
-  
+  # invalidateLater(2000)
+  message("DEBUG renderPlot")
   progress <- shiny::Progress$new(session = session, min = 0, max = 1)
   progress$set(message = "plotting", detail = "QCs")
   on.exit(progress$close())

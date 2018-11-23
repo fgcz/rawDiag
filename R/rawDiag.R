@@ -1383,7 +1383,7 @@ PlotCycleLoad <- function(x, method = 'trellis'){ #old name ms2.distribution
       scale_x_continuous(breaks = scales::pretty_breaks(8)) +
       coord_cartesian(ylim = c(0, max(res$n)+1)) +
       labs(title = "Time resolved number of MS2 scans") +
-      labs(subtitle = "Plotting the number of MS2 per MS1 scan versus retention time") +
+      labs(subtitle = "Plotting the number of MS2 per MS1 scan versus retention time. The deepskyblue colored loess curve shows the trend.") +
       labs(x = "Retention Time [min]", y = "Number of MS2 per MS1 [counts]") +
       theme_light()
     return(figure)
@@ -1458,7 +1458,7 @@ PlotScanFrequency <- function(x, method = 'trellis'){
       scale_y_continuous(breaks = scales::pretty_breaks(8))+
       labs(title = "MS2 Scan Frequency Plot") +
       labs(subtitle = "Plotting number of MS2 per second against retention time") +
-      labs(x = "Retention Time [min]", y = "MS2 frequency [Hz]") +
+      labs(x = "Retention Time [min]", y = "Scan Frequency [Hz]") +
       theme_light() 
     return(figure)  
     
@@ -1513,6 +1513,7 @@ PlotPrecursorHeatmap <- function(x, method = 'overlay', bins = 80){
     dplyr::filter_at(vars("MSOrder"), any_vars(. == "Ms2"))
   
   gp <- ggplot(res, aes_string(x = 'StartTime', y = 'PrecursorMass')) + 
+    labs(x = "Retention Time [min]", y = "Precursor Mass [Da]") +
     geom_hex(bins = bins) + 
     scale_fill_gradientn(colours = colorvector) + 
     scale_x_continuous(breaks = scales::pretty_breaks(8)) + 
@@ -1542,6 +1543,7 @@ PlotMassHeatmap <- function(x, method='trellis', bins = 80){ #rename to mass.hea
     dplyr::filter_at(vars("deconv"), any_vars(. <= 10000))
   
   gp <- ggplot(res, aes_string(x = 'StartTime', y = 'deconv')) + 
+    labs(x = "Retention Time [min]", y = "Mass [Da]") +
     geom_hex(bins = bins ) +
     scale_fill_gradientn(colours = colorvector) +
     scale_x_continuous(breaks = scales::pretty_breaks(8)) + 

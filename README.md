@@ -137,7 +137,7 @@ dim(RAW)
 ### 3.4. FAQ
 
 
-#### I would like to load multiple files into a single `data.frame` to do comparisons; what is the preferred method for doing so? 
+#### 3.4.1. I would like to load multiple files into a single `data.frame` to do comparisons; what is the preferred method for doing so?
 
 ```{r}
 library(parallel)
@@ -153,6 +153,35 @@ RAW <- mclapply(rawFileNames, read.raw, mc.cores=4)
 # concatenate the list data.frames into one single one
 RAW <- plyr::rbind.fill(RAW)
 ```
+
+run the rawDiag shiny application
+
+```{r}
+library(rawDiag)
+
+# root defines where your raw files are
+rawDiagShiny(root="D:/Data2San/")
+```
+
+
+#### 3.4.2. Can I run the rawDiag shiny code as a stand-alone application.
+
+Yes, on Microsoft's system call (`cmd.exe`)
+```
+"c:\Program Files\R\R-3.5.1\bin\R.exe" -e "library(rawDiag); rawDiagShiny(root='D:/Data2San', launch.browser=TRUE)"
+```
+
+using Linux and Apple systems use the `Terminal` application and type
+
+```{bash}
+R -e "library(rawDiag); rawDiagShiny(root='$HOME/Downloads', launch.browser=TRUE)"
+```
+
+and you can add it to you `$HOME/.bashrc`
+```
+alias rawDiag="R -e \"library(rawDiag); rawDiagShiny(root='$HOME/Downloads', launch.browser=TRUE)\""
+```
+
 
 ## 4. Instructions for use
 
