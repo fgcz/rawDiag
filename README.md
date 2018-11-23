@@ -166,18 +166,17 @@ rawDiagShiny(root="D:/Data2San/")
 
 #### 3.4.2. Can I run the rawDiag shiny code as a stand-alone application?
 
-Yes, on Microsoft's system call (`cmd.exe`)
+Yes, on Microsoft's system call (using `cmd.exe`)
 ```
 "c:\Program Files\R\R-3.5.1\bin\R.exe" -e "library(rawDiag); rawDiagShiny(root='D:/Data2San', launch.browser=TRUE)"
 ```
 
 using Linux and Apple systems use the `Terminal` application and type
-
 ```{bash}
 R -e "library(rawDiag); rawDiagShiny(root='$HOME/Downloads', launch.browser=TRUE)"
 ```
 
-and you can add it to you `$HOME/.bashrc`
+and you can add to your alias file, e.g., `$HOME/.bashrc`
 ```
 alias rawDiag="R -e \"library(rawDiag); rawDiagShiny(root='$HOME/Downloads', launch.browser=TRUE)\""
 ```
