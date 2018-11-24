@@ -170,7 +170,7 @@ Yes, on Microsoft's system call (through using `cmd.exe`)
 ```
 "c:\Program Files\R\R-3.5.1\bin\R.exe" -e "library(rawDiag); rawDiagShiny(root='D:/Downloads', launch.browser=TRUE)"
 ```
-expecting the raw file in the `Downloads` folder.
+expecting the raw files in the `Downloads` folder.
 
 using Linux and Apple systems use the `Terminal` application and type
 ```{bash}
