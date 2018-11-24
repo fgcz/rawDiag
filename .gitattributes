@@ -1,3 +1,4 @@
 * linguist-vendored
 *.cs linguist-vendored=false
+R/rawDiag.R linguist-vendored=false
 *sh
