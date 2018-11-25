@@ -166,7 +166,7 @@ rawDiagShiny(root="D:/Data2San/")
 
 #### 3.4.2. Can I run the rawDiag shiny code as a stand-alone application?
 
-Yes, on Microsoft's system call (through using `cmd.exe`)
+Yes, on Microsoft's systems call (through using `cmd.exe`)
 ```
 "c:\Program Files\R\R-3.5.1\bin\R.exe" -e "library(rawDiag); rawDiagShiny(root='D:/Downloads', launch.browser=TRUE)"
 ```
