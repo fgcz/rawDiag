@@ -166,10 +166,11 @@ rawDiagShiny(root="D:/Data2San/")
 
 #### 3.4.2. Can I run the rawDiag shiny code as a stand-alone application?
 
-Yes, on Microsoft's system call (using `cmd.exe`)
+Yes, on Microsoft's systems call (through using `cmd.exe`)
 ```
-"c:\Program Files\R\R-3.5.1\bin\R.exe" -e "library(rawDiag); rawDiagShiny(root='D:/Data2San', launch.browser=TRUE)"
+"c:\Program Files\R\R-3.5.1\bin\R.exe" -e "library(rawDiag); rawDiagShiny(root='D:/Downloads', launch.browser=TRUE)"
 ```
+expecting the raw files in the `Downloads` folder.
 
 using Linux and Apple systems use the `Terminal` application and type
 ```{bash}
@@ -190,7 +191,7 @@ read the vignettes.
 browseVignettes('rawDiag')
 ```
 
-the documentation of the function is available through the R man pages.
+the documentation of the functions is available through the R man pages.
 
 ## 5. Useful bookmarks
 - http://planetorbitrap.com/rawfilereader
