@@ -1,0 +1,609 @@
+\documentclass[aspectratio=169]{beamer}
+% \documentclass[]{beamer}
+\usepackage{Sweave}
+\usepackage{graphics}
+\usepackage{xcolor}
+\usepackage{fancyvrb,graphicx}
+\usepackage{ulem}
+\usepackage{hyperref}
+\usepackage{colortbl}
+
+\setbeamertemplate{footline}[frame number]
+\beamertemplatenavigationsymbolsempty
+\institute{Functional Genomics Center Zurich ETHZ\texttt{|}UZH}
+\title{rawDiag: access orbitrap data on the fast lane}
+\institute 
+{
+Functional Genomics Center Zurich, ETHZ\texttt{|}UZH
+}
+
+\author{Tobias Kockmann \and \textbf{Christian Panse} \and Christian Trachsel }
+\date{\href{https://bioconductor.github.io/EuroBioc2018/}{European Biocondutor Meeting, Munich}, Thu 6 Dec 2018  15:45\\\vspace{0.75cm}\includegraphics[height=0.2\columnwidth, keepaspectratio]{graphics/octopussy_.pdf}}
+
+%\usepackage{helvet}
+\usefonttheme{professionalfonts}
+\begin{document}
+
+%\setbeamertemplate{footline}{\url{https://github.com/fgcz/rawDiag}}
+%\SweaveOpts{concordance=TRUE}
+
+\SweaveOpts{prefix.string = graphics/rawDiag, eval = TRUE, concordance=TRUE}
+
+\begin{frame}[plain, noframenumbering]
+  \titlepage
+\end{frame}
+
+<<echo=FALSE>>=
+options(prompt = "R> ", continue = "+  ", width = 60, useFancyQuotes = FALSE, warn = -1)
+source("bioc2018.R")
+@
+
+\section{FGCZ specs}
+{
+\usebackgroundtemplate{\includegraphics[width=1.1\paperwidth, height=1.0\paperheight]{graphics/rawDiag-bg.pdf}}
+\begin{frame}
+
+\frametitle{Functional Genomcis Center Zurich (FGCZ)}
+
+%\begin{columns}
+%\begin{column}{width=0.8\textwidth}
+\begin{itemize}
+\item Joined core facility of ETH\texttt{|}UZH; exists since 2002; location lat: 47N long: 008E 
+\item Omics areas: Genomics, Transcriptomics, Metabolomics, \textbf{Proteomics}
+\item 40 employees (staff scientists, technology experts, analysts)
+\item LC-MS instruments: 7x Orbitraps, \sout{1x QQQ}, 1x qTOF, 1x timsTOF
+\item We offer full service analysis, technology access (user lab) and consulting.
+\item We are trying to support all types of proteome-scale applications (mostly bottom-up workflows)
+%    + relative & absolute quantification
+%    + interaction proteomics (BioID, AP-MS)
+%    + PTMs (Ubi, Phos, proteolytic, Palmytolation, Carbohydration, ...)
+%    + structural proteomics (Xlink)
+%    + drug-protein interaction (TPP)
+\end{itemize}
+\vspace{1cm}
+%\end{column}
+%\begin{column}
+%    \centering
+%    test
+%    % \includegraphics[width=0.3\textwidth]{ionsource}  
+%\end{column}
+%\end{columns}
+%\includegraphics[height=0.1\columnwidth, keepaspectratio]{thumbs/ionsource}
+\resizebox{\textwidth}{!}{
+\includegraphics[height=0.1\columnwidth, keepaspectratio]{thumbs/ionsource2}
+\includegraphics[height=0.1\columnwidth, keepaspectratio]{thumbs/ionsource3}
+\includegraphics[height=0.1\columnwidth, keepaspectratio]{thumbs/ionsource4}
+\includegraphics[height=0.1\columnwidth, keepaspectratio]{thumbs/ionsource5}
+\includegraphics[height=0.1\columnwidth, keepaspectratio]{thumbs/ionsource6}
+\includegraphics[height=0.1\columnwidth, keepaspectratio]{thumbs/ionsource8}
+\includegraphics[height=0.1\columnwidth, keepaspectratio]{thumbs/ionsource9}
+\includegraphics[height=0.1\columnwidth, keepaspectratio]{thumbs/ionsource7}
+}
+\end{frame}
+}
+\section{Some Statistics}
+\begin{frame}[fragile]
+\frametitle{Some statistics}
+
+<<label=pie-size, fig = TRUE, echo=FALSE, include=FALSE, warnings=FALSE, width=10, height=4>>=
+load("data/massspecfiles.RData")
+
+S$year <- format(as.POSIXct(S$date, origin="1970-01-01"), "%Y")
+library(tools)
+library(colorspace)
+S$file_ext <- file_ext(S$filename)
+
+df <- aggregate(size ~ file_ext, FUN=sum, data=S)
+ext.filter <- df[order(df$size, decreasing = TRUE)[1:10], 'file_ext']
+S <- S[S$file_ext %in% ext.filter, ]
+df <- aggregate(S$size, list(year=S$year, file_ext=S$file_ext), FUN=sum)
+          
+library(ggplot2)
+
+cbPalette <- c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7", "#000000", "#E69F00")
+
+bp <- ggplot(df, aes(x=year, y=x, fill=file_ext)) +
+  geom_bar(width = 0.75, stat = "identity") 
+bp + 
+  # scale_fill_manual(values = alpha(cbPalette, .9)) + 
+  ggthemes::theme_tufte(base_family="sans") + ylab("size [bytes]") 
+ 
+@
+
+
+
+<<label=pie-number, fig = TRUE, echo=FALSE, include=FALSE, warnings=FALSE, width=6, height=5>>=
+df <- aggregate(S$size, list(year=S$year, file_ext=S$file_ext), FUN=length)
+bp <- ggplot(df, aes(x=year, y=x, fill=file_ext)) +
+  geom_bar(width = 0.8, stat = "identity") 
+
+bp + scale_fill_manual(values = alpha(cbPalette, .9)) + 
+    ggthemes::theme_tufte(base_family="sans") + ylab("number of files")
+@
+
+<<label=pie-applications, fig = TRUE, echo=FALSE, include=FALSE, warnings=FALSE, width=12, height=6>>=
+
+app <- read.csv2("data/data-1543582345649.csv", sep=',')
+
+app$appliation <- as.factor(app$name)
+
+app<-na.omit(app[app$entitytype != 'Workunits' & app$count>1 & app$year > 2010,])
+
+bp <- ggplot(app, aes(x=year, y=count, fill=appliation)) +
+  geom_bar(width = 0.9, stat = "identity") +
+  ggthemes::theme_tufte(base_family="sans") + ylab("number of performed applications")
+bp
+@
+@
+
+
+%\begin{columns}
+%\begin{column}[T]{0.5\textwidth}
+\only<1>{
+Archived and annotated mass spec related files
+\includegraphics[width=1.0\columnwidth]{graphics/rawDiag-pie-size.pdf}}
+%\end{column}
+%\begin{column}[T]{0.5\textwidth}
+\only<2>{
+triggered applications
+\includegraphics[width=1.0\columnwidth]{graphics/rawDiag-pie-applications.pdf}}
+%
+%\end{column}
+%\end{columns}
+
+
+\only<1>{from 2002 - 2018: \Sexpr{round((1.628136e+13 + sum(S$size))/1024^4)} TB of archived mass spec data.}
+    
+\end{frame}
+
+\section{Diagnostic plot functions}
+\newcommand{\G}[1]{
+\IfFileExists{graphics/rawDiag-#1.png}{\parbox[c]{3.5cm}{\includegraphics[width=3.5cm, height=3.5cm]{graphics/rawDiag-#1}}}{-}
+}
+\begin{frame}
+\frametitle{Mass Spectrometry diagnostic plot functions}
+\framesubtitle{designed by, and for, expert mass spec operators}
+
+\vspace{1cm}
+\resizebox{\textwidth}{!}{
+\begin{tabular}{lllllllllll}
+\texttt{ChargeState} &  \texttt{CycleLoad} &\texttt{CycleTime} & \texttt{InjectionTime} & \texttt{MassDistribution} & \texttt{MassHeatmap}  & \texttt{MzDistribution} & \texttt{PrecursorHeatmap}  & \texttt{ScanFrequency}  &\texttt{ScanTime} & \texttt{TicBasepeak} \\
+\G{PlotChargeState-trellis} &  \G{PlotCycleLoad-trellis} &\G{PlotCycleTime-trellis} & \G{PlotInjectionTime-trellis} & \G{PlotMassDistribution-trellis} & \G{PlotMassHeatmap-trellis}  & \G{PlotMzDistribution-trellis} & \G{PlotPrecursorHeatmap-trellis}  & \G{PlotScanFrequency-trellis}  &\G{PlotScanTime-trellis} & \G{PlotTicBasepeak-trellis} \\
+\G{PlotChargeState-overlay} &  \G{PlotCycleLoad-overlay} &\G{PlotCycleTime-overlay} & \G{PlotInjectionTime-overlay} & \G{PlotMassDistribution-overlay} & \G{PlotMassHeatmap-overlay}  & \G{PlotMzDistribution-overlay} & \G{PlotPrecursorHeatmap-overlay}  & \G{PlotScanFrequency-overlay}  &\G{PlotScanTime-overlay} & \G{PlotTicBasepeak-overlay} \\
+\G{PlotChargeState-violin} &  \G{PlotCycleLoad-violin} &\G{PlotCycleTime-violin} & \G{PlotInjectionTime-violin} & \G{PlotMassDistribution-violin} & \G{PlotMassHeatmap-violin}  & \G{PlotMzDistribution-violin} & \G{PlotPrecursorHeatmap-violin}  & \G{PlotScanFrequency-violin}  &\G{PlotScanTime-violin} & \G{PlotTicBasepeak-violin} 
+\end{tabular}
+}
+\\
+\vspace{1cm}
+\begin{itemize}
+\item visualization generation through using Rs ggplot2 package.
+\item open standard compatibility through \texttt{as.rawDiag.mzR} function.
+
+\end{itemize}
+\end{frame}
+
+
+\section{Code snippet 1: Usage}
+\begin{frame}[fragile]
+\frametitle{Code snippet 1: Usage}
+\framesubtitle{}
+%\begin{itemize}
+%\item Bring Mass Spectrometry Data to Life - 
+%multiplatform and fast reading through using \href{http://planetorbitrap.com/rawfilereader#.W-WZoSdJl24}{The New RawFileReader from Thermo Fisher Scientific} (.Net Framework library).\\
+%\end{itemize}
+%\vspace{1cm}
+
+<<>>=
+library(rawDiag)
+@
+\pause
+<<>>=
+# example instrument data for unit testing and demonstration
+rawfile <- file.path(path.package(package = 'rawDiag'),
+                      'extdata', 'sample.raw')
+@
+\pause
+<<>>=
+RAW <- read.raw(file = rawfile)
+@
+\pause
+<<>>=
+class(RAW)
+@
+\pause
+<<>>=
+gp <- PlotTicBasepeak(RAW) +
+    ggthemes::theme_tufte() 
+class(gp)
+@
+\end{frame}
+
+
+\section{Architecture}
+\begin{frame}[fragile]
+\include{arch}
+\end{frame}
+
+\section{Benchmark}
+
+\begin{frame}[t]
+\frametitle{It's fast \ldots}
+<<label=benchmarkTime-1, fig = TRUE, echo=FALSE, include=FALSE, warnings=FALSE, width=4, height=5>>=
+library(rawDiag); 
+library(lattice)
+b1 <- function()
+{
+    data(benchmark)
+    cv <- 1 - 2:7/10
+    t <- trellis.par.get("strip.background")
+    t$col <- (rgb(cv, cv, cv))
+    t$col <- (rgb(cv, cv, cv))
+    trellis.par.set("strip.background", t)
+    S <- rbind(b.Linux, X.Linux)
+    S$IO.throuput <- sum(unique(S$nrow)) / S$overall.runtime
+    xyplot(overall.runtime ~ ncpu | system,
+           subset = system == "Linux" & method == 'RawFileReader',
+           group = method, panel = function(...) {
+               panel.xyplot(...)
+               panel.xyplot(..., type = "a", lwd = 2)
+           }, data = S, auto.key = FALSE, 
+           xlab = "number of utilized cores", 
+           ylim=c(45,3600 * 4),
+           ylab = "overall runtime [s]",
+           scales = list(y = list(log = TRUE, 
+                                                                at = c(1, 30, 60, 120, 180, 300, 600, 1800, 3600, 
+                                                                       3600 * 1.5))))
+}
+b2 <- function()
+{
+    data(benchmark)
+    cv <- 1 - 2:7/10
+    t <- trellis.par.get("strip.background")
+    t$col <- (rgb(cv, cv, cv))
+    t$col <- (rgb(cv, cv, cv))
+    trellis.par.set("strip.background", t)
+    S <- rbind(b.Linux, X.Linux)
+    S$IO.throuput <- sum(unique(S$nrow))/S$overall.runtime
+    xyplot(overall.runtime ~ ncpu | system,
+           subset = system == "Linux",
+           group = method, panel = function(...) {
+               panel.xyplot(...)
+               panel.xyplot(..., type = "a", lwd = 2)
+           }, data = S, auto.key = FALSE, 
+           xlab = "number of utilized cores", 
+           ylim=c(45,3600 * 4),
+           ylab = "overall runtime [s]",
+           scales = list(y = list(log = TRUE, 
+                                                                at = c(1, 30, 60, 120, 180, 300, 600, 1800, 3600, 
+                                                                       3600 * 1.5))))
+}
+
+print(b1())
+@
+<<label=benchmarkTime-2, fig = TRUE, echo=FALSE, include=FALSE, warnings=FALSE, width=4, height=5>>=
+print(b2())
+@
+\definecolor{trellisCyan}{HTML}{0080ff}
+\definecolor{trellisMag}{HTML}{ff00ff}
+\begin{columns}
+    \begin{column}[T]{0.48\textwidth}
+        \begin{block}{Benchmark specification:}
+        \begin{itemize}
+        \item \href{http://proteomecentral.proteomexchange.org/cgi/GetDataset?ID=PXD006932}{proteomeXchange PXD006932}
+            \item analyze \Sexpr{length((unique(b.Linux$file.size)))} files 
+            \item overall file size \Sexpr{round(sum((unique(b.Linux$file.size)))/1024^3,2)} GB 
+            \item 64 x core Intel(R) Xeon(R) CPU E5-2698 v3 @ 2.30GHz; Debian 3.16.43-2+deb8u2
+            \item \textcolor{trellisMag}{ThermoRawFileReader v4.0.22 / Mono JIT compiler v5.8.0.127}
+        \only<2> {\item ProteoWizard v3.0.11252 64-bit mzML \textcolor{trellisCyan}{Bioconductor mzR v2.8.1 } through using \texttt{as.rawDiag.mzR}}
+        \end{itemize}
+        \end{block}
+    \end{column}
+    \begin{column}[T]{0.48\textwidth}
+    \only<1> {\includegraphics[width=0.8\columnwidth]{graphics/rawDiag-benchmarkTime-1.pdf}}
+    \only<2> {\includegraphics[width=0.8\columnwidth]{graphics/rawDiag-benchmarkTime-2.pdf}}
+       
+       % \includegraphics[width=\columnwidth]{graphics/ionsource}
+    \end{column}
+\end{columns}
+
+\end{frame}
+
+\section{JPR}
+\begin{frame}[fragile]
+\includegraphics[width=1\columnwidth]{graphics/jpr.pdf}\\
+ \url{https://www.biorxiv.org/content/early/2018/04/24/304485}
+\end{frame}
+
+\section{Reader function overview}
+
+\begin{frame}[fragile]
+\frametitle{Cheatsheet}
+\framesubtitle{of \texttt{rawDiag}'s reader functions}
+\begin{tabular}{l|l|l|l}
+\texttt{function} & Arguments& Value &  Description\\
+\hline
+\cellcolor[gray]{0.8}\texttt{read.raw} & \cellcolor[gray]{0.8}filename & \cellcolor[gray]{0.8}\texttt{data.frame}&\cellcolor[gray]{0.8}reads metadata \\
+\texttt{readXICs} & filename, mZ, tol& \texttt{list} &extracts XICs of a given mass vector\\
+\texttt{readScans} & filename, scanIDs & \texttt{list} &read scan of scanids
+\end{tabular}
+\end{frame}
+
+\section{Code snippet 2: XIC}
+\begin{frame}[fragile]
+\frametitle{Code snippet 2: extracted ion chromatogram (XIC) and fragmention}
+\framesubtitle{using BIOGNOSYS iRT peptides (\href{http://fgcz-ms.uzh.ch/~cpanse/autoQC01.html}{autoQC01}) - robustness of LC and MS}
+
+<<autoQC01>>=
+iRTpeptide <- c("LGGNEQVTR", "GAGSSEPVTGLDAK", "VEATFGVDESNAK",
+    "TPVISGGPYEYR", "YILAGVENSK", "TPVITGAPYEYR", "DGLDAASYYAPVR",
+    "ADVTPADFSEWSK", "GTFIIDPGGVIR", "GTFIIDPAAVIR", "LFLQFGAQGSPFLK")
+@
+\pause
+<<>>=
+# https://cran.r-project.org/package=protViz
+library(protViz)
+@
+\pause
+<<>>=
+(mZ <- (parentIonMass(iRTpeptide) + 1.008) / 2)
+@
+\pause
+<<>>=
+rawfile <- file.path(Sys.getenv('HOME'),
+                    'Downloads/20181113_010_autoQC01.raw')
+XICs <- readXICs(rawfile, masses=mZ, tol = 10)
+@
+\end{frame}
+
+
+\subsection{PlotXIC}
+<<label=autoQC01XICs, fig = TRUE, echo=FALSE, include=FALSE, warnings=FALSE, width=8, height=4.5>>=
+for(i in 1:11){XICs[[i]]$sequence <- iRTpeptide[i]}
+df <- as.data.frame.XICs(XICs)
+
+dd <- df[df$intensity > 5000,]
+
+df.peak <- .iRT.extract.maxpeak(df)
+
+dd$sequence <- factor(dd$sequence, levels = df.peak$peptide[order(df.peak$iRTscore)])
+
+figure <- ggplot(dd, aes(x = time, y = intensity, color=sequence)) +
+    geom_line(size = 1.5, stat = "identity") +
+    labs(x = "Retention Time [min]", y = "Intensity Counts [arb. unit]") +
+    ggthemes::theme_tufte(base_family="sans")
+
+figure 
+@
+
+\begin{frame}[fragile]
+\only<1>{\includegraphics[width=1\columnwidth, keepaspectratio]{graphics/rawDiag-autoQC01XICs}}
+% \only<2>{\includegraphics[width=1\columnwidth, keepaspectratio]{graphics/rawDiag-autoQC01peakplot}}
+\end{frame}
+
+\section{Code snippet 3: PeakPlot}
+
+\begin{frame}[fragile]
+\frametitle{Code snippet 3: determine best peptide spectrum match (PSM)}
+\framesubtitle{using BIOGNOSYS iRT peptides (\href{http://fgcz-ms.uzh.ch/~cpanse/autoQC01.html}{autoQC01}) - robustness of LC and MS}
+
+<<eval=FALSE>>=
+# runtime less than 30 seconds for computing single core 20K PSMs
+scanIds <- .computeBestPeptideSpectrumMatch(rawfile, iRTpeptide,
+    peptideMassTolerance = 0.003)
+@
+<<echo=FALSE>>=
+scanIds <- c(9594, 11113, 11884, 12788, 12677, 13204, 13868, 14551, 16136, 17193, 17612)
+@
+\pause
+<<>>=
+scanIds
+scans <- readScans(rawfile, scanIds)
+@
+\pause
+<<label=autoQC01peakplot, fig = TRUE, echo=TRUE, include=FALSE, warnings=FALSE, width=16, height=9.0, eval=TRUE>>=
+op <- par(mfrow=c(3, 4), mar=c(5, 5, 6, 4))
+
+rv <- mapply(function(x, y) protViz::peakplot(x, y,
+        FUN = function(b, y) cbind(b, y),
+        main=list(x, cex = 2), font.main = 1, family = "sans"),
+    iRTpeptide, scans)
+
+par(op)
+@
+\end{frame}
+
+\begin{frame}[fragile]
+
+\only<1>{\includegraphics[width=1\columnwidth, keepaspectratio]{graphics/rawDiag-autoQC01peakplot}}
+\end{frame}
+
+
+\subsection{iRTscoreFit}
+<<label=autoQC01lm1, fig = TRUE, echo=FALSE, include=FALSE, warnings=FALSE, width=2.0, height=2.0>>=
+p <- ggplot(df.peak, aes(x =  iRTscore, y = rt)) +
+        ylab("Retention Time [min]") + xlab("iRT score") +
+        geom_point() + ggthemes::theme_tufte(base_family="sans")
+p
+@
+
+<<label=autoQC01lm2, fig = TRUE, echo=FALSE, include=FALSE, warnings=FALSE, width=2.0, height=2.0>>=
+p + geom_smooth(method = "lm", se=FALSE, color="black", formula = y ~ x) +
+        geom_text(x = 55, y = 17, label = lm_eqn(df.peak), parse = TRUE, size=2)
+@
+
+<<label=autoQC01bw1, fig = TRUE, echo=FALSE, include=FALSE, warnings=FALSE, width=12, height=3.25>>=
+load("data/autoQC01_20181201.RData")
+autoQC01  <- na.omit(autoQC01)
+
+filter <- autoQC01$r.squared >0.98 & 
+    0.05 < autoQC01$slope & 
+    autoQC01$slope < 0.2 & 
+    autoQC01$time > (1543672213 - 60 * 60 * 24 * 365)
+
+gp <- ggplot(autoQC01[filter,], aes(x=strftime(POSIXct  , "%Y-%m"), y=intercept, color=instrument))  + 
+    geom_boxplot(position=position_dodge(1)) +
+    ggthemes::theme_tufte(base_family="sans") + 
+    theme(legend.position="top") 
+gp
+@
+
+<<label=autoQC01bw2, fig = TRUE, echo=FALSE, include=FALSE, warnings=FALSE, width=12, height=2.75>>=
+gp <- ggplot(autoQC01[filter,], aes(x=strftime(POSIXct  , "%Y-%m"), y=slope,  color=instrument))  + 
+    geom_boxplot(position=position_dodge(1), notch=FALSE) +
+    ggthemes::theme_tufte(base_family="sans") +
+    theme(legend.position='none') 
+gp
+@
+
+
+\begin{frame}[t]
+\begin{columns}
+
+\only<1-3>{
+\begin{column}[T]{0.5\textwidth}
+<<iRT, results=tex, echo=FALSE, eval=TRUE>>=
+library(xtable)
+xt <- xtable::xtable(df.peak[order(df.peak$iRTscore), c('peptide', 'mZ', 'rt', 'iRTscore'), ])
+print(xt,
+      include.rownames = FALSE,scalebox='0.75')
+@
+\end{column}
+}
+\begin{column}[T]{0.5\textwidth}
+\only<2> {\includegraphics[width=\columnwidth, keepaspectratio]{graphics/rawDiag-autoQC01lm1}}
+\only<3> {\includegraphics[width=\columnwidth, keepaspectratio]{graphics/rawDiag-autoQC01lm2}}
+\end{column}
+\end{columns}
+
+
+\only<4>{
+summary:
+overall runtime (single core) to fit 6871 models based on {\bf 11x6871 extracted XICs (total size of 519 GBytes) is 215 minutes} (38MB/second).
+\includegraphics[width=\columnwidth, keepaspectratio]{graphics/rawDiag-autoQC01bw1}
+\includegraphics[width=\columnwidth, keepaspectratio]{graphics/rawDiag-autoQC01bw2}
+}
+\end{frame}
+
+
+\section{Conclusion}
+\begin{frame}{Conclusion: R-package \texttt{rawDiag}}
+\framesubtitle{\url{https://github.com/fgcz/rawDiag}}
+\begin{itemize}
+\item {\bf multiplatform} and {\bf fast} reading through using \href{http://planetorbitrap.com/rawfilereader}{The New RawFileReader from Thermo Fisher Scientific}.
+\pause
+\item ships with a shiny application.
+\item  ``one click'' install iff you accept \href{https://github.com/fgcz/rawDiag/raw/master/inst/docker/ThermoRawFileReader/RawFileReaderLicense.doc}{RawFileReaderLicense.doc}.
+\item work in progress\\{\tiny see also  mzAPI: a new strategy for efficiently sharing mass spectrometry data \url{https://www.nature.com/articles/nmeth0409-240}, 2009.
+}
+\end{itemize}
+
+\pause
+
+\begin{block}{Wishlist}
+\begin{itemize}
+\item \texttt{rC\#} seamless R and CSharp integration - similar to the \texttt{rJava} or \texttt{Rcpp} packages  
+%(\url{https://archive.codeplex.com/?p=rclr})
+\item License issues
+\item soon: Bruker timsTOF ion mobility access open data format (\texttt{*.tdf}) 
+\end{itemize}
+\end{block}
+
+\end{frame}
+
+\section{Acknowledgement}
+\begin{frame}[t]
+\frametitle{Thank you}
+
+\begin{columns}
+\begin{column}[T]{0.55\textwidth}
+\only<1-> {\includegraphics[height=0.4\columnwidth, keepaspectratio]{graphics/CT}}\hfill
+\only<1-> {\includegraphics[height=0.4\columnwidth, keepaspectratio]{graphics/TK}}
+\vspace{0.25cm}
+\only<3> {{\scriptsize
+\include{ack}
+}
+\vspace{0.25cm}
+\resizebox{\columnwidth}{!}{
+\includegraphics[height=0.1\columnwidth, keepaspectratio]{graphics/FGCZ-noborder}
+\includegraphics[height=0.1\columnwidth, keepaspectratio]{graphics/uzh_logo}
+\includegraphics[height=0.1\columnwidth, keepaspectratio]{graphics/ethz_logo}
+\includegraphics[height=0.1\columnwidth, keepaspectratio]{graphics/EU}
+}
+}
+\end{column}
+\begin{column}[T]{0.45\textwidth}
+\only<2-> {\includegraphics[width=0.91\columnwidth, keepaspectratio]{graphics/WEW_JG}}
+\end{column}
+\end{columns}
+\end{frame}
+
+\section{DONE}
+{
+\usebackgroundtemplate{\includegraphics[width=1.0\paperwidth, height=1.0\paperheight]{graphics/SMPTE_Color_Bars.pdf}}
+\begin{frame}[plain,noframenumbering]
+\end{frame}
+}
+\section{APPENDIX}
+
+\subsection{QC4L}
+\begin{frame}[plain,noframenumbering]
+\frametitle{QC4L: promega 6x5 LC-MS/MS Peptide Reference Mix}
+    \begin{columns}
+        \begin{column}[T]{0.48\textwidth}
+        \includegraphics[width=\columnwidth, keepaspectratio]{graphics/promega}\\
+    %    \href{https://ch.promega.com/products/mass-spectrometry/mass-spec-reference-reagents/6-x-5-lc_ms_ms-peptide-r%eference-mix}{source: promega}
+        \end{column}
+        \begin{column}[T]{0.48\textwidth}
+        \href{http://fgcz-ms.uzh.ch/~cpanse/autoQC4L.html}{click here QC4L}    
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\subsection{Levey-Jennings \texttt{ADV}}
+\begin{frame}[fragile,plain,noframenumbering]
+\includegraphics[width=1\columnwidth, keepaspectratio]{graphics/Levey-Jennings-ADVTPADFSEWSK.pdf}
+source \url{https://panoramaweb.org}
+\end{frame}
+
+\subsection{as.rawDiag.mzR}
+\begin{frame}[fragile,plain,noframenumbering]
+\begin{tiny}
+<<>>=
+as.rawDiag.mzR
+@
+\end{tiny}
+\end{frame}
+
+\subsection{readXICs}
+\begin{frame}[fragile,plain,noframenumbering]
+\begin{tiny}
+<<>>=
+readXICs
+@
+\end{tiny}
+\end{frame}
+
+
+\section{Bookmarks}
+\begin{frame}[fragile,plain,noframenumbering]
+\frametitle{Bookmarks}
+
+%{\scriptsize 
+
+\begin{itemize}
+\item \url{http://fgcz-ms.uzh.ch/~cpanse/talks/rawDiag_EuroBioc2018_Munich_20181206.pdf}
+\item \url{https://github.com/fgcz/rawDiag}
+\item \url{https://www.biorxiv.org/content/early/2018/04/24/304485}
+\item \url{http://planetorbitrap.com/rawfilereader#.W-WZoSdJl24}
+\end{itemize}
+%   }
+
+
+% scp bioc2018.pdf r21:~/WWW/talks/rawDiag_EuroBioc2018_Munich_20181206.pdf
+\end{frame}
+\end{document}
+% Despite the widespread usage of R for other omics data analysis, it has been largely ignored by the proteomics community. We believe the mayor reason is the lack of a direct and performant interface between R and mass spectrometry raw data formats. So far this gap has been poorly bridged by the HUPO-PSI standards (mzML, mzXML) that can be read into R using packages like mzR. The problem to this approach is that raw files in vendor specific binary formats first need to be converted to these open formats and later on parsed into R objects. Both steps consume substantial computational resources and obstruct the development of lean data analysis workflows in R. We therefore suggest to bypass these costly conversions and instead use vendor-released APIs to directly access raw data from the R command line. Our previously published R package rawDiag demonstrates the power of this approach by means of scan metadata contained in Thermo Fisher Scientific raw files. Currently, we are extending our philosophy to mass spectra, the core data unit in LC-MS driven proteomics. Our initial results show that complex analytical workflows dealing with the analysis of spectral data can be written directly in R and executed on standard computational infrastructures in an OS independent fashion. In addition, we propose that our approach is easily extendable to other vendors, given a well designed API has been released to the scientific community. References: https://www.biorxiv.org/content/early/2018/04/24/304485 (please no more than 10-15 minutes of presentation)
+
+
+
+
