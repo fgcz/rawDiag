@@ -1,4 +1,4 @@
-\name{NEWS}
+
 \title{News for Package 'rawDiag'}
 
 \section{Changes until version 0.0.5 (2018-06-02)}{

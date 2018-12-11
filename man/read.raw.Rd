@@ -2,13 +2,15 @@
 % Please edit documentation in R/rawDiag.R
 \name{read.raw}
 \alias{read.raw}
+\alias{XIC,}
+\alias{xic}
 \title{mass spec reader function}
 \usage{
-read.raw(file, mono = if (Sys.info()["sysname"] \%in\% c("Darwin", "Linux"))
-  TRUE else FALSE, exe = file.path(path.package(package = "rawDiag"), "exec",
-  "fgcz_raw.exe"), mono_path = "", rawDiag = TRUE, argv = "qc",
-  system2_call = if (Sys.info()["sysname"] == "Windows") TRUE else FALSE,
-  method = "thermo", ssh = FALSE)
+read.raw(file, mono = if (Sys.info()["sysname"] \%in\% c("Darwin",
+  "Linux")) TRUE else FALSE, exe = file.path(path.package(package =
+  "rawDiag"), "exec", "fgcz_raw.exe"), mono_path = "", rawDiag = TRUE,
+  argv = "qc", system2_call = if (Sys.info()["sysname"] == "Windows")
+  TRUE else FALSE, method = "thermo", ssh = FALSE)
 }
 \arguments{
 \item{file}{the name of the Thermo Fisher Scietific raw file which the data
@@ -60,6 +62,23 @@ PlotScanFrequency(RAW)
 dim(RAW)
 RAW <- read.raw(file = rawfile, rawDiag = FALSE)
 dim(RAW)
+\dontrun{
+library(parallel)
+library(rawDiag)
+
+# consider all raw files of your working dir
+rawFileNames <- list.files()[grep("raw$", list.files())]
+
+# read all the meta data using 4 cores
+RAW <- mclapply(rawFileNames, read.raw, mc.cores=4)
+# as alternative  \\code{lapply} instread of \\code{mclapply}
+
+# concatenate the list data.frames into one single one
+RAW <- plyr::rbind.fill(RAW)
+
+# have fun
+PlotMassDistribution(RAW)
+ }                                       
 
 }
 \references{

@@ -245,16 +245,40 @@ read.tdf <- function(filename){
   as.rawDiag(rv)
 }
 
-#' Extracts XIC of a given mass vector
+#' Extracts XICs of a given mass vector
 #'
-#' @param rawfile 
-#' @param masses 
-#' @param tol 
-#' @param mono 
-#' @param exe 
+#' @param rawfile the file name 
+#' @param masses a vector of masses 
+#' @param tol tolerance in ppm
+#' @param mono if the mono enviroment should be used. 
+#' @param exe the exe file user by mono
 #'
-#' @return list of XICs
+#' @return list of XIC objects
 #' @export readXICs 
+#' @examples
+#' # Example 1: extract iRT peptides
+#' iRTpeptide <- c("LGGNEQVTR", "YILAGVENSK", "GTFIIDPGGVIR", "GTFIIDPAAVIR",
+#' "GAGSSEPVTGLDAK", "TPVISGGPYEYR", "VEATFGVDESNAK",
+#' "TPVITGAPYEYR", "DGLDAASYYAPVR", "ADVTPADFSEWSK",
+#' "LFLQFGAQGSPFLK")
+#' 
+#' library(protViz)
+#' # 2Hplus 
+#' (mZ <- (parentIonMass(iRTpeptide) + 1.008) / 2)
+#' 
+#' \dontrun{
+#' rawfile <- "/home/cp/Downloads/20180220_14_autoQC01.raw"
+#'  X <-readXICs(rawfile, masses=mZ)
+#' }
+#' 
+#' 
+#' (rawfile <- file.path(path.package(package = 'rawDiag'), 'extdata', 'sample.raw'))
+#' RAW <- read.raw(rawfile)
+#' 
+#' # not meaning full but proof-of-concept
+#' X <-readXICs(rawfile, masses=unique(RAW$PrecursorMass), tol=1000)
+#' plot(X)
+#' 
 readXICs <- function(rawfile, 
                       masses,
                       tol = 10,
@@ -271,7 +295,6 @@ readXICs <- function(rawfile,
   
   cmd <- exe
   
-  
   if (mono){
     rvs <- system2("mono", args = c(shQuote(exe), shQuote(rawfile), "xic", shQuote(tfi), tol, shQuote(tfo)))
   }else{
@@ -281,23 +304,159 @@ readXICs <- function(rawfile,
   source(tfo)
   unlink(c(tfi, tfo, tfstdout))
   
+  rv <- lapply(e$XIC, 
+               function(x){
+                 class(x) <- c(class(x), 'XIC'); 
+                 x$filename <- basename(rawfile); 
+                 x})
   
-  return(lapply(e$XIC, function(x){class(x) <- c(class(x), 'XIC'); x}))
+  class(rv) <- c(class(rv), 'XICs')
+  return(rv)
+}
+
+
+#' check if x is an XIC object
+#'
+#' @param x 
+#'
+#' @return TRUE ot FALSE
+#' @export is.XIC
+is.XIC <- function(x){
+  if(length(x$times) > 0 && length(x$times) == length(x$intensities)){TRUE}else{FALSE}
 }
 
 #' plot extracted ion chromatogram
+#' @description the defaukt plot function for an XIC object.
 #'
-#' @param x 
-#' @param y 
-#' @param ... 
+#' @param x an XIC S3 class object
+#' @param y will be ignored
+#' @param ...  passed to the plot function
+#' @param fit \code{TRUE} or \code{FALSE}, if a lm fit should be done
 #'
-#' @return
+#' @return plot or ggplot object
 #' @export plot.XIC
-plot.XIC <- function(x, y, ...){
-  if(length(x$times) > 0){
-  plot(x$times, x$intensities, type='h', sub=length(x$times), ...)
+plot.XIC <- function(x, y, fit=FALSE, ...){
+  if(is.XIC(x)){
+    
+    t.max <- x$times[x$intensities == max(x$intensities, na.rm=TRUE)][1]
+    
+    if(!fit){
+      plot(x$times, 
+           x$intensities,
+           xlab='retention time',
+           ylab='intensity',
+           type='h',
+           
+           main=x$filename,
+           ...)
+    }else{
+      intensities.max <- max(x$intensities)
+      max.idx <- which(x$intensities == intensities.max)[1]
+      
+      hsleft <- max.idx - min(which(sapply(rev(1:(max.idx-1)), function(i){0.1 *intensities.max > x$intensities[i]})))
+      hsright <- max.idx + max(which(sapply((max.idx):length(x$intensities), function(i){0.2 *intensities.max < x$intensities[i]})))
+
+      apex.idx <- hsleft:hsright
+      
+      
+      plot(x$times[apex.idx], 
+           x$intensities[apex.idx],
+           xlab='retention time',
+           ylab='intensity',
+           type='h',
+           main=x$filename)
+      
+      peak <- data.frame(logy = log(x$intensities[apex.idx]), x = x$times[apex.idx])
+      x.mean <- mean(peak$x)
+      peak$xc <- (peak$x - x.mean)
+      fm <- lm(logy ~ xc + I(xc^2), data = peak)
+      
+      xx <- with(peak, seq(min(xc) , max(xc), length = 100))
+      
+      lines((xx + x.mean), exp(predict(fm, data.frame(xc = xx))),
+            col=rgb(0.25, 0.25, 0.25, alpha = 0.3), lwd = 5)
+      
+      abline(v=t.max, col=rgb(0.5, 0.5, 0.5, alpha = 0.25), lwd=4)
+   
+    
+    #axis(3, t.max, round(t.max,2))
+    AUC <- sum(diff(x$times[apex.idx]) * (head(x$intensities[apex.idx], -1) + tail(x$intensities[apex.idx], -1))) / 2
+    
+    legend("topleft",
+           c(paste("mZ:", x$mass),
+             paste("number of peaks:", length(x$times)),
+             paste("t max:", t.max),
+             paste("AUC:", round(AUC), title='fm results')
+           ), cex=0.75, title='peak'
+    )
+    
+    print(fm)
+    legend.text<- paste(c(names(fm$coefficients),'r.squared', 'mean'),
+                        round(c(fm$coefficients, summary(fm)$r.squared,mean(peak$x)),3), sep=": ")
+    legend("topright", legend.text, title='model', cex=0.75)
+  
+    }
   }
 } 
+
+#' plot extracted ion chromatograms
+#'
+#' @param x a list of XIC objects
+#' @param y will be ignroed
+#' @param ... passed to \code{plot.XIC}
+#' @import ggplot2
+#' @return 
+#' @export plot.XICs
+#' @examples
+#' # Example 1: extract iRT peptides
+#' iRTpeptide <- c("LGGNEQVTR", "YILAGVENSK", "GTFIIDPGGVIR", "GTFIIDPAAVIR",
+#' "GAGSSEPVTGLDAK", "TPVISGGPYEYR", "VEATFGVDESNAK",
+#' "TPVITGAPYEYR", "DGLDAASYYAPVR", "ADVTPADFSEWSK",
+#' "LFLQFGAQGSPFLK")
+#' 
+#' library(protViz)
+#' # 2Hplus 
+#' (mZ <- (parentIonMass(iRTpeptide) + 1.008) / 2)
+#' 
+#' \dontrun{
+#'  library(ggplot2)
+#'  rawfile <- "/home/cp/Downloads/20180220_14_autoQC01.raw"
+#'  X <-readXICs(rawfile, masses=mZ)
+#'  plot(X, method='ggplot') + facet_wrap(~mass)
+#'  plot(X, method='ggplot') + facet_wrap(~mass, scales = "free_x")
+#'  
+#' }
+plot.XICs <- function(x, y, method='ggplot', ...){
+  if(length(x) > 0){
+    if (method == 'ggplot'){
+      df <- do.call('rbind', lapply(x, function(xx){
+        
+        if (is.XIC(xx)){
+          rv <- data.frame(times=xx$times,
+                           intensities=xx$intensities)
+          
+          rv$filename <- xx$filename
+          rv$mass <- as.factor(xx$mass)
+          rv}else{NULL}
+      }
+      ))
+      
+      
+      gp <- ggplot(df, aes_string(x = "times", y = "intensities")) +
+        #geom_segment() +
+        geom_line(stat='identity', size = 1, aes_string(group = "mass", colour = "mass")) +
+        #scale_x_continuous(breaks = scales::pretty_breaks(8)) +
+        #scale_y_continuous(breaks = scales::pretty_breaks(8)) +
+        labs(title = "XIC plot") +
+        labs(subtitle = "Plotting XIC intensity against retention time") +
+        labs(x = "Retention Time [min]", y = "Intensity Counts [arb. unit]")
+      return(gp)
+    }else{
+      lapply(x, plot.XIC, ...)
+    }
+  }
+} 
+
 
 
 #' read scan of scanids
@@ -312,8 +471,10 @@ plot.XIC <- function(x, y, ...){
 #'
 #' @examples
 #'  (rawfile <- file.path(path.package(package = 'rawDiag'), 'extdata', 'sample.raw'))
-#'  S <- readScans(rawfile, 1:10)
-#'  plot(S[[10]])
+#'  S <- readScans(rawfile, 1:9)
+#'  plot(S[[1]])
+#'  op <- par(mfrow=c(3, 3))
+#'  lapply(S, function(x){plot(x, sub=x$scanType)})
 #' 
 readScans <- function(rawfile, 
                        scans,  
@@ -330,7 +491,6 @@ readScans <- function(rawfile,
   
   cmd <- exe
   
-  
   if (mono){
     rvs <- system2("mono", args = c(shQuote(exe), shQuote(rawfile), "scans", shQuote(tfi), shQuote(tfo)))
   }else{
@@ -338,7 +498,6 @@ readScans <- function(rawfile,
   }
   source(tfo)
   unlink(c(tfi, tfo, tfstdout))
-  
   
   return(lapply(e$PeakList, function(x){class(x) <- c(class(x), 'peaklist'); x}))
 }
@@ -396,7 +555,7 @@ plot.peaklist <- function(x, y, ...){
 #'
 #'   
 #' @return a \code{data.frame}.
-#' 
+#' @aliases XIC, xic
 #' @export read.raw
 #'
 #' @examples
@@ -410,6 +569,23 @@ plot.peaklist <- function(x, y, ...){
 #' dim(RAW)
 #' RAW <- read.raw(file = rawfile, rawDiag = FALSE)
 #' dim(RAW)
+#' \dontrun{
+#' library(parallel)
+#' library(rawDiag)
+#'
+#' # consider all raw files of your working dir
+#' rawFileNames <- list.files()[grep("raw$", list.files())]
+#' 
+#' # read all the meta data using 4 cores
+#' RAW <- mclapply(rawFileNames, read.raw, mc.cores=4)
+#' # as alternative  \code{lapply} instread of \code{mclapply}
+#'
+#' # concatenate the list data.frames into one single one
+#' RAW <- plyr::rbind.fill(RAW)
+#' 
+#' # have fun
+#' PlotMassDistribution(RAW)
+#'  }                                       
 #' 
 read.raw <- function(file, mono = if(Sys.info()['sysname'] %in% c("Darwin", "Linux")) TRUE else FALSE, 
                      exe = file.path(path.package(package = "rawDiag"), "exec", "fgcz_raw.exe"),  
@@ -625,6 +801,27 @@ ScanFrequMovingOver <- function(x){
   return(res)
 }  
 
+.map.type <- function(x){
+  res <- x %>% 
+    dplyr::mutate(Type = dplyr::case_when(grepl("FTMS [[:punct:]] c NSI Full ms", .$ScanType) == "TRUE" ~ "FT_Full_ms_c",
+                                          grepl("FTMS [[:punct:]] p NSI Full ms", .$ScanType) == "TRUE" ~ "FT_Full_ms_p",
+                                          grepl("FTMS [[:punct:]] c NSI Full lock ms", .$ScanType) == "TRUE" ~ "FT_Full_ms_c",
+                                          grepl("FTMS [[:punct:]] p NSI Full lock ms", .$ScanType) == "TRUE" ~ "FT_Full_ms_p",
+                                          grepl("FTMS [[:punct:]] c NSI d Full ms2", .$ScanType) == "TRUE" ~ "FT_d_Full_ms2_c",
+                                          grepl("FTMS [[:punct:]] p NSI d Full ms2", .$ScanType) == "TRUE" ~ "FT_d_Full_ms2_p",
+                                          grepl("FTMS [[:punct:]] c NSI SIM ms", .$ScanType) == "TRUE" ~ "FT_SIM_ms_c",
+                                          grepl("FTMS [[:punct:]] p NSI SIM ms", .$ScanType) == "TRUE" ~ "FT_SIM_ms_p",
+                                          grepl("FTMS [[:punct:]] p NSI SIM msx ms", .$ScanType) == "TRUE" ~ "FT_msxSIM_ms_p",
+                                          grepl("FTMS [[:punct:]] c NSI SIM msx ms", .$ScanType) == "TRUE" ~ "FT_msxSIM_ms_c",
+                                          grepl("FTMS [[:punct:]] c NSI Full ms2", .$ScanType) == "TRUE" ~ "FT_Full_ms2_c",
+                                          grepl("FTMS [[:punct:]] p NSI Full ms2", .$ScanType) == "TRUE" ~ "FT_Full_ms2_p",
+                                          grepl("ITMS [[:punct:]] c NSI r d Full ms2", .$ScanType) == "TRUE" ~ "IT_Full_ms2_c",
+                                          grepl("ITMS [[:punct:]] p NSI r d Full ms2", .$ScanType) == "TRUE" ~ "IT_Full_ms2_p"
+                                          )
+    )
+  return(res)
+}
+
 # ----Plots----
 
 #' TIC and Base Peak plot function
@@ -640,14 +837,14 @@ ScanFrequMovingOver <- function(x){
 #' @importFrom ggplot2 facet_wrap geom_violin scale_y_continuous facet_grid aes_string theme_light geom_line stat_summary
 #' @export PlotTicBasepeak
 PlotTicBasepeak <- function(x, method = 'trellis'){
+  df <- x %>% 
+    dplyr::filter_at(vars("MSOrder"), any_vars( . == "Ms")) %>% 
+    dplyr::select_at(vars("StartTime", "TIC", "BasePeakIntensity", "filename")) %>% 
+    dplyr::rename_at(vars("BasePeakIntensity"), funs(as.character("Base_Peak"))) %>% 
+    tidyr::gather(key = "Type", value = "Intensity", c("TIC", "Base_Peak"))
+  df$Type <- factor(df$Type, levels = c("TIC", "Base_Peak"))
+  
   if (method == 'trellis'){
-    df <- x %>% 
-      dplyr::filter_at(vars("MSOrder"), any_vars( . == "Ms")) %>% 
-      dplyr::select_at(vars("StartTime", "TIC", "BasePeakIntensity", "filename")) %>% 
-      dplyr::rename_at(vars("BasePeakIntensity"), funs(as.character("Base_Peak"))) %>% 
-      tidyr::gather(key = "Type", value = "Intensity", c("TIC", "Base_Peak"))
-    
-    df$Type <- factor(df$Type, levels = c("TIC", "Base_Peak"))
     
     figure <- ggplot(df,aes_string(x = "StartTime", y = "Intensity")) +
       geom_line(size = 0.3) +
@@ -661,18 +858,12 @@ PlotTicBasepeak <- function(x, method = 'trellis'){
     return(figure)
     
   }else if(method =='violin'){
-    df <- x %>% 
-      dplyr::filter_at(vars("MSOrder"), any_vars( . == "Ms")) %>% 
-      dplyr::select_at(vars("StartTime", "TIC", "BasePeakIntensity", "filename")) %>% 
-      dplyr::rename_at(vars("BasePeakIntensity"), funs(as.character("Base_Peak"))) %>% 
-      tidyr::gather(key = "Type", value = "Intensity", c("TIC", "Base_Peak"))
-    df$Type <- factor(df$Type, levels = c("TIC", "Base_Peak"))
     
     figure <- ggplot(df, aes_string(x = "filename", y = "Intensity")) + 
       geom_violin() +
       facet_grid(Type~., scales = "free") +
       #stat_summary(fun.y = mean , geom = "point", colour = "red") +
-      scale_y_continuous(breaks = scales::pretty_breaks(8)) +
+      scale_y_continuous(trans = scales::log10_trans())+
       labs(title = "TIC and Base-Peak plot") +
       labs(subtitle = "Plotting the TIC and base peak density for all mass spectrometry runs") +
       labs(x = "Filename", y = "Intensity Counts [arb. unit]") +
@@ -681,12 +872,6 @@ PlotTicBasepeak <- function(x, method = 'trellis'){
     return(figure)
     
   }else if (method  == 'overlay'){
-    df <- x %>% 
-      dplyr::filter_at(vars("MSOrder"), any_vars( . == "Ms")) %>% 
-      dplyr::select_at(vars("StartTime", "TIC", "BasePeakIntensity", "filename")) %>% 
-      dplyr::rename_at(vars("BasePeakIntensity"), funs(as.character("Base_Peak"))) %>% 
-      tidyr::gather(key = "Type", value = "Intensity", c("TIC", "Base_Peak"))
-    df$Type <- factor(df$Type, levels = c("TIC", "Base_Peak"))
     
     figure <- ggplot(df, aes_string(x = "StartTime", y = "Intensity", colour = "filename")) +
       geom_line(size = 0.3) +
@@ -855,16 +1040,13 @@ PlotMzDistribution <- function(x, method='trellis'){
 #'  PlotMassDistribution(WU163763, method = 'overlay') +
 #'    theme(legend.position = 'none')  
 PlotMassDistribution <- function(x, method = 'trellis'){ 
+  res <- x %>% dplyr::filter_at(vars("MSOrder"), any_vars(. == "Ms2")) %>% 
+    dplyr::select_at(vars("ChargeState", "PrecursorMass", "filename"))
+  res$deconv <-  round((res$PrecursorMass -1.00782) * res$ChargeState, 0)
+  res <- dplyr::mutate_at(res, vars("ChargeState"), funs(factor(.)))
+  
   if (method == 'trellis'){
-    res <- x %>% dplyr::filter_at(vars("MSOrder"), any_vars(. == "Ms2")) %>% 
-      dplyr::select_at(vars("ChargeState", "PrecursorMass", "filename"))
-    
-    res$deconv <-  round((res$PrecursorMass -1.00782) * res$ChargeState, 0)
-    
-    res <- dplyr::mutate_at(res, vars("ChargeState"), funs(factor(.)))
-    
-    ncolor <- length(unique(res$ChargeState))
-    
+
     figure <- ggplot(res, aes_string(x = "deconv", fill = "ChargeState", colour = "ChargeState")) +
       geom_histogram(binwidth = 100, alpha = .3, position = "identity") +
       labs(title = "Precursor mass to charge frequency plot ") +
@@ -878,37 +1060,20 @@ PlotMassDistribution <- function(x, method = 'trellis'){
     return(figure)
     
   }else if (method == 'violin'){ #mz.frequency.violin
-    res <- x %>% dplyr::filter_at(vars("MSOrder"), any_vars(. == "Ms2")) %>% 
-      dplyr::select_at(vars("ChargeState", "PrecursorMass", "filename"))
-    
-    res$deconv <-  round((res$PrecursorMass -1.00782)* res$ChargeState, 0)
-    
-    res <- dplyr::mutate_at(res, vars("ChargeState"), funs(factor(.)))
     
     figure <- ggplot(res, aes_string(x = "ChargeState", y = "deconv", fill = "filename")) +
       geom_violin() +
-      #geom_histogram(binwidth = 100, alpha = .3, position = "identity") +
       labs(title = "Precursor mass to charge density plot ") +
       labs(subtitle = "Plotting the charge state resolved precursor masse density for each mass spectrometry run") +
       labs(x = "Charge State ", y = "Neutral Mass [Da]") +
-      #labs(fill = "Charge State", colour = "Charge State") +
-      #scale_x_continuous(breaks = scales::pretty_breaks(8)) +
       theme_light() +
       theme(legend.position = "top")
-    #facet_wrap(~filename)
     return(figure)
     
   }else if (method == 'overlay'){ #mz.frequency.overlay
-    res <-  x %>% 
-      dplyr::filter_at(vars("MSOrder"), any_vars(. == "Ms2")) %>% 
-      dplyr::select_at(vars("ChargeState", "PrecursorMass", "filename")) %>% 
-      dplyr::mutate("deconv" = round((PrecursorMass -1.00782)*ChargeState, 0)) %>% 
-      dplyr::mutate_at(vars("ChargeState"), funs(factor(.)))
     
     figure <- ggplot(res, aes_string(x = "deconv", colour = "filename")) +
       geom_line(stat = "density") +
-      #geom_density(aes(y= ..density.. )) + with base line along x axis with density value y= 0
-      #geom_histogram(binwidth = 100, alpha = .3, position = "identity") +
       labs(title = "Precursor mass density plot ") +
       labs(subtitle = "Plotting the precursor masse density for each mass spectrometry run") +
       labs(x = "Precursor mass [neutral mass]", y = "Density") +
@@ -916,7 +1081,6 @@ PlotMassDistribution <- function(x, method = 'trellis'){
       coord_cartesian(xlim = c(min(res$deconv), 10000)) +
       theme_light() +
       theme(legend.position = "top")
-    #facet_wrap(~filename)
     return(figure)
     
   }else{NULL}
@@ -1010,13 +1174,18 @@ PlotChargeState <- function(x, method='trellis'){
 #' @export PlotScanTime
 #' @import tidyr
 PlotScanTime <- function(x, method='trellis'){
-  if(method == 'trellis'){
-    res <- x %>% 
-      dplyr::mutate(ElapsedScanTimesec = ElapsedScanTimesec * 1000)
+  res <- x %>% 
+    dplyr::mutate(ElapsedScanTimesec = ElapsedScanTimesec * 1000) %>% 
+    dplyr::select_at(vars("StartTime", "ScanType", "ElapsedScanTimesec", "filename", "MassAnalyzer", "MSOrder", "transient")) %>% 
+    na.omit()
+  
+  res <- .map.type(res)
+  
+   if(method == 'trellis'){
     
     figure <- ggplot(res, aes_string(x = "StartTime", y = "ElapsedScanTimesec")) +
       geom_point(shape = ".") +
-      facet_grid(filename ~ MSOrder + MassAnalyzer) +
+      facet_grid(filename ~ Type) +
       geom_line(stat = "smooth", method = "gam",
                 formula = y~s(x), colour = "deepskyblue3", se = FALSE) +
       labs(title = "Scan time plot") +
@@ -1049,7 +1218,7 @@ PlotScanTime <- function(x, method='trellis'){
     return(figure)
     
   }else if (method == 'overlay'){
-    figure <- ggplot(x, aes_string(x = "StartTime", y = "ElapsedScanTimesec", colour = "filename")) +
+    figure <- ggplot(res, aes_string(x = "StartTime", y = "ElapsedScanTimesec", colour = "filename")) +
       geom_point(size = 0.5) +
       geom_line(aes_string(group = "filename", colour = "filename"), stat = "smooth", method = "gam", formula = y ~ s(x, bs= "cs"), se = FALSE) +
       facet_grid(~ MSOrder + MassAnalyzer, scales = "free") +
@@ -1214,7 +1383,7 @@ PlotCycleLoad <- function(x, method = 'trellis'){ #old name ms2.distribution
       scale_x_continuous(breaks = scales::pretty_breaks(8)) +
       coord_cartesian(ylim = c(0, max(res$n)+1)) +
       labs(title = "Time resolved number of MS2 scans") +
-      labs(subtitle = "Plotting the number of MS2 per MS1 scan versus retention time") +
+      labs(subtitle = "Plotting the number of MS2 per MS1 scan versus retention time. The deepskyblue colored loess curve shows the trend.") +
       labs(x = "Retention Time [min]", y = "Number of MS2 per MS1 [counts]") +
       theme_light()
     return(figure)
@@ -1289,7 +1458,7 @@ PlotScanFrequency <- function(x, method = 'trellis'){
       scale_y_continuous(breaks = scales::pretty_breaks(8))+
       labs(title = "MS2 Scan Frequency Plot") +
       labs(subtitle = "Plotting number of MS2 per second against retention time") +
-      labs(x = "Retention Time [min]", y = "MS2 frequency [Hz]") +
+      labs(x = "Retention Time [min]", y = "Scan Frequency [Hz]") +
       theme_light() 
     return(figure)  
     
@@ -1344,6 +1513,7 @@ PlotPrecursorHeatmap <- function(x, method = 'overlay', bins = 80){
     dplyr::filter_at(vars("MSOrder"), any_vars(. == "Ms2"))
   
   gp <- ggplot(res, aes_string(x = 'StartTime', y = 'PrecursorMass')) + 
+    labs(x = "Retention Time [min]", y = "Precursor Mass [Da]") +
     geom_hex(bins = bins) + 
     scale_fill_gradientn(colours = colorvector) + 
     scale_x_continuous(breaks = scales::pretty_breaks(8)) + 
@@ -1373,6 +1543,7 @@ PlotMassHeatmap <- function(x, method='trellis', bins = 80){ #rename to mass.hea
     dplyr::filter_at(vars("deconv"), any_vars(. <= 10000))
   
   gp <- ggplot(res, aes_string(x = 'StartTime', y = 'deconv')) + 
+    labs(x = "Retention Time [min]", y = "Mass [Da]") +
     geom_hex(bins = bins ) +
     scale_fill_gradientn(colours = colorvector) +
     scale_x_continuous(breaks = scales::pretty_breaks(8)) + 
@@ -2046,3 +2217,46 @@ benchmark_mzR <- function(f, maxncpu = c(16, 32, 64),
     return(benchmark.rawDiag)
   }
 }
+
+
+#' run the package demo 
+#'
+#' @param appDir directory containing the shiny \code{server.R},
+#' @param root default is the home directory.
+#' @param dirlist all directories containg a raw files.
+#' @param ... passed to the \code{\link{runApp}} method.
+#' @return \code{NULL}
+#' @export rawDiagShiny
+#'
+#' @examples
+#' \dontrun{
+#' rawDiagShiny(root="/Users/cp/Downloads", 
+#'   dirlist=unique(dirname(list.files("/Users/cp/Downloads", recursive = TRUE, pattern="*.raw"))))
+#' 
+#' ## run it from the command line
+#' 
+#' # MacOSX and Linux
+#' R -e "library(rawDiag);rawDiagShiny(launch.browser=TRUE)"
+#' 
+#' # Windows
+#' R.exe -e "library(rawDiag);rawDiagShiny(root='D:/Data2Sam/', launch.browser=TRUE)"
+#' }
+rawDiagShiny <- function(appDir = system.file('shiny', 'demo', package = 'rawDiag'), 
+     root = Sys.getenv('HOME'), 
+     dirlist = unique(dirname(list.files(root, recursive = TRUE, pattern="*.raw"))),
+     ...){
+  
+  if (require('shiny')){
+    .GlobalEnv$.rawDiagfilesystemRoot <- root
+    .GlobalEnv$.rawDiagfilesystemDataDir <- dirlist
+    tryCatch({
+      shiny::runApp(appDir, display.mode = 'normal', ...)
+      },
+             error = function(e) e)
+  }else{
+    warning('no shiny package available.')
+  }
+  NULL
+}
+
+

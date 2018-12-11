@@ -2,11 +2,12 @@
 /// see URL http://planetorbitrap.com/rawfilereader#.WjkqIUtJmL4
 /// the ThermoFisher library has to be manual downloaded and installed
 /// Please read the License document
-/// Witold Wolski <wew@fgcz.ethz.ch> and Christian Panse <cp@fgcz.ethz.ch
+/// Witold Wolski <wew@fgcz.ethz.ch> and Christian Panse <cp@fgcz.ethz.ch> and Christian Trachsel
 /// 2017-09-25 Zurich, Switzerland
 /// 2018-04-24 Zurich, Switzerland
 /// 2018-06-04 San Diego, CA, USA added xic option
 /// 2018-06-28 added xic and scan option
+/// 2018-07-24 bugfix
  
 using System;
 using System.Collections.Generic;
@@ -18,6 +19,7 @@ using System.Collections;
 //using System.Diagnostics.Eventing;
 //using System.Data.Common;
 using System.Linq;
+//using System.Runtime.DesignerServices;
 //using System.Runtime.InteropServices.WindowsRuntime;
 //using System.Xml.Schema;
 //using System.Runtime.InteropServices;
@@ -152,9 +154,20 @@ namespace FGCZExtensions
                     + "\tIsolationWidth"
                 );
                 var trailerFields = rawFile.GetTrailerExtraHeaderInformation();
+                var trailerHeaderFieldCounter = 0;
+
                 foreach (var field in trailerFields)
                 {
-                    file.Write("\t{0}", field.Label.ToString().CleanRawfileTrailerHeader());
+                    trailerHeaderFieldCounter++;
+                    var trailerHeaderFieldValue =
+                        field.Label.ToString().CleanRawfileTrailerHeader();
+                    
+                    if (trailerHeaderFieldValue.Length > 1){
+                        file.Write("\t{0}", trailerHeaderFieldValue, trailerHeaderFieldValue.Length );
+                    } else {
+                        file.Write("\tunnamedTrailerHeaderField_{0}", trailerHeaderFieldCounter);
+                    }
+
                 }
 
 
@@ -214,7 +227,7 @@ namespace FGCZExtensions
 
                     foreach (var scanTrailerField in scanTrailer.Values)
                     {
-                        file.Write("\t{0}", scanTrailerField);
+                        file.Write("\t{0}", scanTrailerField.Replace("\t", "").Replace(" ", ""));
                     }
 
                     file.WriteLine();
@@ -224,6 +237,11 @@ namespace FGCZExtensions
         }
 
 
+        /// <summary>
+        /// </summary>
+        /// <param name="rawFile"></param>
+        /// <param name="filename"></param>
+        /// <param name="L"></param>
         public static void PrintScanAsRcode(this IRawDataPlus rawFile, string filename, List<int> L)
         {
             int count = 1;
@@ -235,56 +253,94 @@ namespace FGCZExtensions
                 {
 
                     var trailerFields = rawFile.GetTrailerExtraHeaderInformation();
-
-                    var idx_PEPMASS = trailerFields
-                        .Select((item, index) => new
-                        {
-                            name = item.Label.ToString().CleanRawfileTrailerHeader(),
-                            Position = index
-                        })
-                        .First(x => x.name.Contains("Monoisotopic")).Position;
-
-                    var idx_CHARGE = trailerFields
-                        .Select((item, index) => new
-                        {
-                            name = item.Label.ToString(),
-                            Position = index
-                        })
-                        .First(x => x.name.Contains("Charge State")).Position;
+                    var pepmass = -1.0;
+                    var charge = "NA";
+                    var basepeakIntensity = -1.0;
 
                     var scanStatistics = rawFile.GetScanStatsForScanNumber(scanNumber);
                     var centroidStream = rawFile.GetCentroidStream(scanNumber, false);
+                    var scanTrailer = rawFile.GetTrailerExtraInformation(scanNumber);
                     var scanEvent = rawFile.GetScanEventForScanNumber(scanNumber);
-
-                    if (scanStatistics.IsCentroidScan && centroidStream.Length > 0)
+                    
+                    try
                     {
-                        // Get the centroid (label) data from the RAW file for this scan
-                        var scanTrailer = rawFile.GetTrailerExtraInformation(scanNumber);
                         var reaction0 = scanEvent.GetReaction(0);
+                        var idx_PEPMASS = trailerFields
+                            .Select((item, index) => new
+                            {
+                                name = item.Label.ToString().CleanRawfileTrailerHeader(),
+                                Position = index
+                            })
+                            .First(x => x.name.Contains("Monoisotopic")).Position;
 
-                        file.WriteLine("e$PeakList[[{0}]] <- list(", count++);
-                        file.WriteLine("\tscan = {0},", scanNumber);
-                        file.WriteLine("\trtinseconds = {0},", Math.Round(scanStatistics.StartTime * 60 * 1000) / 1000);
-                        file.WriteLine("\tpepmass = c({0}, {1}),",
-                            reaction0.PrecursorMass,
-                            Math.Round(scanStatistics.BasePeakIntensity));
-                      
-                        file.WriteLine("\ttitle=\"File: {0}; SpectrumID: {1}; scans: {2}\",",
-                            Path.GetFileName(rawFile.FileName),
-                            null,
-                            scanNumber);
-                        
-                        file.WriteLine("\tcharge = {0},", scanTrailer.Values.ToArray()[idx_CHARGE]);
-                        
-                        file.WriteLine("\tmZ = c(" + string.Join(",", centroidStream.Masses) + "),");
-                        file.WriteLine("\tintensity = c(" + string.Join(",", centroidStream.Intensities)+ ")");
-                        file.WriteLine(")");
+                        var idx_CHARGE = trailerFields
+                            .Select((item, index) => new
+                            {
+                                name = item.Label.ToString(),
+                                Position = index
+                            })
+                            .First(x => x.name.Contains("Charge State")).Position;
 
+                            pepmass = reaction0.PrecursorMass;
+                            basepeakIntensity =  Math.Round(scanStatistics.BasePeakIntensity);
+                            charge = scanTrailer.Values.ToArray()[idx_CHARGE];
                     }
-                    else
+                    catch
                     {
-                        Console.WriteLine("# No centroid stream available");
+                        Console.WriteLine("catch");
+                        pepmass = -1.0;
+                        basepeakIntensity = -1.0;
+                        charge = "NA";
                     }
+
+
+                        if (scanStatistics.IsCentroidScan && centroidStream.Length > 0)
+                        {
+                            // Get the centroid (label) data from the RAW file for this scan
+
+                            file.WriteLine("e$PeakList[[{0}]] <- list(", count++);
+                            file.WriteLine("\tscan = {0},", scanNumber);
+                            file.WriteLine("\tscanType = \"{0}\",", scanStatistics.ScanType.ToString());
+                            file.WriteLine("\trtinseconds = {0},",
+                                Math.Round(scanStatistics.StartTime * 60 * 1000) / 1000);
+                            file.WriteLine("\tpepmass = c({0}, {1}),", pepmass, basepeakIntensity);
+                            file.WriteLine("\tcentroidStream = TRUE,");
+
+                            file.WriteLine("\ttitle = \"File: {0}; SpectrumID: {1}; scans: {2}\",",
+                                Path.GetFileName(rawFile.FileName),
+                                null,
+                                scanNumber);
+
+                            file.WriteLine("\tcharge = {0},", charge);
+                            file.WriteLine("\tmZ = c(" + string.Join(",", centroidStream.Masses) + "),");
+                            file.WriteLine("\tintensity = c(" + string.Join(",", centroidStream.Intensities) + ")");
+                            file.WriteLine(")");
+
+                        }
+                        else
+                        {
+                            var scan = Scan.FromFile(rawFile, scanNumber);
+                            
+                            file.WriteLine("e$PeakList[[{0}]] <- list(", count++);
+                            file.WriteLine("\tscan = {0},", scanNumber);
+                            file.WriteLine("\tscanType = \"{0}\",", scanStatistics.ScanType.ToString());
+                            file.WriteLine("\trtinseconds = {0},",
+                                Math.Round(scanStatistics.StartTime * 60 * 1000) / 1000);
+                            file.WriteLine("\tpepmass = c({0}, {1}),", pepmass, basepeakIntensity);
+                            file.WriteLine("\tcentroidStream = FALSE,");
+
+                            file.WriteLine("\ttitle = \"File: {0}; SpectrumID: {1}; scans: {2}\",",
+                                Path.GetFileName(rawFile.FileName),
+                                null,
+                                scanNumber);
+
+                            file.WriteLine("\tcharge = {0},", charge);
+
+                            file.WriteLine("\tmZ = c(" + string.Join(",", scan.SegmentedScan.Positions) + "),");
+                            file.WriteLine("\tintensity = c(" + string.Join(",", scan.SegmentedScan.Intensities) + ")");
+                            file.WriteLine(")");
+                            
+                        }
                 }
             }
 
@@ -335,7 +391,7 @@ namespace FGCZ_Raw
         {
             // This local variable controls if the AnalyzeAllScans method is called
             bool analyzeScans = false;
-            string rawDiagVersion = "0.0.5";
+            string rawDiagVersion = "0.0.10";
 
             // Get the memory used at the beginning of processing
             Process processBefore = Process.GetCurrentProcess();

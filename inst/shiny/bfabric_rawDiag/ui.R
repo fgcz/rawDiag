@@ -22,7 +22,7 @@ if (!require("bfabricShiny")){
 shinyUI(fluidPage(
   
   # Application title
-  titlePanel(paste("rawDiag - Diagnostic Plots for Mass Spectrometry Data", "version", packageVersion('rawDiag'))),
+  #titlePanel(paste("rawDiag - Diagnostic Plots for Mass Spectrometry Data", "version", packageVersion('rawDiag'))),
   
   # Sidebar with a slider input for number of bins 
   sidebarLayout(
@@ -39,10 +39,11 @@ shinyUI(fluidPage(
       htmlOutput("sourceBfabric"),
       hr(),
       htmlOutput("ReaderParameter"),
+      htmlOutput("XICParameter"),
       h3("Graphics Parameter"),
       sliderInput("graphicsheight", "graphicsheight",
                   min = 480, max = 4096,
-                  value = 640),
+                  value = 900),
       sliderInput("hexbinsize", "hexbinsize", min = 1, max = 512, value = 80),
       radioButtons("plottype", "Type of diagnostic plot:",
                    c("overlay" = "overlay",
