@@ -1,4 +1,6 @@
-# rawDiag ![animate](/inst/shiny/bfabric_rawDiag/www/animated100.gif")
+# rawDiag ![alt text][logo]
+[logo]: https://github.com/fgcz/rawDiag/blob/master/inst/shiny/bfabric_rawDiag/www/animated100.gif "rawDiag animation"
+
 
 an R package supporting rational LC-MS method optimization for bottom-up proteomics on multiple OS platforms
 
