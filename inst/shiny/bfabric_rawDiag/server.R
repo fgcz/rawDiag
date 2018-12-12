@@ -14,6 +14,7 @@ library(tidyr)
 library(rmarkdown)
 library(base64enc)
 library(ggplot2)
+library(lattice)
 
 shinyServer(function(input, output, session) {
 # ----check bfabricShinyModule---- 
@@ -546,7 +547,7 @@ PlotQCs <- function(x){
   cbbPalette <- c("#000000", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
 
   message("plotQCs")
-  if (input$XICpepitdes == 'promega_6x5' & require(lattice)){
+  if (input$XICpepitdes == 'promega_6x5'){
     
     df <- rawDiag:::.promega.extract.maxpeak(x)
     
@@ -557,7 +558,7 @@ PlotQCs <- function(x){
                  asp=1,
                  panel=panel.flm)
     return (lp)
-  }else if(input$XICpepitdes == 'iRT' & require(lattice)){
+  }else if(input$XICpepitdes == 'iRT'){
    
     df <- .iRT.extract.maxpeak(x)
     if (input$plottype == "trellis") {
