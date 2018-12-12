@@ -1,4 +1,5 @@
 # rawDiag ![alt text][logo]
+
 [logo]: https://github.com/fgcz/rawDiag/blob/master/inst/shiny/bfabric_rawDiag/www/animated100.gif "rawDiag animation"
 
 
