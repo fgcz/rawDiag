@@ -197,7 +197,7 @@ the documentation of the functions is available through the R man pages.
 ## 5. Useful bookmarks
 - http://planetorbitrap.com/rawfilereader
 - [screen recording (3:02 minutes, size 47MB, no audio track)](http://fgcz-ms.uzh.ch/~cpanse/PAPERS/pr-2018-001736.mov)
-- run [rawDiag shiny demo on our compute server](http://fgcz-ms-shiny.uzh.ch:8080/rawDiag-demo/)
+- run [rawDiag shiny demo on our compute server](http://fgcz-ms-shiny.uzh.ch:8080/bfabric_rawDiag/)
 - *rawDiag - an R package supporting rational LC-MS method optimization for bottom-up proteomics*
 Christian Trachsel, Christian Panse, Tobias Kockmann, Witold Eryk Wolski, Jonas Grossmann, Ralph Schlapbach
 [bioRxiv 304485](https://www.biorxiv.org/content/early/2018/04/24/304485).
