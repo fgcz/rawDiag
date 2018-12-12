@@ -1,4 +1,4 @@
-# rawDiag <img src="https://github.com/fgcz/rawDiag/blob/master/inst/shiny/bfabric_rawDiag/www/animated100.gif" align="right" width="100px" />
+# rawDiag <img src="/inst/shiny/bfabric_rawDiag/www/animated100.gif" align="right" width="100px" />
 
 an R package supporting rational LC-MS method optimization for bottom-up proteomics on multiple OS platforms
 
