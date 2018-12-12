@@ -2,7 +2,7 @@
 an R package supporting rational LC-MS method optimization for bottom-up proteomics on multiple OS platforms
 
 
-![octopussy](https://github.com/fgcz/rawDiag/blob/master/inst/shiny/bfabric_rawDiag/www/octopussy.png)
+![octopussy](https://github.com/fgcz/rawDiag/blob/master/inst/shiny/bfabric_rawDiag/www/animated100.gif)
 
 
 main features:
