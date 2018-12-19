@@ -183,6 +183,44 @@ and you can add to your alias file, e.g., `$HOME/.bashrc`
 alias rawDiag="R -e \"library(rawDiag); rawDiagShiny(root='$HOME/Downloads', launch.browser=TRUE)\""
 ```
 
+#### 3.4.3  How to get all scan attributes assosiated to each scan?
+
+Assuming the raw file name is equal to "20181217_006_autoQC01.raw" the command would be:
+```
+AllScanMetaData <- read.raw("20181217_006_autoQC01.raw", rawDiag = FALSE)
+> dim(AllScanMetaData)
+[1] 21868    82
+> names(AllScanMetaData)
+ [1] "filename"               "scanNumber"             "ScanEventNumber"       
+ [4] "StartTime"              "BasePeakMass"           "BasePeakIntensity"     
+ [7] "TIC"                    "ScanType"               "CycleNumber"           
+[10] "Frequency"              "HighMass"               "IonizationMode"        
+[13] "MSOrder"                "MassAnalyzer"           "Detector"              
+[16] "Lock"                   "PrecursorMass"          "LastPrecursorMass"     
+[19] "CollisionEnergy"        "IsolationWidth"         "MultipleInjection"     
+[22] "MultiInjectInfo"        "AGC"                    "MicroScanCount"        
+[25] "ScanSegment"            "ScanEvent"              "MasterIndex"           
+[28] "ChargeState"            "MonoisotopicmZ"         "IonInjectionTimems"    
+[31] "MaxIonTimems"           "FTResolution"           "MS2IsolationWidth"     
+[34] "MS2IsolationOffset"     "AGCTarget"              "HCDEnergy"             
+[37] "AnalyzerTemperature"    "MassCalibration"        "ConversionParameterB"  
+[40] "ConversionParameterC"   "TemperatureCompppm"     "RFCompppm"             
+[43] "SpaceChargeCompppm"     "ResolutionCompppm"      "NumberofLockMasses"    
+[46] "LockMass1mZ"            "LockMass2mZ"            "LockMass3mZ"           
+[49] "LMSearchWindowppm"      "LMSearchWindowmmu"      "NumberofLMFound"       
+[52] "LastLockingsec"         "LMmZCorrectionppm"      "IonOpticsSettings"     
+[55] "SLensRFLevel"           "SLensVoltageV"          "SkimmerVoltageV"       
+[58] "InjectFlatapoleOffsetV" "BentFlatapoleDCV"       "MP2andMP3RFV"          
+[61] "GateLensVoltageV"       "CTrapRFV"               "DiagnosticData"        
+[64] "DynamicRTShiftmin"      "IntensCompFactor"       "ResDepIntens"          
+[67] "CTCDNumF"               "CTCDComp"               "CTCDScScr"             
+[70] "RawOvFtT"               "LCFWHMparameter"        "Rod"                   
+[73] "PSInjTimems"            "AGCPSMode"              "AGCPSDiag"             
+[76] "HCDEnergyeV"            "AGCFill"                "Injectiont0"           
+[79] "t0FLP"                  "AccessId"               "AnalogInput1V"         
+[82] "AnalogInput2V"         
+```
+
 
 ## 4. Instructions for use
 
