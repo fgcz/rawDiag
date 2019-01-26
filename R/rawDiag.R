@@ -519,6 +519,36 @@ readScans <- function(rawfile,
 plot.peaklist <- function(x, y, ...){
   plot(x$mZ, x$intensity, type = 'h', main = x$title, xlab = 'm/Z', ylab = 'intensity', ...)
 }
+
+.read.raw.info <- function(file,
+    mono = if(Sys.info()['sysname'] %in% c("Darwin", "Linux")) TRUE else FALSE,
+    exe = file.path(path.package(package = "rawDiag"), "exec", "fgcz_raw.exe"),
+    mono_path = "",
+    argv = "info",
+    system2_call = TRUE,
+    method = "thermo"){
+
+  if(system2_call && method == 'thermo'){
+    tf <- tempfile(fileext = '.tsv')
+
+    message(paste("system2 is writting to tempfile ", tf, "..."))
+
+    if (mono){
+      rvs <- system2("mono", args = c(exe, shQuote(file), argv), stdout = tf)
+    }else{
+      rvs <- system2(exe, args = c(shQuote(file), argv), stdout = tfstdout)
+    }
+    if (rvs == 0){
+      rv <- read.csv(tf,  sep = ":",   stringsAsFactors = TRUE, header = FALSE,
+                     col.names = c('attribute', 'value'))
+      message(paste("unlinking", tf, "..."))
+      unlink(tf)
+      unlink(tfstdout)
+      return(rv)
+    }
+  }
+  NULL
+}
   
 #' mass spec reader function 
 #'
@@ -610,7 +640,6 @@ read.raw <- function(file, mono = if(Sys.info()['sysname'] %in% c("Darwin", "Lin
     stopifnot(file.exists(file))
     
     # message(paste("start", Sys.time(), sep = ":"))
-    
     
     if(system2_call){
       tf <- tempfile(fileext = 'tsv')
