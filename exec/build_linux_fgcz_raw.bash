@@ -7,4 +7,5 @@ mcs /out:fgcz_raw.exe \
   /r:ThermoFisher.CommonCore.RawFileReader.dll /target:exe \
   /optimize \
   /platform:anycpu
-  /clr
+
+exit $?

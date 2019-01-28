@@ -8,6 +8,8 @@
 /// 2018-06-04 San Diego, CA, USA added xic option
 /// 2018-06-28 added xic and scan option
 /// 2018-07-24 bugfix
+/// 2018-11-23 added scanFilter option
+/// 2019-01-28 extract monoisotopicmZ attribute; include segments in MGF iff no centroid data are availbale
  
 using System;
 using System.Collections.Generic;
@@ -75,7 +77,7 @@ namespace FGCZExtensions
                     name = item.Label.ToString().CleanRawfileTrailerHeader(),
                     Position = index
                 })
-                .First(x => x.name.Contains("Monoisotopic")).Position;
+                .First(x => x.name.Contains("MonoisotopicmZ")).Position;
 
             var idx_CHARGE = trailerFields
                 .Select((item, index) => new
@@ -89,34 +91,51 @@ namespace FGCZExtensions
             var centroidStream = rawFile.GetCentroidStream(scanNumber, false);
             var scanEvent = rawFile.GetScanEventForScanNumber(scanNumber);
             
+            // Get the centroid (label) data from the RAW file for this scan
+            var scanTrailer = rawFile.GetTrailerExtraInformation(scanNumber);
+            var reaction0 = scanEvent.GetReaction(0);
+            
+            double pepmass = Convert.ToDouble(scanTrailer.Values.ToArray()[idx_PEPMASS]);
+            
+            if (pepmass == 0.0)
+            {
+                Console.WriteLine("# PrecursorMass");
+                pepmass = Convert.ToDouble(reaction0.PrecursorMass);
+            }
+
+            Console.WriteLine("BEGIN IONS");
+            Console.WriteLine("TITLE=File: \"{0}\"; SpectrumID: \"{1}\"; scans: \"{2}\"", 
+                Path.GetFileName(rawFile.FileName),
+                null,
+                scanNumber);
+            
+            
+            Console.WriteLine("PEPMASS={0:F5}", pepmass);
+                //Math.Round(scanStatistics.BasePeakIntensity));
+            Console.WriteLine("CHARGE={0}+", scanTrailer.Values.ToArray()[idx_CHARGE]);
+            Console.WriteLine("RTINSECONDS={0:F0}", Math.Round(scanStatistics.StartTime * 60 * 100)/100);
+            Console.WriteLine("SCANS={0}", scanNumber);
+
             if (scanStatistics.IsCentroidScan && centroidStream.Length > 0)
             {
-                // Get the centroid (label) data from the RAW file for this scan
-                var scanTrailer = rawFile.GetTrailerExtraInformation(scanNumber);
-                var reaction0 = scanEvent.GetReaction(0);
-
-                Console.WriteLine("BEGIN IONS");
-                Console.WriteLine("TITLE=File: \"{0}\"; SpectrumID: \"{1}\"; scans: \"{2}\"", 
-                    Path.GetFileName(rawFile.FileName),
-                    null,
-                    scanNumber);
-                Console.WriteLine("PEPMASS=*{0}* {1}",
-                    reaction0.PrecursorMass,
-                    Math.Round(scanStatistics.BasePeakIntensity));
-                Console.WriteLine("CHARGE={0}+", scanTrailer.Values.ToArray()[idx_CHARGE]);
-                Console.WriteLine("RTINSECONDS={0}", Math.Round(scanStatistics.StartTime * 60 * 100)/100);
-                Console.WriteLine("SCANS={0}", scanNumber);
-
                 for (int i = 0; i < centroidStream.Length; i++)
                 {
-                    Console.WriteLine("{0:F4} {1:F0}", centroidStream.Masses[i], centroidStream.Intensities[i]);
+                    Console.WriteLine("{0:F5} {1:F2}", centroidStream.Masses[i], centroidStream.Intensities[i]);
                 }
-                Console.WriteLine("END IONS\n");
             }
             else
             {
+                var scan = Scan.FromFile(rawFile, scanNumber);
                 Console.WriteLine("# No centroid stream available");
+                var mZ = scan.SegmentedScan.Positions;
+                var intensity = scan.SegmentedScan.Intensities;
+                
+                for (int i = 0; i < scan.SegmentedScan.Positions.Length; i++)
+                {
+                    Console.WriteLine("{0:F5} {1:F2}", mZ[i], intensity[i]);
+                }
             }
+            Console.WriteLine("END IONS\n");
         }
 
         
@@ -255,6 +274,7 @@ namespace FGCZExtensions
                     var trailerFields = rawFile.GetTrailerExtraHeaderInformation();
                     var pepmass = -1.0;
                     var charge = "NA";
+                    var monoisotopicMz = "NA";
                     var basepeakIntensity = -1.0;
 
                     var scanStatistics = rawFile.GetScanStatsForScanNumber(scanNumber);
@@ -271,7 +291,7 @@ namespace FGCZExtensions
                                 name = item.Label.ToString().CleanRawfileTrailerHeader(),
                                 Position = index
                             })
-                            .First(x => x.name.Contains("Monoisotopic")).Position;
+                            .First(x => x.name.Contains("MonoisotopicmZ")).Position;
 
                         var idx_CHARGE = trailerFields
                             .Select((item, index) => new
@@ -284,6 +304,7 @@ namespace FGCZExtensions
                             pepmass = reaction0.PrecursorMass;
                             basepeakIntensity =  Math.Round(scanStatistics.BasePeakIntensity);
                             charge = scanTrailer.Values.ToArray()[idx_CHARGE];
+                            monoisotopicMz = scanTrailer.Values.ToArray()[idx_PEPMASS];
                     }
                     catch
                     {
@@ -291,6 +312,7 @@ namespace FGCZExtensions
                         pepmass = -1.0;
                         basepeakIntensity = -1.0;
                         charge = "NA";
+                        monoisotopicMz = "NA";
                     }
 
 
@@ -312,6 +334,7 @@ namespace FGCZExtensions
                                 scanNumber);
 
                             file.WriteLine("\tcharge = {0},", charge);
+                            file.WriteLine("\tmonoisotopicMz = {0},", monoisotopicMz);
                             file.WriteLine("\tmZ = c(" + string.Join(",", centroidStream.Masses) + "),");
                             file.WriteLine("\tintensity = c(" + string.Join(",", centroidStream.Intensities) + ")");
                             file.WriteLine(")");
@@ -356,6 +379,7 @@ namespace FGCZExtensions
             int firstScanNumber = rawFile.RunHeaderEx.FirstSpectrum;
             int lastScanNumber = rawFile.RunHeaderEx.LastSpectrum;
      
+            Console.WriteLine("MASS=Monoisotopic");
             foreach (var scanNumber in Enumerable.Range(1, lastScanNumber - firstScanNumber))
             {
                 if ( rawFile.GetFilterForScanNumber(scanNumber).ToString().Contains("Full ms2"))
@@ -406,6 +430,7 @@ namespace FGCZ_Raw
                 Hashtable hashtable = new Hashtable()
                 {
                     {"version", "print version information."},
+                    {"scanFilter", "print scan filters."},
                     {"info", "print the raw file's meta data."},
                     {"chromatogram", "base peak chromatogram."},
                     {"mgf", "writes MS2 CentroidStream as mascot generic file (mgf)."},
@@ -593,6 +618,15 @@ namespace FGCZ_Raw
                 var firstFilter = rawFile.GetFilterForScanNumber(firstScanNumber);
                 var lastFilter = rawFile.GetFilterForScanNumber(lastScanNumber);
 
+                if (mode == "scanFilter")
+                {
+                    foreach (var filter in rawFile.GetFilters())
+                    {
+                        Console.WriteLine(filter.ToString());
+                    }
+                    Environment.Exit(0);
+                }
+                
                 if (mode == "info")
                 {
                     Console.WriteLine("Filter Information:");
@@ -1087,12 +1121,10 @@ namespace FGCZ_Raw
                     file.WriteLine("e$XIC[[{0}]] <- list(", i + 1);
                     file.WriteLine("\tmass = {0},", massList[i]);
 
-                    
                     file.WriteLine("\ttimes = c(" + string.Join(",", tTime) + "),");
                     file.WriteLine("\tintensities = c(" + string.Join(",", tIntensities) + ")");
                     
                     file.WriteLine(");");
-                    
                 }
             }
         }
