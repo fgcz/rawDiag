@@ -155,6 +155,11 @@ RAW <- mclapply(rawFileNames, read.raw, mc.cores=4)
 RAW <- plyr::rbind.fill(RAW)
 ```
 
+
+
+
+#### 3.4.2. Can I run the rawDiag shiny code as a stand-alone application?
+
 run the rawDiag shiny application
 
 ```{r}
@@ -163,9 +168,6 @@ library(rawDiag)
 # root defines where your raw files are
 rawDiagShiny(root="D:/Data2San/")
 ```
-
-
-#### 3.4.2. Can I run the rawDiag shiny code as a stand-alone application?
 
 Yes, on Microsoft's systems call (through using `cmd.exe`)
 ```
