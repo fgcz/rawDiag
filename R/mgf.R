@@ -90,9 +90,10 @@
 #' pattern <- list(
 #'   EThcD.lowres = "ITMS.+sa Full ms2.+@etd.+@hcd.+",
 #'   ETciD.lowres = "ITMS.+sa Full ms2.+@etd.+@cid.+",
-#'   CID = "^[^@]+@cid[^@]+$",
-#'   HCD = "^[^@]+@hcd[^@]+$",
-#'   pattern.EThcD.highres = "FTMS.+sa Full ms2.+@etd.+@hcd.+" 
+#'   CID.lowres = "ITMS[^@]+@cid[^@]+$",
+#'   HCD.lowres = "ITMS[^@]+@hcd[^@]+$",
+#'   EThcD.highres = "FTMS.+sa Full ms2.+@etd.+@hcd.+",
+#'   HCD.highres = "FTMS[^@]+@hcd[^@]+$"
 #' )
 #' 
 #' lapply(names(pattern), function(x){
