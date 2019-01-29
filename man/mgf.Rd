@@ -2,28 +2,30 @@
 % Please edit documentation in R/mgf.R
 \name{mgf}
 \alias{mgf}
-\title{generate a Mascot Generic File (mgf)}
+\title{writes a Mascot Generic File (mgf)}
 \usage{
 mgf(rawfilename, mgffilename = paste(sub("\\\\.raw$", "", rawfilename),
-  "mgf", sep = "."), FUN = NULL)
+  "mgf", sep = "."), pattern = ".+", FUN = NULL)
 }
 \arguments{
-\item{rawfilename}{a Thermo Fisher instrument file}
+\item{rawfilename}{a Thermo Fisher instrument file.}
 
-\item{mgffilename}{a Mascot Generic File}
+\item{mgffilename}{a Mascot Generic File.}
 
-\item{FUN}{a function applied to each MS2 scan}
-}
-\value{
+\item{pattern}{ScanType regex pattern; default is \code{".+"}.}
 
+\item{FUN}{a function applied to each MS2 scan.}
 }
 \description{
-generate a Mascot Generic File (mgf)
+The method read the metadata of a given raw filename, applies
+to filter, and writes every MS2 scan into an mgf file. The technique allows
+filtering specific scan as EThcD, HCD, or ETD. Potential use is a combination
+with the comet search engine.
 }
 \examples{
 (rawfilename <- file.path(path.package(package = 'rawDiag'),
   'extdata', 'sample.raw'))
-mgf(rawfile, tempfile(fileext = '.mgf'))
+mgf(rawfilename, tempfile(fileext = '.mgf'))
 
 # extract only top five higest MS2
 
@@ -36,9 +38,32 @@ if(x$mZ > 5){
  x
 }
 
-mgf(rawfile, tempfile(fileext = '.mgf'), FUN=top5)
+pattern.EThcD.lowres <- "ITMS.+sa Full ms2.+@etd.+@hcd.+"
+
+mgf(rawfilename, tempfile(fileext = '.EThcD.lowres.mgf'),
+pattern=pattern.EThcD.lowres, FUN=top5)
+
+
+pattern <- list(
+  EThcD.lowres = "ITMS.+sa Full ms2.+@etd.+@hcd.+",
+  ETciD.lowres = "ITMS.+sa Full ms2.+@etd.+@cid.+",
+  CID = "^[^@]+@cid[^@]+$",
+  HCD = "^[^@]+@hcd[^@]+$",
+  pattern.EThcD.highres = "FTMS.+sa Full ms2.+@etd.+@hcd.+" 
+)
+
+lapply(names(pattern), function(x){
+   mgf(rawfilename,
+     paste(basename(rawfilename), x, "mgf", sep='.'),
+     pattern=pattern[[x]])})
 
 }
+\references{
+\url{https://doi.org/10.1002/pmic.201300036}
+}
+\seealso{
+\url{https://CRAN.R-project.org/package=protViz}
+}
 \author{
-Christian Panse <cp@fgcz.ethz.ch>
+Christian Panse <cp@fgcz.ethz.ch>, 2012-2019
 }
