@@ -520,35 +520,45 @@ plot.peaklist <- function(x, y, ...){
   plot(x$mZ, x$intensity, type = 'h', main = x$title, xlab = 'm/Z', ylab = 'intensity', ...)
 }
 
+
 .read.raw.info <- function(file,
-    mono = if(Sys.info()['sysname'] %in% c("Darwin", "Linux")) TRUE else FALSE,
-    exe = file.path(path.package(package = "rawDiag"), "exec", "fgcz_raw.exe"),
-    mono_path = "",
-    argv = "info",
-    system2_call = TRUE,
-    method = "thermo"){
+     mono = if(Sys.info()['sysname'] %in% c("Darwin", "Linux")) TRUE else FALSE,
+     exe = file.path(path.package(package = "rawDiag"), "exec", "fgcz_raw.exe"),
+     mono_path = "",
+     argv = "info",
+     system2_call = TRUE,
+     method = "thermo"){
 
   if(system2_call && method == 'thermo'){
+
     tf <- tempfile(fileext = '.tsv')
+    tf.err <- tempfile(fileext = '.tsv')
 
     message(paste("system2 is writting to tempfile ", tf, "..."))
 
     if (mono){
-      rvs <- system2("mono", args = c(exe, shQuote(file), argv), stdout = tf)
+      rvs <- system2("mono", args = c(exe, shQuote(file), argv),
+                     stdout = tf)
     }else{
-      rvs <- system2(exe, args = c(shQuote(file), argv), stdout = tfstdout)
+      rvs <- system2(exe, args = c(shQuote(file), argv),
+                     stderr = tf.err,
+                     stdout = tf)
     }
+
     if (rvs == 0){
       rv <- read.csv(tf,  sep = ":",   stringsAsFactors = TRUE, header = FALSE,
                      col.names = c('attribute', 'value'))
+
       message(paste("unlinking", tf, "..."))
+
       unlink(tf)
-      unlink(tfstdout)
+      # unlink(tfstdout)
       return(rv)
     }
   }
   NULL
 }
+
   
 #' mass spec reader function 
 #'
