@@ -695,8 +695,27 @@ read.raw <- function(file, mono = if(Sys.info()['sysname'] %in% c("Darwin", "Lin
 #' @method summary rawDiag
 #' @export summary.rawDiag
 summary.rawDiag <- function(object, ...){
-  table(object$filename, object$MSOrder)
+
+    df.ms2 <- table(object$filename, object$MSOrder)
+
+    pattern <- list(
+        EThcD.lowres = "ITMS.+sa Full ms2.+@etd.+@hcd.+",
+        ETciD.lowres = "ITMS.+sa Full ms2.+@etd.+@cid.+",
+        CID.lowres = "ITMS[^@]+@cid[^@]+$",
+        HCD.lowres = "ITMS[^@]+@hcd[^@]+$",
+        EThcD.highres = "FTMS.+sa Full ms2.+@etd.+@hcd.+",
+        HCD.highres = "FTMS[^@]+@hcd[^@]+$"
+    )
+
+    df <- as.data.frame(lapply(pattern, function(x){
+        sum(grepl(x, object$ScanType[object$MSOrder == "Ms2"]))
+    }))
+
+    df$filename <- object$filename[1]
+
+    list(scanFilter=df, msOrder=df.ms2)
 }
+
 # ----Colors----
 
 #spectral
@@ -1089,7 +1108,7 @@ PlotMassDistribution <- function(x, method = 'trellis'){
     figure <- ggplot(res, aes_string(x = "deconv", fill = "ChargeState", colour = "ChargeState")) +
       geom_histogram(binwidth = 100, alpha = .3, position = "identity") +
       labs(title = "Precursor mass to charge frequency plot ") +
-      labs(subtitle = "Plotting chrage state resolved frequency of precursor masses") +
+      labs(subtitle = "Plotting charge state resolved frequency of precursor masses") +
       labs(x = "Precursor neutral mass [Da]", y = "Frequency [counts]") +
       labs(fill = "Charge State", colour = "Charge State") +
       scale_x_continuous(breaks = scales::pretty_breaks(8)) +
