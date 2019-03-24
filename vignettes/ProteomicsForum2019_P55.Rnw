@@ -1,0 +1,434 @@
+%\VignetteIndexEntry{Proteomics Forum 2019 poster (in portrait) 55}
+%\documentclass[landscape,a0,draft]{a0poster}
+\documentclass[portrait,a0]{a0poster}
+
+\usepackage{multicol}
+
+\usepackage{graphics}
+\usepackage{graphicx}
+\usepackage{color}
+\usepackage{float}
+\usepackage{subfigure}
+%\usepackage[latin1]{inputenc}
+\usepackage{sidecap}
+\usepackage[scaled]{helvet}
+%\usepackage[latin1]{inputenc}
+\graphicspath{{./graphics/}}
+\usepackage{colortbl}
+\usepackage[font={scriptsize}]{caption}
+\usepackage{xcolor}
+\usepackage[colorlinks = true,
+            linkcolor = black,
+            urlcolor  = black,
+            citecolor = blue,
+            anchorcolor = black]{hyperref}
+
+
+\usepackage{tabularx}
+
+\addtolength{\textwidth}{1cm}
+\addtolength{\oddsidemargin}{-1cm}
+\setlength{\topmargin}{-2.6cm}
+\setlength{\headheight}{0cm}
+\setlength{\headsep}{0cm}
+\setlength{\footskip}{0cm}
+\setlength{\columnsep}{3cm}
+\setlength{\parindent}{0cm}
+\setlength{\parskip}{2ex}
+\pagestyle{empty}
+\newcommand*\code[1]{\texttt{\emph{#1}}}
+\newcommand{\scscst}{\scriptscriptstyle}
+\newcommand{\scst}{\scriptstyle}
+\renewcommand{\familydefault}{phv}
+\renewcommand*\familydefault{\sfdefault}
+\definecolor{NTNUBlue}{rgb}{0,0.6,1}
+\definecolor{FGCZ}{rgb}{0,0.6,1}
+\makeatletter
+\renewcommand{\section}{\@startsection
+        {section}%                          % the name
+        {1}%                                % the level
+        {0mm}%                              % the indent
+        {-\baselineskip}%                   % the beforeskip
+        {1mm}%                              % the afterskip
+        {\Large\color{NTNUBlue}\bfseries}}% % the style
+\renewcommand{\subsection}{\@startsection
+        {subsection}%                       % the name
+        {2}%                                % the level
+        {0mm}%                              % the indent
+        {-0.9\baselineskip}%                % the beforeskip
+        {1mm}%                              % the afterskip
+        {\large\color{NTNUBlue}\bfseries}}% % the style
+\renewcommand{\subsubsection}{\@startsection
+        {subsubsection}%                    % the name
+        {3}%                                % the level
+        {0mm}%                              % the indent
+        {-0.7\baselineskip}%                % the beforeskip
+        {1mm}%                              % the afterskip
+        {\color{NTNUBlue}\bfseries}}% % the style
+\makeatother
+
+\def\subfigtopskip{-1pt}       % Length from the top of the subfigure box to
+                               %   the begining of the FIGURE box.
+\def\subfigbottomskip{-1pt}    % Length from the bottom of the CAPTION to
+                               %   the bottom of the subfigure.
+\def\subfigcapskip{-1pt}       % Length from the bottom of the FIGURE to the
+                               %   begining of the CAPTION.
+\def\subfigcapmargin{-1pt}     % Indentation of the caption from the sides
+                               %   of the subfigure box.
+
+%\renewcommand{\normalsize}{\fontsize{24.88}{30}\selectfont}
+%\renewcommand{\normalsize}{\fontsize{20.74}{25}\selectfont}
+%\renewcommand{\normalsize}{\fontsize{22.00}{26.52}\selectfont}
+
+
+\usepackage{eso-pic}
+\newcommand\BackgroundPic{
+\put(0,0){
+\parbox[b][\paperheight]{\paperwidth}{%
+\vfill
+\centering
+%\includegraphics[width=\paperwidth,height=\paperheight, keepaspectratio]{background}
+\vfill
+}}}
+
+
+
+\begin{document}
+
+
+\SweaveOpts{concordance=TRUE, prefix.string=./graphics/ProteomicsForum}
+
+\newcommand*\rawDiag{\textbf{{rawDiag}}}
+\newcommand*\fgcz{Functional Genomics Center Zurich, Swiss Federal Institute of Technology Zurich~\texttt{|}~
+University of Zurich, Winterthurerstr. 190, CH-8057 Zurich, SWITZERLAND.}
+
+<<echo=FALSE>>=
+options(prompt = "R> ", continue = "+  ", width = 60, useFancyQuotes = FALSE, warn = -1)
+library(ggplot2)
+@
+
+\noindent\centerline{\includegraphics[width=\paperwidth]{FGCZ}}\\[2cm]
+
+\vspace{-0.5cm}
+\parbox{\textwidth}{
+\centering
+\resizebox{0.75\textwidth}{!}{\rawDiag \texttt{|} Accessing orbitrap data on the fast lane using R}\\[1.0cm]
+\Large \underline{Tobias Kockmann}, Christian Panse, Christian Trachsel\\[0.5cm]
+\fgcz
+}\\
+\vspace{1.0cm}
+
+
+\begin{multicols}{3}
+
+
+\section{Introduction}
+Despite the widespread usage of R for other omics data analysis, it has
+been largely ignored by the proteomics community. We believe the mayor
+reason is the lack of a direct and performant interface between R and
+mass spectrometry raw data formats. So far this gap has been poorly
+bridged by the HUPO-PSI standards (mzML, mzXML) that can be read into R
+using packages like mzR. The problem to this approach is that raw files
+in vendor specific binary formats first need to be converted to these
+open formats and later on parsed into R objects. Both steps consume
+substantial computational resources and obstruct the development of lean
+data analysis workflows in R. We therefore suggest to bypass these
+costly conversions and instead use vendor-released APIs to directly
+access raw data from the R command line. Our previously published R
+package rawDiag~\cite{rawDiag} demonstrates the power of this approach by
+means of scan
+metadata contained in Thermo Fisher Scientific raw files, see Figure~\ref{fig:meta}. Currently, we
+are extending our philosophy to mass spectra, the core data unit in
+LC-MS driven proteomics. Our initial results show that complex
+analytical workflows dealing with the analysis of spectral data can be
+written directly in R and executed on standard computational
+infrastructures in an OS independent fashion.
+\vspace{1cm}
+\begin{figure}[H]
+\includegraphics[width=1\columnwidth, keepaspectratio]{PlotOverview}
+\caption{
+\label{fig:meta}
+The \rawDiag~cheatsheet lists the main metadata plot functions of the package. Each thumbnail gives an impression of the generated graphical output using \texttt{trellis}, \texttt{overlay} or \texttt{violin} as method parameter. \texttt{-} indicates missing graphical output due to a discrete response variable. All thumbnails are based on a subset of two .raw files taken from the package dataset \texttt{WU163763}.
+All listed functions return a \texttt{ggplot} object.
+}
+\end{figure}
+
+% The table below provides an overview of the package reader functions demonstrated 
+%in that poster.
+
+
+\section{Code snippet 1: Usage of the package}
+For the following code examples we use a raw file containing quality control (QC) data recorded on a Q Exactive HF in PRM mode. The analyzed sample is a tryptic BSA digest incl. 11 iRT peptides and was separated on a 20 min linear gradient.
+\begin{table}[H]
+\resizebox{1.0\columnwidth}{!}
+{
+\begin{tabular}{l|l|l|l}
+\cellcolor[gray]{0.8}\texttt{function} & \cellcolor[gray]{0.8}Arguments& \cellcolor[gray]{0.8}Value &  \cellcolor[gray]{0.8}Description\\
+\hline
+\texttt{read.raw} & filename & \texttt{data.frame}&reads metadata \\
+\texttt{readXICs} & filename, mZ, tol& \texttt{list} &extracts XICs of a given mass vector\\
+\texttt{readScans} & filename, scanIDs & \texttt{list} of peakplist &read scan of scan numbers
+\end{tabular}
+}
+\caption{Overview of the package reader functions.}
+\end{table}
+<<library>>=
+library(rawDiag)
+
+rawfile <- file.path(Sys.getenv('HOME'),
+    'Downloads/20181113_010_autoQC01.raw')
+
+RAW <- read.raw(file = rawfile)
+@
+
+As a plot example we plot the TIC and BPC.
+<<tic, fig = TRUE, width=5.0, include=FALSE, height=3.0>>=
+(gp <- PlotTicBasepeak(RAW) +
+      theme_bw())
+@
+
+\includegraphics[width=\columnwidth, keepaspectratio]{ProteomicsForum-tic}
+
+%The overview table below graphs the available
+%plot functions and options 
+%for the visualization of the meta data.
+
+\section{Code snippet 2: XIC}
+% \section{Code snippet 2: extracted ion chromatogram (XIC) and fragmention}
+
+<<autoQC01>>=
+iRTpeptide <- c("LGGNEQVTR", "GAGSSEPVTGLDAK",
+    "VEATFGVDESNAK", "TPVISGGPYEYR", "YILAGVENSK",
+    "TPVITGAPYEYR", "DGLDAASYYAPVR", "ADVTPADFSEWSK",
+    "GTFIIDPGGVIR", "GTFIIDPAAVIR", "LFLQFGAQGSPFLK")
+@
+
+
+<<>>=
+# https://cran.r-project.org/package=protViz
+library(protViz)
+@
+
+<<>>=
+(mZ <- (parentIonMass(iRTpeptide) + 1.008) / 2)
+@
+
+<<>>=
+
+XICs <- readXICs(rawfile, masses=mZ, tol = 10)
+@
+
+<<echo=FALSE>>=
+source('bioc2018.R')
+@
+
+<<label=autoQC01XICs, fig = TRUE, echo=TRUE, include=FALSE, warnings=FALSE, width=8, height=4.5>>=
+library(ggplot2)
+for(i in 1:11){XICs[[i]]$sequence <- iRTpeptide[i]}
+df <- as.data.frame.XICs(XICs)
+df.peak <- .iRT.extract.maxpeak(df)
+
+dd <- df[df$intensity > 5000,]
+dd$sequence <- factor(dd$sequence,
+    levels = df.peak$peptide[order(df.peak$iRTscore)])
+
+(gp <- ggplot(dd,
+    aes(x = time, y = intensity, color=sequence)) +
+    geom_line(size = 1.5, stat = "identity") +
+    labs(x = "Retention Time [min]",
+         y = "Intensity Counts [arb. unit]") + 
+         theme_bw())
+@
+
+{\centering
+\includegraphics[width=1\columnwidth, keepaspectratio]{graphics/ProteomicsForum-autoQC01XICs}
+}
+
+Fit the linear model rt as a function of iRTscore.
+
+<<>>=
+library(xtable)
+xt <- xtable::xtable(
+    df.peak[order(df.peak$iRTscore),
+    c('peptide', 'mZ', 'rt', 'iRTscore'), ])
+@
+
+\begin{center}
+<<iRT, results=tex, echo=FALSE, eval=TRUE, include=TRUE>>=
+print(xt, include.rownames = FALSE, scalebox='0.8', center=TRUE,floating = FALSE)
+@
+\end{center}
+
+<<fmScatterPlot, echo=FALSE>>=
+p <- ggplot(df.peak,
+    aes(x =  iRTscore, y = rt)) +
+    ylab("Retention Time [min]") + 
+    xlab("iRT score") +
+    geom_point()  
+@
+
+<<label=autoQC01lm2, fig = TRUE, echo=TRUE, include=FALSE, warnings=FALSE, width=2.0, height=2.0>>=
+p + geom_smooth(method = "lm",
+                se=FALSE,
+                color="black",
+                formula = y ~ x) +
+        geom_text(x = 55, y = 17,
+                  label = lm_eqn(df.peak),
+                  parse = TRUE, size=2) +
+     theme_bw()
+@
+
+\begin{center}
+\includegraphics[width=0.6\columnwidth, keepaspectratio]{graphics/ProteomicsForum-autoQC01lm2}
+\end{center}
+
+\section{Code snippet 3: PSM}
+
+Determine best peptide spectrum match (PSM).
+
+<<eval=FALSE>>=
+
+scanIds <- .computeBestPeptideSpectrumMatch(rawfile,
+    iRTpeptide,
+    peptideMassTolerance = 0.003)
+@
+
+Runs in less than 30 seconds for computing single core 20000 PSMs
+
+<<echo=FALSE>>=
+scanIds <- c(9594, 11113, 11884, 12788, 12677,
+             13204, 13868, 14551, 16136, 17193, 17612)
+@
+
+
+<<>>=
+scanIds
+scans <- readScans(rawfile, scanIds)
+@
+
+
+<<label=autoQC01peakplot, fig = TRUE, echo=TRUE, include=FALSE, warnings=FALSE, width=8, height=8, eval=TRUE>>=
+op <- par(mfrow=c(2, 1), mar=c(5, 5, 6, 4))
+
+rv <- mapply(function(x, y) protViz::peakplot(x, y,
+        FUN = function(b, y) cbind(b, y),
+        main=list(x, cex = 2)),
+    iRTpeptide[1:2], scans[1:2])
+
+par(op)
+@
+
+\includegraphics[width=1\columnwidth, keepaspectratio]{graphics/ProteomicsForum-autoQC01peakplot}
+
+<<echo=FALSE>>=
+
+assignInstrument <- function(df){
+    stopifnot(is.data.frame(df))
+
+    df$instrument <- NA
+    for (p in c("FUSION_1", "FUSION_2", "G2HD_1", "LC1100",
+                "LTQ_1", "LTQFT_1", "ORBI_1", "ORBI_2", "PROTEONXPR36",
+                "QEXACTIVE_1", "QEXACTIVE_2", "QEXACTIVE_3", "QEXACTIVEHF_1",
+                "QEXACTIVEHF_2", "QEXACTIVEHFX_1", "QTRAP_1", "T100_1",
+                "TOFTOF_2", "TRIPLETOF_1", "TSQ_1", "TSQ_2", "VELOS_1",
+                "VELOS_2", "LUMOS_1"
+    )){
+        df$instrument[grep(p, df$filename)] <- p
+    }
+    # df$POSIXct <- as.POSIXct(df$time, origin="1970-01-01")
+    df
+}
+
+
+input <- "autoQC01.csv"
+autoQC01 <- read.table(input, header=TRUE, sep=';')
+autoQC01 <- assignInstrument(autoQC01)
+autoQC01$POSIXct <- as.POSIXct(autoQC01$time, origin="1970-01-01")
+@
+
+\section{Evaluation of code performance}
+
+We analysed, according to section 3, \Sexpr{length(autoQC01$runtime)} QC runs recorded on seven orbitrap mass spec devices of a period of 1.5 years. 
+%data anlysis on a time range of 1.5 years.
+
+The slope and intercept of the iRT regression model representing one Q Exatvice HF.
+%models is displayed below.
+<<label=autoQC01slope, fig = TRUE, echo=FALSE, include=FALSE, warnings=FALSE, width=7.5, height=3.75, eval=TRUE>>=
+library(lattice)
+
+cv <- 1-2:7/10
+t <- trellis.par.get("strip.background")
+t$col<-(rgb(cv,cv,cv))
+trellis.par.set("strip.background",t)
+
+
+tp<-trellis.par.get("par.sub.text")
+tp$cex <- 0.5
+trellis.par.set("par.sub.text", tp)
+
+r.squared.cutoff <- 0.98
+
+bwplot(slope ~  strftime(POSIXct  , "%Y-%m")| instrument,
+    data=autoQC01,
+     layout=c(1, 1),
+    scales = list(x = list(rot = 45)),
+    subset=(r.squared > r.squared.cutoff & instrument == "QEXACTIVEHF_2"),
+    panel = function(...){
+        panel.bwplot(...);
+       # panel.abline(h=0.1,col='grey')
+        },
+    ylim=c(0.05,0.15))
+
+#save(autoQC01, file='/home/cpanse/autoQC01_20181201.RData')
+@
+
+<<label=autoQC01intercept, fig = TRUE, echo=FALSE, include=FALSE, warnings=FALSE, width=7.5, height=3.75, eval=TRUE>>=
+bwplot(intercept ~  strftime(POSIXct  , "%Y-%m") | instrument,
+  data=autoQC01,
+  subset=(r.squared > r.squared.cutoff & instrument == "QEXACTIVEHF_2"),
+  scales = list(x = list(rot = 45)),
+  panel = function(...){
+  panel.bwplot(...);
+  #panel.abline(h=0.1,col='grey')
+      }, 
+  layout=c(1,1),
+)
+@
+
+\includegraphics[width=1\columnwidth, keepaspectratio]{graphics/ProteomicsForum-autoQC01intercept}
+\includegraphics[width=1\columnwidth, keepaspectratio]{graphics/ProteomicsForum-autoQC01slope}
+
+
+\paragraph{Performance} The overall runtime using the \texttt{stats::lm} function to fit \Sexpr{length(autoQC01$runtime)} models
+based on 11x\Sexpr{(nrow(autoQC01))} XICs (extracted from raw files having a total size of \Sexpr{round(sum(autoQC01$size/10^9))} GBytes)
+is \Sexpr{ round(sum(autoQC01$runtime) / 6 / 60)} minutes.
+The computations were performed on today's multi-core hardware and Linux's parallel~\cite{parallel} environment.
+
+\nocite{parallel,protViz,rawDiag}
+
+
+\bibliographystyle{plain}
+\bibliography{fgcz}
+
+\begin{flushright}
+\includegraphics[height=0.25\columnwidth, keepaspectratio]{QR_Code_rawDiag}
+\includegraphics[height=0.25\columnwidth, keepaspectratio]{39515832-84b561ea-4dfb-11e8-9411-276bc6fb71d6}
+\includegraphics[height=0.25\columnwidth, keepaspectratio]{qr}
+\end{flushright}
+\end{multicols}
+
+
+\vspace{-0.5cm}
+\resizebox{1.0\textwidth}{!}
+{
+Proteomic Forum 2019/EuPA 2019 poster id: 55,
+Contact: 
+$^\diamond$
+\fgcz~
+Phone: +41 44 635 39 12,
+Fax: +41 44 635 39 22,
+EMail: \url{cp@fgcz.ethz.ch},
+URL: \url{http://fgcz.ethz.ch}.
+} 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\end{document}
