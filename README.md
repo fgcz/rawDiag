@@ -242,7 +242,7 @@ the documentation of the functions is available through the R man pages.
 
 - EuroBioc2018 slides as  [PDF(8.5M, md5=cb8da7f05cb6ab197a9339db477e0887)](http://fgcz-ms.uzh.ch/~cpanse/talks/rawDiag_EuroBioc2018_Munich_20181206.pdf).
 
-- ASMS 2018 poster as [PDF(1.8M, md5=dab9388c1a465d931e9d2345119a2827)](http://fgcz-ms.uzh.ch/~cpanse/ASMS2018_ID291250.pdf).
+- ASMS 2018 poster as [PDF](https://github.com/fgcz/rawDiag/files/3000372/ASMS2018_ID291250.pdf) (1.8M, md5=dab9388c1a465d931e9d2345119a2827).
 
 - use [rawDiag shiny demonstration on our compute server](http://fgcz-ms-shiny.uzh.ch:8080/bfabric_rawDiag/) hosted @ UZH.
 
