@@ -236,7 +236,7 @@ the documentation of the functions is available through the R man pages.
 
 ## 5. Useful bookmarks
 
-- [bioRxiv 304485](https://www.biorxiv.org/content/early/2018/04/24/304485) rawDiag manuscript. [Now published in Journal of Proteome Research doi: 10.1021/acs.jproteome.8b00173](http://dx.doi.org/10.1021/acs.jproteome.8b00173).
+- [bioRxiv 304485](https://www.biorxiv.org/content/early/2018/04/24/304485) rawDiag manuscript. Now published in [Journal of Proteome Research doi: 10.1021/acs.jproteome.8b00173](http://dx.doi.org/10.1021/acs.jproteome.8b00173).
 
 - Proteomics Forum 2019 poster as [PDF](https://github.com/fgcz/rawDiag/files/3000232/ProteomicsForum2019_P55.pdf) (1.5M, md5=10fd42f6212abeea43d1839843a03a45) and [replication code](vignettes/ProteomicsForum2019_P55.Rnw).
 
