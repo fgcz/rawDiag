@@ -250,6 +250,6 @@ the documentation of the functions is available through the R man pages.
 
 - source code: [https://fgcz.github.io/rawDiag/](https://fgcz.github.io/rawDiag/).
 
-- [screen recording (3:02 minutes, size 47MB, no audio track)](http://fgcz-ms.uzh.ch/~cpanse/PAPERS/pr-2018-001736.mov).
+- [screen recording (3:02 minutes, size 47MB, no audio track)](http://fgcz-ms.uzh.ch/~cpanse/manuscripts//pr-2018-001736.mov).
 
 - [New RawFileReader from Thermo Fisher Scientific](http://planetorbitrap.com/rawfilereader).
