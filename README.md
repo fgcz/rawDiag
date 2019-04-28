@@ -238,7 +238,7 @@ the documentation of the functions is available through the R man pages.
 
 - [bioRxiv 304485](https://www.biorxiv.org/content/early/2018/04/24/304485) rawDiag manuscript. Now published in [Journal of Proteome Research doi: 10.1021/acs.jproteome.8b00173](http://dx.doi.org/10.1021/acs.jproteome.8b00173).
 
-- Proteomics Forum 2019 poster as [PDF](https://github.com/fgcz/rawDiag/files/3000232/ProteomicsForum2019_P55.pdf) (1.5M, md5=10fd42f6212abeea43d1839843a03a45) and [replication code](vignettes/ProteomicsForum2019_P55.Rnw).
+- Proteomics Forum 2019 poster [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.2640013.svg)](https://doi.org/10.5281/zenodo.2640013) and [replication code](vignettes/ProteomicsForum2019_P55.Rnw).
 
 - EuroBioc2018 slides as  [PDF](http://fgcz-ms.uzh.ch/~cpanse/talks/rawDiag_EuroBioc2018_Munich_20181206.pdf) (8.5M, md5=cb8da7f05cb6ab197a9339db477e0887).
 
