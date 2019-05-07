@@ -236,6 +236,8 @@ the documentation of the functions is available through the R man pages.
 
 ## 5. Useful bookmarks
 
+- [read MS/MS2 and XIC example](https://github.com/fgcz/rawDiag/files/3152473/rawDiagXICdemo__.pdf); [replication code](https://github.com/fgcz/rawDiag/blob/master/vignettes/XIC.Rmd)
+
 - [bioRxiv 304485](https://www.biorxiv.org/content/early/2018/04/24/304485) rawDiag manuscript. Now published in [Journal of Proteome Research doi: 10.1021/acs.jproteome.8b00173](http://dx.doi.org/10.1021/acs.jproteome.8b00173).
 
 - Proteomics Forum 2019 poster [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.2640013.svg)](https://doi.org/10.5281/zenodo.2640013) and [replication code](vignettes/ProteomicsForum2019_P55.Rnw).
