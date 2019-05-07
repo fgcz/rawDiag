@@ -228,6 +228,9 @@ AllScanMetaData <- read.raw("20181217_006_autoQC01.raw", rawDiag = FALSE)
 apply the divide and conquer is an algorithm design paradigm 
 
 ```{r}
+stopifnot(require(rawDiag))
+stopifnot(require(parallel))
+
 chunk <- function(x,n) split(x, factor(sort(rank(x)%%n)))
 # input: is a given integer vecor of MS2 scanNumber and the raw file name
 # output: list of MS2 scans 
