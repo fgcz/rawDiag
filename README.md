@@ -223,6 +223,18 @@ AllScanMetaData <- read.raw("20181217_006_autoQC01.raw", rawDiag = FALSE)
 [82] "AnalogInput2V"         
 ```
 
+#### 3.4.4 How to read a large number of MS2 scans?
+
+apply the divide and conquer is an algorithm design paradigm 
+
+```{r}
+chunk <- function(x,n) split(x, factor(sort(rank(x)%%n)))
+# input: is a given integer vecor of MS2 scanNumber and the raw file name
+# output: list of MS2 scans 
+MS2 <- mclapply(chunk(scanNumberMs2, 100), 
+  function(scans){readScans(rawfilename, scans=scans)}, 
+	mc.cores=16)
+```
 
 ## 4. Instructions for use
 
