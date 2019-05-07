@@ -236,7 +236,7 @@ the documentation of the functions is available through the R man pages.
 
 ## 5. Useful bookmarks
 
-- [read MS/MS2 and XIC example](https://github.com/fgcz/rawDiag/files/3152473/rawDiagXICdemo__.pdf); [replication code](https://github.com/fgcz/rawDiag/blob/master/vignettes/XIC.Rmd)
+- vignette on [reading MS/MS2 and extracting XIC example](https://github.com/fgcz/rawDiag/files/3152473/rawDiagXICdemo__.pdf) using the `rawDiag::readScans` and `rawDiag::readXICs`functions; [replication code](https://github.com/fgcz/rawDiag/blob/master/vignettes/XIC.Rmd).
 
 - [bioRxiv 304485](https://www.biorxiv.org/content/early/2018/04/24/304485) rawDiag manuscript. Now published in [Journal of Proteome Research doi: 10.1021/acs.jproteome.8b00173](http://dx.doi.org/10.1021/acs.jproteome.8b00173).
 
