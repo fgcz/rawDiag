@@ -64,11 +64,11 @@ The package [JPR.R1](https://github.com/fgcz/rawDiag/tree/JPR.R1) release has be
 ### 2.1. Instructions
 To ensure the proper function of this R package please check if all the [requirements](README.md#1-system-requirements) are fullfilled prior to using it.
 
-##### Current release
+#### Current release
 
-* please check [https://github.com/fgcz/rawDiag/releases]
+follow the instructions here: [https://github.com/fgcz/rawDiag/releases]
 
-#### From source
+#### From GitHub source
 
 the following code downloads and installs the R package from the Github without the required third party .dll files:
 
@@ -78,7 +78,6 @@ please note: due to the data size (>=40MB) download can take a while
 library("devtools")
 devtools::install_github("fgcz/rawDiag", build_vignettes = FALSE)
 ```
-
 
 ### 2.2. Typical install time on a "normal" desktop computer
 
