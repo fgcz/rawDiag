@@ -225,7 +225,7 @@ AllScanMetaData <- read.raw("20181217_006_autoQC01.raw", rawDiag = FALSE)
 
 #### 3.4.4 How to read a large number of MS2 scans?
 
-apply the divide and conquer is an algorithm design paradigm 
+apply the *divide-and-conquer* algorithm design paradigm 
 
 ```{r}
 stopifnot(require(rawDiag))
