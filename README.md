@@ -273,3 +273,13 @@ the documentation of the functions is available through the R man pages.
 - [screen recording (3:02 minutes, size 47MB, no audio track)](http://fgcz-ms.uzh.ch/~cpanse/manuscripts//pr-2018-001736.mov).
 
 - [New RawFileReader from Thermo Fisher Scientific](http://planetorbitrap.com/rawfilereader).
+
+
+## 6. See also 
+
+- ThermoRawFileParser: modular, scalable and cross-platform RAW file conversion
+	- https://www.biorxiv.org/content/10.1101/622852v1.abstract
+- MARMoSET – Extracting Publication-Ready Mass Spectrometry Metadata from RAW Files
+	- https://doi.org/10.1074/mcp.TIR119.001505
+	- C# code https://github.molgen.mpg.de/loosolab/MARMoSET_C
+	
