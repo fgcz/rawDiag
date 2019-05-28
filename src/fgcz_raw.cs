@@ -10,6 +10,7 @@
 /// 2018-07-24 bugfix
 /// 2018-11-23 added scanFilter option
 /// 2019-01-28 extract monoisotopicmZ attribute; include segments in MGF iff no centroid data are availbale
+/// 2019-05-28 save info as Yaml
  
 using System;
 using System.Collections.Generic;
@@ -396,21 +397,8 @@ namespace FGCZ_Raw
 
     using FGCZExtensions;
 
-    /// <summary>
-    /// A C# example program showing how to use RAWFileReader.  More information on the RAWFileReader methods used
-    /// in this example and the other methods available in RAWFileReader can be found in the RAWFileReader user
-    /// documentation, that is installed with the RAWFileReader software.
-    /// This program has been tested with RAWFileReader 4.0.22  Changes maybe necessary with other versions
-    /// of RAWFileReader.
-    /// </summary>
     internal static class Program
     {
-        /// <summary>
-        /// The main routine for this example program.  This example program only shows how to use the RawFileReader library
-        /// in a single-threaded application but our documentation for RawFileReader describes how to use it in a multi-threaded
-        /// application.
-        /// </summary>
-        /// <param name="args">The command line arguments for this program.  The RAW file name should be passed as the first argument</param>
         private static void Main(string[] args)
         {
             // This local variable controls if the AnalyzeAllScans method is called
@@ -514,11 +502,9 @@ namespace FGCZ_Raw
 
                 if (mode == "info")
                 {
-                    Console.WriteLine("***");
-
                     // Get the number of instruments (controllers) present in the RAW file and set the 
                     // selected instrument to the MS instrument, first instance of it
-                    Console.WriteLine("The RAW file has data from {0} instruments", rawFile.InstrumentCount);
+                    Console.WriteLine("Number of instruments: {0}", rawFile.InstrumentCount);
                 }
 
                 rawFile.SelectInstrument(Device.MS, 1);
@@ -538,12 +524,11 @@ namespace FGCZ_Raw
                     Console.WriteLine("raw file name: {0}", Path.GetFileName(filename));
                     // Print some OS and other information
                     Console.WriteLine("System Information:");
-                    Console.WriteLine("   OS Version: " + Environment.OSVersion);
-                    Console.WriteLine("   64 bit OS: " + Environment.Is64BitOperatingSystem);
-                    Console.WriteLine("   Computer: " + Environment.MachineName);
-                    Console.WriteLine("   # Cores: " + Environment.ProcessorCount);
-                    Console.WriteLine("   Date: " + DateTime.Now);
-                    Console.WriteLine();
+                    Console.WriteLine("    OS Version: " + Environment.OSVersion);
+                    Console.WriteLine("    64 bit OS: " + Environment.Is64BitOperatingSystem);
+                    Console.WriteLine("    Computer: " + Environment.MachineName);
+                    Console.WriteLine("    number Cores: " + Environment.ProcessorCount);
+                    Console.WriteLine("    Date: " + DateTime.Now);
                 }
 
                 if (mode == "info")
@@ -552,44 +537,44 @@ namespace FGCZ_Raw
                     // Get some information from the header portions of the RAW file and display that information.
                     // The information is general information pertaining to the RAW file.
                     Console.WriteLine("General File Information:");
-                    Console.WriteLine("   RAW file: " + Path.GetFileName(rawFile.FileName));
-                    Console.WriteLine("   RAW file version: " + rawFile.FileHeader.Revision);
-                    Console.WriteLine("   Creation date: " + rawFile.FileHeader.CreationDate);
-                    Console.WriteLine("   Operator: " + rawFile.FileHeader.WhoCreatedId);
-                    Console.WriteLine("   Number of instruments: " + rawFile.InstrumentCount);
-                    Console.WriteLine("   Description: " + rawFile.FileHeader.FileDescription);
-                    Console.WriteLine("   Instrument model: " + rawFile.GetInstrumentData().Model);
-                    Console.WriteLine("   Instrument name: " + rawFile.GetInstrumentData().Name);
+                    Console.WriteLine("    RAW file: " + Path.GetFileName(rawFile.FileName));
+                    Console.WriteLine("    RAW file version: " + rawFile.FileHeader.Revision);
+                    Console.WriteLine("    Creation date: " + rawFile.FileHeader.CreationDate);
+                    Console.WriteLine("    Operator: " + rawFile.FileHeader.WhoCreatedId);
+                    Console.WriteLine("    Number of instruments: " + rawFile.InstrumentCount);
+                    Console.WriteLine("    Description: " + rawFile.FileHeader.FileDescription);
+                    Console.WriteLine("    Instrument model: " + rawFile.GetInstrumentData().Model);
+                    Console.WriteLine("    Instrument name: " + rawFile.GetInstrumentData().Name);
 //                    Console.WriteLine("   Instrument method: {0}", rawFile.GetAllInstrumentFriendlyNamesFromInstrumentMethod().Length);
-                    Console.WriteLine("   Serial number: " + rawFile.GetInstrumentData().SerialNumber);
-                    Console.WriteLine("   Software version: " + rawFile.GetInstrumentData().SoftwareVersion);
-                    Console.WriteLine("   Firmware version: " + rawFile.GetInstrumentData().HardwareVersion);
-                    Console.WriteLine("   Units: " + rawFile.GetInstrumentData().Units);
-                    Console.WriteLine("   Mass resolution: {0:F3} ", rawFile.RunHeaderEx.MassResolution);
-                    Console.WriteLine("   Number of scans: {0}", rawFile.RunHeaderEx.SpectraCount);
-                    Console.WriteLine("   Number of ms2 scans: {0}",
+                    Console.WriteLine("    Serial number: " + rawFile.GetInstrumentData().SerialNumber);
+                    Console.WriteLine("    Software version: " + rawFile.GetInstrumentData().SoftwareVersion);
+                    Console.WriteLine("    Firmware version: " + rawFile.GetInstrumentData().HardwareVersion);
+                    Console.WriteLine("    Units: " + rawFile.GetInstrumentData().Units);
+                    Console.WriteLine("    Mass resolution: {0:F3} ", rawFile.RunHeaderEx.MassResolution);
+                    Console.WriteLine("    Number of scans: {0}", rawFile.RunHeaderEx.SpectraCount);
+                    Console.WriteLine("    Number of ms2 scans: {0}",
                         Enumerable
                             .Range(1, lastScanNumber - firstScanNumber)
                             .Count(x => rawFile.GetFilterForScanNumber(x)
                                 .ToString()
                                 .Contains("Full ms2")));
-                    Console.WriteLine("   Scan range: {0} - {1}", firstScanNumber, lastScanNumber);
-                    Console.WriteLine("   Time range: {0:F2} - {1:F2}", startTime, endTime);
-                    Console.WriteLine("   Mass range: {0:F4} - {1:F4}", rawFile.RunHeaderEx.LowMass,
+                    Console.WriteLine("    Scan range: [{0}, {1}]", firstScanNumber, lastScanNumber);
+                    Console.WriteLine("    Time range: [{0:F2}, {1:F2}]", startTime, endTime);
+                    Console.WriteLine("    Mass range: [{0:F4}, {1:F4}]", rawFile.RunHeaderEx.LowMass,
                         rawFile.RunHeaderEx.HighMass);
                     Console.WriteLine();
 
                     // Get information related to the sample that was processed
                     Console.WriteLine("Sample Information:");
-                    Console.WriteLine("   Sample name: " + rawFile.SampleInformation.SampleName);
-                    Console.WriteLine("   Sample id: " + rawFile.SampleInformation.SampleId);
-                    Console.WriteLine("   Sample type: " + rawFile.SampleInformation.SampleType);
-                    Console.WriteLine("   Sample comment: " + rawFile.SampleInformation.Comment);
-                    Console.WriteLine("   Sample vial: " + rawFile.SampleInformation.Vial);
-                    Console.WriteLine("   Sample volume: " + rawFile.SampleInformation.SampleVolume);
-                    Console.WriteLine("   Sample injection volume: " + rawFile.SampleInformation.InjectionVolume);
-                    Console.WriteLine("   Sample row number: " + rawFile.SampleInformation.RowNumber);
-                    Console.WriteLine("   Sample dilution factor: " + rawFile.SampleInformation.DilutionFactor);
+                    Console.WriteLine("    Sample name: " + rawFile.SampleInformation.SampleName);
+                    Console.WriteLine("    Sample id: " + rawFile.SampleInformation.SampleId);
+                    Console.WriteLine("    Sample type: " + rawFile.SampleInformation.SampleType);
+                    Console.WriteLine("    Sample comment: " + rawFile.SampleInformation.Comment);
+                    Console.WriteLine("    Sample vial: " + rawFile.SampleInformation.Vial);
+                    Console.WriteLine("    Sample volume: " + rawFile.SampleInformation.SampleVolume);
+                    Console.WriteLine("    Sample injection volume: " + rawFile.SampleInformation.InjectionVolume);
+                    Console.WriteLine("    Sample row number: " + rawFile.SampleInformation.RowNumber);
+                    Console.WriteLine("    Sample dilution factor: " + rawFile.SampleInformation.DilutionFactor);
                     Console.WriteLine();
 
                     // Read the first instrument method (most likely for the MS portion of the instrument).
@@ -630,9 +615,9 @@ namespace FGCZ_Raw
                 if (mode == "info")
                 {
                     Console.WriteLine("Filter Information:");
-                    Console.WriteLine("   Scan filter (first scan): " + firstFilter.ToString());
-                    Console.WriteLine("   Scan filter (last scan): " + lastFilter.ToString());
-                    Console.WriteLine("   Total number of filters: " + numberFilters);
+                    Console.WriteLine("    Scan filter (first scan): " + firstFilter.ToString());
+                    Console.WriteLine("    Scan filter (last scan): " + lastFilter.ToString());
+                    Console.WriteLine("    Total number of filters: " + numberFilters);
                     Console.WriteLine();
                     //  ListTrailerExtraFields(rawFile);
                     Environment.Exit(0);
@@ -663,7 +648,7 @@ namespace FGCZ_Raw
                     {
 
                         var scanStatistics = rawFile.GetScanStatsForScanNumber(i);
-                        var scanFilter = rawFile.GetFilterForScanNumber(i);
+                        // var scanFilter = rawFile.GetFilterForScanNumber(i);
 
                         Console.WriteLine("{0}\t{1:F2}\t{2}",
                             i, GetIntensitySum(rawFile, i, firstFilter.ToString(), true), scanStatistics.TIC);

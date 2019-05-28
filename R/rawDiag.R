@@ -521,7 +521,26 @@ plot.peaklist <- function(x, y, ...){
 }
 
 
-.read.raw.info <- function(file,
+#' Read raw file meta data
+#'
+#' @param file Thermo Fisher raw file name
+#' @param mono enviroment
+#' @param exe path of the executable.
+#' @param mono_path default.
+#' @param argv arguments, default.
+#' @param system2_call system2 call, default.
+#' @param method instrument vendor
+#' @description The function extracts some meta information from a given rawfile.
+#' The output is parsed by the yaml package.
+#' @author Christian Panse 2018, 2019
+#' @seealso Thermo Fisher NewRawfileReader C# code snippet.
+#' @return a nested list object
+#' @export read.raw.info
+#' @importFrom yaml yaml.load_file
+#' @examples
+#' (rawfile <- file.path(path.package(package = 'rawDiag'), 'extdata', 'sample.raw'))
+#' Y <- read.raw.info(rawfile)
+read.raw.info <- function(file,
      mono = if(Sys.info()['sysname'] %in% c("Darwin", "Linux")) TRUE else FALSE,
      exe = file.path(path.package(package = "rawDiag"), "exec", "fgcz_raw.exe"),
      mono_path = "",
@@ -529,12 +548,16 @@ plot.peaklist <- function(x, y, ...){
      system2_call = TRUE,
      method = "thermo"){
 
+  if (!file.exists(file)){
+    warning('file not available. return.')
+    return 
+  }
   if(system2_call && method == 'thermo'){
 
     tf <- tempfile(fileext = '.tsv')
     tf.err <- tempfile(fileext = '.tsv')
 
-    message(paste("system2 is writting to tempfile ", tf, "..."))
+    # message(paste("system2 is writting to tempfile ", tf, "..."))
 
     if (mono){
       rvs <- system2("mono", args = c(exe, shQuote(file), argv),
@@ -546,12 +569,18 @@ plot.peaklist <- function(x, y, ...){
     }
 
     if (rvs == 0){
-      rv <- read.csv(tf,  sep = ":",   stringsAsFactors = TRUE, header = FALSE,
-                     col.names = c('attribute', 'value'))
+      #rv <- read.csv(tf,  sep = ":",   stringsAsFactors = TRUE, header = FALSE,
+      #              col.names = c('attribute', 'value'))
+      
+      try({
+        rv <- yaml.load_file(tf)
+        # message(paste("unlinking", tf, "..."))
+        unlink(tf)
+        return(rv)
+      }, NULL)
+     
 
-      message(paste("unlinking", tf, "..."))
-
-      unlink(tf)
+     
       # unlink(tfstdout)
       return(rv)
     }

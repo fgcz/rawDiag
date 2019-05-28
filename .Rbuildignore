@@ -1,4 +1,5 @@
 ^.*\.Rproj$
+^.*fgcz_raw.cs$
 ^\.Rproj\.user$
 ^.*_config.yml$
 ^.*.travis.yml$
