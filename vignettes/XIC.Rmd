@@ -1,57 +1,76 @@
 ---
-title: "XIC using rawDiag"
-author: "Christian Panse & Christian Trachsel"
-date: "6/29/2018"
+title: "Read Scans and XIC from raw data using the R package rawDiag"
+author: "Christian Panse, Christian Trachsel, Toboas Kockmann"
+date: "2018-06-29"
+bibliography:
+  - rawDiag.bib
 output:
   pdf_document: default
   html_document: default
 ---
   
-  ```{r setup, include=FALSE}
+```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ## Requirements
 
 If not already installed please install the packages:
-- rawDiag download and install from http://fgcz-ms.uzh.ch/~cpanse/rawDiag_0.0.6.tar.gz
-- protViz from https://CRAN.R-project.org/package=protViz
-- get the example data from  http://fgcz-ms.uzh.ch/~cpanse/20180220_14_autoQC01.raw
 
-```{r include = FALSE}
+- rawDiag [@Trachsel2018] download and install
+
+```{r eval=FALSE}
+install.packages('http://fgcz-ms.uzh.ch/~cpanse/rawDiag_0.0.34.tar.gz',
+  repo=NULL)
+```
+
+- protViz from https://CRAN.R-project.org/package=protViz
+
+- get the example data from  http://fgcz-ms.uzh.ch/~cpanse/20180220_14_autoQC01.raw and save in your home Downloads folder.
+
+## Load R packages
+
+```{r include = TRUE}
 library(rawDiag)
 library(protViz)
 ```
 
-Define raw file we work on and we calculate the doubly charged mass of three iRT peptides.
+## Define Input
+
+Let's define a raw file we work on and we calculate the doubly charged mass of
+three iRT peptides.
 
 ```{r}
-#addapt to location where the example data file is located
-rawfile <- "/Users/cp/Downloads/20180220_14_autoQC01.raw"  
+rawfile <- file.path(Sys.getenv("HOME"), "Downloads/20180220_14_autoQC01.raw") 
+
 pepSeq <- c("AGGSSEPVTGLADK", "GDLDAASYYAPVR", "FLLQFGAQGSPLFK")
 mass2Hplus <- (parentIonMass(pepSeq) + 1.008) / 2 
 ```
 
+## Extract Ion Chromatogram  (`readXICs`)
+
 Extract the XIC of the three defined iRT peptides from the raw file.
 
-```{r fig.height=6}
+```{r fig.height=4}
 X <- readXICs(rawfile = rawfile, masses = mass2Hplus)
 
-op <- par(mfrow = c(3, 1), mar=c(4,4,4,1))
-rv <- lapply(1:3, function(i){plot(X[[i]], main = pepSeq[i])})
+plot(X)
 ```
 
-
+## Load Scan Information (`read.raw`)
 
 load the meta data of the specified raw file
+
 ```{r}
 S <- read.raw(rawfile)
 ```
 
-Now we check in which scan the delta of the isolated precursor mass and the calculated precursor mass is smaller as 0.1 Da and return a plot for visual inspection. 
+Now we check in which scan the delta of the isolated precursor mass and the
+calculated precursor mass is smaller as 0.1 Da and return a plot for visual
+inspection. 
 
 ```{r}
-op <- par(mfrow = c(3, 1))
+op <- par(mfrow = c(3, 1), mar=c(4, 4, 4, 1))
 rv <- lapply(mass2Hplus, function(m){
   plot(S$StartTime, S$PrecursorMass -  m, pch='.',
        ylim=c(-0.25,0.25), main = paste("[m+2H]2+ =", m));
@@ -60,13 +79,14 @@ rv <- lapply(mass2Hplus, function(m){
 ```
 
 
-uff...so many scans...locks like we have PRM data. How do we verify the peak produced in the XIC plot with the peptide ID?
+Whew! So many scans. It looks like we have PRM data. How do we verify the peak
+produced in the XIC plot with the peptide ID?
 
-let's see what else we have.
+Let's see what else we have.
   
-  
-we extract the all scan numbers where our precursor filter is true
-```{r, include=TRUE}
+We extract the all scan numbers where our precursor filter is true
+
+```{r extractScans, include=TRUE}
 idx <- lapply(mass2Hplus, function(m){
   which(abs(S$PrecursorMass - m) < 0.1)
 })
@@ -75,9 +95,9 @@ idx <- lapply(mass2Hplus, function(m){
 scanNumbers <- lapply(idx, function(x){S$scanNumber[x]})
 ```
 
-we define a set of fragment ions for labeling our spectra (from package protviz)
-```{r}
+we define a set of fragment ions for labeling our spectra (from package protviz).
 
+```{r defineHCD}
 HCDIons <- function (b, y) 
 {
     Hydrogen <- 1.007825
@@ -88,12 +108,19 @@ HCDIons <- function (b, y)
     # return(cbind(b, y,c ,z))
     return(cbind(b, y))
 }
-
 ```
 
-Now we extract from the raw file the peak list of all scans which match our prcursor filter, pass these scans to peakplot for labeling the b- and y-Ions and use a simple score (largest number of assigned ions) to select the best matching spectrum for each peptide. The score distribution is ploted for visual inspection and the best matching scan is highligted by a red line.
+## Determine best match by using `readScans`
 
-```{r fig.height=6}
+Now we extract from the raw file the peak list of all scans which match our
+precursor filter, pass these scans to peakplot for labeling the b- and y-Ions
+and use a simple score (largest number of assigned ions) to select the best
+matching spectrum for each peptide. The score distribution is plotted for visual
+inspection, and a red line highlights the best matching scan.
+
+### Define best match objectiv function
+
+```{r bestMatch, fig.height=6}
 op <- par(mfrow = c(3, 1), mar = c(5,4,4,1))
 bestMatchingMS2Scan <- sapply(1:3, function(i){
   PL <- readScans(rawfile, scans = scanNumbers[[i]])
@@ -105,7 +132,7 @@ bestMatchingMS2Scan <- sapply(1:3, function(i){
      function(j){
        sum(PL[[j]]$intensity[abs(pp[[j]]$mZ.Da.error) < 0.1])}) #find best scoring spectra
   
-  plot(1+score, main = paste(pepSeq[i], max(score, na.rm = TRUE)), log='y')
+  plot(1 + score, main = paste(pepSeq[i], max(score, na.rm = TRUE)), log='y')
   bestFirstMatch <- which(max(score, na.rm = TRUE) == score)[1]
   abline(v = bestFirstMatch, col = "red")
   # peakplot(pepSeq[i], PL[[bestFirstMatch]])
@@ -113,32 +140,36 @@ bestMatchingMS2Scan <- sapply(1:3, function(i){
 })
 ```
 
+### Visualize the pepitde spectrum match using `protViz::Peakplot`
 
-To check the actual fragment spectra, we plot for each peptide the best matching spectrum and label the corresponding b- and y-Ions.
-```{r fig.height=6}
+To check the actual fragment spectra, we plot for each peptide the best matching
+spectrum and label the corresponding b- and y-Ions.
+
+```{r peakplot, fig.height=6}
 op <- par(mfrow = c(3, 1))
-
 PL <- readScans(rawfile, scans = bestMatchingMS2Scan)
-
 pp <- lapply(1:3, function(i){peakplot(pepSeq[i], PL[[i]], FUN = HCDIons)})
-
 ```
 
-Now we can plot the XIC again, but zoom with a range of +/- 5 min arround the best matching scan and we are sure we look at the proper peak.
+Now we can plot the XIC again, but zoom with a range of +/- 5 min around the
+best matching scan and we are sure we look at the proper peak.
 
-```{r}
+```{r plotXIC}
 op <- par(mfrow = c(3, 1))
 
 lapply(1:3, function(i){
   t <- S$StartTime[bestMatchingMS2Scan[i]]; 
-  plot(X[[i]], xlim = c(t-0.25, t+ 0.25)); 
+  plot(X[[i]], xlim = c(t - 0.25, t + 0.25)); 
   abline(v=t, col='red')})
 ```
 
-```{r}
-library(protViz)
-library(rawDiag)
 
+## Misc
+
+
+### Apply the procedure to all peptides.
+
+```{r foo}
 foo <- function(rawfile, pepSeq){
   mass2Hplus <- (parentIonMass(pepSeq) + 1.008) / 2 
   X <- readXICs(rawfile = rawfile, masses = mass2Hplus)
@@ -158,7 +189,9 @@ foo <- function(rawfile, pepSeq){
         FUN = HCDIons, plot = FALSE)})
     
     
-    score <- sapply(1:length(peptideSpecMatch), function(j){sum(peakList[[j]]$intensity[abs(peptideSpecMatch[[j]]$mZ.Da.error) < 0.1])}) 
+    score <- sapply(1:length(peptideSpecMatch), function(j){
+      sum(peakList[[j]]$intensity[abs(peptideSpecMatch[[j]]$mZ.Da.error) < 0.1])
+      }) 
     
     bestFirstMatch <- which(max(score, na.rm = TRUE) == score)[1]
     scanNumbers[[i]][bestFirstMatch]
@@ -167,7 +200,7 @@ foo <- function(rawfile, pepSeq){
   PL <- readScans(rawfile, scans = bestMatchingMS2Scan)
   
   pp <- lapply(1:length(pepSeq), function(j){
-    op<-par(mfrow = c(2,1), mar = c(5,4,4,1))
+    op<-par(mfrow = c(2, 1), mar = c(5, 4, 4, 1))
     peakplot(pepSeq[j], PL[[j]], FUN = HCDIons)
     
     t <- S$StartTime[bestMatchingMS2Scan[j]]; 
@@ -181,13 +214,27 @@ foo <- function(rawfile, pepSeq){
 }
 ```
 
-```{r}
-
+```{r applyFoo}
 foo(rawfile, c('GAGSSEPVTGLDAK', 'VEATFGVDESNAK', 'TPVISGGPYEYR',
                'TPVITGAPYEYR', 'DGLDAASYYAPVR', 'ADVTPADFSEWSK',
                'GTFIIDPGGVIR', 'LFLQFGAQGSPFLK', 'AGGSSEPVTGLADK',
                'VEATFGVDESANK', 'TPVISGGPYYER', 'TPVITGAPYYER',
                'GDLDAASYYAPVR', 'DAVTPADFSEWSK', 'TGFIIDPGGVIR',
                'FLLQFGAQGSPLFK'))
-
 ```
+
+### Read info 
+
+
+```{r Yaml, warning=FALSE}
+(Y <- read.raw.info(rawfile))
+```
+
+# Session Info
+
+```{r}
+sessionInfo()
+```
+
+#References
+
