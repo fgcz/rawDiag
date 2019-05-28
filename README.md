@@ -136,6 +136,8 @@ dim(RAW)
 # now  read all dimensions
 RAW <- read.raw(file = rawfile, rawDiag = FALSE)
 dim(RAW)
+INFO <- read.raw.info(rawfile)
+head(INFO$`General File Information`)
 ```
 
 ### 3.4. FAQ
