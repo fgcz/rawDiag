@@ -3,9 +3,10 @@ Type: Package
 Title: Diagnostic Plots for Mass Spectrometry Data
 Version: 0.0.34
 Authors@R: c(person("Christian", "Panse", email = "cp@fgcz.ethz.ch", role = c("aut", "cre"), comment = c(ORCID = "0000-0003-1975-3064")),
-	person("Christian", "Trachsel", email = "Christian.Trachsel@fgcz.ethz.ch", role = "aut", "cre"))
-Author: Christian Trachsel [aut, cre]
-	Christian Panse [aut, cre] (0000-0003-1975-3064),
+	person("Christian", "Trachsel", email = "Christian.Trachsel@fgcz.ethz.ch", role = "aut", "cre"),
+	person("Tobias", "Kockmann", email = "Tobias.Kockmann@fgcz.ethz.ch", role = "aut"),
+	person("Witold E.", "Wolski", email = "wew@fgcz.ethz.ch", role = "ctb")
+	)
 Maintainer: Christian Panse <cp@fgcz.ethz.ch>
 Depends: R (>= 3.5.1),
 	methods
