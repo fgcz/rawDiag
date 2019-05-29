@@ -440,8 +440,7 @@ plot.XICs <- function(x, y, method='ggplot', ...){
           rv}else{NULL}
       }
       ))
-      
-      
+
       gp <- ggplot(df, aes_string(x = "times", y = "intensities")) +
         #geom_segment() +
         geom_line(stat='identity', size = 1, aes_string(group = "mass", colour = "mass")) +
@@ -457,7 +456,57 @@ plot.XICs <- function(x, y, method='ggplot', ...){
   }
 } 
 
-
+#' readScans via rDotNet
+#'
+#' @param rawfile the name of the Thermo Fisher Scietific raw file which the data
+#' are to be read from.  
+#' @param scans a vector of requested scan numbers
+#' 
+#' @return \CRANpkg{protViz} peaklist
+#' 
+#' @importFrom rDotNet .cinit .cnew
+#' @export csReadScans
+#'
+#' @examples
+#'  (rawfile <- file.path(path.package(package = 'rawDiag'), 'extdata', 'sample.raw'))
+#'  S <- csReadScans(rawfile, 1:9)
+#'  plot(S[[1]])
+#'  op <- par(mfrow=c(3, 3))
+#'  lapply(S, function(x){plot(x, sub=x$scanType)})
+csReadScans <- function(rawfile, scans = NULL){
+  if (!file.exists(rawfile)){
+    warning("no rawfile")
+    return (NULL)
+  }
+  # for debug use
+  # .cinit(dll="/Users/cp//__checkouts/R/rawDiag/exec/fgcz_raw.dll")
+  try({
+    obj <- .cnew ("Rawfile", rawfile)
+    
+    if(obj$check()){
+      if (is.null(scans)) scans <- obj$getFirstScanNumber():obj$getLastScanNumber()
+      
+      first <- obj$getFirstScanNumber()
+      last <- obj$getLastScanNumber()
+      
+      lapply(scans, function(sn){
+        
+        rv <- list(scan = sn,
+                   scanType = obj$GetScanType(sn),
+                   rtinseconds = obj$GetRTinSeconds(sn),
+                   pepmass = obj$GetPepmass(sn),
+                   monoisotopicMz = as.double(obj$GetMonoisotopicMz(sn)),
+                   centroidStream = obj$IsCentroidScan(sn),
+                   title = obj$GetTitle(sn),
+                   charge = as.integer(obj$GetCharge(sn)),
+                   mZ = obj$GetSpectrumMz(sn, ""),
+                   intensity=obj$GetSpectrumIntensities(sn, ""))
+        class(rv) <- c(class(rv), 'peaklist')
+        rv
+      })
+    }
+  }, NULL)
+}
 
 #' read scan of scanids
 #'

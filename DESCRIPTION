@@ -1,15 +1,15 @@
 Package: rawDiag
 Type: Package
-Title: Diagnostic Plots for Mass Spectrometry Data
-Version: 0.0.34
-Authors@R: c(person("Christian", "Panse", email = "cp@fgcz.ethz.ch", role = c("aut", "cre"), comment = c(ORCID = "0000-0003-1975-3064")),
+Title: Access Thermo Fisher rawfiles 
+Version: 0.0.35
+Authors@R: c(person("Christian", "Panse", email = "cp@fgcz.ethz.ch", role = c("aut", "cre"),
+    comment = c(ORCID = "0000-0003-1975-3064")),
 	person("Christian", "Trachsel", email = "Christian.Trachsel@fgcz.ethz.ch", role = "aut", "cre"),
-	person("Tobias", "Kockmann", email = "Tobias.Kockmann@fgcz.ethz.ch", role = "aut"),
-	person("Witold E.", "Wolski", email = "wew@fgcz.ethz.ch", role = "ctb")
-	)
+	person("Tobias", "Kockmann", email = "Tobias.Kockmann@fgcz.ethz.ch", role = "aut"))
 Maintainer: Christian Panse <cp@fgcz.ethz.ch>
 Depends: R (>= 3.5.1),
-	methods
+	methods,
+	rDotNet (>= 0.9.1)
 Imports: ggplot2 (>= 2.2.1),
 	dplyr,
 	hexbin,
@@ -33,9 +33,11 @@ Description: Helps with quality checks, visualizations
     teaching, and having fun with proteomics data. But it can also be 
     used to do data analysis for small scale data sets.
 License: GPL-3
+SystemRequirements: mono 4.x or higher on OSX / Linux, .NET 4.x or
+        higher on Windows, 'msbuild' and 'nuget' available in the path
 URL: https://github.com/fgcz/rawDiag/
 BugReports: https://github.com/fgcz/rawDiag/issues
 Encoding: UTF-8
 LazyData: true
 NeedsCompilation: no
-RoxygenNote: 6.1.0
+RoxygenNote: 6.1.1
