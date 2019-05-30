@@ -359,7 +359,7 @@ namespace FGCZExtensions
                                 scanNumber);
 
                             file.WriteLine("\tcharge = {0},", charge);
-
+                            file.WriteLine("\tmonoisotopicMz = {0},", monoisotopicMz);
                             file.WriteLine("\tmZ = c(" + string.Join(",", scan.SegmentedScan.Positions) + "),");
                             file.WriteLine("\tintensity = c(" + string.Join(",", scan.SegmentedScan.Intensities) + ")");
                             file.WriteLine(")");
