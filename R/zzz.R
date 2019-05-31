@@ -7,7 +7,7 @@
 		packageStartupMessage("Package 'rawDiag' version ", version)
 	
 		.cinit(dll=file.path(path.package(package = "rawDiag"),
-		                     "exec", "fgcz_raw.dll"))
+		                     "exec", "rawDiag.dll"))
 	  invisible()
 	}
 }
