@@ -3,14 +3,13 @@
 
 #' extracting XIC of a given set of peptides
 #'
-#' @param rawfilename
-#' @param pepSeq 
-#' @author CP/BR
+#' @param rawfilename rawfile
+#' @param pepSeq Amino acid sequence (peptide)
+#' @author CP/BR 
 #' @description ALLES wird gut
-#' @return
+#' @return peptide quant information
 #' @export
 #' @importFrom protViz parentIonMass peakplot
-#' @examples
 .XICextraction <- function(rawfilename="/Users/cp/data//Data_small/F3_20170823_02_autoQC01_threshold.raw",
                            pepSeq=c("AGGSSEPVTGLADK", "GDLDAASYYAPVR", "FLLQFGAQGSPLFK"), debug=FALSE){
   
