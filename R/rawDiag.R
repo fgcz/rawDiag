@@ -484,7 +484,7 @@ plot.XICs <- function(x, y, method='ggplot', ...){
 #' @examples
 #' (rawfile <- file.path(path.package(package = 'rawDiag'), 'extdata', 'sample.raw'))
 #' 
-#' S <- csReadScans(rawfile, 1:9)
+#' S <- readScans(rawfile, 1:9)
 #' 
 #' S[[1]]
 #'  
