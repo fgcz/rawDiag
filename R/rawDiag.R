@@ -471,6 +471,7 @@ plot.XICs <- function(x, y, method='ggplot', ...){
 #' @references \url{https://doi.org/10.5281/zenodo.2640013}
 #' 
 #' @importFrom rDotNet .cinit .cnew
+#' @aliases readScan
 #' 
 #' @export readScans
 #' 
@@ -498,7 +499,7 @@ readScans <- function(rawfile, scans = NULL){
     return (NULL)
   }
   # for debug use
-  # .cinit(dll="/Users/cp//__checkouts/R/rawDiag/exec/fgcz_raw.dll")
+  # .cinit(dll="/Users/cp//__checkouts/R/rawDiag/exec/rawDiag.dll")
   try({
     obj <- .cnew ("Rawfile", rawfile)
     
