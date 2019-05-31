@@ -460,20 +460,29 @@ plot.XICs <- function(x, y, method='ggplot', ...){
 #'
 #' @param rawfile the name of the Thermo Fisher Scietific raw file which the data
 #' are to be read from.  
-#' @param scans a vector of requested scan numbers
+#' @author Christian Panse <cp@fgz.ethz.ch> 2018, 2019
+#' @description the function reads scan information of a given set of scan
+#' number using a dot net interface. 
+#' 
+#' @param scans a vector of requested scan numbers.
+#' 
+#' @seealso \url{https://CRAN.R-project.org/package=rDotNet}
 #' 
 #' @return \CRANpkg{protViz} peaklist
-#' 
+
 #' @importFrom rDotNet .cinit .cnew
-#' @export csReadScans
+#' @export readScans
 #'
 #' @examples
-#'  (rawfile <- file.path(path.package(package = 'rawDiag'), 'extdata', 'sample.raw'))
+#' 
+#'  (rawfile <- file.path(path.package(package = 'rawDiag'), 
+#'     extdata', 'sample.raw'))
 #'  S <- csReadScans(rawfile, 1:9)
 #'  plot(S[[1]])
 #'  op <- par(mfrow=c(3, 3))
 #'  lapply(S, function(x){plot(x, sub=x$scanType)})
-csReadScans <- function(rawfile, scans = NULL){
+#'  
+readScans <- function(rawfile, scans = NULL){
   if (!file.exists(rawfile)){
     warning("no rawfile")
     return (NULL)
@@ -484,7 +493,8 @@ csReadScans <- function(rawfile, scans = NULL){
     obj <- .cnew ("Rawfile", rawfile)
     
     if(obj$check()){
-      if (is.null(scans)) scans <- obj$getFirstScanNumber():obj$getLastScanNumber()
+      if (is.null(scans))
+        scans <- obj$getFirstScanNumber():obj$getLastScanNumber()
       
       first <- obj$getFirstScanNumber()
       last <- obj$getLastScanNumber()
@@ -508,30 +518,14 @@ csReadScans <- function(rawfile, scans = NULL){
   }, NULL)
 }
 
-#' read scan of scanids
-#'
-#' @param rawfile 
-#' @param scans 
-#' @param mono 
-#' @param exe 
-#'
-#' @return
-#' @export readScans
-#'
-#' @examples
-#'  (rawfile <- file.path(path.package(package = 'rawDiag'), 'extdata', 'sample.raw'))
-#'  S <- readScans(rawfile, 1:9)
-#'  plot(S[[1]])
-#'  op <- par(mfrow=c(3, 3))
-#'  lapply(S, function(x){plot(x, sub=x$scanType)})
-#' 
-readScans <- function(rawfile, 
-                       scans,  
-  mono = if(Sys.info()['sysname'] %in% c("Darwin", "Linux")) TRUE else FALSE,
-  exe = file.path(path.package(package = "rawDiag"), "exec", "fgcz_raw.exe")){
+
+.readScans <- function(rawfile, scans){
+  mono <- if(Sys.info()['sysname'] %in% c("Darwin", "Linux")) TRUE else FALSE,
+  exe <- file.path(path.package(package = "rawDiag"), "exec", "fgcz_raw.exe"))
   
   # TODO(cp): replace asap we have an R .Net binding similar as Rcpp
   # the current solution writting and reading from a file is pain-of-the-art
+  # https://github.com/fgcz/rawDiag/issues/46
   tfi <- tempfile()
   tfo <- tempfile()
   tfstdout <- tempfile()

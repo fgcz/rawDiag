@@ -4,18 +4,19 @@ context("read.raw")
 
 
 test_that("check rDotNet.", {
+
   library(rawDiag)
   
   rawfile <- file.path(path.package(package = 'rawDiag'), 'extdata', 'sample.raw')
 
-  RAWcs <- csReadScans(rawfile)
+  RAWcs <- readScans(rawfile)
   expect_true(length(RAWcs) == 574)
 
   idx <- 1:574
-  RAWcs <- csReadScans(rawfile, idx)
-  RAWf <- readScans(rawfile, idx)
+  RAWcs <- readScans(rawfile, idx)
+  RAWf <- rawDiag:::.readScans(rawfile, idx)
 
-  rv<- lapply(idx, function(i){
+  rv <- lapply(idx, function(i){
 	expect_equal(RAWf[[i]]$intensity, RAWcs[[i]]$intensity)
 	expect_equal(RAWf[[i]]$mZ, RAWcs[[i]]$mZ)
 	expect_equal(RAWf[[i]]$charge, RAWcs[[i]]$charge)
