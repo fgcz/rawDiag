@@ -2,30 +2,34 @@
 % Please edit documentation in R/rawDiag.R
 \name{readScans}
 \alias{readScans}
-\title{read scan of scanids}
+\title{readScans of a raw file}
 \usage{
-readScans(rawfile, scans, mono = if (Sys.info()["sysname"] \%in\%
-  c("Darwin", "Linux")) TRUE else FALSE,
-  exe = file.path(path.package(package = "rawDiag"), "exec",
-  "fgcz_raw.exe"))
+readScans(rawfile, scans = NULL)
 }
 \arguments{
-\item{rawfile}{}
+\item{rawfile}{the name of the Thermo Fisher Scietific raw file which the data
+are to be read from.}
 
-\item{scans}{}
-
-\item{mono}{}
-
-\item{exe}{}
+\item{scans}{a vector of requested scan numbers.}
+}
+\value{
+\CRANpkg{protViz} peaklist
 }
 \description{
-read scan of scanids
+the function reads scan information of a given set of scan
+number using a dot net interface and the ThermoFisher NewRawFileReader 
+libraries.
 }
-\examples{
- (rawfile <- file.path(path.package(package = 'rawDiag'), 'extdata', 'sample.raw'))
- S <- readScans(rawfile, 1:9)
- plot(S[[1]])
- op <- par(mfrow=c(3, 3))
- lapply(S, function(x){plot(x, sub=x$scanType)})
-
+\note{
+the deprecated function is available through 
+using \code{rawDiag:::.readScans}.
+}
+\references{
+\url{https://doi.org/10.5281/zenodo.2640013}
+}
+\seealso{
+\url{https://CRAN.R-project.org/package=rDotNet}
+}
+\author{
+Christian Panse <cp@fgz.ethz.ch> 2018, 2019
 }

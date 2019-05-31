@@ -456,20 +456,28 @@ plot.XICs <- function(x, y, method='ggplot', ...){
   }
 } 
 
-#' readScans via rDotNet
+#' readScans of a raw file
 #'
 #' @param rawfile the name of the Thermo Fisher Scietific raw file which the data
 #' are to be read from.  
+#' 
 #' @author Christian Panse <cp@fgz.ethz.ch> 2018, 2019
+#' 
 #' @description the function reads scan information of a given set of scan
-#' number using a dot net interface. 
+#' number using a dot net interface and the ThermoFisher NewRawFileReader 
+#' libraries. 
+#' 
+#' @note the deprecated function is available through 
+#' using \code{rawDiag:::.readScans}. 
 #' 
 #' @param scans a vector of requested scan numbers.
 #' 
 #' @seealso \url{https://CRAN.R-project.org/package=rDotNet}
 #' 
 #' @return \CRANpkg{protViz} peaklist
-
+#' 
+#' @references \url{https://doi.org/10.5281/zenodo.2640013}
+#' 
 #' @importFrom rDotNet .cinit .cnew
 #' @export readScans
 #'
@@ -478,6 +486,7 @@ plot.XICs <- function(x, y, method='ggplot', ...){
 #'  (rawfile <- file.path(path.package(package = 'rawDiag'), 
 #'     extdata', 'sample.raw'))
 #'  S <- csReadScans(rawfile, 1:9)
+#'  
 #'  plot(S[[1]])
 #'  op <- par(mfrow=c(3, 3))
 #'  lapply(S, function(x){plot(x, sub=x$scanType)})
@@ -520,8 +529,8 @@ readScans <- function(rawfile, scans = NULL){
 
 
 .readScans <- function(rawfile, scans){
-  mono <- if(Sys.info()['sysname'] %in% c("Darwin", "Linux")) TRUE else FALSE,
-  exe <- file.path(path.package(package = "rawDiag"), "exec", "fgcz_raw.exe"))
+  mono <- if(Sys.info()['sysname'] %in% c("Darwin", "Linux")) TRUE else FALSE
+  exe <- file.path(path.package(package = "rawDiag"), "exec", "fgcz_raw.exe")
   
   # TODO(cp): replace asap we have an R .Net binding similar as Rcpp
   # the current solution writting and reading from a file is pain-of-the-art
