@@ -274,7 +274,7 @@ namespace FGCZExtensions
 
                     var trailerFields = rawFile.GetTrailerExtraHeaderInformation();
                     var pepmass = -1.0;
-                    var charge = "NA";
+                    var charge = 0;
                     var monoisotopicMz = "NA";
                     var basepeakIntensity = -1.0;
 
@@ -304,7 +304,7 @@ namespace FGCZExtensions
 
                             pepmass = reaction0.PrecursorMass;
                             basepeakIntensity =  Math.Round(scanStatistics.BasePeakIntensity);
-                            charge = scanTrailer.Values.ToArray()[idx_CHARGE];
+                            charge = int.Parse(scanTrailer.Values.ToArray()[idx_CHARGE]);
                             monoisotopicMz = scanTrailer.Values.ToArray()[idx_PEPMASS];
                     }
                     catch
@@ -312,7 +312,7 @@ namespace FGCZExtensions
                         // Console.WriteLine("catch");
                         pepmass = -1.0;
                         basepeakIntensity = -1.0;
-                        charge = "NA";
+                        charge = 0;
                         monoisotopicMz = "NA";
                     }
 
@@ -441,7 +441,7 @@ namespace FGCZ_Raw
 
         public string GetTitle(int scanNumber)
         {
-            string s = "File: " + Path.GetFileName(_rawfile) + "SpectrumID: scans: " + scanNumber;
+            string s = "File: " + Path.GetFileName(_rawfile) + " SpectrumID: scans: " + scanNumber;
             return s;
         }
 
@@ -469,6 +469,13 @@ namespace FGCZ_Raw
             var scanStatistics = rawFile.GetScanStatsForScanNumber(scanNumber);
             return Math.Round(scanStatistics.StartTime * 60 * 1000) / 1000;
         }
+
+	public double GetBasepeakIntensity(int scanNumber)
+	{
+            var scanStatistics = rawFile.GetScanStatsForScanNumber(scanNumber);
+            return  Math.Round(scanStatistics.BasePeakIntensity);
+	}
+
 
         public string GetMonoisotopicMz(int scanNumber)
         {
