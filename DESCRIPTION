@@ -2,11 +2,10 @@ Package: rawDiag
 Type: Package
 Title: Access Thermo Fisher rawfiles 
 Version: 0.0.35
-Authors@R: c(person("Christian", "Panse", email = "cp@fgcz.ethz.ch", role = c("aut", "cre"),
+Authors@R: c(person(given = "Christian", family = "Panse", email = "cp@fgcz.ethz.ch", role = c("aut", "cre"),
     comment = c(ORCID = "0000-0003-1975-3064")),
-	person("Christian", "Trachsel", email = "Christian.Trachsel@fgcz.ethz.ch", role = "aut", "cre"),
-	person("Tobias", "Kockmann", email = "Tobias.Kockmann@fgcz.ethz.ch", role = "aut"))
-Maintainer: Christian Panse <cp@fgcz.ethz.ch>
+	person(given = "Christian", family = "Trachsel", email = "Christian.Trachsel@fgcz.ethz.ch", role = "aut", "cre"),
+	person(given = "Tobias", family = "Kockmann", email = "Tobias.Kockmann@fgcz.ethz.ch", role = "aut"))
 Depends: R (>= 3.5.1),
 	methods,
 	rDotNet (>= 0.9.1)

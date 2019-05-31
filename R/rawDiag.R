@@ -405,7 +405,7 @@ plot.XIC <- function(x, y, fit=FALSE, ...){
 #' @param y will be ignroed
 #' @param ... passed to \code{plot.XIC}
 #' @import ggplot2
-#' @return 
+#' @return a ggplot2 object
 #' @export plot.XICs
 #' @examples
 #' # Example 1: extract iRT peptides
@@ -460,37 +460,38 @@ plot.XICs <- function(x, y, method='ggplot', ...){
 #'
 #' @param rawfile the name of the Thermo Fisher Scietific raw file which the data
 #' are to be read from.  
-#' 
+#' @param scans a vector of requested scan numbers.
+
 #' @author Christian Panse <cp@fgz.ethz.ch> 2018, 2019
 #' 
 #' @description the function reads scan information of a given set of scan
 #' number using a dot net interface and the ThermoFisher NewRawFileReader 
 #' libraries. 
-#' 
-#' @note the deprecated function is available through 
-#' using \code{rawDiag:::.readScans}. 
-#' 
-#' @param scans a vector of requested scan numbers.
-#' 
-#' @seealso \url{https://CRAN.R-project.org/package=rDotNet}
-#' 
-#' @return \CRANpkg{protViz} peaklist
-#' 
+#'  
 #' @references \url{https://doi.org/10.5281/zenodo.2640013}
 #' 
 #' @importFrom rDotNet .cinit .cnew
-#' @export readScans
-#'
-#' @examples
 #' 
-#'  (rawfile <- file.path(path.package(package = 'rawDiag'), 
-#'     extdata', 'sample.raw'))
-#'  S <- csReadScans(rawfile, 1:9)
+#' @export readScans
+#' 
+#' @note the deprecated previous implemention is available through 
+#' using the function \code{rawDiag:::.readScans}. 
+#' 
+#' @seealso \url{https://CRAN.R-project.org/package=rDotNet}
+#' 
+#' @return a nested list of \CRANpkg{protViz} peaklists.
+#' 
+#' @examples
+#' (rawfile <- file.path(path.package(package = 'rawDiag'), 'extdata', 'sample.raw'))
+#' 
+#' S <- csReadScans(rawfile, 1:9)
+#' 
+#' S[[1]]
 #'  
-#'  plot(S[[1]])
-#'  op <- par(mfrow=c(3, 3))
-#'  lapply(S, function(x){plot(x, sub=x$scanType)})
-#'  
+#' plot(S[[1]])
+#' op <- par(mfrow = c(3, 3))
+#' lapply(S, function(x){ plot(x, sub=x$scanType) })
+#' 
 readScans <- function(rawfile, scans = NULL){
   if (!file.exists(rawfile)){
     warning("no rawfile")

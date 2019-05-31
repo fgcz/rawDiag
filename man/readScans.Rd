@@ -13,7 +13,7 @@ are to be read from.}
 \item{scans}{a vector of requested scan numbers.}
 }
 \value{
-\CRANpkg{protViz} peaklist
+a nested list of \CRANpkg{protViz} peaklists.
 }
 \description{
 the function reads scan information of a given set of scan
@@ -21,8 +21,20 @@ number using a dot net interface and the ThermoFisher NewRawFileReader
 libraries.
 }
 \note{
-the deprecated function is available through 
-using \code{rawDiag:::.readScans}.
+the deprecated previous implemention is available through 
+using the function \code{rawDiag:::.readScans}.
+}
+\examples{
+(rawfile <- file.path(path.package(package = 'rawDiag'), 'extdata', 'sample.raw'))
+
+S <- csReadScans(rawfile, 1:9)
+
+S[[1]]
+ 
+plot(S[[1]])
+op <- par(mfrow = c(3, 3))
+lapply(S, function(x){ plot(x, sub=x$scanType) })
+
 }
 \references{
 \url{https://doi.org/10.5281/zenodo.2640013}

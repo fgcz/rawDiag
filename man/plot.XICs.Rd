@@ -13,6 +13,9 @@ plot.XICs(x, y, method = "ggplot", ...)
 
 \item{...}{passed to \code{plot.XIC}}
 }
+\value{
+a ggplot2 object
+}
 \description{
 plot extracted ion chromatograms
 }
