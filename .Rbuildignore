@@ -11,6 +11,7 @@
 ^.*vignettes/rawDiag_EuroBioc2018_Munich_20181206.*$
 ^.*vignettes/ProteomicsForum2019_P55.*$
 ^.*vignettes/.*Rmd$
+^.*vignettes/.*$
 #^.*data/.*RData$
 ^.*inst/extdata/PXD006932_Exp3A_smp.RData$
 ^.*inst/extdata/PXD006932_Exp3A.RData$
