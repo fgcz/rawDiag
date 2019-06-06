@@ -1,3 +1,4 @@
 * linguist-vendored
-inst/docker/fgcz_raw.cs  linguist-vendored=false
+
 R/rawDiag.R linguist-vendored=false
+src/rawDiag.cs linguist-vendored=false
