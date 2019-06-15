@@ -471,7 +471,7 @@ plot.XICs <- function(x, y, method='ggplot', ...){
 #' @references \url{https://doi.org/10.5281/zenodo.2640013}
 #' 
 #' @importFrom rDotNet .cinit .cnew
-#' @aliases readScan
+#' @aliases readScan peaklistSet
 #' 
 #' @export readScans
 #' 
@@ -480,7 +480,7 @@ plot.XICs <- function(x, y, method='ggplot', ...){
 #' 
 #' @seealso \url{https://CRAN.R-project.org/package=rDotNet}
 #' 
-#' @return a nested list of \CRANpkg{protViz} peaklists.
+#' @return  peaklistSet, a nested list  of \CRANpkg{protViz} peaklist objects.
 #' 
 #' @examples
 #' (rawfile <- file.path(path.package(package = 'rawDiag'), 'extdata', 'sample.raw'))
@@ -510,10 +510,12 @@ readScans <- function(rawfile, scans = NULL){
       first <- obj$getFirstScanNumber()
       last <- obj$getLastScanNumber()
       
-      lapply(scans, function(sn){
+      res <- lapply(scans, function(sn){
         
         rv <- list(scan = sn,
                    scanType = obj$GetScanType(sn),
+                   polarity = obj$GetPolarity(sn),
+                   msLevel = obj$GetMsLevel(sn),
                    rtinseconds = obj$GetRTinSeconds(sn),
                    pepmass = c(obj$GetPepmass(sn), obj$GetBasepeakIntensity(sn)),
                    monoisotopicMz = as.double(obj$GetMonoisotopicMz(sn)),
@@ -525,6 +527,8 @@ readScans <- function(rawfile, scans = NULL){
         class(rv) <- c(class(rv), 'peaklist')
         rv
       })
+      class(res) <- c(class(res), 'peaklistSet')
+      res
     }
   }, NULL)
 }

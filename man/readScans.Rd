@@ -2,6 +2,8 @@
 % Please edit documentation in R/rawDiag.R
 \name{readScans}
 \alias{readScans}
+\alias{readScan}
+\alias{peaklistSet}
 \title{readScans of a raw file}
 \usage{
 readScans(rawfile, scans = NULL)
@@ -13,7 +15,7 @@ are to be read from.}
 \item{scans}{a vector of requested scan numbers.}
 }
 \value{
-a nested list of \CRANpkg{protViz} peaklists.
+peaklistSet, a nested list  of \CRANpkg{protViz} peaklist objects.
 }
 \description{
 the function reads scan information of a given set of scan

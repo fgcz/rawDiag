@@ -140,6 +140,29 @@ namespace rawDiag
                 return null;
             }
         }
+
+        public int GetPolarity(int scanNumber)
+        {
+            
+            var scanFilter = rawFile.GetFilterForScanNumber(scanNumber);
+
+            if (scanFilter.Polarity.ToString() == "Positive") return 1;
+            
+            return -1;
+        }
+
+        
+        public int GetMsLevel(int scanNumber)
+        {
+            
+            var scanFilter = rawFile.GetFilterForScanNumber(scanNumber);
+            
+            if (scanFilter.MSOrder.ToString() == "Ms") return 1;
+            else if (scanFilter.MSOrder.ToString() == "Ms2") return 2; 
+            else if (scanFilter.MSOrder.ToString() == "Ms3") return 3; 
+            else return -1;
+        }
+        
         public string GetCharge(int scanNumber)
         {
             var trailerFields = rawFile.GetTrailerExtraHeaderInformation();
