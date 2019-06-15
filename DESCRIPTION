@@ -8,6 +8,7 @@ Authors@R: c(person(given = "Christian", family = "Panse", email = "cp@fgcz.ethz
 	person(given = "Tobias", family = "Kockmann", email = "Tobias.Kockmann@fgcz.ethz.ch", role = "aut"))
 Depends: R (>= 3.5.1),
 	methods,
+	Spectra,
 	rDotNet (>= 0.9.1)
 Imports: ggplot2 (>= 2.2.1),
 	dplyr,
