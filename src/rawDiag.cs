@@ -162,6 +162,14 @@ namespace rawDiag
             else if (scanFilter.MSOrder.ToString() == "Ms3") return 3; 
             else return -1;
         }
+
+        // TODO(cp): implement it 
+        public int[] GetMsLevel()
+        {
+            int[] rv = {1,2,2,3,4};
+            return rv;
+
+        }
         
         public string GetCharge(int scanNumber)
         {

@@ -47,7 +47,7 @@ shinyServer(function(input, output, session) {
   if(exists(".rawDiagfilesystemDataDir")){
     filesystemDataDir <- .GlobalEnv$.rawDiagfilesystemDataDir
   }else{
-    filesystemDataDir <- c("Documents", "Downloads", "WU163230", "WU163763", "autoQC")
+    filesystemDataDir <- c("Documents", "Downloads", "WU163230", "WU163763", "autoQC", "Core4Life")
   }
   
 
