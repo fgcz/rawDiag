@@ -459,14 +459,16 @@ plot.XICs <- function(x, y, method='ggplot', ...){
 
 
 
-#' read scan of scanids
+#' read scan data
 #'
-#' @param rawfile 
-#' @param scans 
-#' @param mono 
-#' @param exe 
+#' /code{readScans} reads scan-level information from a binary raw file and returns them as a list of /code{peaklist} objects.                     
+#'                     
+#' @param rawfile Path to a rawfile (*.raw) on your local file system. 
+#' @param scans Numeric vector of scan numbers you would like to read from your rawfile. 
+#' @param mono Path to mono executable.
+#' @param exe Path to rawDiag executable.
 #'
-#' @return
+#' @return A list of S3 /code{peaklist} objects.
 #' @export readScans
 #'
 #' @examples
