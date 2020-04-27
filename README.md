@@ -55,6 +55,7 @@ The package [JPR.R1](https://github.com/fgcz/rawDiag/tree/JPR.R1) release has be
 |Windows   | Server 2012 R2 x64 | 3.4.4|CP|
 |Windows   | 10 x64 | 3.4.3 | WEW |
 |Windows   | 10 x64 | R Open 3.5.0 | WEW |
+|Windows   | 12    | 4.0.0 | CP [see also #56](https://github.com/fgcz/rawDiag/issues/56) |
 |MacOSX    | 10.13.5 (17F77)|3.4.2|CP|
 |MacOSX    | 10.11.6 (15G20015)|3.4.3 |JG|
 |MacOSX    | 10.13.4 (17E202)|3.4.4|CP|
