@@ -522,6 +522,7 @@ readScans <- function(rawfile, scans = NULL){
                    centroidStream = obj$IsCentroidScan(sn),
                    title = obj$GetTitle(sn),
                    charge = as.integer(obj$GetCharge(sn)),
+                   noise = obj$GetSpectrumNoises(sn, ""),
                    mZ = obj$GetSpectrumMz(sn, ""),
                    intensity=obj$GetSpectrumIntensities(sn, ""))
         class(rv) <- c(class(rv), 'peaklist')

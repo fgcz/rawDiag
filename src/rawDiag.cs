@@ -199,6 +199,17 @@ namespace rawDiag
 		return segmentedScan.Intensities.ToArray();
 	    }
 	}
+        public double[] GetSpectrumNoises(int scanNumber, string scanFilter)
+	{
+            var scanStatistics = rawFile.GetScanStatsForScanNumber(scanNumber);
+            if (scanStatistics.IsCentroidScan)
+            {
+                var centroidStream = rawFile.GetCentroidStream(scanNumber, false);
+		return centroidStream.Noises.ToArray();
+	    }else{
+		return null;
+	    }
+	}
         public double[] GetSpectrumMz(int scanNumber, string scanFilter)
         {
 
