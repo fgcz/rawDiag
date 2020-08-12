@@ -1067,7 +1067,7 @@ namespace FGCZ_Raw
                 ChromatogramTraceSettings settings = new ChromatogramTraceSettings(TraceType.MassRange)
                 {
                     Filter = "ms",
-                    MassRanges = new[] {Range.Create(mass - massError, mass + massError)}
+                    MassRanges = new[] {ThermoFisher.CommonCore.Data.Business.Range.Create(mass - massError, mass + massError)}
                 };
 
                 settingList.Add(settings);
