@@ -20,6 +20,7 @@ a ggplot object.
 plots the mass frequency in dependency to the charge state
 }
 \examples{
+\dontrun{
  library(ggplot2)
  data(WU163763)
  
@@ -31,4 +32,5 @@ plots the mass frequency in dependency to the charge state
    
  PlotMassDistribution(WU163763, method = 'overlay') +
    theme(legend.position = 'none')  
+   }
 }

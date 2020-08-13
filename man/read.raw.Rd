@@ -6,11 +6,17 @@
 \alias{xic}
 \title{mass spec reader function}
 \usage{
-read.raw(file, mono = if (Sys.info()["sysname"] \%in\% c("Darwin",
-  "Linux")) TRUE else FALSE, exe = file.path(path.package(package =
-  "rawDiag"), "exec", "fgcz_raw.exe"), mono_path = "", rawDiag = TRUE,
-  argv = "qc", system2_call = if (Sys.info()["sysname"] == "Windows")
-  TRUE else FALSE, method = "thermo", ssh = FALSE)
+read.raw(
+  file,
+  mono = if (Sys.info()["sysname"] \%in\% c("Darwin", "Linux")) TRUE else FALSE,
+  exe = file.path(path.package(package = "rawDiag"), "exec", "fgcz_raw.exe"),
+  mono_path = "",
+  rawDiag = TRUE,
+  argv = "qc",
+  system2_call = if (Sys.info()["sysname"] == "Windows") TRUE else FALSE,
+  method = "thermo",
+  ssh = FALSE
+)
 }
 \arguments{
 \item{file}{the name of the Thermo Fisher Scietific raw file which the data
@@ -71,7 +77,7 @@ rawFileNames <- list.files()[grep("raw$", list.files())]
 
 # read all the meta data using 4 cores
 RAW <- mclapply(rawFileNames, read.raw, mc.cores=4)
-# as alternative  \\code{lapply} instread of \\code{mclapply}
+# as alternative  \code{lapply} instread of \code{mclapply}
 
 # concatenate the list data.frames into one single one
 RAW <- plyr::rbind.fill(RAW)

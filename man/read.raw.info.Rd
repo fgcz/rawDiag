@@ -4,10 +4,15 @@
 \alias{read.raw.info}
 \title{Read raw file meta data}
 \usage{
-read.raw.info(file, mono = if (Sys.info()["sysname"] \%in\% c("Darwin",
-  "Linux")) TRUE else FALSE, exe = file.path(path.package(package =
-  "rawDiag"), "exec", "fgcz_raw.exe"), mono_path = "", argv = "info",
-  system2_call = TRUE, method = "thermo")
+read.raw.info(
+  file,
+  mono = if (Sys.info()["sysname"] \%in\% c("Darwin", "Linux")) TRUE else FALSE,
+  exe = file.path(path.package(package = "rawDiag"), "exec", "fgcz_raw.exe"),
+  mono_path = "",
+  argv = "infoR",
+  system2_call = TRUE,
+  method = "thermo"
+)
 }
 \arguments{
 \item{file}{Thermo Fisher raw file name}
@@ -25,19 +30,19 @@ read.raw.info(file, mono = if (Sys.info()["sysname"] \%in\% c("Darwin",
 \item{method}{instrument vendor}
 }
 \value{
-a nested list object
+a list object
 }
 \description{
 The function extracts some meta information from a given rawfile.
-The output is parsed by the yaml package.
+The R code output is parsed by the function and a list object is returned.
 }
 \examples{
 (rawfile <- file.path(path.package(package = 'rawDiag'), 'extdata', 'sample.raw'))
-Y <- read.raw.info(rawfile)
+(info <- read.raw.info(rawfile))
 }
 \seealso{
-Thermo Fisher NewRawfileReader C# code snippet.
+Thermo Fisher NewRawfileReader C# code snippets.
 }
 \author{
-Christian Panse 2018, 2019
+Christian Panse 2018, 2019, 2020
 }

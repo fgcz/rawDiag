@@ -19,9 +19,11 @@ PlotAll(x, prefix = "primer", savepng = TRUE, resolution = 240)
 PlotAll applies all available rawDiag plot functions to a given rawDiag object
 }
 \examples{
+\dontrun{
 data(WU163763)
 WU <- WU163763[WU163763$filename \%in\% unique(WU163763$filename)[1:2], ]
 rv <- rawDiag:::PlotAll(x = WU, savepng = FALSE)
+}
 }
 \references{
 Table 1 in \url{https://doi.org/10.1101/304485}

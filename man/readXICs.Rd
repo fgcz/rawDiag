@@ -4,10 +4,13 @@
 \alias{readXICs}
 \title{Extracts XICs of a given mass vector}
 \usage{
-readXICs(rawfile, masses, tol = 10, mono = if (Sys.info()["sysname"]
-  \%in\% c("Darwin", "Linux")) TRUE else FALSE,
-  exe = file.path(path.package(package = "rawDiag"), "exec",
-  "fgcz_raw.exe"))
+readXICs(
+  rawfile,
+  masses,
+  tol = 10,
+  mono = if (Sys.info()["sysname"] \%in\% c("Darwin", "Linux")) TRUE else FALSE,
+  exe = file.path(path.package(package = "rawDiag"), "exec", "fgcz_raw.exe")
+)
 }
 \arguments{
 \item{rawfile}{the file name}
@@ -47,7 +50,7 @@ rawfile <- "/home/cp/Downloads/20180220_14_autoQC01.raw"
 RAW <- read.raw(rawfile)
 
 # not meaning full but proof-of-concept
-X <-readXICs(rawfile, masses=unique(RAW$PrecursorMass), tol=1000)
-plot(X)
+X <- readXICs(rawfile, masses=unique(RAW$PrecursorMass), tol=1000)
+plot.XIC(X)
 
 }

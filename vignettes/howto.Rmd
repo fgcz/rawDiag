@@ -1,0 +1,80 @@
+---
+title: "On reading raw files using rawDiag"
+author: "Christian Panse"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 7
+)
+```
+
+## Load
+
+```{r}
+library(rawDiag)
+```
+
+
+## Read raw files
+
+```{r defineInput}
+(rawfile <- file.path(path.package(package = 'rawDiag'), 'extdata', 'sample.raw'))
+```
+
+
+### Read raw file information 
+
+
+
+```{r info}
+(info <- read.raw.info(rawfile))
+```
+### Read scan parameter
+
+
+```{r readRaw}
+system.time(RAW <- read.raw(file = rawfile))
+dim(RAW)
+PlotScanFrequency(RAW)
+```
+
+
+### Read spectra
+
+
+```{r spectra}
+scans <- readScans(rawfile, info$`Scan range`[1]:info$`Scan range`[2])
+
+plot.peaklist(scans[[1]])
+```
+
+### Read chomatograms
+
+```{r XIC}
+# not meaning full but proof-of-concept
+X <- readXICs(rawfile, masses=unique(RAW$PrecursorMass), tol=1000)
+plot.XICs(X)
+```
+
+
+
+
+
+## Misc
+```{r citation}
+citation('rawDiag')
+```
+
+
+```{r sessionInfo}
+sessionInfo()
+```

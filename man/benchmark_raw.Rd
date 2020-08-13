@@ -4,9 +4,12 @@
 \alias{benchmark_raw}
 \title{benchmark of \code{read.raw}}
 \usage{
-benchmark_raw(f, maxncpu = c(16, 32, 64),
-  exe = file.path(path.package(package = "rawDiag"), "exec",
-  "fgcz_raw.exe"), rdata = tempfile(fileext = ".RData"))
+benchmark_raw(
+  f,
+  maxncpu = c(16, 32, 64),
+  exe = file.path(path.package(package = "rawDiag"), "exec", "fgcz_raw.exe"),
+  rdata = tempfile(fileext = ".RData")
+)
 }
 \arguments{
 \item{f}{set of files}

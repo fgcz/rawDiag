@@ -22,6 +22,6 @@ plot a peaklist
 \examples{
 (rawfile <- file.path(path.package(package = 'rawDiag'), 'extdata', 'sample.raw'))
 S <- readScans(rawfile, 1:10)
-plot(S[[1]])
+plot.peaklist(S[[1]])
 
 }

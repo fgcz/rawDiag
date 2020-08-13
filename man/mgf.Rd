@@ -4,8 +4,12 @@
 \alias{mgf}
 \title{writes a Mascot Generic File (mgf)}
 \usage{
-mgf(rawfilename, mgffilename = paste(sub("\\\\.raw$", "", rawfilename),
-  "mgf", sep = "."), pattern = ".+", FUN = NULL)
+mgf(
+  rawfilename,
+  mgffilename = paste(sub("\\\\.raw$", "", rawfilename), "mgf", sep = "."),
+  pattern = ".+",
+  FUN = NULL
+)
 }
 \arguments{
 \item{rawfilename}{a Thermo Fisher instrument file.}
