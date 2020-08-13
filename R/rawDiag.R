@@ -1,4 +1,4 @@
-#R visualiz Thermo raw file data with R @Functional Genomics Center Zurich 
+#R
 
 # Hack to handle 
 # no visible binding for global variable '.'
@@ -276,8 +276,8 @@ read.tdf <- function(filename){
 #' RAW <- read.raw(rawfile)
 #' 
 #' # not meaning full but proof-of-concept
-#' X <-readXICs(rawfile, masses=unique(RAW$PrecursorMass), tol=1000)
-#' plot(X)
+#' X <- readXICs(rawfile, masses=unique(RAW$PrecursorMass), tol=1000)
+#' plot.XIC(X)
 #' 
 readXICs <- function(rawfile, 
                       masses,
@@ -462,7 +462,7 @@ plot.XICs <- function(x, y, method='ggplot', ...){
 #' are to be read from.  
 #' @param scans a vector of requested scan numbers.
 
-#' @author Christian Panse <cp@fgz.ethz.ch> 2018, 2019
+#' @author Christian Panse <cp@fgz.ethz.ch> 2018, 2019, 2020
 #' 
 #' @description the function reads scan information of a given set of scan
 #' number using a dot net interface and the ThermoFisher NewRawFileReader 
@@ -470,15 +470,9 @@ plot.XICs <- function(x, y, method='ggplot', ...){
 #'  
 #' @references \url{https://doi.org/10.5281/zenodo.2640013}
 #' 
-#' @importFrom rDotNet .cinit .cnew
 #' @aliases readScan peaklistSet
 #' 
 #' @export readScans
-#' 
-#' @note the deprecated previous implemention is available through 
-#' using the function \code{rawDiag:::.readScans}. 
-#' 
-#' @seealso \url{https://CRAN.R-project.org/package=rDotNet}
 #' 
 #' @return  peaklistSet, a nested list  of \CRANpkg{protViz} peaklist objects.
 #' 
@@ -489,53 +483,11 @@ plot.XICs <- function(x, y, method='ggplot', ...){
 #' 
 #' S[[1]]
 #'  
-#' plot(S[[1]])
+#' plot.peaklist(S[[1]])
 #' op <- par(mfrow = c(3, 3))
-#' lapply(S, function(x){ plot(x, sub=x$scanType) })
+#' lapply(S, function(x){ plot.peaklist(x, sub=x$scanType) })
 #' 
-readScans <- function(rawfile, scans = NULL){
-  if (!file.exists(rawfile)){
-    warning("no rawfile")
-    return (NULL)
-  }
-  # for debug use
-  # .cinit(dll="/Users/cp//__checkouts/R/rawDiag/exec/rawDiag.dll")
-  try({
-    obj <- .cnew ("Rawfile", rawfile)
-    
-    if(obj$check()){
-      if (is.null(scans))
-        scans <- obj$getFirstScanNumber():obj$getLastScanNumber()
-      
-      first <- obj$getFirstScanNumber()
-      last <- obj$getLastScanNumber()
-      
-      res <- lapply(scans, function(sn){
-        
-        rv <- list(scan = sn,
-                   scanType = obj$GetScanType(sn),
-                   polarity = obj$GetPolarity(sn),
-                   msLevel = obj$GetMsLevel(sn),
-                   rtinseconds = obj$GetRTinSeconds(sn),
-                   pepmass = c(obj$GetPepmass(sn), obj$GetBasepeakIntensity(sn)),
-                   monoisotopicMz = as.double(obj$GetMonoisotopicMz(sn)),
-                   centroidStream = obj$IsCentroidScan(sn),
-                   title = obj$GetTitle(sn),
-                   charge = as.integer(obj$GetCharge(sn)),
-                   noise = obj$GetSpectrumNoises(sn, ""),
-                   mZ = obj$GetSpectrumMz(sn, ""),
-                   intensity=obj$GetSpectrumIntensities(sn, ""))
-        class(rv) <- c(class(rv), 'peaklist')
-        rv
-      })
-      class(res) <- c(class(res), 'peaklistSet')
-      res
-    }
-  }, NULL)
-}
-
-
-.readScans <- function(rawfile, scans){
+readScans <- function(rawfile, scans){
   mono <- if(Sys.info()['sysname'] %in% c("Darwin", "Linux")) TRUE else FALSE
   exe <- file.path(path.package(package = "rawDiag"), "exec", "fgcz_raw.exe")
   
@@ -573,10 +525,10 @@ readScans <- function(rawfile, scans = NULL){
 #' @examples
 #' (rawfile <- file.path(path.package(package = 'rawDiag'), 'extdata', 'sample.raw'))
 #' S <- readScans(rawfile, 1:10)
-#' plot(S[[1]])
+#' plot.peaklist(S[[1]])
 #' 
 plot.peaklist <- function(x, y, ...){
-  plot(x$mZ, x$intensity, type = 'h', main = x$title, xlab = 'm/Z', ylab = 'intensity', ...)
+  plot(x$mZ, x$intensity, type = 'h', main = x$title, xlab = 'm / z', ylab = 'intensity', ...)
 }
 
 
@@ -590,20 +542,20 @@ plot.peaklist <- function(x, y, ...){
 #' @param system2_call system2 call, default.
 #' @param method instrument vendor
 #' @description The function extracts some meta information from a given rawfile.
-#' The output is parsed by the yaml package.
-#' @author Christian Panse 2018, 2019
-#' @seealso Thermo Fisher NewRawfileReader C# code snippet.
-#' @return a nested list object
+#' The R code output is parsed by the function and a list object is returned.
+#' @author Christian Panse 2018, 2019, 2020
+#' @seealso Thermo Fisher NewRawfileReader C# code snippets.
+#' @return a list object
 #' @export read.raw.info
 #' @importFrom yaml yaml.load_file
 #' @examples
 #' (rawfile <- file.path(path.package(package = 'rawDiag'), 'extdata', 'sample.raw'))
-#' Y <- read.raw.info(rawfile)
+#' (info <- read.raw.info(rawfile))
 read.raw.info <- function(file,
      mono = if(Sys.info()['sysname'] %in% c("Darwin", "Linux")) TRUE else FALSE,
      exe = file.path(path.package(package = "rawDiag"), "exec", "fgcz_raw.exe"),
      mono_path = "",
-     argv = "info",
+     argv = "infoR",
      system2_call = TRUE,
      method = "thermo"){
 
@@ -613,8 +565,8 @@ read.raw.info <- function(file,
   }
   if(system2_call && method == 'thermo'){
 
-    tf <- tempfile(fileext = '.tsv')
-    tf.err <- tempfile(fileext = '.tsv')
+    tf <- tempfile(fileext = '.R')
+    tf.err <- tempfile(fileext = '.err')
 
     # message(paste("system2 is writting to tempfile ", tf, "..."))
 
@@ -628,17 +580,14 @@ read.raw.info <- function(file,
     }
 
     if (rvs == 0){
-      #rv <- read.csv(tf,  sep = ":",   stringsAsFactors = TRUE, header = FALSE,
-      #              col.names = c('attribute', 'value'))
-      
+    
       try({
-        rv <- yaml.load_file(tf)
-        # message(paste("unlinking", tf, "..."))
-        unlink(tf)
-        return(rv)
+        source(tf)
+       
+        #message(paste("unlinking", tf, "..."))
+        #unlink(tf)
+        return(e$info)
       }, NULL)
-     
-
      
       # unlink(tfstdout)
       return(rv)
@@ -770,7 +719,7 @@ read.raw <- function(file, mono = if(Sys.info()['sysname'] %in% c("Darwin", "Lin
   }
   
   if (rawDiag) rv <- as.rawDiag(rv)
-  class(rv) <- c(class(rv), 'rawDiag')
+  class(rv) <- c('data.frame')
   rv
 }
 
@@ -1174,6 +1123,7 @@ PlotMzDistribution <- function(x, method='trellis'){
 #' @aliases mass.distribution.violin mass.distribution.overlay
 #' @export PlotMassDistribution
 #' @examples 
+#' \dontrun{
 #'  library(ggplot2)
 #'  data(WU163763)
 #'  
@@ -1185,6 +1135,7 @@ PlotMzDistribution <- function(x, method='trellis'){
 #'    
 #'  PlotMassDistribution(WU163763, method = 'overlay') +
 #'    theme(legend.position = 'none')  
+#'    }
 PlotMassDistribution <- function(x, method = 'trellis'){ 
   res <- x %>% dplyr::filter_at(vars("MSOrder"), any_vars(. == "Ms2")) %>% 
     dplyr::select_at(vars("ChargeState", "PrecursorMass", "filename"))
@@ -1793,9 +1744,11 @@ PlotMassHeatmap <- function(x, method='trellis', bins = 80){ #rename to mass.hea
 #' @author Christian Panse <cp@fgcz.ethz.ch>, 2018
 #' @references Table 1 in \url{https://doi.org/10.1101/304485} 
 #' @examples 
+#' \dontrun{
 #' data(WU163763)
 #' WU <- WU163763[WU163763$filename %in% unique(WU163763$filename)[1:2], ]
 #' rv <- rawDiag:::PlotAll(x = WU, savepng = FALSE)
+#' }
 PlotAll <- function(x, prefix = "primer", savepng = TRUE, resolution = 240){
   WU <- x
   lapply(ls("package:rawDiag")[grepl("Plot", ls("package:rawDiag"))], 
@@ -2405,44 +2358,3 @@ rawDiagShiny <- function(appDir = system.file('shiny', 'demo', package = 'rawDia
   NULL
 }
 
-
-#R 
-# FGCZ, TK,CP 2019-06-14
-
-
-#' Force an peaklistSet Object to Belong to a Class DataFrame
-#'
-#' @param x an \code{\link[protViz]{peaklistSet}}} object.
-#' @param ... 
-#'
-#' @author TK,CP 2019-06-14
-#' @return \code{\link[S4Vectors]{DataFrane} object}
-#' @export as.peaklistSet.DataFrame
-#' @examples 
-#' library(rawDiag)
-#' (rawfile <- file.path(path.package(package = 'rawDiag'), 'extdata', 'sample.raw'))
-#' PLS <-readScans(rawfile)
-#' DF <- as.peaklistSet.DataFrame(PLS)
-#' DF$fromFile = as.integer(1)
-#' 
-#' if(require(Spectra)){
-#'   rawDiagSample <- MsBackendDataFrame()
-#'   BE <- backendInitialize(object=rawDiagSample, files=rawfile, spectraData=DF)
-#' }
-as.peaklistSet.DataFrame <- function(x, ...){
-  if (!require(S4Vectors)){ warning("pkg 'S4Vectors' not installed."); return (NULL) }
-  
-  n <- length(x)
-  df <- DataFrame(
-    msLevel = sapply(x, function(y){as.integer(y$msLevel)}),
-    charge = sapply(x, function(y){as.integer(y$charge)}),
-    rtime = sapply(x, function(y){y$rtinseconds}),
-    scanIndex = sapply(x, function(y){y$scan}),
-    polarity = sapply(x, function(y){as.integer(y$polarity)}),
-    id = rep(NA, n),
-    name = sapply(x, function(y){y$title}))
-  df$mz <- lapply(x, function(y){y$mZ})
-  df$intensity <- lapply(x, function(y){y$intensity})
-  
-  df
-}

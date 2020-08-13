@@ -1,9 +1,10 @@
-
+\name{NEWS}
 \title{News for Package 'rawDiag'}
 
 \section{Changes until version 0.0.34 (2019-05-28)}{
   \itemize{
-	  resolve issue \url{https://github.com/fgcz/rawDiag/issues/49} 
+	  \item resolve issue \url{https://github.com/fgcz/rawDiag/issues/49} 
+
   }
 }
 

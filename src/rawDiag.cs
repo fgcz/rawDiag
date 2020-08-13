@@ -1,4 +1,4 @@
-﻿/// adapded from the ThermoFischer `Hello, world!` example provided by Jim Shofstahl 
+/// adapded from the ThermoFischer `Hello, world!` example provided by Jim Shofstahl 
 /// see URL http://planetorbitrap.com/rawfilereader#.WjkqIUtJmL4
 /// the ThermoFisher library has to be manual downloaded and installed
 /// Please read the License document
@@ -18,8 +18,6 @@ using ThermoFisher.CommonCore.Data.FilterEnums;
 using ThermoFisher.CommonCore.Data.Interfaces;
 using ThermoFisher.CommonCore.MassPrecisionEstimator;
 using ThermoFisher.CommonCore.RawFileReader;
-
-
 
 namespace rawDiag
 {
