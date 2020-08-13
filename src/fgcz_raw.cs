@@ -11,6 +11,7 @@
 /// 2018-11-23 added scanFilter option
 /// 2019-01-28 extract monoisotopicmZ attribute; include segments in MGF iff no centroid data are availbale
 /// 2019-05-28 save info as Yaml
+/// 2020-08-12 added infoR option
  
 using System;
 using System.Collections.Generic;
@@ -256,6 +257,51 @@ namespace FGCZExtensions
             }
         }
 
+        public static void PrintInfoAsRcode(this IRawDataPlus rawFile)
+	{
+                Console.WriteLine("#R\ne <- new.env();\ne$info <- list()");
+                Console.WriteLine("e$info$`RAW file` <- '" + Path.GetFileName(rawFile.FileName) + "'");
+                Console.WriteLine("e$info$`RAW file version` <- '" + rawFile.FileHeader.Revision + "'");
+                Console.WriteLine("e$info$`Creation date` <- '" + rawFile.FileHeader.CreationDate + "'");
+                Console.WriteLine("e$info$Operator <- '" + rawFile.FileHeader.WhoCreatedId + "'");
+                Console.WriteLine("e$info$`Number of instruments` <- {0}", rawFile.InstrumentCount);
+                Console.WriteLine("e$info$Description <- '" + rawFile.FileHeader.FileDescription + "'");
+                Console.WriteLine("e$info$`Instrument model` <- '{0}'", rawFile.GetInstrumentData().Model);
+                Console.WriteLine("e$info$`Instrument name` <- '{0}'", rawFile.GetInstrumentData().Name);
+               // Console.WriteLine("e$info$`Instrument method` <- '{0}'", rawFile.GetAllInstrumentFriendlyNamesFromInstrumentMethod().Length);
+                Console.WriteLine("e$info$`Serial number` <- '{0}'", rawFile.GetInstrumentData().SerialNumber);
+                Console.WriteLine("e$info$`Software version` <- '{0}'", rawFile.GetInstrumentData().SoftwareVersion);
+                Console.WriteLine("e$info$`Firmware version` <- '{0}'", rawFile.GetInstrumentData().HardwareVersion);
+                Console.WriteLine("e$info$Units <- '{0}'", rawFile.GetInstrumentData().Units);
+                Console.WriteLine("e$info$`Mass resolution` <- '{0:F3}'", rawFile.RunHeaderEx.MassResolution);
+                Console.WriteLine("e$info$`Number of scans` <- {0}", rawFile.RunHeaderEx.SpectraCount);
+             	int firstScanNumber = rawFile.RunHeaderEx.FirstSpectrum;
+            	int lastScanNumber = rawFile.RunHeaderEx.LastSpectrum;
+                Console.WriteLine("e$info$`Number of ms2 scans` <- {0}", Enumerable.Range(1, lastScanNumber - firstScanNumber).Count(x => rawFile.GetFilterForScanNumber(x).ToString().Contains("Full ms2")));
+                Console.WriteLine("e$info$`Scan range` <- c({0}, {1})", firstScanNumber, lastScanNumber);
+                double startTime = rawFile.RunHeaderEx.StartTime;
+                double endTime = rawFile.RunHeaderEx.EndTime;
+                Console.WriteLine("e$info$`Time range` <- c({0:F2}, {1:F2})", startTime, endTime);
+                Console.WriteLine("e$info$`Mass range` <- c({0:F4}, {1:F4})", rawFile.RunHeaderEx.LowMass, rawFile.RunHeaderEx.HighMass);
+
+                var firstFilter = rawFile.GetFilterForScanNumber(firstScanNumber);
+                var lastFilter = rawFile.GetFilterForScanNumber(lastScanNumber);
+                int numberFilters = rawFile.GetFilters().Count;
+                Console.WriteLine("e$info$`Scan filter (first scan)` <- '{0}'", firstFilter.ToString());
+                Console.WriteLine("e$info$`Scan filter (last scan)` <- '{0}'", lastFilter.ToString());
+                Console.WriteLine("e$info$`Total number of filters` <- '{0}'", numberFilters);
+
+                Console.WriteLine("e$info$`Sample name` <- '{0}' ", rawFile.SampleInformation.SampleName);
+                Console.WriteLine("e$info$`Sample id` <- '{0}' ", rawFile.SampleInformation.SampleId);
+                Console.WriteLine("e$info$`Sample type` <- '{0}' ", rawFile.SampleInformation.SampleType);
+                Console.WriteLine("e$info$`Sample comment` <- '{0}' ", rawFile.SampleInformation.Comment);
+                Console.WriteLine("e$info$`Sample vial` <- '{0}' ", rawFile.SampleInformation.Vial);
+                Console.WriteLine("e$info$`Sample volume` <- '{0}' ", rawFile.SampleInformation.SampleVolume);
+                Console.WriteLine("e$info$`Sample injection volume` <- '{0}' ", rawFile.SampleInformation.InjectionVolume);
+                Console.WriteLine("e$info$`Sample row number` <- '{0}' ", rawFile.SampleInformation.RowNumber);
+                Console.WriteLine("e$info$`Sample dilution factor` <- '{0}' ", rawFile.SampleInformation.DilutionFactor);
+		return;
+	}
 
         /// <summary>
         /// </summary>
@@ -421,6 +467,7 @@ namespace FGCZ_Raw
                     {"version", "print version information."},
                     {"scanFilter", "print scan filters."},
                     {"info", "print the raw file's meta data."},
+                    {"infoR", "print the raw file's meta data as R code."},
                     {"chromatogram", "base peak chromatogram."},
                     {"mgf", "writes MS2 CentroidStream as mascot generic file (mgf)."},
                     {"qc", "prints a qc table having one entry per scan."},
@@ -532,6 +579,10 @@ namespace FGCZ_Raw
                     Console.WriteLine("    Date: " + DateTime.Now);
                 }
 
+                if (mode == "infoR"){
+		 rawFile.PrintInfoAsRcode();
+		 return;
+		}
                 if (mode == "info")
                 {
 
