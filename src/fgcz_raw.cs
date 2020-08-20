@@ -362,6 +362,7 @@ namespace FGCZExtensions
                         monoisotopicMz = "NA";
                     }
 
+                        var scan = Scan.FromFile(rawFile, scanNumber);
 
                         if (scanStatistics.IsCentroidScan && centroidStream.Length > 0)
                         {
@@ -374,6 +375,12 @@ namespace FGCZExtensions
                                 Math.Round(scanStatistics.StartTime * 60 * 1000) / 1000);
                             file.WriteLine("\tpepmass = c({0}, {1}),", pepmass, basepeakIntensity);
                             file.WriteLine("\tcentroidStream = TRUE,");
+
+                            file.WriteLine("\tHasCentroidStream = '{0}, Length={1}',", scan.HasCentroidStream, scan.CentroidScan.Length);
+			    if(scan.HasCentroidStream){
+                                file.WriteLine("\tcentroid.mZ = c(" + string.Join(",", scan.CentroidScan.Masses.ToArray()) + "),");
+                                file.WriteLine("\tcentroid.intensity = c(" + string.Join(",", scan.CentroidScan.Intensities.ToArray()) + "),");
+			    }
 
                             file.WriteLine("\ttitle = \"File: {0}; SpectrumID: {1}; scans: {2}\",",
                                 Path.GetFileName(rawFile.FileName),
@@ -389,7 +396,6 @@ namespace FGCZExtensions
                         }
                         else
                         {
-                            var scan = Scan.FromFile(rawFile, scanNumber);
                             
                             file.WriteLine("e$PeakList[[{0}]] <- list(", count++);
                             file.WriteLine("\tscan = {0},", scanNumber);
@@ -398,6 +404,12 @@ namespace FGCZExtensions
                                 Math.Round(scanStatistics.StartTime * 60 * 1000) / 1000);
                             file.WriteLine("\tpepmass = c({0}, {1}),", pepmass, basepeakIntensity);
                             file.WriteLine("\tcentroidStream = FALSE,");
+
+                            file.WriteLine("\tHasCentroidStream = '{0}, Length={1}',", scan.HasCentroidStream, scan.CentroidScan.Length);
+			    if(scan.HasCentroidStream){
+                                file.WriteLine("\tcentroid.mZ = c(" + string.Join(",", scan.CentroidScan.Masses.ToArray()) + "),");
+                                file.WriteLine("\tcentroid.intensity = c(" + string.Join(",", scan.CentroidScan.Intensities.ToArray()) + "),");
+			    }
 
                             file.WriteLine("\ttitle = \"File: {0}; SpectrumID: {1}; scans: {2}\",",
                                 Path.GetFileName(rawFile.FileName),

@@ -487,16 +487,16 @@ plot.XICs <- function(x, y, method='ggplot', ...){
 #' op <- par(mfrow = c(3, 3))
 #' lapply(S, function(x){ plot.peaklist(x, sub=x$scanType) })
 #' 
-readScans <- function(rawfile, scans){
+readScans <- function(rawfile, scans, tmpdir=tempdir()){
   mono <- if(Sys.info()['sysname'] %in% c("Darwin", "Linux")) TRUE else FALSE
   exe <- file.path(path.package(package = "rawDiag"), "exec", "fgcz_raw.exe")
   
   # TODO(cp): replace asap we have an R .Net binding similar as Rcpp
   # the current solution writting and reading from a file is pain-of-the-art
   # https://github.com/fgcz/rawDiag/issues/46
-  tfi <- tempfile()
-  tfo <- tempfile()
-  tfstdout <- tempfile()
+  tfi <- tempfile(tmpdir=tmpdir)
+  tfo <- tempfile(tmpdir=tmpdir)
+  tfstdout <- tempfile(tmpdir=tmpdir)
   
   cat(scans, file = tfi, sep="\n")
   
