@@ -17,31 +17,15 @@ main features:
 a Windows/Linux/MacOSX x64 platform 
 
 
-### 1.1 .NET Framework and R
+### 1.1 .NET framework and R
 
 - https://www.mono-project.com/ (>4.0.22) for (Linux and MacOSX)
 - .NET Framework 4.5.1 or higher (Windows)
-- R (>3.4.0); please do not use R (3.5.0) on Windows! There is an `system2` issue.
-- install https://CRAN.R-project.org/package=devtools
 - if you want support for [Open File Standards](http://www.psidev.info/) install the [mzR](http://bioconductor.org/packages/mzR/) package. 
 - U.S. language setting on windows/linux/apple [see issue 33](https://github.com/fgcz/rawDiag/issues/33)
 
-### 1.2. The New RawFileReader .Net assembly from Thermo Fisher Scientific
 
-**If your installation does not work with the below-mentioned instructions, do not hesitate to request a ready to run R package from the authors via [Email, SUBJECT `request rawDiag package`](mailto:cp@fgcz.ethz.ch?SUBJECT=request%20current%20rawDiag%20package).**
-
-
-Due to [licensing reasons](https://github.com/fgcz/rawDiag/blob/master/inst/docker/ThermoRawFileReader/RawFileReaderLicense.doc),
-we currently not allowed to distribute Thermo Fisher Scientific software with the *rawDiag*
-package (we hope that this will change soon).
-The [New RawFileReader from Thermo Fisher Scientific](http://planetorbitrap.com/rawfilereader)
-has to be downloaded and installed separately in order to be able to directly read Thermo
-raw-files (by using the R function `read.raw`).
-
-To install [the New RawFileReader .Net assembly](http://planetorbitrap.com/rawfilereader) follow the installation instructions provided by Thermo Fisher Scientific.
-
-
-### 1.3. Platforms and versions the software has been tested on
+### 1.2 Platforms and versions the software has been tested on
 
 The package [JPR.R1](https://github.com/fgcz/rawDiag/tree/JPR.R1) release has been tested on the following platforms using [RStudio](https://www.rstudio.com/):
 
@@ -68,23 +52,19 @@ Please check the above installation [requirements](README.md#1-system-requiremen
 
 #### Current release
 
-Please install the latest release: [https://github.com/fgcz/rawDiag/releases]
+Please install the latest release from [https://github.com/fgcz/rawDiag/releases]
 
 #### From GitHub source
 
-the following code downloads and installs the R package from the Github without the required third party .dll files:
+The following code downloads and installs the R package from GitHub without the required third party libraries:
 
-please note: due to the data size (>=40MB) download can take a while
+**!!! Use this option only if you know what you are doing !!!**
+
 ```{r}
 # install.packages("devtools")
 library("devtools")
 devtools::install_github("fgcz/rawDiag", build_vignettes = FALSE)
 ```
-
-### 2.2. Typical install time on a "normal" desktop computer
-
-* Thermo RawFileReader dll: 1sec to 30 minutes
-* the rawDiag package through github: 10 minutes 
 
 ## 3. Demonstration
 
