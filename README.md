@@ -24,7 +24,7 @@ A Windows/Linux/MacOSX x64 platform.
 
 ### 1.2 R
 
-You need the [R software invorenment](https://www.r-project.org/) for statistical computing.
+You need the [R software environment](https://www.r-project.org/) for statistical computing.
 
 - if you want support for [Open File Standards](http://www.psidev.info/) install the [mzR](http://bioconductor.org/packages/mzR/) package. 
 - U.S. language setting on windows/linux/apple [see issue 33](https://github.com/fgcz/rawDiag/issues/33)
