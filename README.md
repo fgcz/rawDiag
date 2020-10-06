@@ -20,7 +20,7 @@ A Windows/Linux/MacOSX x64 platform.
 ### 1.1 .NET framework
 
 - Linux and MacOSX: https://www.mono-project.com/ (>4.0.22)
-- MS Windows: [MS .NET Framework 4.5.1](https://dotnet.microsoft.com/) or higher
+- MS Windows: [MS .NET Framework](https://dotnet.microsoft.com/download) or higher
 
 ### 1.2 R
 
