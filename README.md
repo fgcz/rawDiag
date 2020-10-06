@@ -46,15 +46,13 @@ The package [JPR.R1](https://github.com/fgcz/rawDiag/tree/JPR.R1) release has be
 
 ## 2. Installation guide
 
-### 2.1. Instructions
+**Please check the above installation [requirements](README.md#1-system-requirements)!**
 
-Please check the above installation [requirements](README.md#1-system-requirements)!
-
-#### Current release
+#### 2.1 Current release
 
 Please install the latest release from [https://github.com/fgcz/rawDiag/releases] according to the provided instructions.
 
-#### From GitHub source
+#### 2.2 From GitHub source
 
 The following code downloads and installs the R package from GitHub without the required third party libraries:
 
