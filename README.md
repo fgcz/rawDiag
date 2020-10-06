@@ -54,15 +54,14 @@ Please install the latest release from [https://github.com/fgcz/rawDiag/releases
 
 #### 2.2 From GitHub source
 
-The following code downloads and installs the R package from GitHub without the required third party libraries:
-
-**!!! Use this option only if you know what you are doing !!!**
+The following code downloads and installs the R package from GitHub without the required third party libraries.
 
 ```{r}
 # install.packages("devtools")
 library("devtools")
 devtools::install_github("fgcz/rawDiag", build_vignettes = FALSE)
 ```
+**!!! Use this option only if you know what you are doing !!!**
 
 ## 3. Demonstration
 
