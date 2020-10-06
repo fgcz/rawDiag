@@ -52,7 +52,7 @@ Please check the above installation [requirements](README.md#1-system-requiremen
 
 #### Current release
 
-Please install the latest release from [https://github.com/fgcz/rawDiag/releases]
+Please install the latest release from [https://github.com/fgcz/rawDiag/releases] according to the provided instructions.
 
 #### From GitHub source
 
