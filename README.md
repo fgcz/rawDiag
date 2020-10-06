@@ -14,18 +14,23 @@ main features:
 
 ## 1. System Requirements  
 
-a Windows/Linux/MacOSX x64 platform 
+A Windows/Linux/MacOSX x64 platform.
 
 
-### 1.1 .NET framework and R
+### 1.1 .NET framework
 
-- https://www.mono-project.com/ (>4.0.22) for (Linux and MacOSX)
-- .NET Framework 4.5.1 or higher (Windows)
+- Linux and MacOSX: https://www.mono-project.com/ (>4.0.22)
+- MS Windows: [MS .NET Framework 4.5.1](https://dotnet.microsoft.com/) or higher
+
+### 1.2 R
+
+You need the [R software invorenment](https://www.r-project.org/) for statistical computing.
+
 - if you want support for [Open File Standards](http://www.psidev.info/) install the [mzR](http://bioconductor.org/packages/mzR/) package. 
 - U.S. language setting on windows/linux/apple [see issue 33](https://github.com/fgcz/rawDiag/issues/33)
 
 
-### 1.2 Platforms and versions the software has been tested on
+### 1.3 Platforms and R versions the package has been tested on
 
 The package [JPR.R1](https://github.com/fgcz/rawDiag/tree/JPR.R1) release has been tested on the following platforms using [RStudio](https://www.rstudio.com/):
 
@@ -50,7 +55,7 @@ The package [JPR.R1](https://github.com/fgcz/rawDiag/tree/JPR.R1) release has be
 
 #### 2.1 Current release
 
-Please install the latest release from [https://github.com/fgcz/rawDiag/releases] according to the provided instructions.
+Please install the **latest release** from [https://github.com/fgcz/rawDiag/releases] according to the provided instructions.
 
 #### 2.2 From GitHub source
 
