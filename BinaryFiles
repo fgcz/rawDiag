@@ -1,0 +1,4 @@
+exec/ThermoFisher.CommonCore.Data.dll
+exec/ThermoFisher.CommonCore.MassPrecisionEstimator.dll
+exec/ThermoFisher.CommonCore.RawFileReader.dll
+exec/fgcz_raw.exe
