@@ -265,6 +265,8 @@ the documentation of the functions is available through the R man pages.
 
 ## 6. See also 
 
+- Direct Access to Orbitrap Data and Beyond - https://github.com/fgcz/rawrr
+- RawBeans: A Simple, Vendor-Independent, Raw-Data Quality-Control Tool - https://pubs.acs.org/doi/10.1021/acs.jproteome.0c00956
 - ThermoRawFileParser: modular, scalable and cross-platform RAW file conversion
 	- https://www.biorxiv.org/content/10.1101/622852v1.abstract
 - MARMoSET – Extracting Publication-Ready Mass Spectrometry Metadata from RAW Files
