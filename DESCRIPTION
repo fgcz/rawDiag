@@ -1,14 +1,14 @@
 Package: rawDiag
 Type: Package
 Title: Access Thermo Fisher raw files 
-Version: 0.0.37
+Version: 0.0.39
 Authors@R: c(person(given = "Christian", family = "Panse", email = "cp@fgcz.ethz.ch", role = c("aut", "cre"),
     comment = c(ORCID = "0000-0003-1975-3064")),
 	person(given = "Christian", family = "Trachsel", email = "Christian.Trachsel@fgcz.ethz.ch", role = "aut"),
 	person(given = "Tobias", family = "Kockmann", email = "Tobias.Kockmann@fgcz.ethz.ch", role = "aut"))
 Depends: R (>= 4.0),
 	methods,
-Imports: ggplot2 (>= 2.2.1),
+Imports: ggplot2 (>= 2.2),
 	dplyr,
 	hexbin,
 	magrittr,
