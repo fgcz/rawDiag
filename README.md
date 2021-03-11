@@ -1,4 +1,4 @@
-[![JPR](https://img.shields.io/badge/JPR-%2F10.1021/acs.jproteome.8b00173-brightgreen)](http://dx.doi.org/10.1021/acs.jproteome.8b00173)
+[![JPR](https://img.shields.io/badge/JPR-10.1021%2Facs.jproteome.8b00173-brightgreen)](http://dx.doi.org/10.1021/acs.jproteome.8b00173)
 
 # rawDiag 
 
