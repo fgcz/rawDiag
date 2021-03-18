@@ -15,12 +15,15 @@
     return(f)
 }
 
-.checkRawFileReaderLicense <- function(){
-    licenseFile <- file.path(system.file(package = 'rawDiag'), 'inst', 'RawFileReaderLicense.txt')
+.isRawFileReaderLicenseAccepted <- function(){
+    licenseFile <- file.path(system.file(package = 'rawDiag'), 'RawFileReaderLicense.txt')
+    stopifnot(file.exists(licenseFile))
+
     eulaFile <- file.path(cachedir <- tools::R_user_dir("rawrr", which='cache'), "eula.txt")
     msg <- "# By changing the setting below to TRUE you are accepting the Thermo License agreement."
 
     if (!file.exists(eulaFile)){
+	file.show(licenseFile)
 	fmt <- "Do you accept the Thermo License agreement '%s'? [Y/n]: "
 	prompt <- sprintf(fmt, licenseFile)
 	response <- readline(prompt = prompt)
@@ -30,10 +33,10 @@
 	    writeLines(paste(msg, paste0("# ", date()), "eula=true", sep="\n"), fileConn)
 	    close(fileConn)
 
-	    return(grepl("eula=true", tolower(readLines(eulaFile))))
+	    return(TRUE %in% grepl("eula=true", tolower(readLines(eulaFile))))
 	}
     }else{
-	    return(grepl("eula=true", tolower(readLines(eulaFile))))
+	    return(TRUE %in% grepl("eula=true", tolower(readLines(eulaFile))))
     }
 
     stop("You have to accept the Thermo License agreement!")
@@ -708,7 +711,7 @@ read.raw <- function(file, mono = if(Sys.info()['sysname'] %in% c("Darwin", "Lin
                      method = "thermo",
                      ssh = FALSE){
   
-  if(interactive()){ .checkRawFileReaderLicense() }
+  if(interactive()){ stopifnot(.isRawFileReaderLicenseAccepted()) }
 
   rv <- NULL
   if (mono_path != ''){
@@ -722,8 +725,6 @@ read.raw <- function(file, mono = if(Sys.info()['sysname'] %in% c("Darwin", "Lin
     
     stopifnot(file.exists(exe))
     stopifnot(file.exists(file))
-    
-    # message(paste("start", Sys.time(), sep = ":"))
     
     if(system2_call){
       tf <- tempfile(fileext = 'tsv')
