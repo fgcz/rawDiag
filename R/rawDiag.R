@@ -75,7 +75,7 @@ is.rawDiag <- function(object){
  
  msg <- cn[! cn %in% colnames(object)]
  if (length(msg) > 0){
-   warning(paste("missing column name(s):", paste(msg, collapse = ", ")))
+   message(paste("missing column name(s):", paste(msg, collapse = ", ")))
    return(FALSE)
  }
  
