@@ -10,6 +10,11 @@
 
 #define colours
 
+.rawDiagAssembly <- function(){
+	  f <- file.path(system.file(package = 'rawDiag'), 'exec', 'fgcz_raw.exe')
+	    return(f)
+}
+
 
 .darkTheme <- function(){
   theme(legend.position = 'none') +
@@ -75,7 +80,7 @@ is.rawDiag <- function(object){
  
  msg <- cn[! cn %in% colnames(object)]
  if (length(msg) > 0){
-   warning(paste("missing column name(s):", paste(msg, collapse = ", ")))
+   message(paste("missing column name(s):", paste(msg, collapse = ", ")))
    return(FALSE)
  }
  
@@ -283,7 +288,7 @@ readXICs <- function(rawfile,
                       masses,
                       tol = 10,
                       mono = if(Sys.info()['sysname'] %in% c("Darwin", "Linux")) TRUE else FALSE,
-                      exe = file.path(path.package(package = "rawDiag"), "exec", "fgcz_raw.exe")){
+                      exe = .rawDiagAssembly()){
   
   # TODO(cp): replace asap we have an R .Net binding similar as Rcpp
   # the current solution writting and reading from a file is pain-of-the-art
@@ -490,7 +495,7 @@ plot.XICs <- function(x, y, method='ggplot', ...){
 #' 
 readScans <- function(rawfile, scans, tmpdir=tempdir()){
   mono <- if(Sys.info()['sysname'] %in% c("Darwin", "Linux")) TRUE else FALSE
-  exe <- file.path(path.package(package = "rawDiag"), "exec", "fgcz_raw.exe")
+  exe <- .rawDiagAssembly()
   
   # TODO(cp): replace asap we have an R .Net binding similar as Rcpp
   # the current solution writting and reading from a file is pain-of-the-art
@@ -554,7 +559,7 @@ plot.peaklist <- function(x, y, ...){
 #' (info <- read.raw.info(rawfile))
 read.raw.info <- function(file,
      mono = if(Sys.info()['sysname'] %in% c("Darwin", "Linux")) TRUE else FALSE,
-     exe = file.path(path.package(package = "rawDiag"), "exec", "fgcz_raw.exe"),
+     exe = .rawDiagAssembly(),
      mono_path = "",
      argv = "infoR",
      system2_call = TRUE,
@@ -666,7 +671,7 @@ read.raw.info <- function(file,
 #'  }                                       
 #' 
 read.raw <- function(file, mono = if(Sys.info()['sysname'] %in% c("Darwin", "Linux")) TRUE else FALSE, 
-                     exe = file.path(path.package(package = "rawDiag"), "exec", "fgcz_raw.exe"),  
+                     exe = .rawDiagAssembly(),
                      mono_path = "",
                      rawDiag = TRUE,
                      argv = "qc",
