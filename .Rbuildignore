@@ -29,3 +29,4 @@ vignettes/.gitignore
 vignettes/ASMS2018_ID291250.Rnw
 vignettes/rawDiag.bib
 vignettes/39515832-84b561ea-4dfb-11e8-9411-276bc6fb71d6.png
+src/.*

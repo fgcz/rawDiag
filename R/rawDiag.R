@@ -461,7 +461,8 @@ plot.XICs <- function(x, y, method='ggplot', ...){
 #' @param rawfile the name of the Thermo Fisher Scietific raw file which the data
 #' are to be read from.  
 #' @param scans a vector of requested scan numbers.
-
+#' @param tmpdir a non-empty character vector giving the directory name; default
+#' uses \code{tempdir()}.
 #' @author Christian Panse <cp@fgz.ethz.ch> 2018, 2019, 2020
 #' 
 #' @description the function reads scan information of a given set of scan
