@@ -9,7 +9,7 @@
 read.raw(
   file,
   mono = if (Sys.info()["sysname"] \%in\% c("Darwin", "Linux")) TRUE else FALSE,
-  exe = file.path(path.package(package = "rawDiag"), "exec", "fgcz_raw.exe"),
+  exe = .rawDiagAssembly(),
   mono_path = "",
   rawDiag = TRUE,
   argv = "qc",
