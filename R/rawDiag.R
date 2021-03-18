@@ -19,7 +19,7 @@
     licenseFile <- file.path(system.file(package = 'rawDiag'), 'RawFileReaderLicense.txt')
     stopifnot(file.exists(licenseFile))
 
-    eulaFile <- file.path(cachedir <- tools::R_user_dir("rawrr", which='cache'), "eula.txt")
+    eulaFile <- file.path(cachedir <- tools::R_user_dir("rawDiag", which='cache'), "eula.txt")
     msg <- "# By changing the setting below to TRUE you are accepting the Thermo License agreement."
 
     if (!file.exists(eulaFile)){
