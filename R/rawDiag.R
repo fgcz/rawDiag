@@ -272,8 +272,11 @@ read.tdf <- function(filename){
 #' (mZ <- (parentIonMass(iRTpeptide) + 1.008) / 2)
 #' 
 #' \dontrun{
-#' rawfile <- "/home/cp/Downloads/20180220_14_autoQC01.raw"
-#'  X <-readXICs(rawfile, masses=mZ)
+#' f <- "ftp://massive.ucsd.edu/MSV000086542/raw/20181113_010_autoQC01.raw"
+#' rawfile <- file.path(cachedir <- tools::R_user_dir("rawrr", which='cache'), "20181113_010_autoQC01.raw")
+#' if (!dir.exists(cachedir)) { dir.create(cachedir, recursive = TRUE) }
+#' if (!file.exists(rawfile)) { download.file(f, rawfile) }
+#' X <-readXICs(rawfile, masses=mZ)
 #' }
 #' 
 #' 
@@ -289,7 +292,7 @@ readXICs <- function(rawfile,
                       tol = 10,
                       mono = if(Sys.info()['sysname'] %in% c("Darwin", "Linux")) TRUE else FALSE,
                       exe = .rawDiagAssembly()){
-  
+  .Deprecated("rawrr::readChromatogram")
   # TODO(cp): replace asap we have an R .Net binding similar as Rcpp
   # the current solution writting and reading from a file is pain-of-the-art
   tfi <- tempfile()
@@ -494,6 +497,7 @@ plot.XICs <- function(x, y, method='ggplot', ...){
 #' lapply(S, function(x){ plot.peaklist(x, sub=x$scanType) })
 #' 
 readScans <- function(rawfile, scans, tmpdir=tempdir()){
+  .Deprecated("rawrr::readSpectrum")
   mono <- if(Sys.info()['sysname'] %in% c("Darwin", "Linux")) TRUE else FALSE
   exe <- .rawDiagAssembly()
   
@@ -564,7 +568,7 @@ read.raw.info <- function(file,
      argv = "infoR",
      system2_call = TRUE,
      method = "thermo"){
-
+  .Deprecated("rawrr::readFileHeader")
   if (!file.exists(file)){
     warning('file not available. return.')
     return 
