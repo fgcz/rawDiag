@@ -11,10 +11,35 @@
 #define colours
 
 .rawDiagAssembly <- function(){
-	  f <- file.path(system.file(package = 'rawDiag'), 'exec', 'fgcz_raw.exe')
-	    return(f)
+    f <- file.path(system.file(package = 'rawDiag'), 'exec', 'fgcz_raw.exe')
+    return(f)
 }
 
+.checkRawFileReaderLicense <- function(){
+    licenseFile <- file.path(system.file(package = 'rawDiag'), 'inst', 'RawFileReaderLicense.txt')
+    eulaFile <- file.path(cachedir <- tools::R_user_dir("rawrr", which='cache'), "eula.txt")
+    msg <- "# By changing the setting below to TRUE you are accepting the Thermo License agreement."
+
+    if (!file.exists(eulaFile)){
+	fmt <- "Do you accept the Thermo License agreement '%s'? [Y/n]: "
+	prompt <- sprintf(fmt, licenseFile)
+	response <- readline(prompt = prompt)
+	if (tolower(response) == "y"){
+    	    if (!dir.exists(cachedir)) { dir.create(cachedir, recursive = TRUE) }
+	    fileConn <- file(eulaFile)
+	    writeLines(paste(msg, paste0("# ", date()), "eula=true", sep="\n"), fileConn)
+	    close(fileConn)
+
+	    return(grepl("eula=true", tolower(readLines(eulaFile))))
+	}
+    }else{
+	    return(grepl("eula=true", tolower(readLines(eulaFile))))
+    }
+
+    stop("You have to accept the Thermo License agreement!")
+
+    FALSE
+}
 
 .darkTheme <- function(){
   theme(legend.position = 'none') +
@@ -683,6 +708,8 @@ read.raw <- function(file, mono = if(Sys.info()['sysname'] %in% c("Darwin", "Lin
                      method = "thermo",
                      ssh = FALSE){
   
+  if(interactive()){ .checkRawFileReaderLicense() }
+
   rv <- NULL
   if (mono_path != ''){
     message(Sys.setenv(MONO_PATH = mono_path))
@@ -860,12 +887,12 @@ calc.cycle.time <- function(x){
     dplyr::filter_at(vars("MSOrder"), any_vars(. == "Ms")) %>% 
     dplyr::select_at(vars("StartTime", "filename")) %>% 
     dplyr::group_by_at(vars("filename")) %>% 
-    dplyr::mutate_at(vars("StartTime"), funs("CycleTime" = (. - lag(.))*60)) %>% 
+    dplyr::mutate_at(vars("StartTime"), list("CycleTime" = (. - lag(.))*60)) %>% 
     na.omit()
   
   df2 <- df %>% 
     group_by_at("filename") %>% 
-    summarise_at(vars("CycleTime"),funs("quan" = quantile), probs = 0.95)
+    summarise_at(vars("CycleTime"),list("quan" = quantile), probs = 0.95)
   res <- dplyr::left_join(df, df2, by = "filename") %>% 
     ungroup()
   
