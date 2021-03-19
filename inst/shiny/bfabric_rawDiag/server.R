@@ -16,11 +16,21 @@ library(base64enc)
 library(ggplot2)
 library(lattice)
 
+
+.WU163763 <- function(f="fgcz-ms.uzh.ch/~cpanse/rawDiag/WU163763.RData"){
+	rdataFile <- file.path(cachedir <- tools::R_user_dir("rawrr", which='cache'), basename(f))
+	if (!dir.exists(cachedir)) { dir.create(cachedir, recursive = TRUE) }
+	if (!file.exists(rdataFile)) { download.file(f, rdataFile) }
+	rdataFile
+}
+.WU163763()
+
+
 shinyServer(function(input, output, session) {
 # ----check bfabricShinyModule---- 
   if (require("bfabricShiny")){
     bf <- callModule(bfabric, "bfabric8",
-                     applicationid = c(7, 160, 161, 162, 163, 176, 177, 197, 214, 232, 248),
+                     applicationid = c(7, 160, 161, 162, 163, 176, 177, 197, 214, 232, 248, 269),
                      resoucepattern = 'raw$|RAW$',
                      resourcemultiple = TRUE)
   }
@@ -49,7 +59,6 @@ shinyServer(function(input, output, session) {
   }else{
     filesystemDataDir <- c("Documents", "Downloads", "WU163230", "WU163763", "autoQC", "Core4Life")
   }
-  
 
   
   filesystemDataDir <- filesystemDataDir[dir.exists(file.path(filesystemRoot, filesystemDataDir))]
@@ -57,7 +66,8 @@ shinyServer(function(input, output, session) {
   values <- reactiveValues(pdfcontent=NULL,
                            filesystemRoot=filesystemRoot,
                            filesystemDataDir = filesystemDataDir,
-                           RDataRoot = file.path(path.package(package = "rawDiag"), "extdata"),
+                           #RDataRoot = file.path(path.package(package = "rawDiag"), "extdata"),
+                           RDataRoot = tools::R_user_dir("rawrr", which='cache'),
                            RDataData = c("WU163763"))
   
   output$tabs <- renderUI({
