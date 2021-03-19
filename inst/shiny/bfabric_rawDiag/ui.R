@@ -9,7 +9,7 @@
 
 library(shiny)
 
-INPUTTYPES <- c("package" = "package",
+INPUTTYPES <- c(
   "filesystem" = "filesystem",
   "bfabric" = "bfabric")
 if (!require("bfabricShiny")){
