@@ -888,12 +888,14 @@ calc.cycle.time <- function(x){
     dplyr::filter_at(vars("MSOrder"), any_vars(. == "Ms")) %>% 
     dplyr::select_at(vars("StartTime", "filename")) %>% 
     dplyr::group_by_at(vars("filename")) %>% 
-    dplyr::mutate_at(vars("StartTime"), list("CycleTime" = (. - lag(.))*60)) %>% 
+    dplyr::mutate_at(vars("StartTime"), list("CycleTime" = ~(. - lag(.))*60)) %>% 	
+    #dplyr::mutate_at(vars("StartTime"), list("CycleTime" = (. - lag(.))*60)) %>% 
     na.omit()
   
   df2 <- df %>% 
     group_by_at("filename") %>% 
-    summarise_at(vars("CycleTime"),list("quan" = quantile), probs = 0.95)
+    summarise_at(vars("CycleTime"), list("quan" = ~ quantile(., probs = 0.95)))
+    #summarise_at(vars("CycleTime"),list("quan" = quantile), probs = 0.95)
   res <- dplyr::left_join(df, df2, by = "filename") %>% 
     ungroup()
   
