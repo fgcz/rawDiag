@@ -984,7 +984,7 @@ PlotTicBasepeak <- function(x, method = 'trellis'){
   df <- x %>% 
     dplyr::filter_at(vars("MSOrder"), any_vars( . == "Ms")) %>% 
     dplyr::select_at(vars("StartTime", "TIC", "BasePeakIntensity", "filename")) %>% 
-    dplyr::rename_at(vars("BasePeakIntensity"), liast(~ as.character("Base_Peak"))) %>% 
+    dplyr::rename_at(vars("BasePeakIntensity"), list(~ as.character("Base_Peak"))) %>% 
     #dplyr::rename_at(vars("BasePeakIntensity"), funs(as.character("Base_Peak"))) %>% 
     tidyr::gather(key = "Type", value = "Intensity", c("TIC", "Base_Peak"))
   df$Type <- factor(df$Type, levels = c("TIC", "Base_Peak"))
