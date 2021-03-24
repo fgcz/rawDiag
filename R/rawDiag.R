@@ -265,6 +265,7 @@ as.rawDiag.mzR <- function(object){
 #' 
 #' @note this is work in progress
 read.tdf <- function(filename){
+  .Deprecated("opentimsr::")
   con <- dbConnect(RSQLite::SQLite(), filename)
   rv <- dbGetQuery(con, "SELECT * FROM Precursors a INNER JOIN Frames b on a.id == b.id;");
   dbDisconnect(con)
@@ -984,7 +985,7 @@ PlotTicBasepeak <- function(x, method = 'trellis'){
   df <- x %>% 
     dplyr::filter_at(vars("MSOrder"), any_vars( . == "Ms")) %>% 
     dplyr::select_at(vars("StartTime", "TIC", "BasePeakIntensity", "filename")) %>% 
-    dplyr::rename_at(vars("BasePeakIntensity"), liast(~ as.character("Base_Peak"))) %>% 
+    dplyr::rename_at(vars("BasePeakIntensity"), list(~ as.character("Base_Peak"))) %>% 
     #dplyr::rename_at(vars("BasePeakIntensity"), funs(as.character("Base_Peak"))) %>% 
     tidyr::gather(key = "Type", value = "Intensity", c("TIC", "Base_Peak"))
   df$Type <- factor(df$Type, levels = c("TIC", "Base_Peak"))
