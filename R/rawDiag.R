@@ -1190,7 +1190,7 @@ PlotMzDistribution <- function(x, method='trellis'){
 PlotMassDistribution <- function(x, method = 'trellis'){ 
   res <- x %>% dplyr::filter_at(vars("MSOrder"), any_vars(. == "Ms2")) %>% 
     dplyr::select_at(vars("ChargeState", "PrecursorMass", "filename"))
-  res$deconv <-  round((res$PrecursorMass -1.00782) * res$ChargeState, 0)$
+  res$deconv <-  round((res$PrecursorMass -1.00782) * res$ChargeState, 0)
   res <- dplyr::mutate_at(res, vars("ChargeState"), list(~ factor(.)))  
   #res <- dplyr::mutate_at(res, vars("ChargeState"), funs(factor(.)))
   
