@@ -11,37 +11,37 @@
 #define colours
 
 .rawDiagAssembly <- function(){
-    f <- file.path(system.file(package = 'rawDiag'), 'exec', 'fgcz_raw.exe')
-    return(f)
+  f <- file.path(system.file(package = 'rawDiag'), 'exec', 'fgcz_raw.exe')
+  return(f)
 }
 
 .isRawFileReaderLicenseAccepted <- function(){
-    licenseFile <- file.path(system.file(package = 'rawDiag'), 'RawFileReaderLicense.txt')
-    stopifnot(file.exists(licenseFile))
-
-    eulaFile <- file.path(cachedir <- tools::R_user_dir("rawDiag", which='cache'), "eula.txt")
-    msg <- "# By changing the setting below to TRUE you are accepting the Thermo License agreement."
-
-    if (!file.exists(eulaFile)){
-	file.show(licenseFile)
-	fmt <- "Do you accept the Thermo License agreement '%s'? [Y/n]: "
-	prompt <- sprintf(fmt, licenseFile)
-	response <- readline(prompt = prompt)
-	if (tolower(response) == "y"){
-    	    if (!dir.exists(cachedir)) { dir.create(cachedir, recursive = TRUE) }
-	    fileConn <- file(eulaFile)
-	    writeLines(paste(msg, paste0("# ", date()), "eula=true", sep="\n"), fileConn)
-	    close(fileConn)
-
-	    return(TRUE %in% grepl("eula=true", tolower(readLines(eulaFile))))
-	}
-    }else{
-	    return(TRUE %in% grepl("eula=true", tolower(readLines(eulaFile))))
+  licenseFile <- file.path(system.file(package = 'rawDiag'), 'RawFileReaderLicense.txt')
+  stopifnot(file.exists(licenseFile))
+  
+  eulaFile <- file.path(cachedir <- tools::R_user_dir("rawDiag", which='cache'), "eula.txt")
+  msg <- "# By changing the setting below to TRUE you are accepting the Thermo License agreement."
+  
+  if (!file.exists(eulaFile)){
+    file.show(licenseFile)
+    fmt <- "Do you accept the Thermo License agreement '%s'? [Y/n]: "
+    prompt <- sprintf(fmt, licenseFile)
+    response <- readline(prompt = prompt)
+    if (tolower(response) == "y"){
+      if (!dir.exists(cachedir)) { dir.create(cachedir, recursive = TRUE) }
+      fileConn <- file(eulaFile)
+      writeLines(paste(msg, paste0("# ", date()), "eula=true", sep="\n"), fileConn)
+      close(fileConn)
+      
+      return(TRUE %in% grepl("eula=true", tolower(readLines(eulaFile))))
     }
-
-    stop("You have to accept the Thermo License agreement!")
-
-    FALSE
+  }else{
+    return(TRUE %in% grepl("eula=true", tolower(readLines(eulaFile))))
+  }
+  
+  stop("You have to accept the Thermo License agreement!")
+  
+  FALSE
 }
 
 .darkTheme <- function(){
@@ -105,14 +105,14 @@
 #' @export is.rawDiag
 is.rawDiag <- function(object){
   cn <- .getDesiredColNames()
- 
- msg <- cn[! cn %in% colnames(object)]
- if (length(msg) > 0){
-   message(paste("missing column name(s):", paste(msg, collapse = ", ")))
-   return(FALSE)
- }
- 
- return(TRUE)
+  
+  msg <- cn[! cn %in% colnames(object)]
+  if (length(msg) > 0){
+    message(paste("missing column name(s):", paste(msg, collapse = ", ")))
+    return(FALSE)
+  }
+  
+  return(TRUE)
 }
 
 #' Force an Object to Belong to a Class \code{rawDiag}
@@ -137,7 +137,7 @@ as.rawDiag <- function(object){
       object <- object %>% 
         dplyr::mutate(ElapsedScanTimesec = (lead(object$StartTime) - object$StartTime) * 60) 
     }
-
+    
     if ("LMCorrectionppm" %in% colnames(object)){
       message("renamed LMCorrectionppm to LMCorrection")
       object <- dplyr::rename(object, LMCorrection = LMCorrectionppm)
@@ -152,36 +152,38 @@ as.rawDiag <- function(object){
     } else {
       object$AGCMode <- NA
     }
-
+    
     if ("AGCPSMode" %in% colnames(object)){
       message("renamed AGCPSMode to PrescanMode")
-      object <- dplyr::rename_at(object, vars("AGCPSMode"), funs(paste("PrescanMode")))
+      object <- dplyr::rename_at(object, vars("AGCPSMode"), list(~ paste("PrescanMode")))
+      #object <- dplyr::rename_at(object, vars("AGCPSMode"), funs(paste("PrescanMode")))
       object$PrescanMode[1] <- 1
     } else {
       message("calculated PrescanMode values")
       object$PrescanMode <- .CalculatePrescan(object)
-
+      
     }
     
     # TODO(cp,ct): maybe NULL because of ggplot  
     if (! "LMCorrection" %in% colnames(object)){
-        object$LMCorrection <- NA
-        warning("Lock mass correction values not found in raw file!!")
+      object$LMCorrection <- NA
+      warning("Lock mass correction values not found in raw file!!")
     }
     
     if ("OrbitrapResolution" %in% colnames(object)){
-      object <- dplyr::rename_at(object, vars("OrbitrapResolution"), funs(paste("FTResolution")))
+      object <- dplyr::rename_at(object, vars("OrbitrapResolution"), list(~ paste("FTResolution")))
+      #object <- dplyr::rename_at(object, vars("OrbitrapResolution"), funs(paste("FTResolution")))
     }
   }
-
-
+  
+  
   for (cn in .getDesiredColNames()){
     if (!cn %in% colnames(object)){
       object[cn] <- NA
     }
   }
   
-
+  
   object <- .calc.transient(object)
   object[, colnames(object) %in% .getDesiredColNames()]
 }
@@ -241,8 +243,8 @@ as.rawDiag.mzR <- function(object){
   message(ssh_cmd)
   
   as.rawDiag(read.csv(pipe(ssh_cmd), sep='\t',
-                        stringsAsFactors = FALSE,
-                        header = TRUE))
+                      stringsAsFactors = FALSE,
+                      header = TRUE))
   
 }
 
@@ -263,6 +265,7 @@ as.rawDiag.mzR <- function(object){
 #' 
 #' @note this is work in progress
 read.tdf <- function(filename){
+  .Deprecated("opentimsr::")
   con <- dbConnect(RSQLite::SQLite(), filename)
   rv <- dbGetQuery(con, "SELECT * FROM Precursors a INNER JOIN Frames b on a.id == b.id;");
   dbDisconnect(con)
@@ -316,10 +319,10 @@ read.tdf <- function(filename){
 #' plot.XIC(X)
 #' 
 readXICs <- function(rawfile, 
-                      masses,
-                      tol = 10,
-                      mono = if(Sys.info()['sysname'] %in% c("Darwin", "Linux")) TRUE else FALSE,
-                      exe = .rawDiagAssembly()){
+                     masses,
+                     tol = 10,
+                     mono = if(Sys.info()['sysname'] %in% c("Darwin", "Linux")) TRUE else FALSE,
+                     exe = .rawDiagAssembly()){
   .Deprecated("rawrr::readChromatogram")
   # TODO(cp): replace asap we have an R .Net binding similar as Rcpp
   # the current solution writting and reading from a file is pain-of-the-art
@@ -391,7 +394,7 @@ plot.XIC <- function(x, y, fit=FALSE, ...){
       
       hsleft <- max.idx - min(which(sapply(rev(1:(max.idx-1)), function(i){0.1 *intensities.max > x$intensities[i]})))
       hsright <- max.idx + max(which(sapply((max.idx):length(x$intensities), function(i){0.2 *intensities.max < x$intensities[i]})))
-
+      
       apex.idx <- hsleft:hsright
       
       
@@ -413,24 +416,24 @@ plot.XIC <- function(x, y, fit=FALSE, ...){
             col=rgb(0.25, 0.25, 0.25, alpha = 0.3), lwd = 5)
       
       abline(v=t.max, col=rgb(0.5, 0.5, 0.5, alpha = 0.25), lwd=4)
-   
-    
-    #axis(3, t.max, round(t.max,2))
-    AUC <- sum(diff(x$times[apex.idx]) * (head(x$intensities[apex.idx], -1) + tail(x$intensities[apex.idx], -1))) / 2
-    
-    legend("topleft",
-           c(paste("mZ:", x$mass),
-             paste("number of peaks:", length(x$times)),
-             paste("t max:", t.max),
-             paste("AUC:", round(AUC), title='fm results')
-           ), cex=0.75, title='peak'
-    )
-    
-    print(fm)
-    legend.text<- paste(c(names(fm$coefficients),'r.squared', 'mean'),
-                        round(c(fm$coefficients, summary(fm)$r.squared,mean(peak$x)),3), sep=": ")
-    legend("topright", legend.text, title='model', cex=0.75)
-  
+      
+      
+      #axis(3, t.max, round(t.max,2))
+      AUC <- sum(diff(x$times[apex.idx]) * (head(x$intensities[apex.idx], -1) + tail(x$intensities[apex.idx], -1))) / 2
+      
+      legend("topleft",
+             c(paste("mZ:", x$mass),
+               paste("number of peaks:", length(x$times)),
+               paste("t max:", t.max),
+               paste("AUC:", round(AUC), title='fm results')
+             ), cex=0.75, title='peak'
+      )
+      
+      print(fm)
+      legend.text<- paste(c(names(fm$coefficients),'r.squared', 'mean'),
+                          round(c(fm$coefficients, summary(fm)$r.squared,mean(peak$x)),3), sep=": ")
+      legend("topright", legend.text, title='model', cex=0.75)
+      
     }
   }
 } 
@@ -476,7 +479,7 @@ plot.XICs <- function(x, y, method='ggplot', ...){
           rv}else{NULL}
       }
       ))
-
+      
       gp <- ggplot(df, aes_string(x = "times", y = "intensities")) +
         #geom_segment() +
         geom_line(stat='identity', size = 1, aes_string(group = "mass", colour = "mass")) +
@@ -590,24 +593,24 @@ plot.peaklist <- function(x, y, ...){
 #' (rawfile <- file.path(path.package(package = 'rawDiag'), 'extdata', 'sample.raw'))
 #' (info <- read.raw.info(rawfile))
 read.raw.info <- function(file,
-     mono = if(Sys.info()['sysname'] %in% c("Darwin", "Linux")) TRUE else FALSE,
-     exe = .rawDiagAssembly(),
-     mono_path = "",
-     argv = "infoR",
-     system2_call = TRUE,
-     method = "thermo"){
+                          mono = if(Sys.info()['sysname'] %in% c("Darwin", "Linux")) TRUE else FALSE,
+                          exe = .rawDiagAssembly(),
+                          mono_path = "",
+                          argv = "infoR",
+                          system2_call = TRUE,
+                          method = "thermo"){
   .Deprecated("rawrr::readFileHeader")
   if (!file.exists(file)){
     warning('file not available. return.')
     return 
   }
   if(system2_call && method == 'thermo'){
-
+    
     tf <- tempfile(fileext = '.R')
     tf.err <- tempfile(fileext = '.err')
-
+    
     # message(paste("system2 is writting to tempfile ", tf, "..."))
-
+    
     if (mono){
       rvs <- system2("mono", args = c(exe, shQuote(file), argv),
                      stdout = tf)
@@ -616,17 +619,17 @@ read.raw.info <- function(file,
                      stderr = tf.err,
                      stdout = tf)
     }
-
-    if (rvs == 0){
     
+    if (rvs == 0){
+      
       try({
         source(tf)
-       
+        
         #message(paste("unlinking", tf, "..."))
         #unlink(tf)
         return(e$info)
       }, NULL)
-     
+      
       # unlink(tfstdout)
       return(rv)
     }
@@ -634,7 +637,7 @@ read.raw.info <- function(file,
   NULL
 }
 
-  
+
 #' mass spec reader function 
 #'
 #' @importFrom utils read.csv
@@ -712,7 +715,7 @@ read.raw <- function(file, mono = if(Sys.info()['sysname'] %in% c("Darwin", "Lin
                      ssh = FALSE){
   
   if(interactive()){ stopifnot(.isRawFileReaderLicenseAccepted()) }
-
+  
   rv <- NULL
   if (mono_path != ''){
     message(Sys.setenv(MONO_PATH = mono_path))
@@ -770,25 +773,25 @@ read.raw <- function(file, mono = if(Sys.info()['sysname'] %in% c("Darwin", "Lin
 #' @method summary rawDiag
 #' @export summary.rawDiag
 summary.rawDiag <- function(object, ...){
-
-    df.ms2 <- table(object$filename, object$MSOrder)
-
-    pattern <- list(
-        EThcD.lowres = "ITMS.+sa Full ms2.+@etd.+@hcd.+",
-        ETciD.lowres = "ITMS.+sa Full ms2.+@etd.+@cid.+",
-        CID.lowres = "ITMS[^@]+@cid[^@]+$",
-        HCD.lowres = "ITMS[^@]+@hcd[^@]+$",
-        EThcD.highres = "FTMS.+sa Full ms2.+@etd.+@hcd.+",
-        HCD.highres = "FTMS[^@]+@hcd[^@]+$"
-    )
-
-    df <- as.data.frame(lapply(pattern, function(x){
-        sum(grepl(x, object$ScanType[object$MSOrder == "Ms2"]))
-    }))
-
-    df$filename <- object$filename[1]
-
-    list(scanFilter=df, msOrder=df.ms2)
+  
+  df.ms2 <- table(object$filename, object$MSOrder)
+  
+  pattern <- list(
+    EThcD.lowres = "ITMS.+sa Full ms2.+@etd.+@hcd.+",
+    ETciD.lowres = "ITMS.+sa Full ms2.+@etd.+@cid.+",
+    CID.lowres = "ITMS[^@]+@cid[^@]+$",
+    HCD.lowres = "ITMS[^@]+@hcd[^@]+$",
+    EThcD.highres = "FTMS.+sa Full ms2.+@etd.+@hcd.+",
+    HCD.highres = "FTMS[^@]+@hcd[^@]+$"
+  )
+  
+  df <- as.data.frame(lapply(pattern, function(x){
+    sum(grepl(x, object$ScanType[object$MSOrder == "Ms2"]))
+  }))
+  
+  df$filename <- object$filename[1]
+  
+  list(scanFilter=df, msOrder=df.ms2)
 }
 
 # ----Colors----
@@ -851,7 +854,7 @@ fillNAgaps <- function(x) {
 #)
 #case_when(!!! patterns)
 .calc.transient <- function(x){
-
+  
   stopifnot(is.rawDiag(x))
   
   res <- x %>%
@@ -869,8 +872,8 @@ fillNAgaps <- function(x) {
                                                FTResolution == 120000 ~ 256,
                                                FTResolution == 140000 ~ 512,
                                                FTResolution == 240000 ~ 512
-                                              )
-                 )
+    )
+    )
   return(res)
 } 
 
@@ -888,12 +891,14 @@ calc.cycle.time <- function(x){
     dplyr::filter_at(vars("MSOrder"), any_vars(. == "Ms")) %>% 
     dplyr::select_at(vars("StartTime", "filename")) %>% 
     dplyr::group_by_at(vars("filename")) %>% 
-    dplyr::mutate_at(vars("StartTime"), list("CycleTime" = (. - lag(.))*60)) %>% 
+    dplyr::mutate_at(vars("StartTime"), list("CycleTime" = ~(. - lag(.))*60)) %>% 	
+    #dplyr::mutate_at(vars("StartTime"), list("CycleTime" = (. - lag(.))*60)) %>% 
     na.omit()
   
   df2 <- df %>% 
     group_by_at("filename") %>% 
-    summarise_at(vars("CycleTime"),list("quan" = quantile), probs = 0.95)
+    summarise_at(vars("CycleTime"), list("quan" = ~ quantile(., probs = 0.95)))
+  #summarise_at(vars("CycleTime"),list("quan" = quantile), probs = 0.95)
   res <- dplyr::left_join(df, df2, by = "filename") %>% 
     ungroup()
   
@@ -909,17 +914,24 @@ ScanFrequMovingOver <- function(x){
   res <- x %>%
     dplyr::ungroup() %>% 
     dplyr::select_at(vars("filename", "MSOrder","StartTime")) %>% 
-    dplyr::mutate_at(vars("StartTime"), funs("Time"= ceiling(.*60))) %>% 
-    dplyr::mutate_at(vars("MSOrder"), funs("ms" = (. == "Ms"))) %>% 
-    dplyr::mutate_at(vars("MSOrder"), funs("ms2" = (. == "Ms2"))) %>% 
+    dplyr::mutate_at(vars("StartTime"), list("Time"=~ ceiling(.*60))) %>% 
+    #dplyr::mutate_at(vars("StartTime"), funs("Time"= ceiling(.*60))) %>% 
+    dplyr::mutate_at(vars("MSOrder"), list("ms" = (~ . == "Ms"))) %>% 
+    #dplyr::mutate_at(vars("MSOrder"), funs("ms" = (. == "Ms"))) %>% 
+    dplyr::mutate_at(vars("MSOrder"), list("ms2" = (~ . == "Ms2"))) %>% 
+    #dplyr::mutate_at(vars("MSOrder"), funs("ms2" = (. == "Ms2"))) %>% 
     dplyr::group_by_at(vars("filename","Time")) %>% 
-    dplyr::mutate_at(vars("ms", "ms2"), funs(cumsum(.))) %>% 
-    dplyr::summarise_at(vars("ms", "ms2"), funs(max(.))) %>% 
+    dplyr::mutate_at(vars("ms", "ms2"), list(~ cumsum(.))) %>% 
+    #dplyr::mutate_at(vars("ms", "ms2"), funs(cumsum(.))) %>%
+    dplyr::summarise_at(vars("ms", "ms2"), list(~ max(.))) %>%
+    #dplyr::summarise_at(vars("ms", "ms2"), funs(max(.))) %>% 
     tidyr::gather(key = "Type", value = "Counts", c("ms", "ms2")) %>% 
     dplyr::ungroup() %>% 
     dplyr::group_by_at(vars("filename", "Type")) %>% 
-    dplyr::mutate_at(vars("Counts"), funs("Frequency" =  as.numeric(stats::filter(., rep( 1/30, 30), sides = 2)))) %>% 
-    dplyr::mutate_at(vars("Time"), funs(./60))
+    dplyr::mutate_at(vars("Counts"), list("Frequency" =  ~ as.numeric(stats::filter(., rep( 1/30, 30), sides = 2)))) %>% 
+    #dplyr::mutate_at(vars("Counts"), funs("Frequency" =  as.numeric(stats::filter(., rep( 1/30, 30), sides = 2)))) %>% 
+    dplyr::mutate_at(vars("Time"), list(~ ./60))
+    #dplyr::mutate_at(vars("Time"), funs(./60))
   return(res)
 }  
 
@@ -950,7 +962,7 @@ ScanFrequMovingOver <- function(x){
                                           grepl("FTMS [[:punct:]] p NSI Full ms2", .$ScanType) == "TRUE" ~ "FT_Full_ms2_p",
                                           grepl("ITMS [[:punct:]] c NSI r d Full ms2", .$ScanType) == "TRUE" ~ "IT_Full_ms2_c",
                                           grepl("ITMS [[:punct:]] p NSI r d Full ms2", .$ScanType) == "TRUE" ~ "IT_Full_ms2_p"
-                                          )
+    )
     )
   return(res)
 }
@@ -973,7 +985,8 @@ PlotTicBasepeak <- function(x, method = 'trellis'){
   df <- x %>% 
     dplyr::filter_at(vars("MSOrder"), any_vars( . == "Ms")) %>% 
     dplyr::select_at(vars("StartTime", "TIC", "BasePeakIntensity", "filename")) %>% 
-    dplyr::rename_at(vars("BasePeakIntensity"), funs(as.character("Base_Peak"))) %>% 
+    dplyr::rename_at(vars("BasePeakIntensity"), list(~ as.character("Base_Peak"))) %>% 
+    #dplyr::rename_at(vars("BasePeakIntensity"), funs(as.character("Base_Peak"))) %>% 
     tidyr::gather(key = "Type", value = "Intensity", c("TIC", "Base_Peak"))
   df$Type <- factor(df$Type, levels = c("TIC", "Base_Peak"))
   
@@ -1178,10 +1191,11 @@ PlotMassDistribution <- function(x, method = 'trellis'){
   res <- x %>% dplyr::filter_at(vars("MSOrder"), any_vars(. == "Ms2")) %>% 
     dplyr::select_at(vars("ChargeState", "PrecursorMass", "filename"))
   res$deconv <-  round((res$PrecursorMass -1.00782) * res$ChargeState, 0)
-  res <- dplyr::mutate_at(res, vars("ChargeState"), funs(factor(.)))
+  res <- dplyr::mutate_at(res, vars("ChargeState"), list(~ factor(.)))  
+  #res <- dplyr::mutate_at(res, vars("ChargeState"), funs(factor(.)))
   
   if (method == 'trellis'){
-
+    
     figure <- ggplot(res, aes_string(x = "deconv", fill = "ChargeState", colour = "ChargeState")) +
       geom_histogram(binwidth = 100, alpha = .3, position = "identity") +
       labs(title = "Precursor mass to charge frequency plot ") +
@@ -1236,7 +1250,8 @@ PlotChargeState <- function(x, method='trellis'){
       dplyr::group_by_at(vars("filename")) %>% 
       dplyr::count(ChargeState) %>% 
       dplyr::ungroup() %>% 
-      dplyr::rename_at(vars("n"), funs(as.character("Counts")))
+      dplyr::rename_at(vars("n"), list(~ as.character("Counts")))
+      #dplyr::rename_at(vars("n"), funs(as.character("Counts")))
     
     res$percentage <- (100 / sum(res$Counts)) * res$Counts
     
@@ -1260,7 +1275,8 @@ PlotChargeState <- function(x, method='trellis'){
       dplyr::group_by_at(vars("filename")) %>% 
       dplyr::count(ChargeState) %>% 
       dplyr::ungroup() %>% 
-      dplyr::rename_at(vars("n"), funs(as.character("Counts")))
+      dplyr::rename_at(vars("n"), list(~ as.character("Counts")))
+     # dplyr::rename_at(vars("n"), funs(as.character("Counts")))
     
     res$percentage <- (100 / sum(res$Counts)) * res$Counts
     
@@ -1292,7 +1308,7 @@ PlotChargeState <- function(x, method='trellis'){
       labs(x = "Filename", y = "Charge State") +
       theme_light() +
       theme(axis.text.x = element_text(angle = 90))
-      #theme(axis.text.x=element_blank(), legend.position = "top")
+    #theme(axis.text.x=element_blank(), legend.position = "top")
     return(figure)
     
   }else{NULL}
@@ -1316,7 +1332,7 @@ PlotScanTime <- function(x, method='trellis'){
   
   res <- .map.type(res)
   
-   if(method == 'trellis'){
+  if(method == 'trellis'){
     
     figure <- ggplot(res, aes_string(x = "StartTime", y = "ElapsedScanTimesec")) +
       geom_point(shape = ".") +
@@ -1336,7 +1352,8 @@ PlotScanTime <- function(x, method='trellis'){
     # TODO
     # stopifnot(is.rawfile(x))
     res <- x %>% 
-      dplyr::mutate_at(vars("ElapsedScanTimesec"), funs(.*1000)) %>% 
+      dplyr::mutate_at(vars("ElapsedScanTimesec"), list(~ .*1000)) %>% 
+      #dplyr::mutate_at(vars("ElapsedScanTimesec"), funs(.*1000)) %>% 
       dplyr::select_at(vars("ElapsedScanTimesec", "filename", "MassAnalyzer", "MSOrder")) %>% 
       na.omit()
     
@@ -1532,8 +1549,10 @@ PlotCycleLoad <- function(x, method = 'trellis'){ #old name ms2.distribution
     MS <- x %>% 
       dplyr::select(StartTime, scanNumber)
     res <- dplyr::inner_join(MS, MS2, by = "scanNumber") %>% 
-      dplyr::mutate_at(vars("filename"), funs(as.factor(.))) %>% 
-      dplyr::mutate_at(vars("n"), funs(as.numeric(.)))
+      dplyr::mutate_at(vars("filename"), list(~ as.factor(.))) %>% 
+      #dplyr::mutate_at(vars("filename"), funs(as.factor(.))) %>% 
+      dplyr::mutate_at(vars("n"), list(~ as.numeric(.)))
+      #dplyr::mutate_at(vars("n"), funs(as.numeric(.)))
     
     figure <- ggplot(res, aes_string(x = "filename", y = "n")) +
       geom_violin() +
@@ -1567,7 +1586,7 @@ PlotCycleLoad <- function(x, method = 'trellis'){ #old name ms2.distribution
       theme_light() +
       theme(legend.position = "top")
     return(figure)
-  
+    
   }else{NULL}
 }
 
@@ -1747,26 +1766,26 @@ PlotMassHeatmap <- function(x, method='trellis', bins = 80){ #rename to mass.hea
     R7500 <- c(30.6791765637371,30.7659144893112,30.6657957244656,29.6024506988321,29.5382730231668,29.530078498947,28.2862130623,28.2683987574132,28.1165489974583,32.4190476190476,32.5380102040816,32.5643707482993))
   
   p <- xyplot(scanSpeed ~ nMS2|paste("R =",R), group=func, data=ScanSpeed, 
-         ylim=c(min(MScanSpeed[[1]])-1,45),
-         xlab=expression(n[MS2]),
-         ylab=expression(f[MS2]),
-         type='b',
-         auto.key = list(columns=2),
-         panel = function(x, y, ...) {
-           panel.grid(h=-1, v=-1)
-           panel.xyplot(x, y, ...)
-           pn = panel.number()
-           panel.points(rep(12, length(MScanSpeed[[pn]])), MScanSpeed[[pn]], pch=16, col='black',cex=0.5)
-           panel.points(12, mean(MScanSpeed[[pn]]), cex=4, pch='-', col='black')
-         },
-         scales=list(
-          
-           x=list(
-             #tck=c(12, 18, 72, 120),
-             #at=nMS2[1:3]
-             at = c(12, 18, 36, 72, 120)
-           )
-         ))
+              ylim=c(min(MScanSpeed[[1]])-1,45),
+              xlab=expression(n[MS2]),
+              ylab=expression(f[MS2]),
+              type='b',
+              auto.key = list(columns=2),
+              panel = function(x, y, ...) {
+                panel.grid(h=-1, v=-1)
+                panel.xyplot(x, y, ...)
+                pn = panel.number()
+                panel.points(rep(12, length(MScanSpeed[[pn]])), MScanSpeed[[pn]], pch=16, col='black',cex=0.5)
+                panel.points(12, mean(MScanSpeed[[pn]]), cex=4, pch='-', col='black')
+              },
+              scales=list(
+                
+                x=list(
+                  #tck=c(12, 18, 72, 120),
+                  #at=nMS2[1:3]
+                  at = c(12, 18, 36, 72, 120)
+                )
+              ))
   p
 }
 
@@ -1817,9 +1836,9 @@ PlotAll <- function(x, prefix = "primer", savepng = TRUE, resolution = 240){
                  theme(strip.text = element_blank())
                if (!is.null(gp)){
                  if(savepng){
-                 png(pngFileName, resolution, resolution)
-                 print(gp)
-                 dev.off()}else{print(gp)}}
+                   png(pngFileName, resolution, resolution)
+                   print(gp)
+                   dev.off()}else{print(gp)}}
              }
            })}
          
@@ -1887,15 +1906,15 @@ PlotAll <- function(x, prefix = "primer", savepng = TRUE, resolution = 240){
   gp <- ggplot(rbind(b.Linux, b.Apple, X.Linux), aes(y = overall.runtime, 
                                                      x = ncpu, 
                                                      colour = method)) + 
-  geom_line(size = 1.3) +
-  facet_wrap(~system) + 
-  coord_trans( y = "log10") +
-  scale_colour_manual(values = c("cornflowerblue", "magenta")) + 
-  scale_y_continuous(breaks = c(90, 120, 180, 240, 480, 600, 900, 1800, 3600, 5400)) +
-  labs(x = "number of used processes", y = "overall runtime [sec]",
-        subtitle='A') +
-  theme_light() +
-  theme(legend.position = "top") +
+    geom_line(size = 1.3) +
+    facet_wrap(~system) + 
+    coord_trans( y = "log10") +
+    scale_colour_manual(values = c("cornflowerblue", "magenta")) + 
+    scale_y_continuous(breaks = c(90, 120, 180, 240, 480, 600, 900, 1800, 3600, 5400)) +
+    labs(x = "number of used processes", y = "overall runtime [sec]",
+         subtitle='A') +
+    theme_light() +
+    theme(legend.position = "top") +
     theme(title = element_text(size = 24)) +
     theme(axis.title = element_text(size = 14)) +
     theme(legend.text = element_text(size = 9)) +
@@ -2035,9 +2054,11 @@ PlotAll <- function(x, prefix = "primer", savepng = TRUE, resolution = 240){
 .technote_application_figure_3 <- function(x){
   res <- x %>% 
     dplyr::select_at(vars("proteins", "peptides", "TopN")) %>% 
-    dplyr::mutate_at(vars("peptides"), funs(./10)) %>% 
+    dplyr::mutate_at(vars("peptides"), list(~ ./10)) %>% 
+   # dplyr::mutate_at(vars("peptides"), funs(./10)) %>% 
     tidyr::gather(key = "Type", value = "counts", c("proteins", "peptides")) %>% 
-    dplyr::mutate_at(vars("Type"), funs(as.factor(.)))
+    dplyr::mutate_at(vars("Type"), list(~ as.factor(.)))
+    #dplyr::mutate_at(vars("Type"), funs(as.factor(.)))
   
   ggplot(res, aes_string(x = "TopN", y = "counts")) + 
     geom_point(aes_string( colour = "Type")) +
@@ -2090,20 +2111,23 @@ PlotAll <- function(x, prefix = "primer", savepng = TRUE, resolution = 240){
   res <- x %>% 
     dplyr::group_by_at(vars("Filetag", "TopN")) %>% 
     dplyr::filter_at(vars("MSOrder"), any_vars(. == "Ms2")) %>% 
-    dplyr::summarise_at(vars("scanNumber"), funs(n()))
+    dplyr::summarise_at(vars("scanNumber"), list(~ n()))
+    #dplyr::summarise_at(vars("scanNumber"), funs(n()))
   
   res$psm <- y
   
   res <- res %>% 
     tidyr::gather(key= "Type", value = "counts", c("scanNumber", "psm")) %>% 
-    dplyr::mutate_at(vars("Type", "TopN"), funs(as.factor(.)))
+    dplyr::mutate_at(vars("Type", "TopN"), list(~ as.factor(.)))
+    #dplyr::mutate_at(vars("Type", "TopN"), funs(as.factor(.)))
   
   res2 <- res %>% 
     dplyr::group_by_at(vars("TopN", "Type")) %>% 
-    summarise_at(vars("counts"), funs(mean(.))) %>% 
+    summarise_at(vars("counts"), list(~ mean(.))) %>%
+    #summarise_at(vars("counts"), funs(mean(.))) %>% 
     tidyr::spread(key = "Type", value = "counts")
-
-
+  
+  
   
   ggplot(res, aes_string(x = "TopN", y = "counts")) + 
     geom_point(aes_string( colour = "Type")) +
@@ -2154,9 +2178,10 @@ PlotAll <- function(x, prefix = "primer", savepng = TRUE, resolution = 240){
   res <- res %>% 
     dplyr::filter_at(vars("StartTime"), any_vars(.>= 15 & .<= 70)) %>% 
     dplyr::group_by_at(vars("Filetag", "MSOrder")) %>% 
-    dplyr::summarise_at(vars("ElapsedScanTimesec"), funs(Time = round((sum(.)/60),1)))
-
-
+    dplyr::summarise_at(vars("ElapsedScanTimesec"), list(Time = ~ round((sum(.)/60),1)))
+    #dplyr::summarise_at(vars("ElapsedScanTimesec"), funs(Time = round((sum(.)/60),1)))
+  
+  
   
   ggplot(res, aes_string(x = "Filetag", y = "Time")) + 
     geom_bar(aes_string(fill = "MSOrder"), stat = "identity")+
@@ -2183,7 +2208,8 @@ PlotAll <- function(x, prefix = "primer", savepng = TRUE, resolution = 240){
   
   res$deconv <-  round((res$PrecursorMass -1.00782)* res$ChargeState, 0)
   
-  res <- dplyr::mutate_at(res, vars("ChargeState"), funs(factor(.)))
+  res <- dplyr::mutate_at(res, vars("ChargeState"), list(~ factor(.)))
+  #res <- dplyr::mutate_at(res, vars("ChargeState"), funs(factor(.)))
   
   figure <- ggplot(res, aes_string(x = "deconv", fill = "ChargeState", colour = "ChargeState")) +
     geom_histogram(binwidth = 100, alpha = .3, position = "identity") +
@@ -2206,7 +2232,7 @@ PlotAll <- function(x, prefix = "primer", savepng = TRUE, resolution = 240){
     theme(axis.text.y = element_text(face="bold", size=21)) +
     theme(axis.line = element_line(size = 1)) +
     theme(panel.grid.major = element_line(colour = "gray"))
-
+  
   return(figure)
 }
 
@@ -2216,7 +2242,8 @@ PlotAll <- function(x, prefix = "primer", savepng = TRUE, resolution = 240){
     dplyr::filter_at(vars("MSOrder"), any_vars(. == "Ms2")) %>% 
     dplyr::select_at(vars("ChargeState", "PrecursorMass", "filename")) %>% 
     dplyr::mutate("deconv" = round((PrecursorMass -1.00782)*ChargeState, 0)) %>% 
-    dplyr::mutate_at(vars("ChargeState"), funs(factor(.)))
+    dplyr::mutate_at(vars("ChargeState"), list(~ factor(.)))
+    #dplyr::mutate_at(vars("ChargeState"), funs(factor(.)))
   
   figure <- ggplot(res, aes_string(x = "deconv", colour = "filename")) +
     geom_line(stat = "density") +
@@ -2236,7 +2263,7 @@ PlotAll <- function(x, prefix = "primer", savepng = TRUE, resolution = 240){
     theme(axis.text.y = element_text(face="bold", size=21)) +
     theme(axis.line = element_line(size = 1)) +
     theme(panel.grid.major = element_line(colour = "gray"))
-
+  
   return(figure)}
 
 
@@ -2246,7 +2273,8 @@ PlotAll <- function(x, prefix = "primer", savepng = TRUE, resolution = 240){
   
   res$deconv <-  round((res$PrecursorMass -1.00782) * res$ChargeState, 0)
   
-  res <- dplyr::mutate_at(res, vars("ChargeState"), funs(factor(.)))
+  res <- dplyr::mutate_at(res, vars("ChargeState"), list(~ factor(.)))
+  #res <- dplyr::mutate_at(res, vars("ChargeState"), funs(factor(.)))
   
   figure <- ggplot(res, aes_string(x = "ChargeState", y = "deconv", fill = "filename")) +
     geom_violin() +
@@ -2262,7 +2290,7 @@ PlotAll <- function(x, prefix = "primer", savepng = TRUE, resolution = 240){
     theme(axis.text.y = element_text(face="bold", size=21)) +
     theme(axis.line = element_line(size = 1)) +
     theme(panel.grid.major = element_line(colour = "gray"))
-
+  
   return(figure)
 }
 
@@ -2285,8 +2313,8 @@ PlotAll <- function(x, prefix = "primer", savepng = TRUE, resolution = 240){
 #'  benchmark_raw(f, maxncpu = 8, exe='~/bin/fgcz_raw.exe', mono=TRUE, rdata='/tmp/b2.RData')
 #' }
 benchmark_raw <- function(f, maxncpu = c(16, 32, 64), 
-                       exe = file.path(path.package(package = "rawDiag"), "exec", "fgcz_raw.exe"), 
-                       rdata = tempfile(fileext = ".RData")){
+                          exe = file.path(path.package(package = "rawDiag"), "exec", "fgcz_raw.exe"), 
+                          rdata = tempfile(fileext = ".RData")){
   if(TRUE){
     benchmark.rawDiag  <- lapply(maxncpu, 
                                  function(ncpu){
@@ -2321,32 +2349,32 @@ benchmark_raw <- function(f, maxncpu = c(16, 32, 64),
 }
 
 benchmark_mzR <- function(f, maxncpu = c(16, 32, 64), 
-                           rdata = tempfile(fileext = ".RData")){
+                          rdata = tempfile(fileext = ".RData")){
   if(TRUE){
     benchmark.rawDiag  <- lapply(maxncpu, 
-     function(ncpu){
-       ostart <- Sys.time()
-       r <- do.call('rbind',  
-                    mclapply(f, function(file){
-                      
-                      start <- Sys.time()
-                      
-                      S <- as.rawDiag.mzR(openMSfile(file))
-                      
-                      end <- Sys.time()
-                      
-                      rv <- data.frame(file = file, 
-                                       runtime = end - start,
-                                       nrow  =nrow(S))
-                      rv
-                    }, mc.cores = ncpu))
-       
-       r$ncpu <- ncpu
-       r$start.time <-  ostart
-       r$end.time <- Sys.time()
-       
-       return(r)
-     })
+                                 function(ncpu){
+                                   ostart <- Sys.time()
+                                   r <- do.call('rbind',  
+                                                mclapply(f, function(file){
+                                                  
+                                                  start <- Sys.time()
+                                                  
+                                                  S <- as.rawDiag.mzR(openMSfile(file))
+                                                  
+                                                  end <- Sys.time()
+                                                  
+                                                  rv <- data.frame(file = file, 
+                                                                   runtime = end - start,
+                                                                   nrow  =nrow(S))
+                                                  rv
+                                                }, mc.cores = ncpu))
+                                   
+                                   r$ncpu <- ncpu
+                                   r$start.time <-  ostart
+                                   r$end.time <- Sys.time()
+                                   
+                                   return(r)
+                                 })
     
     message(paste("writting result to", rdata, "..."))
     save(benchmark.rawDiag, file=rdata) 
@@ -2379,20 +2407,19 @@ benchmark_mzR <- function(f, maxncpu = c(16, 32, 64),
 #' R.exe -e "library(rawDiag);rawDiagShiny(root='D:/Data2Sam/', launch.browser=TRUE)"
 #' }
 rawDiagShiny <- function(appDir = system.file('shiny', 'demo', package = 'rawDiag'), 
-     root = Sys.getenv('HOME'), 
-     dirlist = unique(dirname(list.files(root, recursive = TRUE, pattern="*.raw"))),
-     ...){
+                         root = Sys.getenv('HOME'), 
+                         dirlist = unique(dirname(list.files(root, recursive = TRUE, pattern="*.raw"))),
+                         ...){
   
   if (require('shiny')){
     .GlobalEnv$.rawDiagfilesystemRoot <- root
     .GlobalEnv$.rawDiagfilesystemDataDir <- dirlist
     tryCatch({
       shiny::runApp(appDir, display.mode = 'normal', ...)
-      },
-             error = function(e) e)
+    },
+    error = function(e) e)
   }else{
     warning('no shiny package available.')
   }
   NULL
 }
-
