@@ -3,18 +3,21 @@
 
 library(shiny)
 
-if (!require("bfabricShiny")){
+if (isFALSE(require("bfabricShiny"))){
   message("running without bfabricShiny")
 }
 
-library(protViz)
-library(rawDiag)
-library(parallel)
-library(tidyr)
-library(rmarkdown)
-library(base64enc)
-library(ggplot2)
-library(lattice)
+stopifnot(
+    require(protViz),
+    require(rawDiag),
+    require(parallel),
+    require(tidyr),
+    require(rmarkdown),
+    require(base64enc),
+    require(PKI),
+    require(ggplot2),
+    require(lattice)
+    )
 
 
 .WU163763 <- function(f="fgcz-ms.uzh.ch/~cpanse/rawDiag/WU163763.RData"){
