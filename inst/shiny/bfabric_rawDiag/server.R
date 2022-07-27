@@ -33,7 +33,7 @@ shinyServer(function(input, output, session) {
 # ----check bfabricShinyModule---- 
   if (require("bfabricShiny")){
     bf <- callModule(bfabric, "bfabric8",
-                     applicationid = c(7, 160, 161, 162, 163, 176, 177, 197, 214, 232, 248, 269),
+                     applicationid = c(7, 160, 161, 162, 163, 176, 177, 197, 214, 232, 248, 268, 269, 301),
                      resoucepattern = 'raw$|RAW$',
                      resourcemultiple = TRUE)
   }
