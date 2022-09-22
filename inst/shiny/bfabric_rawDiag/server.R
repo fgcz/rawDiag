@@ -14,7 +14,6 @@ stopifnot(
     require(tidyr),
     require(rmarkdown),
     require(base64enc),
-    require(PKI),
     require(ggplot2),
     require(lattice)
     )
@@ -31,7 +30,7 @@ stopifnot(
 
 shinyServer(function(input, output, session) {
 # ----check bfabricShinyModule---- 
-  if (require("bfabricShiny")){
+  if (require("bfabricShiny") && require("PKI")){
     bf <- callModule(bfabric, "bfabric8",
                      applicationid = c(7, 160, 161, 162, 163, 176, 177, 197, 214, 232, 248, 268, 269, 301),
                      resoucepattern = 'raw$|RAW$',
