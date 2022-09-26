@@ -858,9 +858,6 @@ output$qc <- renderPlot({
   bfabricUploadResource <- observeEvent(rv$download_flag, {
     if (rv$download_flag > 0 && input$source == 'bfabric'){
       resources <- bf$resources()
-      resourceIDs <- resources$resourceid[resources$relativepath == input$relativepath]
-      print(resourceIDs)
-
       rvupload <- bfabricShiny::uploadResource(
         login = bf$login(),
         webservicepassword = bf$webservicepassword(),
@@ -873,7 +870,10 @@ output$qc <- renderPlot({
         resourcename = sprintf("%s.pdf", "rawDiag"),
         file = pdf()
       )
-    }else{print("already uploaded to bfabric")}
+    }else{
+	    print("already uploaded to bfabric")
+	    message("already uploaded to bfabric")
+    }
   }
   )
   #---- downloadPDF ----
