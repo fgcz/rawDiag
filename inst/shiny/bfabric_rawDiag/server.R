@@ -666,7 +666,7 @@ output$qc <- renderPlot({
     progress$set(message = "plotting", detail = "tic.basepeak")
     on.exit(progress$close())
 
-    values$name <- "tic and basepeak plot"
+    values$name <- "TIC and basepeak plot"
     
     if (nrow(rawData()) > 0){
       
