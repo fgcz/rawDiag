@@ -32,7 +32,7 @@ shinyServer(function(input, output, session) {
 # ----check bfabricShinyModule---- 
   if (require("bfabricShiny") && require("PKI")){
     bf <- callModule(bfabric, "bfabric8",
-                     applicationid = c(7, 160, 161, 162, 163, 176, 177, 197, 214, 232, 248, 268, 269, 301),
+                     applicationid = c(7, 160, 161, 162, 163, 176, 177, 197, 214, 232, 248, 268, 269, 301, 309),
                      resoucepattern = 'raw$|RAW$',
                      resourcemultiple = TRUE)
   }
@@ -857,6 +857,10 @@ output$qc <- renderPlot({
 #------------------- uploadResource --------
   bfabricUploadResource <- observeEvent(rv$download_flag, {
     if (rv$download_flag > 0 && input$source == 'bfabric'){
+      resources <- bf$resources()
+      resourceIDs <- resources$resourceid[resources$relativepath == input$relativepath]
+      print(resourceIDs)
+
       rvupload <- bfabricShiny::uploadResource(
         login = bf$login(),
         webservicepassword = bf$webservicepassword(),
@@ -864,7 +868,7 @@ output$qc <- renderPlot({
         applicationid = 225,
         status = "AVAILABLE",
         description = sprintf("input files:\n%s", (input$relativepath |> format() |> paste(collapse='\n'))),
-        #inputresourceid = v_upload_file$inputresourceID,
+        inputresourceid = resources$resourceid[resources$relativepath == input$relativepath],
         workunitname = values$name,
         resourcename = sprintf("%s.pdf", "rawDiag"),
         file = pdf()
