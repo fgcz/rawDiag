@@ -1,4 +1,5 @@
 [![JPR](https://img.shields.io/badge/JPR-10.1021%2Facs.jproteome.8b00173-brightgreen)](http://dx.doi.org/10.1021/acs.jproteome.8b00173)
+![Downloads](https://img.shields.io/github/downloads/fgcz/rawDiag/total)
 
 # rawDiag 
 
