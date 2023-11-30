@@ -2,6 +2,7 @@
 
 export(plotLockMassCorrection)
 export(plotPrecursorHeatmap)
+export(plotTicBasepeak)
 export(read.raw)
 importFrom(ggplot2,aes_string)
 importFrom(ggplot2,facet_wrap)
@@ -16,3 +17,4 @@ importFrom(ggplot2,theme_light)
 importFrom(grDevices,colorRampPalette)
 importFrom(rawrr,readIndex)
 importFrom(rawrr,readTrailer)
+importFrom(reshape2,melt)

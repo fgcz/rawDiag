@@ -7,12 +7,14 @@ Authors@R: c(person(given = "Christian", family = "Panse", email = "cp@fgcz.ethz
 	person(given = "Christian", family = "Trachsel", email = "Christian.Trachsel@fgcz.ethz.ch", role = "aut"),
 	person(given = "Tobias", family = "Kockmann", email = "Tobias.Kockmann@fgcz.ethz.ch", role = "aut"))
 Depends: R (>= 4.3)
-Imports: ggplot2 (>= 3.0),
+Imports: ggplot2 (>= 3.4),
         grDevices,
 	rawrr (>= 1.11),
+	reshape2,
 	scales
 Suggests:
-        BiocStyle (>= 2.5),
+  BiocStyle (>= 2.5),
+  knitr,
 	testthat
 Description: Helps with quality checks, visualizations 
     and analysis of mass spectrometry data, coming from proteomics 
@@ -26,3 +28,4 @@ Encoding: UTF-8
 LazyData: true
 NeedsCompilation: no
 RoxygenNote: 7.2.3
+VignetteBuilder: knitr

@@ -19,10 +19,11 @@ read.raw <- function(rawfile){
   rawfile |>
     rawrr::readTrailer() -> trailerNames
   
+  message("determining ElapsedScanTimesec ...")
   rawrrIndex$ElapsedScanTimesec <- c(diff(rawrrIndex$StartTime), NA)
   
   if ("LM m/z-Correction (ppm):" %in% trailerNames){
-    message("reading LM m/z-Correction (ppm) ...")
+    message("reading trailer LM m/z-Correction (ppm) ...")
     rawfile |> 
       rawrr::readTrailer("LM m/z-Correction (ppm):") |> 
       as.numeric() -> LMCorrection
@@ -30,26 +31,36 @@ read.raw <- function(rawfile){
   }
   
   if ("AGC:" %in% trailerNames){
-    message("reading AGC ...")
+    message("reading trailer AGC ...")
     rawfile |> 
       rawrr::readTrailer("AGC:") -> AGC
     rawrrIndex$AGC <- AGC
   }
   
   if ("AGC PS Mode:" %in% trailerNames){
-    message("reading PrescanMode ...")
+    message("reading trailer AGC PS Mode ...")
     rawfile |> 
       rawrr::readTrailer("AGC PS Mode:") -> PrescanMode
     rawrrIndex$PrescanMode <- PrescanMode
   }
   
   if ("FT Resolution:" %in% trailerNames){
-    message("reading FTResolution ...")
+    message("reading trailer FT Resolution ...")
     rawfile |> 
       rawrr::readTrailer("FT Resolution:") |>
       as.numeric() -> FTResolution
     rawrrIndex$FTResolution <- FTResolution
   }
+  
+  message("reading TIC ...")
+  rawrrIndex$TIC <- NA
+  rawfile |> rawrr::readChromatogram(type = 'tic') -> tic
+  rawrrIndex$TIC[rawrrIndex$MSOrder == "Ms"] <- tic$intensities
+  
+  message("reading BasePeakIntensity ...")
+  rawrrIndex$BasePeakIntensity <- NA
+  rawfile |> rawrr::readChromatogram(type = 'bpc') -> bpc
+  rawrrIndex$BasePeakIntensity[rawrrIndex$MSOrder == "Ms"] <- bpc$intensities
   
   rawrrIndex
 }
@@ -69,7 +80,7 @@ read.raw <- function(rawfile){
 #' @export
 plotLockMassCorrection <- function(x, method = 'trellis'){
   stopifnot("LMCorrection" %in% colnames(x))
-  
+
   x |>
     base::subset(x['MSOrder'] == "Ms") -> x
   
@@ -77,7 +88,7 @@ plotLockMassCorrection <- function(x, method = 'trellis'){
     x |>
       ggplot2::ggplot(ggplot2::aes_string(x = "StartTime" , y = "LMCorrection")) +
       ggplot2::geom_hline(yintercept = c(-5, 5), colour = "red3", linetype = "longdash") +
-      ggplot2::geom_line(size = 0.3) +
+      ggplot2::geom_line(linewidth = 0.3) +
       ggplot2::geom_line(stat = "smooth",
                          method= "gam",
                          formula = y ~ s(x, bs ="cs"),
@@ -86,7 +97,7 @@ plotLockMassCorrection <- function(x, method = 'trellis'){
     x |>
       ggplot2::ggplot(ggplot2::aes_string(x = "StartTime" , y = "LMCorrection", colour = "rawfile")) +
       ggplot2::geom_hline(yintercept = c(-5, 5), colour = "red3", linetype = "longdash") +
-      ggplot2::geom_line(size = 0.3) +
+      ggplot2::geom_line(linewidth = 0.3) +
       ggplot2::geom_line(stat = "smooth",
                          method= "gam",
                          formula = y ~ s(x, bs ="cs"),
@@ -109,7 +120,7 @@ plotLockMassCorrection <- function(x, method = 'trellis'){
   gp
 }
 
-#' PrecursorMass versus StartTime hexagons MS2
+#' precursorMass versus StartTime hexagons MS2
 #' 
 #' @inheritParams plotLockMassCorrection
 #' @param bins number of bins in both vertical and horizontal directions. default is 80.
@@ -142,12 +153,64 @@ plotPrecursorHeatmap <- function(x, method = 'overlay', bins = 80){
     ggplot2::scale_fill_gradientn(colours = spectralramp(32)) + 
     ggplot2::scale_x_continuous(breaks = scales::pretty_breaks(8)) + 
     ggplot2::scale_y_continuous(breaks = scales::pretty_breaks(15)) + 
-    ggplot2::theme_light()
+    ggplot2::theme_light() -> gp
   
   if (method == 'trellis'){
-    gp <- gp + ggplot2::facet_wrap(~ rawfile) 
+    gp +
+      ggplot2::facet_wrap(~ rawfile) -> gp
   }
   
-  gp
+  gp +
+    ggplot2::labs(title = "precursorMass versus StartTime hexagons MS2") 
 }
+
+#' TIC and Base Peak plot function
+#' 
+#' @description Function for displaying the Total Ion Cound (TIC) and Base
+#' Peak chromatogram of a mass spectrometry measurement. 
+#' Multiple files are handled by faceting based on rawfile name.
+#'
+#' @inheritParams plotLockMassCorrection
+#' @return a ggplot object for graphing the TIC and the Base Peak chromatogram
+#' @export
+#' @importFrom ggplot2 ggplot aes_string geom_line labs scale_x_continuous facet_wrap theme_light
+#' @importFrom reshape2 melt
+plotTicBasepeak <- function(x, method = 'trellis'){
+  stopifnot(method %in% c('trellis', 'violin', 'overlay'))
+  
+  x[, c('StartTime', 'TIC', 'BasePeakIntensity', 'rawfile')] |>
+    base::subset(x$MSOrder == "Ms") |>
+    reshape2::melt(id.vars = c("StartTime", "rawfile")) -> xx
+
+  if (method == 'trellis'){
+    xx |>
+      ggplot2::ggplot(ggplot2::aes_string(x = "StartTime", y = "value")) +
+      ggplot2::geom_line(linewidth = 0.3) +
+      ggplot2::facet_wrap(rawfile ~ variable, scales = "free", ncol = 2) +
+      ggplot2::scale_x_continuous(breaks = scales::pretty_breaks(8)) +
+      ggplot2::scale_y_continuous(breaks = scales::pretty_breaks(8)) -> gp
+  }else if(method =='violin'){
+    xx |>
+      ggplot2::ggplot(ggplot2::aes(x = "rawfile", y = "value")) + 
+      ggplot2::geom_violin() +
+      ggplot2::facet_grid(variable ~ ., scales = "free") +
+      #ggplot2::scale_y_continuous(trans = scales::log10_trans()) +
+      ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90)) -> gp
+  }else if (method  == 'overlay'){
+    xx |>
+      ggplot2::ggplot(ggplot2::aes_string(x = "StartTime", y = "value", colour = "rawfile")) +
+      ggplot2::geom_line(size = 0.3) +
+      ggplot2::facet_grid(variable ~ ., scales = "free") +
+      ggplot2::scale_x_continuous(breaks = scales::pretty_breaks(8)) +
+      ggplot2::scale_y_continuous(breaks = scales::pretty_breaks(8)) +
+      ggplot2::theme(legend.position="top") -> gp
+  }else{NULL}
+  
+  gp +
+    ggplot2::labs(title = "Total Ion Count and Base-Peak plot") +
+    ggplot2::labs(subtitle = "Plotting the TIC and base peak density for all mass spectrometry runs") +
+    ggplot2::labs(x = "Retention Time [min]", y = "Intensity Counts [arb. unit]") +
+    ggplot2::theme_light() 
+}
+
 
