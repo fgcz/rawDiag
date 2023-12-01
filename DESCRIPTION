@@ -1,4 +1,4 @@
-Package: rawDiag
+Package: rawDiagB
 Type: Package
 Title: Brings Orbitrap Mass Spectrometry Data to Life; Fast and Colorful 
 Version: 0.0.0
@@ -6,21 +6,24 @@ Authors@R: c(person(given = "Christian", family = "Panse", email = "cp@fgcz.ethz
     comment = c(ORCID = "0000-0003-1975-3064")),
 	person(given = "Christian", family = "Trachsel", email = "Christian.Trachsel@fgcz.ethz.ch", role = "aut"),
 	person(given = "Tobias", family = "Kockmann", email = "Tobias.Kockmann@fgcz.ethz.ch", role = "aut"))
-Depends: R (>= 4.3)
-Imports: ggplot2 (>= 3.4),
-        grDevices,
-	rawrr (>= 1.11),
-	reshape2,
-	scales
+Depends:
+  R (>= 4.3)
+Imports:
+  dplyr,
+  ggplot2 (>= 3.4),
+  grDevices,
+  rawrr (>= 1.11),
+  reshape2,
+  scales
 Suggests:
   BiocStyle (>= 2.5),
   knitr,
-	testthat
+  testthat
 Description: Helps with quality checks, visualizations 
-    and analysis of mass spectrometry data, coming from proteomics 
-    experiments. The package is developed, tested and used at the Functional 
-    Genomics Center Zurich 
-    (Trachsel C. (2018) <doi:10.1021/acs.jproteome.8b00173>).
+  and analysis of mass spectrometry data, coming from proteomics 
+  experiments. The package is developed, tested and used at the Functional 
+  Genomics Center Zurich 
+  (Trachsel C. (2018) <doi:10.1021/acs.jproteome.8b00173>).
 License: GPL-3
 URL: https://github.com/fgcz/rawDiag/
 BugReports: https://github.com/fgcz/rawDiag/issues

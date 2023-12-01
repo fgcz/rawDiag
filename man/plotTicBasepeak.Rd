@@ -19,3 +19,6 @@ Function for displaying the Total Ion Cound (TIC) and Base
 Peak chromatogram of a mass spectrometry measurement. 
 Multiple files are handled by faceting based on rawfile name.
 }
+\author{
+Christian Trachsel (2017), Christian Panse (20231130) refactored
+}
