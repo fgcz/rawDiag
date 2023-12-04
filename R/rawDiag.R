@@ -11,7 +11,8 @@
 #' default is using the \code{message}.
 #' @author Christian Panse (2016-2023)
 #' @export 
-#' @example  rawrr::sampleFilePath() |> rawDiagB::read.raw()
+#' @examples
+#' rawrr::sampleFilePath() |> rawDiagB::read.raw()
 #' @importFrom rawrr readIndex readTrailer readChromatogram
 read.raw <- function(rawfile, msgFUN = function(x){message(x)}){
   message("reading index for ", basename(rawfile), "...")

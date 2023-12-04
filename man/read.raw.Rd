@@ -22,6 +22,9 @@ default is using the \code{message}.}
 \description{
 Reads selected raw file trailer for rawDiag plot functions
 }
+\examples{
+rawrr::sampleFilePath() |> rawDiagB::read.raw()
+}
 \author{
 Christian Panse (2016-2023)
 }
