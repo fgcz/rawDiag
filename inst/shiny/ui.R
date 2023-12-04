@@ -8,7 +8,6 @@
 #
 
 library(shiny)
-source("module-rawDiag.R")
 
 rootdir <- "/Users/cp/data/"
 files <- file.path(rootdir, list.files(rootdir, pattern = '*.raw'))

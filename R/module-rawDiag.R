@@ -1,15 +1,12 @@
 #R
 
-stopifnot(require(rawDiagB))
+#stopifnot(require(rawDiagB))
 
-#' Title
+#' rawDiag shiny module UI
 #'
-#' @param id 
-#'
-#' @return
+#' @param id  session id
+
 #' @export
-#'
-#' @examples
 rawDiagUI <- function(id){
     ns <- NS(id)
     
@@ -26,10 +23,7 @@ rawDiagUI <- function(id){
 #' @param id shiny session id
 #' @param vals containing rawfile
 #'
-#' @return
 #' @export
-#'
-#' @examples
 #' @importFrom shiny moduleServer 
 rawDiagServer <- function(id, vals){
     
@@ -39,11 +33,14 @@ rawDiagServer <- function(id, vals){
                      data <- reactive({
                          shiny::req(rawfile())
                          progress <- shiny::Progress$new(session = session)
-                         progress$set(message = paste("Reading", vals$rawfile) )
+                         progress$set(message = paste("Reading", basename(vals$rawfile) ))
                          on.exit(progress$close())
                          
-                         rawDiagB::read.raw(rawfile())
+                         rawDiagB::read.raw(rawfile(),
+                                            msgFUN = function(msg){
+                                                progress$set(detail = msg)})
                      })
+                     
                      
                      observeEvent(input$plotFUN, {message(input$plotFUN)})
                      
