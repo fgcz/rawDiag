@@ -2,16 +2,25 @@
 % Please edit documentation in R/rawDiag.R
 \name{read.raw}
 \alias{read.raw}
-\title{reads selected raw file trailer for rawDiag plot functions}
+\title{Reads selected raw file trailer for rawDiag plot functions}
 \usage{
-read.raw(rawfile)
+read.raw(
+  rawfile,
+  msgFUN = function(x) {
+     message(x)
+ }
+)
 }
 \arguments{
 \item{rawfile}{the name of the raw file containing the mass
 spectrometry data from the Thermo Fisher Scientific instrument.}
+
+\item{msgFUN}{this function is used for logging information while composing
+the resulting data.frame. It can also be used for shiny progress bar. The 
+default is using the \code{message}.}
 }
 \description{
-reads selected raw file trailer for rawDiag plot functions
+Reads selected raw file trailer for rawDiag plot functions
 }
 \author{
 Christian Panse (2016-2023)
