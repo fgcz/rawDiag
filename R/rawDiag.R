@@ -2,14 +2,19 @@
 # contains selected rawDiag plot methods
 # 
 
-#' reads selected raw file trailer for rawDiag plot functions
+#' Reads selected raw file trailer for rawDiag plot functions
 #' 
 #' @param rawfile the name of the raw file containing the mass
 #' spectrometry data from the Thermo Fisher Scientific instrument.
+#' @param msgFUN this function is used for logging information while composing
+#' the resulting data.frame. It can also be used for shiny progress bar. The 
+#' default is using the \code{message}.
 #' @author Christian Panse (2016-2023)
 #' @export 
-#' @importFrom rawrr readIndex readTrailer
-read.raw <- function(rawfile){
+#' @examples
+#' rawrr::sampleFilePath() |> rawDiagB::read.raw()
+#' @importFrom rawrr readIndex readTrailer readChromatogram
+read.raw <- function(rawfile, msgFUN = function(x){message(x)}){
   message("reading index for ", basename(rawfile), "...")
   
   rawfile |> 
@@ -19,11 +24,11 @@ read.raw <- function(rawfile){
   rawfile |>
     rawrr::readTrailer() -> trailerNames
   
-  message("determining ElapsedScanTimesec ...")
+  msgFUN("determining ElapsedScanTimesec ...")
   rawrrIndex$ElapsedScanTimesec <- c(diff(rawrrIndex$StartTime), NA)
   
   if ("LM m/z-Correction (ppm):" %in% trailerNames){
-    message("reading trailer LM m/z-Correction (ppm) ...")
+    msgFUN("reading trailer LM m/z-Correction (ppm) ...")
     rawfile |> 
       rawrr::readTrailer("LM m/z-Correction (ppm):") |> 
       as.numeric() -> LMCorrection
@@ -31,33 +36,33 @@ read.raw <- function(rawfile){
   }
   
   if ("AGC:" %in% trailerNames){
-    message("reading trailer AGC ...")
+    msgFUN("reading trailer AGC ...")
     rawfile |> 
       rawrr::readTrailer("AGC:") -> AGC
     rawrrIndex$AGC <- AGC
   }
   
   if ("AGC PS Mode:" %in% trailerNames){
-    message("reading trailer AGC PS Mode ...")
+    msgFUN("reading trailer AGC PS Mode ...")
     rawfile |> 
       rawrr::readTrailer("AGC PS Mode:") -> PrescanMode
     rawrrIndex$PrescanMode <- PrescanMode
   }
   
   if ("FT Resolution:" %in% trailerNames){
-    message("reading trailer FT Resolution ...")
+    msgFUN("reading trailer FT Resolution ...")
     rawfile |> 
       rawrr::readTrailer("FT Resolution:") |>
       as.numeric() -> FTResolution
     rawrrIndex$FTResolution <- FTResolution
   }
   
-  message("reading TIC ...")
+  msgFUN("reading TIC ...")
   rawrrIndex$TIC <- NA
   rawfile |> rawrr::readChromatogram(type = 'tic') -> tic
   rawrrIndex$TIC[rawrrIndex$MSOrder == "Ms"] <- tic$intensities
   
-  message("reading BasePeakIntensity ...")
+  msgFUN("reading BasePeakIntensity ...")
   rawrrIndex$BasePeakIntensity <- NA
   rawfile |> rawrr::readChromatogram(type = 'bpc') -> bpc
   rawrrIndex$BasePeakIntensity[rawrrIndex$MSOrder == "Ms"] <- bpc$intensities
@@ -216,39 +221,37 @@ plotTicBasepeak <- function(x, method = 'trellis'){
 
 
 #' Calculate MS Cycle Time
-#'
+#' @description Graphs the lock mass deviations along RT.
 #' @inheritParams plotLockMassCorrection
-#' @details TODO: qunatile part needed? If no MS1 scan is present? -> DIA take lowest window as cycle indicator?
+#' @details TODO: quan
+#' tile part needed? If no MS1 scan is present? -> DIA take lowest window as cycle indicator?
 #'
-#' @importFrom dplyr filter_at select_at group_by_at mutate_at summarise_at any_vars vars ungroup
 #' @importFrom stats na.omit
 #' @author Christian Trachsel (2017), Christian Panse (20231201) refactored
 #' @return calculates the time of all ms cycles and the 95% quantile value there of. 
 #' the cycle time is defined as the time between two consecutive MS1 scans
-.calcCycleTime <- function(x){
-  
+.cycleTime <- function(x){
   x |>
-    dplyr::filter_at(dplyr::vars("MSOrder"), dplyr::any_vars(. == "Ms")) |>
-    dplyr::select_at(dplyr::vars("StartTime", "rawfile")) |>
-    dplyr::group_by_at(dplyr::vars("rawfile")) |>
-    dplyr::mutate_at(dplyr::vars("StartTime"), list("CycleTime" = ~ (. - lag(.)) * 60)) |>
-    stats::na.omit() -> xx
-  
-  xx |> 
-    group_by_at("rawfile") |>
-    dplyr::summarise_at(dplyr::vars("CycleTime"), list("quan" = ~ quantile(., probs = 0.95))) -> xxx
-  
+    subset(x$MSOrder == "Ms") -> xx
+  split(xx, xx$rawfile) |>
+    lapply(function(o){
+      o$CycleTime <- c(NA, (o$StartTime * 60) |> diff())
+      o$quan <- quantile(o$CycleTime, probs = 0.95, na.rm = TRUE)
+      o[, c('StartTime', 'CycleTime',  'quan', 'rawfile')]
+    }) |>
+    Reduce(f = rbind) |> 
+    na.omit()
+} 
 
-  dplyr::left_join(xx, xxx, by = "rawfile") |>
-    dplyr::ungroup() 
-}
-
-#' cycle time plot
+#' Plot Cycle Time
 #' 
 #' @inheritParams plotLockMassCorrection
 #' 
-#' @description graphs cycle time versus rt.
-#' each item represents the time for one scan cycle.
+#' @description  Graphs the time difference between two consecutive MS1 scans
+#' (cycle time) with respect to RT (scatter plots) or its density (violin).
+#' A smooth curve graphs the trend. The 95th percentile is indicated by a red
+#' dashed line.
+#' 
 #' @return a \code{\link{ggplot2}} object.
 #' @importFrom ggplot2 ggplot aes_string geom_point geom_line scale_x_continuous scale_y_continuous geom_hline theme_light
 #' @importFrom scales pretty_breaks
@@ -256,10 +259,10 @@ plotTicBasepeak <- function(x, method = 'trellis'){
 #' @importFrom stats quantile na.omit
 #' @export 
 plotCycleTime <- function(x, method = 'trellis'){
-  xx <- .calcCycleTime(x)
+  xx <- .cycleTime(x)
   
   if (method == 'trellis'){
-    xx |>
+    xx |> 
       ggplot2::ggplot(ggplot2::aes_string(x = "StartTime", y = "CycleTime")) + 
       ggplot2::geom_point(shape = ".") +
       ggplot2::geom_line(stat = "smooth", method = "gam", formula = y ~ s(x, bs= "cs"), colour = "deepskyblue3", se = FALSE) +

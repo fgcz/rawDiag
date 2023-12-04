@@ -2,7 +2,7 @@
 % Please edit documentation in R/rawDiag.R
 \name{plotCycleTime}
 \alias{plotCycleTime}
-\title{cycle time plot}
+\title{Plot Cycle Time}
 \usage{
 plotCycleTime(x, method = "trellis")
 }
@@ -15,6 +15,8 @@ plotCycleTime(x, method = "trellis")
 a \code{\link{ggplot2}} object.
 }
 \description{
-graphs cycle time versus rt.
-each item represents the time for one scan cycle.
+Graphs the time difference between two consecutive MS1 scans
+(cycle time) with respect to RT (scatter plots) or its density (violin).
+A smooth curve graphs the trend. The 95th percentile is indicated by a red
+dashed line.
 }

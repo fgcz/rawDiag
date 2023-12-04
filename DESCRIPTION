@@ -12,7 +12,7 @@ Imports:
   dplyr,
   ggplot2 (>= 3.4),
   grDevices,
-  rawrr (>= 1.8),
+  rawrr (>= 1.10),
   reshape2,
   scales
 Suggests:
