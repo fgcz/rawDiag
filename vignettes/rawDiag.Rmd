@@ -8,8 +8,8 @@ author:
   email: cp@fgcz.ethz.ch
 package: rawDiag
 abstract: |
-  This vignette provides a primer of the functionalities of the `rawrr` package
-  [@Trachsel2018]. 
+  This vignette provides a primer of the functionalities of the `r BiocStyle::Biocpkg('rawDiag')` package
+  [@Trachsel2018]. The package provides a set of functions to quickly visualize and inspect Thermo Fischer Scientific Orbitrap generated measurements. 
 output:
   BiocStyle::html_document:
     toc_float: true
@@ -34,13 +34,19 @@ knitr::opts_chunk$set(fig.wide = TRUE, fig.retina = 3, error=FALSE)
 # Usage
 
 ```{r usage, echo=FALSE, eval=TRUE}
-rawrr::sampleFilePath() |>
-  rawDiagB::read.raw() -> x
-```
 
-```{r usage2, echo=FALSE, eval=TRUE, fig.width=10, fig.height=5}
-x |>
-  rawDiagB::plotPrecursorHeatmap()
+
+# fetch via ExperimentHub
+library(ExperimentHub)
+eh <- ExperimentHub::ExperimentHub()
+EH4547 <- normalizePath(eh[["EH4547"]])
+
+(rawfile <- paste0(EH4547, ".raw"))
+if (!file.exists(rawfile)){
+  file.copy(EH4547, rawfile)
+}
+rawfile |>
+  rawDiagB::read.raw() -> x
 ```
 
 ```{r plotALL, echo=FALSE, eval=TRUE, fig.width=10, fig.height=5}

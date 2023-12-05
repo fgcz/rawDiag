@@ -13,22 +13,24 @@ Imports:
   ggplot2 (>= 3.4),
   grDevices,
   rawrr (>= 1.10),
+  rlang,
   reshape2,
-  scales
+  scales,
+  shiny
 Suggests:
-  BiocStyle (>= 2.5),
+  BiocStyle (>= 2.28),
+  ExperimentHub,
+  tartare,
   knitr,
   testthat
 Description: Helps with quality checks, visualizations 
   and analysis of mass spectrometry data, coming from proteomics 
   experiments. The package is developed, tested and used at the Functional 
-  Genomics Center Zurich 
-  (Trachsel C. (2018) <doi:10.1021/acs.jproteome.8b00173>).
+  Genomics Center Zurich ETHZ | UZH.
 License: GPL-3
 URL: https://github.com/fgcz/rawDiag/
 BugReports: https://github.com/fgcz/rawDiag/issues
 Encoding: UTF-8
-LazyData: true
 NeedsCompilation: no
 RoxygenNote: 7.2.3
 VignetteBuilder: knitr

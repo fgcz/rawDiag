@@ -57,6 +57,14 @@ read.raw <- function(rawfile, msgFUN = function(x){message(x)}){
     rawrrIndex$FTResolution <- FTResolution
   }
   
+  if ("Ion Injection Time (ms):" %in% trailerNames){
+    msgFUN("reading trailer Ion Injection Time (ms) ...")
+    rawfile |> 
+      rawrr::readTrailer("Ion Injection Time (ms):") |>
+      as.numeric() -> IonInjectionTime
+    rawrrIndex$IonInjectionTime <- IonInjectionTime
+  }
+  
   msgFUN("reading TIC ...")
   rawrrIndex$TIC <- NA
   rawfile |> rawrr::readChromatogram(type = 'tic') -> tic
@@ -67,7 +75,32 @@ read.raw <- function(rawfile, msgFUN = function(x){message(x)}){
   rawfile |> rawrr::readChromatogram(type = 'bpc') -> bpc
   rawrrIndex$BasePeakIntensity[rawrrIndex$MSOrder == "Ms"] <- bpc$intensities
   
-  rawrrIndex
+  rawrrIndex |> validate_read.raw() 
+}
+
+validate_read.raw <- function(x){
+  validateIndex <- TRUE
+  
+  if (!is.data.frame(x)){
+    message("Object is not a 'data.frame'.")
+    valideIndex <- FALSE
+  }
+  
+  IndexColNames <- c("scan", "scanType", "StartTime", "precursorMass",
+                     "MSOrder", "charge", "masterScan", "dependencyType", 
+                      "TIC", "BasePeakIntensity", "ElapsedScanTimesec", "rawfile", 
+                      "LMCorrection", "AGC", "PrescanMode", "FTResolution")
+  
+  for (i in IndexColNames){
+    if (!(i %in% colnames(x))){
+      msg <- sprintf("Missing column %d.", i)
+      message(msg)
+      valideIndex <- FALSE
+    }
+  }
+  
+  stopifnot(validateIndex)
+  return(x)
 }
 
 #' lock mass correction plot
@@ -303,3 +336,56 @@ plotCycleTime <- function(x, method = 'trellis'){
     ggplot2::labs(x = "Retention Time [min]", y = "Cycle Time [sec]") +
     ggplot2::theme_light() 
 }
+
+
+
+#' Plot Injection Time
+#'
+#' @inheritParams plotLockMassCorrection
+#' 
+#' @return a \code{\link{ggplot2}} object.
+#' @export
+#' @importFrom ggplot2 ggplot aes_string geom_point geom_line scale_x_continuous scale_y_continuous geom_hline theme_light
+#' @importFrom rlang .data
+plotInjectionTime <- function(x, method = 'trellis'){
+  if (method == 'trellis'){
+    maxtimes <- x |>
+      dplyr::group_by(.data$rawfile, .data$MSOrder) |>
+      dplyr::summarise(maxima = max(.data$IonInjectionTime))
+    
+    ggplot2::ggplot(x, ggplot2::aes(x = .data$StartTime, y = .data$IonInjectionTime)) +
+      ggplot2::geom_hline(data = maxtimes, ggplot2::aes_string(yintercept = "maxima"), colour = "red3", linetype = "longdash") +
+      ggplot2::geom_point(shape = ".") +
+      ggplot2::geom_line(stat = "smooth", method = "gam", formula = y ~ s(x, bs= "cs"), colour = "deepskyblue3", se = FALSE) +
+      ggplot2::facet_grid(rawfile ~ MSOrder, scales = "free") +
+      ggplot2::scale_y_continuous(breaks = scales::pretty_breaks((n = 8))) +
+      ggplot2::scale_x_continuous(breaks = scales::pretty_breaks((n = 8))) +
+      ggplot2::labs(subtitle = "Plotting injection time against retention time for MS and MSn level") +
+      ggplot2::labs(x = "Retentione Time [min]", y = "Injection Time [ms]") -> gp
+  }else if (method == 'violin'){
+    ggplot2::ggplot(x, ggplot2::aes(x = .data$rawfile, y = .data$IonInjectionTime)) +
+      ggplot2::geom_violin() +
+      ggplot2::facet_grid(MSOrder ~ .) +
+      ggplot2::labs(subtitle = "Plotting retention time resolved injection time density for each mass spectrometry run") +
+      ggplot2::labs(x = "rawfile", y = "Injection Time [ms]") +
+      ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90)) -> gp
+  }else if(method == 'overlay'){
+    ggplot2::ggplot(x, ggplot2::aes(x = .data$StartTime, y = .data$IonInjectionTime, colour = .data$rawfile)) +
+      ggplot2::geom_point(size = 0.5, alpha = 0.1) +
+      ggplot2::geom_line(ggplot2::aes(group = .data$rawfile, colour = .data$rawfile),
+                stat = "smooth",
+                method = "gam",
+                formula = y ~ s(x, bs= "cs"),
+                se = FALSE) +
+      ggplot2::scale_y_continuous(breaks = scales::pretty_breaks((n = 8))) +
+      ggplot2::scale_x_continuous(breaks = scales::pretty_breaks((n = 8))) +
+      ggplot2::facet_grid(~ .data$MSOrder, scales = "free") +
+      ggplot2::labs(subtitle = "Plotting injection time against retention time for MS and MSn level") +
+      ggplot2::labs(x = "Retentione Time [min]", y = "Injection Time [ms]") +
+      ggplot2::theme(legend.position = "top") -> gp
+  }else{NULL}
+  
+  gp + ggplot2::labs(title = "Injection time plot") +
+    ggplot2::theme_light()
+}
+

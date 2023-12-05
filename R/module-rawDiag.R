@@ -27,7 +27,7 @@ rawDiagUI <- function(id){
 #' @param vals containing rawfile
 #'
 #' @export
-#' @importFrom shiny moduleServer 
+#' @importFrom shiny moduleServer reactive reactiveValues observeEvent renderPlot req NS tagList selectInput checkboxInput plotOutput debounce
 rawDiagServer <- function(id, vals){
   
   moduleServer(id,
