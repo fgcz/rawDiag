@@ -9,7 +9,7 @@
 
 library(shiny)
 
-rootdir <- "/Users/cp/data/"
+rootdir <- "/home/cp/Downloads/PXD006932ls/"
 files <- file.path(rootdir, list.files(rootdir, pattern = '*.raw'))
 
 # Define UI for application that draws a histogram
@@ -22,7 +22,7 @@ fluidPage(
     sidebarLayout(
         sidebarPanel(
             tagList(
-                selectInput("rawfile", "rawrfile",
+                selectInput("rawfile", "rawfile",
                             choices = files,
                             selected = files[1], width = "100%", multiple = TRUE),
             )
