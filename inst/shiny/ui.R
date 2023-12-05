@@ -24,7 +24,7 @@ fluidPage(
             tagList(
                 selectInput("rawfile", "rawrfile",
                             choices = files,
-                            selected = files[1], width = "100%"),
+                            selected = files[1], width = "100%", multiple = TRUE),
             )
         ),
         

@@ -12,8 +12,10 @@ rawDiagUI <- function(id){
     
     plotFunctions <- ls("package:rawDiagB")[ls("package:rawDiagB")|>grepl(pattern = "^plot")]
     tagList(
-        selectInput(ns("plotFUN"), "plotFUN", choices = plotFunctions,
+        selectInput(ns("plotFUN"), "rawDiag plot function", choices = plotFunctions,
                     selected = plotFunctions, multiple = FALSE),
+        selectInput(ns("plotArg"), "rawDiag plot argument", choices = c("trellis", "violin", "overlay"),
+                    selected = "trellis", multiple = FALSE),
         plotOutput(ns("plot"))
     )
 }
@@ -32,22 +34,28 @@ rawDiagServer <- function(id, vals){
                      rawfile <- reactive({ vals$rawfile })
                      data <- reactive({
                          shiny::req(rawfile())
-                         progress <- shiny::Progress$new(session = session)
-                         progress$set(message = paste("Reading", basename(vals$rawfile) ))
-                         on.exit(progress$close())
                          
-                         rawDiagB::read.raw(rawfile(),
-                                            msgFUN = function(msg){
-                                                progress$set(detail = msg)})
+                         parallel::mclapply(rawfile(), function(f){
+                             progress <- shiny::Progress$new(session = session)
+                             progress$set(message = paste0("Reading", basename(f), "..."))
+                             on.exit(progress$close())
+                             
+                             rawDiagB::read.raw(f,
+                                                msgFUN = function(msg){
+                                                    progress$set(detail = msg)
+                                                })
+                         }) |>
+                             Reduce(f = rbind)
                      })
                      
                      
                      observeEvent(input$plotFUN, {message(input$plotFUN)})
                      
                      output$plot <- renderPlot({
-                         shiny::req(data(), input$plotFUN)
-                        
-                         do.call(what = input$plotFUN, args = list(x = data()))
+                         shiny::req(data(), input$plotFUN, input$plotArg)
+                         do.call(what = input$plotFUN,
+                                 args = list(x = data(),
+                                             method = input$plotArg))
                      })
                  }
     )
