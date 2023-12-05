@@ -1,0 +1,77 @@
+---
+title: "Brings Orbitrap Mass Spectrometry Data to Life; Fast and Colorful"
+author:
+- name: Christian Panse
+  affiliation:
+    - &id Functional Genomics Center Zurich (FGCZ) - University of Zurich | ETH Zurich, Winterthurerstrasse 190, CH-8057 Zurich, Switzerland
+    - Swiss Institute of Bioinformatics (SIB), Quartier Sorge - Batiment Amphipole, CH-1015 Lausanne, Switzerland
+  email: cp@fgcz.ethz.ch
+package: rawDiag
+abstract: |
+  This vignette provides a primer of the functionalities of the `rawrr` package
+  [@Trachsel2018]. 
+output:
+  BiocStyle::html_document:
+    toc_float: true
+bibliography: rawDiag.bib
+vignette: >
+  %\usepackage[utf8]{inputenc}
+  %\VignetteIndexEntry{Brings Orbitrap Mass Spectrometry Data to Life; Fast and Colorful}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+urlcolor: blue
+---
+
+```{r style, echo = FALSE, results = 'asis'}
+BiocStyle::markdown()
+knitr::opts_chunk$set(fig.wide = TRUE, fig.retina = 3, error=FALSE)
+```
+
+```{r rawDiagLogo, echo=FALSE, out.width="50%", eval=TRUE}
+  knitr::include_graphics("octopussy.png")
+```
+
+# Usage
+
+```{r usage, echo=FALSE, eval=TRUE}
+rawrr::sampleFilePath() |>
+  rawDiagB::read.raw() -> x
+```
+
+```{r usage2, echo=FALSE, eval=TRUE, fig.width=10, fig.height=5}
+x |>
+  rawDiagB::plotPrecursorHeatmap()
+```
+
+```{r plotALL, echo=FALSE, eval=TRUE, fig.width=10, fig.height=5}
+library(rawDiagB)
+pm <- ls("package:rawDiagB")
+pm[grepl(pm, pattern = 'plot')] |> 
+  lapply(FUN = function(plotFUN) {
+    lapply(c('trellis', 'violin', 'overlay'), function(method) {
+      message(paste0("plotting", plotFUN, "using method", method, "..."))
+      do.call(plotFUN, list(x, method))
+    })
+  })
+```
+
+```{r fun, echo=FALSE, eval=FALSE}
+f1 <- '/Users/cp/Downloads/20230404_OLEP08_TP_1ug_MB_60min_AS_dDIA_15ms_2Th_3.raw'
+
+f2 <- '/Users/cp/Downloads/20230906/20220915/20220830/LUMOS_1/20210527_077_autoQC4L.raw'
+
+f3 <- '/Users/cp/Downloads/WU296852/20231123_C33274_009_S583627_L_TDPwt_2_WT_L/20231123_C33274_009_S583627_L_TDPwt_2_WT_L.raw'
+library(rawDiagB)
+rawDiagB::read.raw(f1) -> S1
+rawDiagB::read.raw(f2) -> S2
+rawDiagB::read.raw(f3) -> S3
+S3 |> plotLockMassCorrection()
+```
+
+# Session information {-}
+
+```{r sessioninfo, echo=FALSE}
+sessionInfo()
+```
+
+# References {-}
