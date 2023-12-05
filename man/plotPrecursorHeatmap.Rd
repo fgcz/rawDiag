@@ -2,14 +2,14 @@
 % Please edit documentation in R/rawDiag.R
 \name{plotPrecursorHeatmap}
 \alias{plotPrecursorHeatmap}
-\title{precursorMass versus StartTime hexagons MS2}
+\title{Precursor Mass versus StartTime  MS2 based hexagons}
 \usage{
 plotPrecursorHeatmap(x, method = "overlay", bins = 80)
 }
 \arguments{
-\item{x}{a \code{\link{data.frame}} fullfilling the \code{is.rawDiag} column naming criteria.}
+\item{x}{a \code{data.frame} object adhering to the specified criteria for the \code{is.rawDiag} function.}
 
-\item{method}{a character 'trellis', 'violin' or 'overlay'.}
+\item{method}{specifying the plot method 'trellis' | 'violin' | 'overlay'. The default is 'trellis'.}
 
 \item{bins}{number of bins in both vertical and horizontal directions. default is 80.}
 }
@@ -17,10 +17,13 @@ plotPrecursorHeatmap(x, method = "overlay", bins = 80)
 a ggplot2 object.
 }
 \description{
-precursorMass versus StartTime hexagons MS2
+Precursor Mass versus StartTime  MS2 based hexagons
 }
 \note{
 TODO: define bin with dynamically as h= 2x IQR x n e-1/3 or number of bins (max-min)/h
+}
+\examples{
+rawrr::sampleFilePath() |> read.raw() |> plotPrecursorHeatmap()
 }
 \author{
 Christian Trachsel (2017)

@@ -1,4 +1,4 @@
-Package: rawDiagB
+Package: rawDiag
 Type: Package
 Title: Brings Orbitrap Mass Spectrometry Data to Life; Fast and Colorful 
 Version: 0.0.1
@@ -23,10 +23,13 @@ Suggests:
   tartare,
   knitr,
   testthat
-Description: Helps with quality checks, visualizations 
-  and analysis of mass spectrometry data, coming from proteomics 
-  experiments. The package is developed, tested and used at the Functional 
-  Genomics Center Zurich ETHZ | UZH.
+Description: Optimizing methods for liquid chromatography coupled to mass
+  spectrometry (LC–MS) poses a nontrivial challenge. The rawDiag package
+  facilitates rational method optimization by generating MS operator-tailored
+  diagnostic plots of scan-level metadata. The package is designed for use on
+  the R shell or as a Shiny application on the Orbitrap instrument PC.
+  The package is developed, tested and used at the Functional Genomics Center
+  Zurich ETHZ | UZH.
 License: GPL-3
 URL: https://github.com/fgcz/rawDiag/
 BugReports: https://github.com/fgcz/rawDiag/issues

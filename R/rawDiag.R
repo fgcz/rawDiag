@@ -4,15 +4,15 @@
 
 #' Reads selected raw file trailer for rawDiag plot functions
 #' 
-#' @param rawfile the name of the raw file containing the mass
-#' spectrometry data from the Thermo Fisher Scientific instrument.
+#' @inheritParams rawrr::readIndex
 #' @param msgFUN this function is used for logging information while composing
 #' the resulting data.frame. It can also be used for shiny progress bar. The 
 #' default is using the \code{message}.
+#' @return a \code{data.frame} containing the selected trailer information.
 #' @author Christian Panse (2016-2023)
 #' @export 
 #' @examples
-#' rawrr::sampleFilePath() |> rawDiagB::read.raw()
+#' rawrr::sampleFilePath() |> rawDiag::read.raw()
 #' @importFrom rawrr readIndex readTrailer readChromatogram
 read.raw <- function(rawfile, msgFUN = function(x){message(x)}){
   message("reading index for ", basename(rawfile), "...")
@@ -78,6 +78,36 @@ read.raw <- function(rawfile, msgFUN = function(x){message(x)}){
   rawrrIndex |> validate_read.raw() 
 }
 
+
+.rawDiagColumns <- function(){
+    c("scan", "scanType", "StartTime", "precursorMass",
+      "MSOrder", "charge", "masterScan", "dependencyType", 
+      "TIC", "BasePeakIntensity", "ElapsedScanTimesec", "rawfile", 
+      "LMCorrection", "AGC", "PrescanMode", "FTResolution") |>
+        sort()
+}
+
+#' Is an Object from a rawDiag class?
+#'
+#' @inheritParams methods::is
+#' @return a boolean
+#' @author Christian Panse 2018
+#' @examples
+#' rawrr::sampleFilePath() |> rawDiag::read.raw() |> rawDiag::is.rawDiag()
+#' 
+#' @export 
+is.rawDiag <- function(object){
+    cn <- .rawDiagColumns()
+    
+    msg <- cn[! cn %in% colnames(object)]
+    if (length(msg) > 0){
+        message(paste("missing column name(s):", paste(msg, collapse = ", ")))
+        return(FALSE)
+    }
+
+    return(TRUE)
+}
+
 validate_read.raw <- function(x){
   validateIndex <- TRUE
   
@@ -86,10 +116,7 @@ validate_read.raw <- function(x){
     valideIndex <- FALSE
   }
   
-  IndexColNames <- c("scan", "scanType", "StartTime", "precursorMass",
-                     "MSOrder", "charge", "masterScan", "dependencyType", 
-                      "TIC", "BasePeakIntensity", "ElapsedScanTimesec", "rawfile", 
-                      "LMCorrection", "AGC", "PrescanMode", "FTResolution")
+  IndexColNames <- .rawDiagColumns()
   
   for (i in IndexColNames){
     if (!(i %in% colnames(x))){
@@ -103,11 +130,11 @@ validate_read.raw <- function(x){
   return(x)
 }
 
-#' lock mass correction plot
+#' Lock Mass Correction plot
 #' 
-#' @param x a \code{\link{data.frame}} fullfilling the \code{is.rawDiag} column naming criteria.
-#' @param method a character 'trellis', 'violin' or 'overlay'.
-#' @return a ggplot2 object
+#' @param x a \code{data.frame} object adhering to the specified criteria for the \code{is.rawDiag} function.
+#' @param method specifying the plot method 'trellis' | 'violin' | 'overlay'. The default is 'trellis'.
+#' @return a \code{ggplot2} object
 #' @author Christian Trachsel (2017), Christian Panse (2023)
 #' @references rawDiag \doi{10.1021/acs.jproteome.8b00173}
 #' @examples 
@@ -158,7 +185,7 @@ plotLockMassCorrection <- function(x, method = 'trellis'){
   gp
 }
 
-#' precursorMass versus StartTime hexagons MS2
+#' Precursor Mass versus StartTime  MS2 based hexagons
 #' 
 #' @inheritParams plotLockMassCorrection
 #' @param bins number of bins in both vertical and horizontal directions. default is 80.
@@ -168,6 +195,8 @@ plotLockMassCorrection <- function(x, method = 'trellis'){
 #' @note TODO: define bin with dynamically as h= 2x IQR x n e-1/3 or number of bins (max-min)/h
 #' @importFrom ggplot2 ggplot aes_string geom_hex labs scale_fill_gradientn theme_light
 #' @importFrom grDevices colorRampPalette
+#' @examples 
+#' rawrr::sampleFilePath() |> read.raw() |> plotPrecursorHeatmap()
 plotPrecursorHeatmap <- function(x, method = 'overlay', bins = 80){
   spectral <- c("#5E4FA2",
                 "#3288BD",
@@ -202,7 +231,7 @@ plotPrecursorHeatmap <- function(x, method = 'overlay', bins = 80){
     ggplot2::labs(title = "precursorMass versus StartTime hexagons MS2") 
 }
 
-#' TIC and Base Peak plot function
+#' Total Ion Count and Base Peak Plot
 #' 
 #' @description Function for displaying the Total Ion Cound (TIC) and Base
 #' Peak chromatogram of a mass spectrometry measurement. 
@@ -214,6 +243,8 @@ plotPrecursorHeatmap <- function(x, method = 'overlay', bins = 80){
 #' @author Christian Trachsel (2017), Christian Panse (20231130) refactored
 #' @importFrom ggplot2 ggplot aes_string geom_line labs scale_x_continuous facet_wrap theme_light
 #' @importFrom reshape2 melt
+#' @examples
+#' rawrr::sampleFilePath() |> read.raw() |> plotTicBasepeak()
 plotTicBasepeak <- function(x, method = 'trellis'){
   stopifnot(method %in% c('trellis', 'violin', 'overlay'))
   
@@ -291,6 +322,8 @@ plotTicBasepeak <- function(x, method = 'trellis'){
 #' @importFrom dplyr left_join
 #' @importFrom stats quantile na.omit
 #' @export 
+#' @examples
+#' rawrr::sampleFilePath() |> read.raw() |> plotCycleTime()
 plotCycleTime <- function(x, method = 'trellis'){
   xx <- .cycleTime(x)
   
@@ -347,6 +380,8 @@ plotCycleTime <- function(x, method = 'trellis'){
 #' @export
 #' @importFrom ggplot2 ggplot aes_string geom_point geom_line scale_x_continuous scale_y_continuous geom_hline theme_light
 #' @importFrom rlang .data
+#' @examples
+#' rawrr::sampleFilePath() |> read.raw() |> plotInjectionTime()
 plotInjectionTime <- function(x, method = 'trellis'){
   if (method == 'trellis'){
     maxtimes <- x |>
@@ -388,4 +423,3 @@ plotInjectionTime <- function(x, method = 'trellis'){
   gp + ggplot2::labs(title = "Injection time plot") +
     ggplot2::theme_light()
 }
-

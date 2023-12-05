@@ -8,8 +8,16 @@ author:
   email: cp@fgcz.ethz.ch
 package: rawDiag
 abstract: |
-  This vignette provides a primer of the functionalities of the `r BiocStyle::Biocpkg('rawDiag')` package
-  [@Trachsel2018]. The package provides a set of functions to quickly visualize and inspect Thermo Fischer Scientific Orbitrap generated measurements. 
+  Optimizing liquid chromatography coupled to mass spectrometry (LC–MS) methods    presents a significant challenge. The 'rawDiag' package [@Trachsel2018],
+  accessible through `r BiocStyle::Biocpkg('rawDiag')`, streamlines method
+  optimization by generating MS operator-specific diagnostic plots based on
+  scan-level metadata. Tailored for use on the R shell or as a
+  `r BiocStyle::CRANpkg('shiny')` application on the Orbitrap instrument PC,
+  'rawDiag' leverages `r BiocStyle::Biocpkg('rawrr')` [@Kockmann2021] for
+  reading vendor proprietary instrument data.
+  Developed, rigorously tested, and actively employed at the
+  Functional Genomics Center Zurich ETHZ | UZH, 'rawDiag' stands as a robust
+  solution in advancing LC–MS Orbitrap method optimization."
 output:
   BiocStyle::html_document:
     toc_float: true
@@ -33,46 +41,41 @@ knitr::opts_chunk$set(fig.wide = TRUE, fig.retina = 3, error=FALSE)
 
 # Usage
 
-```{r usage, echo=FALSE, eval=TRUE}
-
-
+```{r fetchFromExperimentHub, echo=FALSE, eval=FALSE}
 # fetch via ExperimentHub
 library(ExperimentHub)
-eh <- ExperimentHub::ExperimentHub()
+eh = ExperimentHub()
 EH4547 <- normalizePath(eh[["EH4547"]])
 
 (rawfile <- paste0(EH4547, ".raw"))
 if (!file.exists(rawfile)){
   file.copy(EH4547, rawfile)
 }
+```
+
+```{r}
+rawrr::sampleFilePath() -> rawfile
+```
+
+
+```{r readOrbitrap}
+## read Orbitrap meta data
 rawfile |>
   rawDiagB::read.raw() -> x
 ```
 
-```{r plotALL, echo=FALSE, eval=TRUE, fig.width=10, fig.height=5}
+```{r plotALL, echo = FALSE, eval = TRUE, fig.width = 10, fig.height = 5}
 library(rawDiagB)
-pm <- ls("package:rawDiagB")
+pm <- ls("package:rawDiag")
 pm[grepl(pm, pattern = 'plot')] |> 
   lapply(FUN = function(plotFUN) {
     lapply(c('trellis', 'violin', 'overlay'), function(method) {
       message(paste0("plotting", plotFUN, "using method", method, "..."))
       do.call(plotFUN, list(x, method))
     })
-  })
+  }) |> print()
 ```
 
-```{r fun, echo=FALSE, eval=FALSE}
-f1 <- '/Users/cp/Downloads/20230404_OLEP08_TP_1ug_MB_60min_AS_dDIA_15ms_2Th_3.raw'
-
-f2 <- '/Users/cp/Downloads/20230906/20220915/20220830/LUMOS_1/20210527_077_autoQC4L.raw'
-
-f3 <- '/Users/cp/Downloads/WU296852/20231123_C33274_009_S583627_L_TDPwt_2_WT_L/20231123_C33274_009_S583627_L_TDPwt_2_WT_L.raw'
-library(rawDiagB)
-rawDiagB::read.raw(f1) -> S1
-rawDiagB::read.raw(f2) -> S2
-rawDiagB::read.raw(f3) -> S3
-S3 |> plotLockMassCorrection()
-```
 
 # Session information {-}
 

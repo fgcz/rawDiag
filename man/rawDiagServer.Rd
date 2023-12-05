@@ -7,13 +7,11 @@
 rawDiagServer(id, vals)
 }
 \arguments{
-\item{id}{the shiny session id.}
+\item{id}{An ID string that corresponds with the ID used to call the module's
+UI function.}
 
-\item{vals}{reactiveValues containing, e.g., the rawfile path.}
+\item{vals}{containing rawfile}
 }
 \description{
 rawDiag shiny module
-}
-\author{
-Christian Panse (2018-2023)
 }

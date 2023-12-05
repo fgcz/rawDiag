@@ -2,14 +2,14 @@
 % Please edit documentation in R/rawDiag.R
 \name{plotTicBasepeak}
 \alias{plotTicBasepeak}
-\title{TIC and Base Peak plot function}
+\title{Total Ion Count and Base Peak Plot}
 \usage{
 plotTicBasepeak(x, method = "trellis")
 }
 \arguments{
-\item{x}{a \code{\link{data.frame}} fullfilling the \code{is.rawDiag} column naming criteria.}
+\item{x}{a \code{data.frame} object adhering to the specified criteria for the \code{is.rawDiag} function.}
 
-\item{method}{a character 'trellis', 'violin' or 'overlay'.}
+\item{method}{specifying the plot method 'trellis' | 'violin' | 'overlay'. The default is 'trellis'.}
 }
 \value{
 a ggplot object for graphing the TIC and the Base Peak chromatogram
@@ -18,6 +18,9 @@ a ggplot object for graphing the TIC and the Base Peak chromatogram
 Function for displaying the Total Ion Cound (TIC) and Base
 Peak chromatogram of a mass spectrometry measurement. 
 Multiple files are handled by faceting based on rawfile name.
+}
+\examples{
+rawrr::sampleFilePath() |> read.raw() |> plotTicBasepeak()
 }
 \author{
 Christian Trachsel (2017), Christian Panse (20231130) refactored

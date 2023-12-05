@@ -1,16 +1,13 @@
 #R
 
-#stopifnot(require(rawDiagB))
-
 #' rawDiag shiny module UI
 #'
-#' @param id  session id
-
+#' @inheritParams shiny::moduleServer
 #' @export
 rawDiagUI <- function(id){
   ns <- NS(id)
   
-  plotFunctions <- ls("package:rawDiagB")[ls("package:rawDiagB")|>grepl(pattern = "^plot")]
+  plotFunctions <- ls("package:rawDiag")[ls("package:rawDiag")|>grepl(pattern = "^plot")]
   tagList(
     selectInput(ns("plotFUN"), "rawDiag plot function", choices = plotFunctions,
                 selected = plotFunctions, multiple = FALSE),
@@ -23,7 +20,7 @@ rawDiagUI <- function(id){
 
 #' rawDiag shiny module
 #'
-#' @param id shiny session id
+#' @inheritParams shiny::moduleServer
 #' @param vals containing rawfile
 #'
 #' @export
@@ -43,11 +40,11 @@ rawDiagServer <- function(id, vals){
                      progress$set(message = paste0("Reading ", length(rawfile()), " files ..."),
                                   detail = "using parallel::mclapply")
                      
-                     parallel::mclapply(rawfile(),FUN = rawDiagB::read.raw, mc.cores = parallel::detectCores()) |>
+                     parallel::mclapply(rawfile(),FUN = rawDiag::read.raw, mc.cores = parallel::detectCores()) |>
                        Reduce(f = rbind)
                    }else{
                      lapply(rawfile(), function(f){
-                       rawDiagB::read.raw(f,
+                       rawDiag::read.raw(f,
                                           msgFUN = function(msg){
                                             progress$set(detail = paste0("Reading ", basename(f)),
                                                          message = msg)

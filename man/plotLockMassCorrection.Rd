@@ -2,20 +2,20 @@
 % Please edit documentation in R/rawDiag.R
 \name{plotLockMassCorrection}
 \alias{plotLockMassCorrection}
-\title{lock mass correction plot}
+\title{Lock Mass Correction plot}
 \usage{
 plotLockMassCorrection(x, method = "trellis")
 }
 \arguments{
-\item{x}{a \code{\link{data.frame}} fullfilling the \code{is.rawDiag} column naming criteria.}
+\item{x}{a \code{data.frame} object adhering to the specified criteria for the \code{is.rawDiag} function.}
 
-\item{method}{a character 'trellis', 'violin' or 'overlay'.}
+\item{method}{specifying the plot method 'trellis' | 'violin' | 'overlay'. The default is 'trellis'.}
 }
 \value{
-a ggplot2 object
+a \code{ggplot2} object
 }
 \description{
-lock mass correction plot
+Lock Mass Correction plot
 }
 \examples{
 rawrr::sampleFilePath() |>

@@ -7,7 +7,8 @@
 rawDiagUI(id)
 }
 \arguments{
-\item{id}{session id}
+\item{id}{An ID string that corresponds with the ID used to call the module's
+UI function.}
 }
 \description{
 rawDiag shiny module UI

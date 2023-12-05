@@ -7,7 +7,7 @@
 .cycleTime(x)
 }
 \arguments{
-\item{x}{a \code{\link{data.frame}} fullfilling the \code{is.rawDiag} column naming criteria.}
+\item{x}{a \code{data.frame} object adhering to the specified criteria for the \code{is.rawDiag} function.}
 }
 \value{
 calculates the time of all ms cycles and the 95% quantile value there of. 

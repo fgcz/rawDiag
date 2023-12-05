@@ -12,18 +12,20 @@ read.raw(
 )
 }
 \arguments{
-\item{rawfile}{the name of the raw file containing the mass
-spectrometry data from the Thermo Fisher Scientific instrument.}
+\item{rawfile}{the name of the raw file containing the mass spectrometry data from the Thermo Fisher Scientific instrument.}
 
 \item{msgFUN}{this function is used for logging information while composing
 the resulting data.frame. It can also be used for shiny progress bar. The 
 default is using the \code{message}.}
 }
+\value{
+a \code{data.frame} containing the selected trailer information.
+}
 \description{
 Reads selected raw file trailer for rawDiag plot functions
 }
 \examples{
-rawrr::sampleFilePath() |> rawDiagB::read.raw()
+rawrr::sampleFilePath() |> rawDiag::read.raw()
 }
 \author{
 Christian Panse (2016-2023)

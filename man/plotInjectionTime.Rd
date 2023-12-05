@@ -7,13 +7,16 @@
 plotInjectionTime(x, method = "trellis")
 }
 \arguments{
-\item{x}{a \code{\link{data.frame}} fullfilling the \code{is.rawDiag} column naming criteria.}
+\item{x}{a \code{data.frame} object adhering to the specified criteria for the \code{is.rawDiag} function.}
 
-\item{method}{a character 'trellis', 'violin' or 'overlay'.}
+\item{method}{specifying the plot method 'trellis' | 'violin' | 'overlay'. The default is 'trellis'.}
 }
 \value{
 a \code{\link{ggplot2}} object.
 }
 \description{
 Plot Injection Time
+}
+\examples{
+rawrr::sampleFilePath() |> read.raw() |> plotInjectionTime()
 }
