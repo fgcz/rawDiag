@@ -8,7 +8,8 @@ author:
   email: cp@fgcz.ethz.ch
 package: rawDiag
 abstract: |
-  Optimizing liquid chromatography coupled to mass spectrometry (LC–MS) methods    presents a significant challenge. The 'rawDiag' package [@Trachsel2018],
+  Optimizing liquid chromatography coupled to mass spectrometry (LC–MS) methods
+  presents a significant challenge. The 'rawDiag' package [@Trachsel2018],
   accessible through `r BiocStyle::Biocpkg('rawDiag')`, streamlines method
   optimization by generating MS operator-specific diagnostic plots based on
   scan-level metadata. Tailored for use on the R shell or as a
@@ -36,7 +37,7 @@ knitr::opts_chunk$set(fig.wide = TRUE, fig.retina = 3, error=FALSE)
 ```
 
 ```{r rawDiagLogo, echo=FALSE, out.width="50%", eval=TRUE}
-  knitr::include_graphics("octopussy.png")
+knitr::include_graphics("octopussy.png")
 ```
 
 # Usage

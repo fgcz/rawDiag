@@ -1,19 +1,61 @@
 #R
 
+#' Run the rawDiag shiny application 
+#'
+#' @inheritParams shiny::runApp
+#' @param rawDir A directory containing the input raw files,
+#' default is set to the \code{$HOME/Downloads} directory.
+#' @param \ldots passed to the \code{\link{runApp}} method.
+#' @importFrom shiny runApp
+#' @export
+#' @examples
+#' \dontrun{
+#' rawDiag::shiny(launch.browser = TRUE, display.mode = 'normal')
+#' 
+#' ## embracing the command line
+#' 
+#' # MacOSX and Linux
+#' R -e "rawDiag::shiny(launch.browser = TRUE)"
+#' 
+#' # Microsoft Windows
+#' R.exe -e "rawDiag::shiny(launch.browser = TRUE)"
+#' }
+shiny <- function(appDir = system.file('shiny', package = 'rawDiag'), 
+                  rawDir = (Sys.getenv('HOME') |>
+                              file.path("Downloads")),
+                  ...){
+  
+  files <<- rawDir |>
+    file.path(rawDir |>
+                list.files(recursive = TRUE,
+                           pattern = "*.raw$"))
+  
+  shiny::runApp(appDir,  ...)
+}
+
 #' rawDiag shiny module UI
 #' @return a shiny UI module
 #' @inheritParams shiny::moduleServer
 rawDiagUI <- function(id){
   ns <- NS(id)
   
-  plotFunctions <- ls("package:rawDiag")[ls("package:rawDiag")|>grepl(pattern = "^plot")]
+  plotFunctions <- ls("package:rawDiag")[ls("package:rawDiag") |> grepl(pattern = "^plot")]
   tagList(
-    selectInput(ns("plotFUN"), "rawDiag plot function", choices = plotFunctions,
-                selected = plotFunctions, multiple = FALSE),
-    selectInput(ns("plotArg"), "rawDiag plot argument", choices = c("trellis", "violin", "overlay"),
-                selected = "trellis", multiple = FALSE),
-    checkboxInput(ns('useParallel'), 'Use parallel processing (mclapply)', value = TRUE),
-    plotOutput(ns("plot"))
+    fluidRow(a(img(src="https://img.shields.io/badge/JPR-10.1021%2Facs.jproteome.8b00173-brightgreen"),
+               href='http://dx.doi.org/10.1021/acs.jproteome.8b00173')),
+    fluidRow(
+      column(width = 4,
+             selectInput(ns("plotFUN"), "function", choices = plotFunctions,
+                         selected = plotFunctions[1], multiple = FALSE)),
+      column(width = 4,
+             selectInput(ns("plotArg"), "argument", choices = c("trellis", "violin", "overlay"),
+                         selected = "trellis", multiple = FALSE),
+      ),
+      column(width = 3,
+             checkboxInput(ns('useParallel'), 'Use parallel processing (mclapply)', value = TRUE)
+      )),
+   
+    fluidRow(plotOutput(ns("plot")))
   )
 }
 
@@ -26,11 +68,13 @@ rawDiagUI <- function(id){
 rawDiagServer <- function(id, vals){
   moduleServer(id,
                function(input, output, session) {
-                 rawfile <- reactive({ vals$rawfile }) |> debounce(2000)
+                 rawfile <- reactive({ vals$rawfile }) |>
+                   debounce(2000)
                  data <- reactive({
                    shiny::req(rawfile())
                    
                    progress <- shiny::Progress$new(session = session)
+                   progress$set(message = "Reading Index ...")
                    on.exit(progress$close())
                    
                    if (input$useParallel & parallel::detectCores() > 1 & length(rawfile()) > 1){
@@ -42,10 +86,10 @@ rawDiagServer <- function(id, vals){
                    }else{
                      lapply(rawfile(), function(f){
                        rawDiag::read.raw(f,
-                                          msgFUN = function(msg){
-                                            progress$set(detail = paste0("Reading ", basename(f)),
-                                                         message = msg)
-                                          })
+                                         msgFUN = function(msg){
+                                           progress$set(detail = paste0("Reading ", basename(f)),
+                                                        message = msg)
+                                         })
                      }) |>
                        Reduce(f = rbind)
                    }
@@ -63,6 +107,11 @@ rawDiagServer <- function(id, vals){
                  
                  output$plot <- renderPlot({
                    shiny::req(data(), input$plotFUN, input$plotArg)
+                   progress <- shiny::Progress$new(session = session)
+                   progress$set(message = "plotting ...")
+                   on.exit(progress$close())
+                   
+                   
                    do.call(what = input$plotFUN,
                            args = list(x = data(),
                                        method = input$plotArg))

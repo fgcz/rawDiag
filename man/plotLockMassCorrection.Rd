@@ -2,7 +2,7 @@
 % Please edit documentation in R/rawDiag.R
 \name{plotLockMassCorrection}
 \alias{plotLockMassCorrection}
-\title{Lock Mass Correction plot}
+\title{Lock Mass Correction Plot}
 \usage{
 plotLockMassCorrection(x, method = "trellis")
 }
@@ -12,10 +12,10 @@ plotLockMassCorrection(x, method = "trellis")
 \item{method}{specifying the plot method 'trellis' | 'violin' | 'overlay'. The default is 'trellis'.}
 }
 \value{
-a \code{ggplot2} object
+a \code{ggplot2} object.
 }
 \description{
-Lock Mass Correction plot
+Lock Mass Correction Plot
 }
 \examples{
 rawrr::sampleFilePath() |>

@@ -2,7 +2,7 @@
 % Please edit documentation in R/rawDiag.R
 \name{is.rawDiag}
 \alias{is.rawDiag}
-\title{Is an Object from a rawDiag class?}
+\title{Is an Object an rawDiag Object?}
 \usage{
 is.rawDiag(object)
 }
@@ -13,7 +13,7 @@ is.rawDiag(object)
 a boolean
 }
 \description{
-Is an Object from a rawDiag class?
+Is an Object an rawDiag Object?
 }
 \examples{
 rawrr::sampleFilePath() |> rawDiag::read.raw() |> rawDiag::is.rawDiag()

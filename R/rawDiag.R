@@ -1,6 +1,4 @@
 #R
-# contains selected rawDiag plot methods
-# 
 
 #' Reads selected raw file trailer for rawDiag plot functions
 #' 
@@ -82,12 +80,12 @@ read.raw <- function(rawfile, msgFUN = function(x){message(x)}){
 .rawDiagColumns <- function(){
     c("scan", "scanType", "StartTime", "precursorMass",
       "MSOrder", "charge", "masterScan", "dependencyType", 
-      "TIC", "BasePeakIntensity", "ElapsedScanTimesec", "rawfile", 
-      "LMCorrection", "AGC", "PrescanMode", "FTResolution") |>
+      "TIC", "BasePeakIntensity", "ElapsedScanTimesec", "rawfile", "AGC",
+      "LMCorrection", "PrescanMode", "FTResolution") |>
         sort()
 }
 
-#' Is an Object from a rawDiag class?
+#' Is an Object an rawDiag Object?
 #'
 #' @inheritParams methods::is
 #' @return a boolean
@@ -120,21 +118,21 @@ validate_read.raw <- function(x){
   
   for (i in IndexColNames){
     if (!(i %in% colnames(x))){
-      msg <- sprintf("Missing column %d.", i)
-      message(msg)
+      msg <- sprintf("Missing column %s.", i)
+      warning(msg)
       valideIndex <- FALSE
     }
   }
   
-  stopifnot(validateIndex)
+  # stopifnot(valideIndex)
   return(x)
 }
 
-#' Lock Mass Correction plot
+#' Lock Mass Correction Plot
 #' 
 #' @param x a \code{data.frame} object adhering to the specified criteria for the \code{is.rawDiag} function.
 #' @param method specifying the plot method 'trellis' | 'violin' | 'overlay'. The default is 'trellis'.
-#' @return a \code{ggplot2} object
+#' @return a \code{ggplot2} object.
 #' @author Christian Trachsel (2017), Christian Panse (2023)
 #' @references rawDiag \doi{10.1021/acs.jproteome.8b00173}
 #' @examples 
@@ -151,7 +149,7 @@ plotLockMassCorrection <- function(x, method = 'trellis'){
   
   if (method %in% c('trellis')){
     x |>
-      ggplot2::ggplot(ggplot2::aes_string(x = "StartTime" , y = "LMCorrection")) +
+      ggplot2::ggplot(ggplot2::aes(x = .data$StartTime , y = .data$LMCorrection)) +
       ggplot2::geom_hline(yintercept = c(-5, 5), colour = "red3", linetype = "longdash") +
       ggplot2::geom_line(linewidth = 0.3) +
       ggplot2::geom_line(stat = "smooth",
@@ -160,7 +158,7 @@ plotLockMassCorrection <- function(x, method = 'trellis'){
                          colour = "deepskyblue3", se = FALSE) -> gp
   }else if(method %in% c('overlay')){
     x |>
-      ggplot2::ggplot(ggplot2::aes_string(x = "StartTime" , y = "LMCorrection", colour = "rawfile")) +
+      ggplot2::ggplot(ggplot2::aes_string(x = .data$StartTime , y = .data$LMCorrection, colour = .data$rawfile)) +
       ggplot2::geom_hline(yintercept = c(-5, 5), colour = "red3", linetype = "longdash") +
       ggplot2::geom_line(linewidth = 0.3) +
       ggplot2::geom_line(stat = "smooth",
@@ -185,7 +183,7 @@ plotLockMassCorrection <- function(x, method = 'trellis'){
   gp
 }
 
-#' Precursor Mass versus StartTime  MS2 based hexagons
+#' Precursor Mass versus StartTime MS2 based hexagons
 #' 
 #' @inheritParams plotLockMassCorrection
 #' @param bins number of bins in both vertical and horizontal directions. default is 80.
@@ -238,7 +236,7 @@ plotPrecursorHeatmap <- function(x, method = 'overlay', bins = 80){
 #' Multiple files are handled by faceting based on rawfile name.
 #'
 #' @inheritParams plotLockMassCorrection
-#' @return a ggplot object for graphing the TIC and the Base Peak chromatogram
+#' @return a ggplot2 object for graphing the TIC and the Base Peak chromatogram.
 #' @export
 #' @author Christian Trachsel (2017), Christian Panse (20231130) refactored
 #' @importFrom ggplot2 ggplot aes_string geom_line labs scale_x_continuous facet_wrap theme_light

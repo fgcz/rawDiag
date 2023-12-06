@@ -6,7 +6,7 @@
 #
 #    http://shiny.rstudio.com/
 #
-library(rawDiag)
+stopifnot(require(rawDiag))
 
 # Define server logic required to draw a histogram
 function(input, output, session) {
@@ -14,6 +14,6 @@ function(input, output, session) {
     vals <- reactiveValues(rawfile  = NA)
     
     observeEvent(input$rawfile, {vals$rawfile = input$rawfile; message(vals$rawfile )})
-    rawDiagServer("test", vals)
+    rawDiag:::rawDiagServer("test", vals)
 
 }

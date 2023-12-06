@@ -7,10 +7,10 @@
 #    http://shiny.rstudio.com/
 #
 
-library(rawDiag)
+stopifnot(require(rawDiag))
 
-rootdir <- "/home/cp/Downloads/PXD006932ls/"
-files <- file.path(rootdir, list.files(rootdir, pattern = '*.raw'))
+#rootdir <- file.path(Sys.getenv('HOME'), "/Downloads/20230906/20220915/20220830/autoQC4L/LUMOS_2/")
+#files <- file.path(rootdir, list.files(rootdir, pattern = '*.raw'))
 
 # Define UI for application that draws a histogram
 fluidPage(
@@ -30,7 +30,7 @@ fluidPage(
         
         # Show a plot of the generated distribution
         mainPanel(
-            rawDiagUI("test")
+            rawDiag:::rawDiagUI("test")
             #plotOutput("distPlot")
         )
     )

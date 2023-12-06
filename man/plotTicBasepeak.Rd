@@ -12,7 +12,7 @@ plotTicBasepeak(x, method = "trellis")
 \item{method}{specifying the plot method 'trellis' | 'violin' | 'overlay'. The default is 'trellis'.}
 }
 \value{
-a ggplot object for graphing the TIC and the Base Peak chromatogram
+a ggplot2 object for graphing the TIC and the Base Peak chromatogram.
 }
 \description{
 Function for displaying the Total Ion Cound (TIC) and Base

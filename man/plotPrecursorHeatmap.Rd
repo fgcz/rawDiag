@@ -2,7 +2,7 @@
 % Please edit documentation in R/rawDiag.R
 \name{plotPrecursorHeatmap}
 \alias{plotPrecursorHeatmap}
-\title{Precursor Mass versus StartTime  MS2 based hexagons}
+\title{Precursor Mass versus StartTime MS2 based hexagons}
 \usage{
 plotPrecursorHeatmap(x, method = "overlay", bins = 80)
 }
@@ -17,7 +17,7 @@ plotPrecursorHeatmap(x, method = "overlay", bins = 80)
 a ggplot2 object.
 }
 \description{
-Precursor Mass versus StartTime  MS2 based hexagons
+Precursor Mass versus StartTime MS2 based hexagons
 }
 \note{
 TODO: define bin with dynamically as h= 2x IQR x n e-1/3 or number of bins (max-min)/h
