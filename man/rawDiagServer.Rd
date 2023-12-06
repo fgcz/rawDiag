@@ -12,6 +12,9 @@ UI function.}
 
 \item{vals}{containing rawfile}
 }
+\value{
+shiny module server
+}
 \description{
 rawDiag shiny module
 }

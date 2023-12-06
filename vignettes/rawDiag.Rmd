@@ -41,7 +41,7 @@ knitr::opts_chunk$set(fig.wide = TRUE, fig.retina = 3, error=FALSE)
 
 # Usage
 
-```{r fetchFromExperimentHub, echo=FALSE, eval=FALSE}
+```{r fetchFromExperimentHub, echo=FALSE, eval=TRUE}
 # fetch via ExperimentHub
 library(ExperimentHub)
 eh = ExperimentHub()
@@ -51,9 +51,13 @@ EH4547 <- normalizePath(eh[["EH4547"]])
 if (!file.exists(rawfile)){
   file.copy(EH4547, rawfile)
 }
+
+
+
+
 ```
 
-```{r}
+```{r eval=FALSE, echo=FALSE}
 rawrr::sampleFilePath() -> rawfile
 ```
 
@@ -61,11 +65,11 @@ rawrr::sampleFilePath() -> rawfile
 ```{r readOrbitrap}
 ## read Orbitrap meta data
 rawfile |>
-  rawDiagB::read.raw() -> x
+  rawDiag::read.raw() -> x
 ```
 
 ```{r plotALL, echo = FALSE, eval = TRUE, fig.width = 10, fig.height = 5}
-library(rawDiagB)
+library(rawDiag)
 pm <- ls("package:rawDiag")
 pm[grepl(pm, pattern = 'plot')] |> 
   lapply(FUN = function(plotFUN) {

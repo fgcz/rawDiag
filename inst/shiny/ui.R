@@ -7,7 +7,7 @@
 #    http://shiny.rstudio.com/
 #
 
-library(rawDiagB)
+library(rawDiag)
 
 rootdir <- "/home/cp/Downloads/PXD006932ls/"
 files <- file.path(rootdir, list.files(rootdir, pattern = '*.raw'))

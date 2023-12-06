@@ -317,10 +317,11 @@ plotTicBasepeak <- function(x, method = 'trellis'){
 #' dashed line.
 #' 
 #' @return a \code{\link{ggplot2}} object.
-#' @importFrom ggplot2 ggplot aes_string geom_point geom_line scale_x_continuous scale_y_continuous geom_hline theme_light
+#' @importFrom ggplot2 ggplot aes geom_point geom_line scale_x_continuous scale_y_continuous geom_hline theme_light
 #' @importFrom scales pretty_breaks
 #' @importFrom dplyr left_join
 #' @importFrom stats quantile na.omit
+#' @importFrom rlang .data
 #' @export 
 #' @examples
 #' rawrr::sampleFilePath() |> read.raw() |> plotCycleTime()
@@ -329,21 +330,20 @@ plotCycleTime <- function(x, method = 'trellis'){
   
   if (method == 'trellis'){
     xx |> 
-      ggplot2::ggplot(ggplot2::aes_string(x = "StartTime", y = "CycleTime")) + 
+      ggplot2::ggplot(ggplot2::aes(x = .data$StartTime, y = .data$CycleTime)) + 
       ggplot2::geom_point(shape = ".") +
-      ggplot2::geom_line(stat = "smooth", method = "gam", formula = y ~ s(x, bs= "cs"), colour = "deepskyblue3", se = FALSE) +
+      ggplot2::geom_line(stat = "smooth", method = "gam", formula = y ~ s(x, bs= "cs"),
+                         colour = "deepskyblue3", se = FALSE) +
       ggplot2::scale_x_continuous(breaks = scales::pretty_breaks(8)) +
       ggplot2::scale_y_continuous(breaks = scales::pretty_breaks(8)) +
-      ggplot2::geom_hline(ggplot2::aes_string(yintercept = "quan", group = "rawfile"), colour = "red3", linetype = "longdash") +
+      ggplot2::geom_hline(ggplot2::aes(yintercept = .data$quan, group = .data$rawfile),
+                          colour = "red3", linetype = "longdash") +
       ggplot2::facet_grid(rawfile ~ ., scales = "free") +
       ggplot2::labs(subtitle = "Plotting the caclulated cycle time of each cycle vs retention time") + 
       ggplot2::labs(x = "Retention Time [min]", y = "Cycle Time [sec]") -> gp
   }else if (method == 'violin'){
-    #xx |>
-      #dplyr::select_at(dplyr::vars("rawfile", "quan")) |>
-      #distinct() -> dots
     xx |>
-      ggplot2::ggplot(ggplot2::aes_string(x = "rawfile", y = "CycleTime")) + 
+      ggplot2::ggplot(ggplot2::aes(x = .data$rawfile, y = .data$CycleTime)) + 
       ggplot2::geom_violin()  +
       ggplot2::scale_y_continuous(breaks = scales::pretty_breaks(8)) +
       ggplot2::labs(subtitle = "Plotting the cycle time density of all mass spectrometry runs") +
@@ -351,10 +351,10 @@ plotCycleTime <- function(x, method = 'trellis'){
       ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90)) -> gp
   } else if(method == 'overlay'){
     xx|>
-      ggplot2::ggplot(ggplot2::aes_string(x = "StartTime", y = "CycleTime", colour = "rawfile")) + 
+      ggplot2::ggplot(ggplot2::aes(x = .data$StartTime, y = .data$CycleTime, colour = .data$rawfile)) + 
       ggplot2::geom_point(size = 0.5) +
-      ggplot2::geom_line(ggplot2::aes_string(group = "rawfile",
-                                             colour = "rawfile"),
+      ggplot2::geom_line(ggplot2::aes(group = .data$rawfile,
+                                             colour = .data$rawfile),
                          stat = "smooth", method = "gam",
                          formula = y ~ s(x, bs= "cs"), se = FALSE) +
       ggplot2::scale_x_continuous(breaks = scales::pretty_breaks(8)) +
@@ -378,7 +378,7 @@ plotCycleTime <- function(x, method = 'trellis'){
 #' 
 #' @return a \code{\link{ggplot2}} object.
 #' @export
-#' @importFrom ggplot2 ggplot aes_string geom_point geom_line scale_x_continuous scale_y_continuous geom_hline theme_light
+#' @importFrom ggplot2 ggplot aes geom_point geom_line scale_x_continuous scale_y_continuous geom_hline theme_light
 #' @importFrom rlang .data
 #' @examples
 #' rawrr::sampleFilePath() |> read.raw() |> plotInjectionTime()
@@ -389,9 +389,11 @@ plotInjectionTime <- function(x, method = 'trellis'){
       dplyr::summarise(maxima = max(.data$IonInjectionTime))
     
     ggplot2::ggplot(x, ggplot2::aes(x = .data$StartTime, y = .data$IonInjectionTime)) +
-      ggplot2::geom_hline(data = maxtimes, ggplot2::aes_string(yintercept = "maxima"), colour = "red3", linetype = "longdash") +
+      ggplot2::geom_hline(data = maxtimes, ggplot2::aes(yintercept = .data$maxima),
+                          colour = "red3", linetype = "longdash") +
       ggplot2::geom_point(shape = ".") +
-      ggplot2::geom_line(stat = "smooth", method = "gam", formula = y ~ s(x, bs= "cs"), colour = "deepskyblue3", se = FALSE) +
+      ggplot2::geom_line(stat = "smooth", method = "gam", formula = y ~ s(x, bs= "cs"),
+                         colour = "deepskyblue3", se = FALSE) +
       ggplot2::facet_grid(rawfile ~ MSOrder, scales = "free") +
       ggplot2::scale_y_continuous(breaks = scales::pretty_breaks((n = 8))) +
       ggplot2::scale_x_continuous(breaks = scales::pretty_breaks((n = 8))) +

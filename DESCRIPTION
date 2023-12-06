@@ -16,7 +16,8 @@ Imports:
   rlang,
   reshape2,
   scales,
-  shiny
+  shiny,
+  stats
 Suggests:
   BiocStyle (>= 2.28),
   ExperimentHub,
@@ -28,12 +29,11 @@ Description: Optimizing methods for liquid chromatography coupled to mass
   facilitates rational method optimization by generating MS operator-tailored
   diagnostic plots of scan-level metadata. The package is designed for use on
   the R shell or as a Shiny application on the Orbitrap instrument PC.
-  The package is developed, tested and used at the Functional Genomics Center
-  Zurich ETHZ | UZH.
 License: GPL-3
-URL: https://github.com/fgcz/rawDiag/
-BugReports: https://github.com/fgcz/rawDiag/issues
+URL: https://github.com/cpanse/rawDiag/
+BugReports: https://github.com/cpanse/rawDiag/issues
 Encoding: UTF-8
 NeedsCompilation: no
 RoxygenNote: 7.2.3
 VignetteBuilder: knitr
+biocViews: MassSpectrometry, Proteomics, Metabolomics

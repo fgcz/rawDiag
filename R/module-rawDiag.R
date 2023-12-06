@@ -1,9 +1,8 @@
 #R
 
 #' rawDiag shiny module UI
-#'
+#' @return a shiny UI module
 #' @inheritParams shiny::moduleServer
-#' @export
 rawDiagUI <- function(id){
   ns <- NS(id)
   
@@ -22,11 +21,9 @@ rawDiagUI <- function(id){
 #'
 #' @inheritParams shiny::moduleServer
 #' @param vals containing rawfile
-#'
-#' @export
+#' @return shiny module server
 #' @importFrom shiny moduleServer reactive reactiveValues observeEvent renderPlot req NS tagList selectInput checkboxInput plotOutput debounce
 rawDiagServer <- function(id, vals){
-  
   moduleServer(id,
                function(input, output, session) {
                  rawfile <- reactive({ vals$rawfile }) |> debounce(2000)
