@@ -16,21 +16,23 @@ stopifnot(require(rawDiag))
 fluidPage(
     
     # Application title
-    titlePanel("Brings Orbitrap Mass Spectrometry Data to Life; Fast and Colorful"),
+    titlePanel("rawDiag - Brings Orbitrap Mass Spectrometry Data to Life; Fast and Colorful"),
     
     # Sidebar with a slider input for number of bins
     sidebarLayout(
         sidebarPanel(
             tagList(
+                # html::img(src='https://github.com/cpanse/rawDiag/blob/main/vignettes/octopussy.png', height = 100),
                 selectInput("rawfile", "rawfile",
                             choices = files,
                             selected = files[1], width = "100%", multiple = TRUE),
+                downloadButton("downloadPdf", "Download")
             )
         ),
         
         # Show a plot of the generated distribution
         mainPanel(
-            rawDiag:::rawDiagUI("test")
+            rawDiag:::rawDiagUI("OrbitrapFun02")
             #plotOutput("distPlot")
         )
     )

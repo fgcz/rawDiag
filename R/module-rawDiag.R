@@ -8,10 +8,10 @@
 #' @param \ldots passed to the \code{\link{runApp}} method.
 #' @importFrom shiny runApp
 #' @export
+#' @examplesIf interactive()
+#' rawDiag::shiny(rawDir = (rawrr::sampleFilePath() |> dirname()))
 #' @examples
 #' \dontrun{
-#' rawDiag::shiny(launch.browser = TRUE, display.mode = 'normal')
-#' 
 #' ## embracing the command line
 #' 
 #' # MacOSX and Linux
@@ -73,6 +73,7 @@ rawDiagServer <- function(id, vals){
                function(input, output, session) {
                  rawfile <- reactive({ vals$rawfile }) |>
                    debounce(2000)
+                 
                  data <- reactive({
                    shiny::req(rawfile())
                    progress <- shiny::Progress$new(session = session)
@@ -91,7 +92,7 @@ rawDiagServer <- function(id, vals){
                      lapply(rawfile(), function(f){
                        rawDiag::read.raw(f,
                                          msgFUN = function(msg){
-                                           progress$set(detail = paste0("Reading ", basename(f)),
+                                           progress$set(detail = paste0("from file ", basename(f)),
                                                         message = msg)
                                          })
                      }) |>
@@ -100,7 +101,7 @@ rawDiagServer <- function(id, vals){
                  })
                  
                  
-                 observeEvent(input$plotFUN, {message(input$plotFUN)})
+                 observeEvent(input$plotFUN, {vals$plot <- input$plotFUN;  message(input$plotFUN)})
                  
                  
                  dynamicHeight <- reactive({
@@ -115,11 +116,14 @@ rawDiagServer <- function(id, vals){
                    progress$set(message = "plotting ...")
                    on.exit(progress$close())
                    
-                   
                    do.call(what = input$plotFUN,
                            args = list(x = data(),
-                                       method = input$plotArg))
+                                       method = input$plotArg)) -> gp
+                   vals$gp <- gp
+                   gp
                  }, height = function()dynamicHeight(), width = 800)
                }
+               
+               
   )
 }
