@@ -128,6 +128,20 @@ validate_read.raw <- function(x){
   return(x)
 }
 
+
+.plotMissingData <- function(){
+  ggplot2::ggplot() +
+    geom_blank() +
+    theme_void() +
+    labs(
+      title = "Oops! Missing Data Detected",
+      subtitle = "It seems there are missing values in your data.",
+      caption = "Please handle missing data before creating the plot."
+    ) -> ggplot_error_message 
+  
+  print(ggplot_error_message)
+}
+
 #' Lock Mass Correction Plot
 #' 
 #' @param x a \code{data.frame} object adhering to the specified criteria for the \code{is.rawDiag} function.
@@ -142,7 +156,7 @@ validate_read.raw <- function(x){
 #' @importFrom ggplot2 ggplot aes_string geom_hline geom_line labs scale_x_continuous facet_wrap theme_light
 #' @export
 plotLockMassCorrection <- function(x, method = 'trellis'){
-  stopifnot("LMCorrection" %in% colnames(x))
+  if(isFALSE("LMCorrection" %in% colnames(x))) {return(.plotMissingData())}
 
   x |>
     base::subset(x['MSOrder'] == "Ms") -> x
