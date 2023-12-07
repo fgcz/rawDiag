@@ -129,17 +129,16 @@ validate_read.raw <- function(x){
 }
 
 
+#' @importFrom ggplot2 geom_blank theme_void
 .plotMissingData <- function(){
   ggplot2::ggplot() +
-    geom_blank() +
-    theme_void() +
-    labs(
+    ggplot2::geom_blank() +
+    ggplot2::theme_void() +
+    ggplot2::labs(
       title = "Oops! Missing Data Detected",
       subtitle = "It seems there are missing values in your data.",
       caption = "Please handle missing data before creating the plot."
-    ) -> ggplot_error_message 
-  
-  print(ggplot_error_message)
+    ) 
 }
 
 #' Lock Mass Correction Plot
