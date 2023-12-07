@@ -15,7 +15,7 @@
 #' ## embracing the command line
 #' 
 #' # MacOSX and Linux
-#' R -e "rawDiag::shiny(launch.browser = TRUE)"
+#' R -q -e "rawDiag::shiny(launch.browser = TRUE)"
 #' 
 #' # Microsoft Windows
 #' R.exe -e "rawDiag::shiny(launch.browser = TRUE)"
@@ -25,10 +25,13 @@ shiny <- function(appDir = system.file('shiny', package = 'rawDiag'),
                               file.path("Downloads")),
                   ...){
   
-  files <<- rawDir |>
+  rawDir |>
     file.path(rawDir |>
                 list.files(recursive = TRUE,
-                           pattern = "*.raw$"))
+                           pattern = "*.raw$")) -> files
+  
+  sapply(files, FUN=file.mtime) |> order() -> idx
+  files[rev(idx)] ->> files
   
   shiny::runApp(appDir,  ...)
 }
