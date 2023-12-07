@@ -146,9 +146,9 @@ validate_read.raw <- function(x){
 #' 
 #' @param x a \code{data.frame} object adhering to the specified criteria for the \code{is.rawDiag} function.
 #' @param method specifying the plot method 'trellis' | 'violin' | 'overlay'. The default is 'trellis'.
-#' @return a \code{ggplot2} object.
+#' @return a \code{\link[ggplot2]{ggplot}} object.
 #' @author Christian Trachsel (2017), Christian Panse (2023)
-#' @references rawDiag \doi{10.1021/acs.jproteome.8b00173}
+#' @references \doi{10.1021/acs.jproteome.8b00173}, \doi{10.1021/acs.jproteome.0c00866}
 #' @examples 
 #' rawrr::sampleFilePath() |>
 #'   read.raw() |>
@@ -199,9 +199,8 @@ plotLockMassCorrection <- function(x, method = 'trellis'){
 
 #' Precursor Mass versus StartTime MS2 based hexagons
 #' 
-#' @inheritParams plotLockMassCorrection
+#' @inherit plotLockMassCorrection params return references author
 #' @param bins number of bins in both vertical and horizontal directions. default is 80.
-#' @return a ggplot2 object.
 #' @author Christian Trachsel (2017)
 #' @export
 #' @note TODO: define bin with dynamically as h= 2x IQR x n e-1/3 or number of bins (max-min)/h
@@ -321,14 +320,12 @@ plotTicBasepeak <- function(x, method = 'trellis'){
 
 #' Plot Cycle Time
 #' 
-#' @inheritParams plotLockMassCorrection
-#' 
+#' @inherit plotLockMassCorrection params return
 #' @description  Graphs the time difference between two consecutive MS1 scans
 #' (cycle time) with respect to RT (scatter plots) or its density (violin).
 #' A smooth curve graphs the trend. The 95th percentile is indicated by a red
 #' dashed line.
 #' 
-#' @return a \code{\link{ggplot2}} object.
 #' @importFrom ggplot2 ggplot aes geom_point geom_line scale_x_continuous scale_y_continuous geom_hline theme_light
 #' @importFrom scales pretty_breaks
 #' @importFrom dplyr left_join
@@ -386,9 +383,7 @@ plotCycleTime <- function(x, method = 'trellis'){
 
 #' Plot Injection Time
 #'
-#' @inheritParams plotLockMassCorrection
-#' 
-#' @return a \code{\link{ggplot2}} object.
+#' @inherit plotLockMassCorrection params return  references author
 #' @export
 #' @importFrom ggplot2 ggplot aes geom_point geom_line scale_x_continuous scale_y_continuous geom_hline theme_light
 #' @importFrom rlang .data
@@ -437,3 +432,52 @@ plotInjectionTime <- function(x, method = 'trellis'){
   gp + ggplot2::labs(title = "Injection time plot") +
     ggplot2::theme_light()
 }
+
+#' Mass Distribution Plot
+#'
+#' @description plots the mass frequency in dependency to the charge state
+#' @inherit plotLockMassCorrection params return references author
+#' @examples
+#' rawrr::sampleFilePath() |> rawDiag::read.raw() |> rawDiag::plotMassDistribution('overlay')
+#' @export
+plotMassDistribution <- function(x, method = 'trellis'){ 
+  x[x['MSOrder'] == 'Ms2', c('MSOrder', 'charge','rawfile', 'precursorMass')] -> xx
+  
+  xx$deconv <-  round((xx$precursorMass - 1.00782) * xx$charge, 0)
+  xx$charge <- factor(xx$charge)
+  if (method == 'trellis'){
+    xx |>
+      ggplot2::ggplot(ggplot2::aes(x = .data$deconv, fill = .data$charge, colour = .data$charge)) +
+      ggplot2::geom_histogram(binwidth = 50, alpha = 0.3, position = "identity") +
+      ggplot2::labs(title = "Precursor mass to charge frequency plot ") +
+      ggplot2::labs(subtitle = "Plotting charge state resolved frequency of precursor masses") +
+      ggplot2::labs(x = "Precursor neutral mass [Da]", y = "Frequency [counts]") +
+      ggplot2::labs(fill = "Charge State", colour = "Charge State") +
+      ggplot2::scale_x_continuous(breaks = scales::pretty_breaks(8)) +
+      ggplot2::coord_cartesian(xlim = range(xx$deconv)) +
+      ggplot2::theme_light() + 
+      ggplot2::facet_wrap(~ .data$rawfile) -> gp
+  }else if (method == 'violin'){ #mz.frequency.violin
+    xx |>
+      ggplot2::ggplot(ggplot2::aes(x = .data$charge, y = .data$deconv, fill = .data$rawfile)) +
+      ggplot2::geom_violin() +
+      ggplot2::labs(title = "Precursor mass to charge density plot ") +
+      ggplot2::labs(subtitle = "Plotting the charge state resolved precursor masse density for each mass spectrometry run") +
+      ggplot2::labs(x = "Charge State ", y = "Neutral Mass [Da]") +
+      ggplot2::theme_light() +
+      ggplot2::theme(legend.position = "top") -> gp
+  }else if (method == 'overlay'){ #mz.frequency.overlay
+    xx |> 
+      ggplot2::ggplot(ggplot2::aes(x = .data$deconv, colour = .data$rawfile)) +
+      ggplot2::geom_line(stat = "density") +
+      ggplot2::labs(title = "Precursor mass density plot ") +
+      ggplot2::labs(subtitle = "Plotting the precursor masse density for each mass spectrometry run") +
+      ggplot2::labs(x = "Precursor mass [neutral mass]", y = "Density") +
+      ggplot2::scale_x_continuous(breaks = scales::pretty_breaks(12)) +
+      ggplot2::coord_cartesian(xlim = range(xx$deconv)) +
+      ggplot2::theme_light() +
+      ggplot2::theme(legend.position = "top") -> gp
+  }else{NULL}
+  gp
+}
+

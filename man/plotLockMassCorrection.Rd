@@ -12,7 +12,7 @@ plotLockMassCorrection(x, method = "trellis")
 \item{method}{specifying the plot method 'trellis' | 'violin' | 'overlay'. The default is 'trellis'.}
 }
 \value{
-a \code{ggplot2} object.
+a \code{\link[ggplot2]{ggplot}} object.
 }
 \description{
 Lock Mass Correction Plot
@@ -23,7 +23,7 @@ rawrr::sampleFilePath() |>
   plotLockMassCorrection()
 }
 \references{
-rawDiag \doi{10.1021/acs.jproteome.8b00173}
+\doi{10.1021/acs.jproteome.8b00173}, \doi{10.1021/acs.jproteome.0c00866}
 }
 \author{
 Christian Trachsel (2017), Christian Panse (2023)

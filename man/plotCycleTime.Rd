@@ -12,7 +12,7 @@ plotCycleTime(x, method = "trellis")
 \item{method}{specifying the plot method 'trellis' | 'violin' | 'overlay'. The default is 'trellis'.}
 }
 \value{
-a \code{\link{ggplot2}} object.
+a \code{\link[ggplot2]{ggplot}} object.
 }
 \description{
 Graphs the time difference between two consecutive MS1 scans

@@ -6,7 +6,7 @@
 \usage{
 shiny(
   appDir = system.file("shiny", package = "rawDiag"),
-  dir = (file.path(Sys.getenv("HOME"), "Downloads")),
+  rawDir = (file.path(Sys.getenv("HOME"), "Downloads")),
   ...
 )
 }
@@ -37,7 +37,7 @@ rawDiag::shiny(launch.browser = TRUE, display.mode = 'normal')
 ## embracing the command line
 
 # MacOSX and Linux
-R -e "rawDiag::shiny(launch.browser = TRUE)"
+R -q -e "rawDiag::shiny(launch.browser = TRUE)"
 
 # Microsoft Windows
 R.exe -e "rawDiag::shiny(launch.browser = TRUE)"
