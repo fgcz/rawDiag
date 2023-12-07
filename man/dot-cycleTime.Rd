@@ -7,18 +7,19 @@
 .cycleTime(x)
 }
 \arguments{
-\item{x}{a \code{data.frame} object adhering to the specified criteria for the \code{is.rawDiag} function.}
+\item{x}{a \code{data.frame} object adhering to the specified criteria for
+the \code{is.rawDiag} function.}
 }
 \value{
 calculates the time of all ms cycles and the 95% quantile value there of. 
 the cycle time is defined as the time between two consecutive MS1 scans
 }
 \description{
-Graphs the lock mass deviations along RT.
+calculates the lock mass deviations along RT.
 }
-\details{
-TODO: quan
-tile part needed? If no MS1 scan is present? -> DIA take lowest window as cycle indicator?
+\note{
+TODO: quantile part needed? If no MS1 scan is present?
+E.g., DIA take lowest window as cycle indicator?
 }
 \author{
 Christian Trachsel (2017), Christian Panse (20231201) refactored

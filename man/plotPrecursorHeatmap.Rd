@@ -7,9 +7,11 @@
 plotPrecursorHeatmap(x, method = "overlay", bins = 80)
 }
 \arguments{
-\item{x}{a \code{data.frame} object adhering to the specified criteria for the \code{is.rawDiag} function.}
+\item{x}{a \code{data.frame} object adhering to the specified criteria for
+the \code{is.rawDiag} function.}
 
-\item{method}{specifying the plot method 'trellis' | 'violin' | 'overlay'. The default is 'trellis'.}
+\item{method}{specifying the plot method 'trellis' | 'violin' | 'overlay'.
+The default is 'trellis'.}
 
 \item{bins}{number of bins in both vertical and horizontal directions. default is 80.}
 }
@@ -26,7 +28,10 @@ TODO: define bin with dynamically as h= 2x IQR x n e-1/3 or number of bins (max-
 rawrr::sampleFilePath() |> read.raw() |> plotPrecursorHeatmap()
 }
 \references{
-\doi{10.1021/acs.jproteome.8b00173}, \doi{10.1021/acs.jproteome.0c00866}
+\itemize{
+\item rawDiag: \doi{10.1021/acs.jproteome.8b00173},
+\item rawrr: \doi{10.1021/acs.jproteome.0c00866}
+}
 }
 \author{
 Christian Trachsel (2017)

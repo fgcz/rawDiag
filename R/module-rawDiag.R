@@ -7,19 +7,14 @@
 #' default is set to the \code{$HOME/Downloads} directory.
 #' @param \ldots passed to the \code{\link{runApp}} method.
 #' @importFrom shiny runApp
+#' @inherit plotLockMassCorrection author references
 #' @export
 #' @examplesIf interactive()
 #' rawDiag::shiny(rawDir = (rawrr::sampleFilePath() |> dirname()))
-#' @examples
-#' \dontrun{
-#' ## embracing the command line
-#' 
-#' # MacOSX and Linux
-#' R -q -e "rawDiag::shiny(launch.browser = TRUE)"
-#' 
-#' # Microsoft Windows
-#' R.exe -e "rawDiag::shiny(launch.browser = TRUE)"
-#' }
+#' @note launch the shiny application by embracing your command line
+#' * MacOSX and Linux: `R -q -e "rawDiag::shiny(launch.browser = TRUE)"`
+#' * Microsoft Windows: `R.exe -e "rawDiag::shiny(launch.browser = TRUE)"`
+#' @md
 shiny <- function(appDir = system.file('shiny', package = 'rawDiag'), 
                   rawDir = (Sys.getenv('HOME') |>
                               file.path("Downloads")),
@@ -39,6 +34,8 @@ shiny <- function(appDir = system.file('shiny', package = 'rawDiag'),
 #' rawDiag shiny module UI
 #' @return a shiny UI module
 #' @inheritParams shiny::moduleServer
+#' @importFrom shiny fluidRow column
+#' @importFrom htmltools a img
 rawDiagUI <- function(id){
   ns <- NS(id)
   
@@ -57,7 +54,7 @@ rawDiagUI <- function(id){
       column(width = 3,
              checkboxInput(ns('useParallel'), 'Use parallel processing (mclapply)', value = TRUE)
       )),
-   
+    
     fluidRow(plotOutput(ns("plot")))
   )
 }
@@ -101,7 +98,10 @@ rawDiagServer <- function(id, vals){
                  })
                  
                  
-                 observeEvent(input$plotFUN, {vals$plot <- input$plotFUN;  message(input$plotFUN)})
+                 observeEvent(input$plotFUN, {
+                   vals$plot <- input$plotFUN;
+                   message(input$plotFUN)
+                   })
                  
                  
                  dynamicHeight <- reactive({
@@ -121,9 +121,51 @@ rawDiagServer <- function(id, vals){
                                        method = input$plotArg)) -> gp
                    vals$gp <- gp
                    gp
-                 }, height = function()dynamicHeight(), width = 800)
+                 },
+                 height = function()dynamicHeight(),
+                 width = 800)
+                 
+                 observeEvent(vals$gp, {
+                   pdfFilename <- tempdir() |>
+                     file.path(paste0("rawDiag",
+                                      format(Sys.time(), "_%Y%m%d-%H%M%S_"),
+                                      vals$plot, '.pdf'))
+                   
+                   msg <- paste0("ggplot2::ggsave to file ", pdfFilename)
+                   message(msg)
+                   progress <- shiny::Progress$new(session = session, min = 0, max = 1)
+                   progress$set(message = msg)
+                   on.exit(progress$close())
+                   
+                   gglabs <- ggplot2::labs(
+                     caption = paste0("Generated on ", 
+                                      format(Sys.time(), "%Y-%m-%d %H:%M:%S"),
+                                      ", @", Sys.info()["nodename"],
+                                      " using the rawrr/rawDiag R package versions ", 
+                                      packageVersion('rawrr'), "/",
+                                      packageVersion('rawDiag'), " ",
+                                      R.Version()['version.string'],
+                                      ". If you want to cite rawrr and rawDiag in your work, use:\n",
+                                      "T. Kockmann and C. Panse (2021), Journal of Proteome Research doi: 10.1021/acs.jproteome.0c00866; ",
+                                      "C. Trachsel et al. (2018), Journal of Proteome Research doi: 10.1021/acs.jproteome.8b00173"))
+                   
+                   rvgg <- ggplot2::ggsave(
+                     vals$gp + gglabs,
+                     filename = pdfFilename,
+                     dpi = 600,
+                     device = "pdf",
+                     width = 297,
+                     height = 210,
+                     units = 'mm',
+                     limitsize = FALSE)
+                   
+                   if (file.exists(pdfFilename)){
+                     vals$pdfFilename <- pdfFilename
+                   } else{
+                     vals$pdfFilename <- NULL
+                   }
+                 })
+                 
                }
-               
-               
   )
 }

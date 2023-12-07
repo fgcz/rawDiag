@@ -7,21 +7,28 @@
 plotInjectionTime(x, method = "trellis")
 }
 \arguments{
-\item{x}{a \code{data.frame} object adhering to the specified criteria for the \code{is.rawDiag} function.}
+\item{x}{a \code{data.frame} object adhering to the specified criteria for
+the \code{is.rawDiag} function.}
 
-\item{method}{specifying the plot method 'trellis' | 'violin' | 'overlay'. The default is 'trellis'.}
+\item{method}{specifying the plot method 'trellis' | 'violin' | 'overlay'.
+The default is 'trellis'.}
 }
 \value{
 a \code{\link[ggplot2]{ggplot}} object.
 }
 \description{
-Plot Injection Time
+shows the injection time density of each mass spectrometry file as a violin
+plot. The higher the maximum number of MS2 scans is in the method,
+the more the density is shifted towards the maximum injection time value.
 }
 \examples{
 rawrr::sampleFilePath() |> read.raw() |> plotInjectionTime()
 }
 \references{
-\doi{10.1021/acs.jproteome.8b00173}, \doi{10.1021/acs.jproteome.0c00866}
+\itemize{
+\item rawDiag: \doi{10.1021/acs.jproteome.8b00173},
+\item rawrr: \doi{10.1021/acs.jproteome.0c00866}
+}
 }
 \author{
 Christian Trachsel (2017), Christian Panse (2023)

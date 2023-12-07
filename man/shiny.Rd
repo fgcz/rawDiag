@@ -30,16 +30,24 @@ default is set to the \code{$HOME/Downloads} directory.}
 \description{
 Run the rawDiag shiny application
 }
-\examples{
-\dontrun{
-rawDiag::shiny(launch.browser = TRUE, display.mode = 'normal')
-
-## embracing the command line
-
-# MacOSX and Linux
-R -q -e "rawDiag::shiny(launch.browser = TRUE)"
-
-# Microsoft Windows
-R.exe -e "rawDiag::shiny(launch.browser = TRUE)"
+\note{
+launch the shiny application by embracing your command line
+\itemize{
+\item MacOSX and Linux: \verb{R -q -e "rawDiag::shiny(launch.browser = TRUE)"}
+\item Microsoft Windows: \verb{R.exe -e "rawDiag::shiny(launch.browser = TRUE)"}
 }
+}
+\examples{
+\dontshow{if (interactive()) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+rawDiag::shiny(rawDir = (rawrr::sampleFilePath() |> dirname()))
+\dontshow{\}) # examplesIf}
+}
+\references{
+\itemize{
+\item rawDiag: \doi{10.1021/acs.jproteome.8b00173},
+\item rawrr: \doi{10.1021/acs.jproteome.0c00866}
+}
+}
+\author{
+Christian Trachsel (2017), Christian Panse (2023)
 }

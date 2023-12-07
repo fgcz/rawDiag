@@ -7,15 +7,17 @@
 plotCycleTime(x, method = "trellis")
 }
 \arguments{
-\item{x}{a \code{data.frame} object adhering to the specified criteria for the \code{is.rawDiag} function.}
+\item{x}{a \code{data.frame} object adhering to the specified criteria for
+the \code{is.rawDiag} function.}
 
-\item{method}{specifying the plot method 'trellis' | 'violin' | 'overlay'. The default is 'trellis'.}
+\item{method}{specifying the plot method 'trellis' | 'violin' | 'overlay'.
+The default is 'trellis'.}
 }
 \value{
 a \code{\link[ggplot2]{ggplot}} object.
 }
 \description{
-Graphs the time difference between two consecutive MS1 scans
+graphs the time difference between two consecutive MS1 scans
 (cycle time) with respect to RT (scatter plots) or its density (violin).
 A smooth curve graphs the trend. The 95th percentile is indicated by a red
 dashed line.

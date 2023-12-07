@@ -143,15 +143,25 @@ validate_read.raw <- function(x){
 
 #' Lock Mass Correction Plot
 #' 
-#' @param x a \code{data.frame} object adhering to the specified criteria for the \code{is.rawDiag} function.
-#' @param method specifying the plot method 'trellis' | 'violin' | 'overlay'. The default is 'trellis'.
+#' @param x a \code{data.frame} object adhering to the specified criteria for
+#' the \code{is.rawDiag} function.
+#' @param method specifying the plot method 'trellis' | 'violin' | 'overlay'.
+#' The default is 'trellis'.
+#' 
 #' @return a \code{\link[ggplot2]{ggplot}} object.
+#' 
 #' @author Christian Trachsel (2017), Christian Panse (2023)
-#' @references \doi{10.1021/acs.jproteome.8b00173}, \doi{10.1021/acs.jproteome.0c00866}
+#' 
+#' @references
+#' * rawDiag: \doi{10.1021/acs.jproteome.8b00173},
+#' * rawrr: \doi{10.1021/acs.jproteome.0c00866}
+#' @md
+
 #' @examples 
 #' rawrr::sampleFilePath() |>
 #'   read.raw() |>
 #'   plotLockMassCorrection()
+#'
 #' @importFrom ggplot2 ggplot aes_string geom_hline geom_line labs scale_x_continuous facet_wrap theme_light
 #' @export
 plotLockMassCorrection <- function(x, method = 'trellis'){
@@ -171,7 +181,7 @@ plotLockMassCorrection <- function(x, method = 'trellis'){
                          colour = "deepskyblue3", se = FALSE) -> gp
   }else if(method %in% c('overlay')){
     x |>
-      ggplot2::ggplot(ggplot2::aes_string(x = .data$StartTime , y = .data$LMCorrection, colour = .data$rawfile)) +
+      ggplot2::ggplot(ggplot2::aes(x = .data$StartTime , y = .data$LMCorrection, colour = .data$rawfile)) +
       ggplot2::geom_hline(yintercept = c(-5, 5), colour = "red3", linetype = "longdash") +
       ggplot2::geom_line(linewidth = 0.3) +
       ggplot2::geom_line(stat = "smooth",
@@ -180,7 +190,7 @@ plotLockMassCorrection <- function(x, method = 'trellis'){
                          colour = "deepskyblue3", se = FALSE) -> gp
   }else{
     x |>
-      ggplot2::ggplot(ggplot2::aes_string(x = "StartTime" , y = "LMCorrection")) +
+      ggplot2::ggplot(ggplot2::aes(x = .data$StartTime , y = .data$LMCorrection)) +
       ggplot2::geom_hline(yintercept = c(-5, 5), colour = "red3", linetype = "longdash") + 
       ggplot2::geom_violin() -> gp
   }
@@ -243,8 +253,8 @@ plotPrecursorHeatmap <- function(x, method = 'overlay', bins = 80){
 
 #' Total Ion Count and Base Peak Plot
 #' 
-#' @description Function for displaying the Total Ion Cound (TIC) and Base
-#' Peak chromatogram of a mass spectrometry measurement. 
+#' displays the Total Ion Count (TIC) and the Base Peak Chromatogram
+#' of a mass spectrometry measurement. 
 #' Multiple files are handled by faceting based on rawfile name.
 #'
 #' @inheritParams plotLockMassCorrection
@@ -295,13 +305,17 @@ plotTicBasepeak <- function(x, method = 'trellis'){
 
 
 #' Calculate MS Cycle Time
-#' @description Graphs the lock mass deviations along RT.
+#' 
+#' calculates the lock mass deviations along RT.
+#' 
 #' @inheritParams plotLockMassCorrection
-#' @details TODO: quan
-#' tile part needed? If no MS1 scan is present? -> DIA take lowest window as cycle indicator?
+#' 
+#' @note TODO: quantile part needed? If no MS1 scan is present?
+#' E.g., DIA take lowest window as cycle indicator?
 #'
 #' @importFrom stats na.omit
 #' @author Christian Trachsel (2017), Christian Panse (20231201) refactored
+#' 
 #' @return calculates the time of all ms cycles and the 95% quantile value there of. 
 #' the cycle time is defined as the time between two consecutive MS1 scans
 .cycleTime <- function(x){
@@ -319,12 +333,13 @@ plotTicBasepeak <- function(x, method = 'trellis'){
 
 #' Plot Cycle Time
 #' 
-#' @inherit plotLockMassCorrection params return
-#' @description  Graphs the time difference between two consecutive MS1 scans
+#' graphs the time difference between two consecutive MS1 scans
 #' (cycle time) with respect to RT (scatter plots) or its density (violin).
 #' A smooth curve graphs the trend. The 95th percentile is indicated by a red
 #' dashed line.
-#' 
+#'
+#' @inherit plotLockMassCorrection params return
+#'
 #' @importFrom ggplot2 ggplot aes geom_point geom_line scale_x_continuous scale_y_continuous geom_hline theme_light
 #' @importFrom scales pretty_breaks
 #' @importFrom dplyr left_join
@@ -381,7 +396,11 @@ plotCycleTime <- function(x, method = 'trellis'){
 
 
 #' Plot Injection Time
-#'
+#' 
+#' shows the injection time density of each mass spectrometry file as a violin
+#' plot. The higher the maximum number of MS2 scans is in the method,
+#' the more the density is shifted towards the maximum injection time value.
+#' 
 #' @inherit plotLockMassCorrection params return  references author
 #' @export
 #' @importFrom ggplot2 ggplot aes geom_point geom_line scale_x_continuous scale_y_continuous geom_hline theme_light

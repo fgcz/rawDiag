@@ -7,16 +7,18 @@
 plotTicBasepeak(x, method = "trellis")
 }
 \arguments{
-\item{x}{a \code{data.frame} object adhering to the specified criteria for the \code{is.rawDiag} function.}
+\item{x}{a \code{data.frame} object adhering to the specified criteria for
+the \code{is.rawDiag} function.}
 
-\item{method}{specifying the plot method 'trellis' | 'violin' | 'overlay'. The default is 'trellis'.}
+\item{method}{specifying the plot method 'trellis' | 'violin' | 'overlay'.
+The default is 'trellis'.}
 }
 \value{
 a ggplot2 object for graphing the TIC and the Base Peak chromatogram.
 }
 \description{
-Function for displaying the Total Ion Cound (TIC) and Base
-Peak chromatogram of a mass spectrometry measurement. 
+displays the Total Ion Count (TIC) and the Base Peak Chromatogram
+of a mass spectrometry measurement. 
 Multiple files are handled by faceting based on rawfile name.
 }
 \examples{

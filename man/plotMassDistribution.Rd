@@ -7,9 +7,11 @@
 plotMassDistribution(x, method = "trellis")
 }
 \arguments{
-\item{x}{a \code{data.frame} object adhering to the specified criteria for the \code{is.rawDiag} function.}
+\item{x}{a \code{data.frame} object adhering to the specified criteria for
+the \code{is.rawDiag} function.}
 
-\item{method}{specifying the plot method 'trellis' | 'violin' | 'overlay'. The default is 'trellis'.}
+\item{method}{specifying the plot method 'trellis' | 'violin' | 'overlay'.
+The default is 'trellis'.}
 }
 \value{
 a \code{\link[ggplot2]{ggplot}} object.
@@ -21,7 +23,10 @@ plots the mass frequency in dependency to the charge state
 rawrr::sampleFilePath() |> rawDiag::read.raw() |> rawDiag::plotMassDistribution('overlay')
 }
 \references{
-\doi{10.1021/acs.jproteome.8b00173}, \doi{10.1021/acs.jproteome.0c00866}
+\itemize{
+\item rawDiag: \doi{10.1021/acs.jproteome.8b00173},
+\item rawrr: \doi{10.1021/acs.jproteome.0c00866}
+}
 }
 \author{
 Christian Trachsel (2017), Christian Panse (2023)

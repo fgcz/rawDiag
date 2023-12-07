@@ -9,8 +9,9 @@
 
 stopifnot(require(rawDiag))
 
-#rootdir <- file.path(Sys.getenv('HOME'), "/Downloads/20230906/20220915/20220830/autoQC4L/LUMOS_2/")
-#files <- file.path(rootdir, list.files(rootdir, pattern = '*.raw'))
+if (isFALSE(exists('files'))){
+  rawrr::sampleFilePath() ->> files
+}
 
 # Define UI for application that draws a histogram
 fluidPage(
@@ -23,17 +24,15 @@ fluidPage(
         sidebarPanel(
             tagList(
                 # html::img(src='https://github.com/cpanse/rawDiag/blob/main/vignettes/octopussy.png', height = 100),
-                selectInput("rawfile", "rawfile",
+              selectInput("rawfile", "rawfile",
                             choices = files,
                             selected = files[1], width = "100%", multiple = TRUE),
                 downloadButton("downloadPdf", "Download")
             )
         ),
         
-        # Show a plot of the generated distribution
         mainPanel(
             rawDiag:::rawDiagUI("OrbitrapFun02")
-            #plotOutput("distPlot")
         )
     )
 )
