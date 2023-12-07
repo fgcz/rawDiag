@@ -75,16 +75,17 @@ rawDiagServer <- function(id, vals){
                    debounce(2000)
                  data <- reactive({
                    shiny::req(rawfile())
-                   
                    progress <- shiny::Progress$new(session = session)
                    progress$set(message = "Reading Index ...")
                    on.exit(progress$close())
-                   
+                   ## TODO(cp): think about as.rawDiag to ensure all columns are there.
                    if (input$useParallel & parallel::detectCores() > 1 & length(rawfile()) > 1){
                      progress$set(message = paste0("Reading ", length(rawfile()), " files ..."),
                                   detail = "using parallel::mclapply")
                      
-                     parallel::mclapply(rawfile(),FUN = rawDiag::read.raw, mc.cores = parallel::detectCores()) |>
+                     parallel::mclapply(rawfile(),
+                                        FUN = rawDiag::read.raw,
+                                        mc.cores = parallel::detectCores()) |>
                        Reduce(f = rbind)
                    }else{
                      lapply(rawfile(), function(f){
