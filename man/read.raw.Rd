@@ -2,6 +2,7 @@
 % Please edit documentation in R/rawDiag.R
 \name{read.raw}
 \alias{read.raw}
+\alias{rawDiag}
 \title{Reads selected raw file trailer for rawDiag plot functions}
 \usage{
 read.raw(
@@ -22,7 +23,14 @@ default is using the \code{message}.}
 a \code{data.frame} containing the selected trailer information.
 }
 \description{
-Reads selected raw file trailer for rawDiag plot functions
+implements a wrapper function using the rawrr methods
+\code{\link[rawrr]{readIndex}}, \code{\link[rawrr]{readTrailer}},
+and \code{\link[rawrr]{readChromatogram}} to read
+proprietary mass spectrometer generated data using third-party libraries.
+}
+\note{
+The set up procedure for the rawrr package needs to be run in order to use
+this package.
 }
 \examples{
 rawrr::sampleFilePath() |> rawDiag::read.raw()

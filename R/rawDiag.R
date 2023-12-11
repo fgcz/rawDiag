@@ -2,6 +2,15 @@
 
 #' Reads selected raw file trailer for rawDiag plot functions
 #' 
+#' implements a wrapper function using the rawrr methods
+#' \code{\link[rawrr]{readIndex}}, \code{\link[rawrr]{readTrailer}},
+#' and \code{\link[rawrr]{readChromatogram}} to read
+#' proprietary mass spectrometer generated data using third-party libraries.
+#'
+#' @note
+#' The set up procedure for the rawrr package needs to be run in order to use
+#' this package. 
+#' 
 #' @inheritParams rawrr::readIndex
 #' @param msgFUN this function is used for logging information while composing
 #' the resulting data.frame. It can also be used for shiny progress bar. The 
@@ -9,6 +18,7 @@
 #' @return a \code{data.frame} containing the selected trailer information.
 #' @author Christian Panse (2016-2023)
 #' @export 
+#' @aliases rawDiag
 #' @examples
 #' rawrr::sampleFilePath() |> rawDiag::read.raw()
 #' @importFrom rawrr readIndex readTrailer readChromatogram
@@ -510,12 +520,12 @@ plotMassDistribution <- function(x, method = 'trellis'){
 plotChargeState <- function(x, method='trellis'){
   x |>
     dplyr::filter(MSOrder == "Ms2") |>
-    dplyr::group_by_at(dplyr::vars(.data$rawfile)) |>
+    dplyr::group_by_at(dplyr::vars(rawfile)) |>
     dplyr::count(.data$charge) |>
     dplyr::ungroup() |>
     dplyr::rename_at(dplyr::vars("n"), list(~ as.character("Counts"))) -> xx
   
-  xx$percentage <- (100 / sum(xx$Counts)) * res$Counts
+  xx$percentage <- (100 / sum(xx$Counts)) * xx$Counts
   xbreaks <- unique(xx$charge)
   
   if (method == 'trellis'){

@@ -57,6 +57,14 @@ rawDiagUI <- function(id){
       column(width = 3,
              checkboxInput(ns('useParallel'), 'Use parallel processing (mclapply)', value = TRUE)
       )),
+    fluidRow(
+      column(width = 4,
+             selectInput(ns("plotHeight"), "height x n", choices = 1:10,
+                         selected = 1, multiple = FALSE)),
+      column(width = 4,
+             selectInput(ns("plotWidth"), "width x n", choices = 1:4,
+                         selected = 1, multiple = FALSE),
+      )),
     
     fluidRow(plotOutput(ns("plot")))
   )
@@ -112,9 +120,20 @@ rawDiagServer <- function(id, vals){
                  
                  
                  dynamicHeight <- reactive({
+                   n <- 400
                    if (input$plotArg == "trellis"){
-                     400 * length(rawfile())
-                   }else{400}
+                     n <- n * length(rawfile()) 
+                   }
+                   
+                   n * as.integer(input$plotHeight)
+                 })
+                 
+                 dynamicWidth <- reactive({
+                   n <- 400
+                   if (input$plotArg == "trellis"){
+                     400 
+                   }
+                   n * as.integer(input$plotWidth)
                  })
                  
                  output$plot <- renderPlot({
@@ -165,8 +184,8 @@ rawDiagServer <- function(id, vals){
                      filename = pdfFileName,
                      dpi = 600,
                      device = "pdf",
-                     width = 297,
-                     height = 210,
+                     width = 297 * as.integer(input$plotWidth),
+                     height = 210 * as.integer(input$plotHeight),
                      units = 'mm',
                      limitsize = FALSE)
                    

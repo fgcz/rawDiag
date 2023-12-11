@@ -42,3 +42,11 @@ PlotMassDistribution <- function(x, method = 'trellis'){
 	.Deprecated("plotMassDistribution")
 	plotMassDistribution(x, method)
 }
+
+
+#' @inherit plotChargeState params return references author title
+#' @export
+PlotChargeState <- function(x, method = 'trellis'){ 
+  .Deprecated("plotChargeState")
+  plotChargeState(x, method)
+}
