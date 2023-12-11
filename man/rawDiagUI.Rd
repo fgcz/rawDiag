@@ -16,3 +16,8 @@ a shiny UI module
 \description{
 rawDiag shiny module UI
 }
+\examples{
+\dontshow{if (interactive()) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+rawDiag::shiny(rawDir = (rawrr::sampleFilePath() |> dirname()))
+\dontshow{\}) # examplesIf}
+}

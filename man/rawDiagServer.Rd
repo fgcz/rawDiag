@@ -18,3 +18,8 @@ shiny module server
 \description{
 rawDiag shiny module
 }
+\examples{
+\dontshow{if (interactive()) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+rawDiag::shiny(rawDir = (rawrr::sampleFilePath() |> dirname()))
+\dontshow{\}) # examplesIf}
+}

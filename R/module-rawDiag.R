@@ -36,13 +36,16 @@ shiny <- function(appDir = system.file('shiny', package = 'rawDiag'),
 #' @inheritParams shiny::moduleServer
 #' @importFrom shiny fluidRow column
 #' @importFrom htmltools a img
+#' @examplesIf interactive()
+#' rawDiag::shiny(rawDir = (rawrr::sampleFilePath() |> dirname()))
+#' @export
 rawDiagUI <- function(id){
   ns <- NS(id)
   
   plotFunctions <- ls("package:rawDiag")[ls("package:rawDiag") |> grepl(pattern = "^plot")]
   tagList(
-    fluidRow(a(img(src="https://img.shields.io/badge/JPR-10.1021%2Facs.jproteome.8b00173-brightgreen"),
-               href='http://dx.doi.org/10.1021/acs.jproteome.8b00173')),
+    #fluidRow(a(img(src="https://img.shields.io/badge/JPR-10.1021%2Facs.jproteome.8b00173-brightgreen"),
+    #           href='http://dx.doi.org/10.1021/acs.jproteome.8b00173')),
     fluidRow(
       column(width = 4,
              selectInput(ns("plotFUN"), "function", choices = plotFunctions,
@@ -65,17 +68,21 @@ rawDiagUI <- function(id){
 #' @param vals containing rawfile
 #' @return shiny module server
 #' @importFrom shiny moduleServer reactive reactiveValues observeEvent renderPlot req NS tagList selectInput checkboxInput plotOutput debounce
+#' @examplesIf interactive()
+#' rawDiag::shiny(rawDir = (rawrr::sampleFilePath() |> dirname()))
+#' @export
 rawDiagServer <- function(id, vals){
   moduleServer(id,
                function(input, output, session) {
                  rawfile <- reactive({ vals$rawfile }) |>
-                   debounce(2000)
+                   debounce(500)
                  
                  data <- reactive({
                    shiny::req(rawfile())
                    progress <- shiny::Progress$new(session = session)
                    progress$set(message = "Reading Index ...")
                    on.exit(progress$close())
+                   vals$pdfFileName <- NULL
                    ## TODO(cp): think about as.rawDiag to ensure all columns are there.
                    if (input$useParallel & parallel::detectCores() > 1 & length(rawfile()) > 1){
                      progress$set(message = paste0("Reading ", length(rawfile()), " files ..."),
@@ -116,6 +123,9 @@ rawDiagServer <- function(id, vals){
                    progress$set(message = "plotting ...")
                    on.exit(progress$close())
                    
+                   
+                   
+                   ## call the plot method
                    do.call(what = input$plotFUN,
                            args = list(x = data(),
                                        method = input$plotArg)) -> gp
@@ -125,13 +135,14 @@ rawDiagServer <- function(id, vals){
                  height = function()dynamicHeight(),
                  width = 800)
                  
-                 observeEvent(vals$gp, {
-                   pdfFilename <- tempdir() |>
+                 observeEvent(vals$generatePDF, {
+                   shiny::req(data())
+                   pdfFileName <- tempdir() |>
                      file.path(paste0("rawDiag",
                                       format(Sys.time(), "_%Y%m%d-%H%M%S_"),
                                       vals$plot, '.pdf'))
                    
-                   msg <- paste0("ggplot2::ggsave to file ", pdfFilename)
+                   msg <- paste0("ggplot2::ggsave to file ", pdfFileName)
                    message(msg)
                    progress <- shiny::Progress$new(session = session, min = 0, max = 1)
                    progress$set(message = msg)
@@ -151,7 +162,7 @@ rawDiagServer <- function(id, vals){
                    
                    rvgg <- ggplot2::ggsave(
                      vals$gp + gglabs,
-                     filename = pdfFilename,
+                     filename = pdfFileName,
                      dpi = 600,
                      device = "pdf",
                      width = 297,
@@ -159,10 +170,10 @@ rawDiagServer <- function(id, vals){
                      units = 'mm',
                      limitsize = FALSE)
                    
-                   if (file.exists(pdfFilename)){
-                     vals$pdfFilename <- pdfFilename
+                   if (file.exists(pdfFileName)){
+                     vals$pdfFileName <- pdfFileName
                    } else{
-                     vals$pdfFilename <- NULL
+                     vals$pdfFileName <- NULL
                    }
                  })
                  

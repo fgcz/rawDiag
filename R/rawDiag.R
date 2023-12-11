@@ -499,3 +499,64 @@ plotMassDistribution <- function(x, method = 'trellis'){
   gp
 }
 
+#' Charge State Overview Plot
+#' 
+#' @inherit plotLockMassCorrection params return references author
+#' @export
+#' @examples
+#'  rawrr::sampleFilePath() |> rawDiag::read.raw() -> S
+#'  
+#'  S|>plotLockMassCorrection()
+plotChargeState <- function(x, method='trellis'){
+  x |>
+    dplyr::filter(MSOrder == "Ms2") |>
+    dplyr::group_by_at(dplyr::vars(.data$rawfile)) |>
+    dplyr::count(.data$charge) |>
+    dplyr::ungroup() |>
+    dplyr::rename_at(dplyr::vars("n"), list(~ as.character("Counts"))) -> xx
+  
+  xx$percentage <- (100 / sum(xx$Counts)) * res$Counts
+  xbreaks <- unique(xx$charge)
+  
+  if (method == 'trellis'){
+    ggplot2::ggplot(xx, ggplot2::aes(x = .data$charge, y = .data$percentage)) +
+      ggplot2::geom_bar(stat = "identity", fill = "cornflowerblue") +
+      ggplot2::geom_text(ggplot2::aes(label = .data$Counts),
+                         vjust=-0.3, size=3.5) +
+      ggplot2::scale_x_continuous(breaks = xbreaks) +
+      ggplot2::scale_y_continuous(breaks = scales::pretty_breaks(15),
+                                  expand = c(0, 0),
+                                  limits = c(0, (max(xx$percentage)) + 3)) +
+      ggplot2::labs(title = "Charge state plot") +
+      ggplot2::labs(subtitle = "Plotting the number of occurrences of all selected precursor charge states") +
+      ggplot2::labs(x = "Charge States", y = "Percent [%]") +
+      ggplot2::theme_light() +
+      ggplot2::facet_wrap(~ rawfile) -> gp
+  }else if(method =='overlay'){
+    ggplot2::ggplot(xx, ggplot2::aes(x = .data$charge, y = .data$percentage,
+                                     fill = .data$rawfile)) +
+      ggplot2::geom_bar(stat = "identity", position = ggplot2::position_dodge(),
+                        colour = "black") +
+      ggplot2::scale_x_continuous(breaks = xbreaks) +
+      ggplot2::scale_y_continuous(breaks = scales::pretty_breaks(15),
+                                  expand = c(0, 0),
+                                  limits = c(0, (max(xx$percentage)) + 3)) +
+      ggplot2::labs(title = "Charge state plot") +
+      ggplot2::labs(subtitle = "Plotting the number of occurrences of all selected precursor charge states") +
+      ggplot2::labs(x = "Charge States", y = "Percent [%]") +
+      ggplot2::theme_light()+
+      ggplot2::theme(legend.position = "top") -> gp
+  }else if (method =='violin'){
+   x |>
+      dplyr::filter(MSOrder == "Ms2")  -> xx
+    ggplot2::ggplot(xx, ggplot2::aes(x = .data$rawfile, y = .data$charge)) + 
+      ggplot2::geom_violin() +
+      ggplot2::scale_y_continuous(breaks = scales::pretty_breaks(8)) +
+      ggplot2::labs(title = "Charge state plot") +
+      ggplot2::labs(subtitle = "Plotting the precursor charge state density for each mass spectrometry run") +
+      ggplot2::labs(x = "Filename", y = "Charge State") +
+      ggplot2::theme_light() +
+      ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90)) -> gp
+  }else{NULL}
+}
+
