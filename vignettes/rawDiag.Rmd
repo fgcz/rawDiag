@@ -59,6 +59,8 @@ if (isFALSE(file.exists(rawrr:::.rawrrAssembly()))){
 
 # Usage
 
+graph all varieties of plots
+
 ```{r fetchFromExperimentHub, echo=FALSE, eval=TRUE}
 # fetch via ExperimentHub
 library(ExperimentHub)
@@ -69,14 +71,11 @@ EH4547 <- normalizePath(eh[["EH4547"]])
 if (!file.exists(rawfile)){
   file.copy(EH4547, rawfile)
 }
-
-
 ```
 
 ```{r eval=FALSE, echo=FALSE}
 rawrr::sampleFilePath() -> rawfile
 ```
-
 
 ```{r readOrbitrap}
 ## read Orbitrap meta data

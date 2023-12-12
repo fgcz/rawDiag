@@ -50,3 +50,10 @@ PlotChargeState <- function(x, method = 'trellis'){
   .Deprecated("plotChargeState")
   plotChargeState(x, method)
 }
+
+#' @inherit plotChargeState params return references author title
+#' @export
+PlotScanTime <- function(x, method = 'trellis'){ 
+  .Deprecated("plotScanTime")
+  plotScanTime(x, method)
+}

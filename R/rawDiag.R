@@ -570,3 +570,119 @@ plotChargeState <- function(x, method='trellis'){
   }else{NULL}
 }
 
+.mapType <- function(x){
+  x |>
+    dplyr::mutate(Type = dplyr::case_when(grepl("FTMS [[:punct:]] c NSI Full ms", .data$scanType) == "TRUE" ~ "FT_Full_ms_c",
+                                          grepl("FTMS [[:punct:]] p NSI Full ms", .data$scanType) == "TRUE" ~ "FT_Full_ms_p",
+                                          grepl("FTMS [[:punct:]] c NSI Full lock ms", .data$scanType) == "TRUE" ~ "FT_Full_ms_c",
+                                          grepl("FTMS [[:punct:]] p NSI Full lock ms", .data$scanType) == "TRUE" ~ "FT_Full_ms_p",
+                                          grepl("FTMS [[:punct:]] c NSI d Full ms2", .data$scanType) == "TRUE" ~ "FT_d_Full_ms2_c",
+                                          grepl("FTMS [[:punct:]] p NSI d Full ms2", .data$scanType) == "TRUE" ~ "FT_d_Full_ms2_p",
+                                          grepl("FTMS [[:punct:]] c NSI SIM ms", .data$scanType) == "TRUE" ~ "FT_SIM_ms_c",
+                                          grepl("FTMS [[:punct:]] p NSI SIM ms", .data$scanType) == "TRUE" ~ "FT_SIM_ms_p",
+                                          grepl("FTMS [[:punct:]] p NSI SIM msx ms", .data$scanType) == "TRUE" ~ "FT_msxSIM_ms_p",
+                                          grepl("FTMS [[:punct:]] c NSI SIM msx ms", .data$scanType) == "TRUE" ~ "FT_msxSIM_ms_c",
+                                          grepl("FTMS [[:punct:]] c NSI Full ms2", .data$scanType) == "TRUE" ~ "FT_Full_ms2_c",
+                                          grepl("FTMS [[:punct:]] p NSI Full ms2", .data$scanType) == "TRUE" ~ "FT_Full_ms2_p",
+                                          grepl("ITMS [[:punct:]] c NSI r d Full ms2", .data$scanType) == "TRUE" ~ "IT_Full_ms2_c",
+                                          grepl("ITMS [[:punct:]] p NSI r d Full ms2", .data$scanType) == "TRUE" ~ "IT_Full_ms2_p"
+    )
+    )
+  
+}
+
+
+#TODO: supply cases as list
+#patterns <- list(
+#x %% 35 == 0 ~ "fizz buzz",
+#x %% 5 == 0 ~ "fizz",
+#x %% 7 == 0 ~ "buzz",
+#TRUE ~ as.character(x)
+#)
+#case_when(!!! patterns)
+.calcTransient <- function(x){
+  x$MassAnalyzer <- NA
+  x$MassAnalyzer[grepl(x$scanType, pattern="^ITMS")] <- "ITMS"
+  x$MassAnalyzer[grepl(x$scanType, pattern="^FTMS")] <- "FTMS"
+  
+  x |>
+    dplyr::mutate(transient = dplyr::case_when(FTResolution == 7500 ~ 16,
+                                               FTResolution == 15000 ~ 32, 
+                                               FTResolution == 17500 ~ 64,
+                                               FTResolution == 30000 ~ 64,
+                                               FTResolution == 45000 ~ 96,
+                                               FTResolution == 50000 ~ 96,
+                                               FTResolution == 35000 ~ 128,
+                                               FTResolution == 60000 ~ 128,
+                                               FTResolution == 70000 ~ 256,
+                                               FTResolution == 120000 ~ 256,
+                                               FTResolution == 140000 ~ 512,
+                                               FTResolution == 240000 ~ 512
+    )
+    )
+} 
+
+
+#' Scan Event Plot
+#' 
+#' plots time for each scan event
+#' @inherit plotLockMassCorrection params return references author
+#' @export
+#' @examples
+#'  rawrr::sampleFilePath() |> rawDiag::read.raw() -> S
+#'  
+#'  S|> plotScanTime()
+plotScanTime <- function(x, method='trellis'){
+  x |>
+    .calcTransient() |>
+    dplyr::mutate(ElapsedScanTimesec = ElapsedScanTimesec * 1000) |>
+    dplyr::select_at(dplyr::vars("StartTime", "scanType", "ElapsedScanTimesec", "rawfile", "MassAnalyzer", "MSOrder", "transient")) |>
+    na.omit() |>
+    .mapType()-> xx
+  
+  if(method == 'trellis'){
+    ggplot2::ggplot(xx, ggplot2::aes(x = .data$StartTime, y = .data$ElapsedScanTimesec)) +
+      ggplot2::geom_point(shape = ".") +
+      ggplot2::facet_grid(rawfile ~ Type) +
+      ggplot2::geom_line(stat = "smooth", method = "gam",
+                         formula = y ~ s(x), colour = "deepskyblue3", se = FALSE) +
+      ggplot2::labs(title = "Scan time plot") +
+      ggplot2::labs(subtitle = "Plotting the elapsed scan time for each individual scan") +
+      ggplot2::labs(x = "Retentione Time [min]", y = "Elapsed Scan Time [ms]") +
+      ggplot2::scale_x_continuous(breaks = scales::pretty_breaks((n = 8))) +
+      ggplot2::scale_y_continuous(breaks = scales::pretty_breaks((n = 8))) +
+      ggplot2::theme_light() +
+      ggplot2::geom_hline(data = xx, ggplot2::aes(yintercept = .data$transient), colour = "red3") -> gp
+    
+  }else if (method == 'violin'){
+    xx |> 
+      dplyr::mutate_at(dplyr::vars("ElapsedScanTimesec"), list(~ .*1000)) |>
+      dplyr::select_at(dplyr::vars("ElapsedScanTimesec", "rawfile", "MassAnalyzer", "MSOrder")) |> 
+      na.omit() -> xxx
+    
+    ggplot2::ggplot(xxx, ggplot2::aes(x = .data$rawfile, y = .data$ElapsedScanTimesec)) +
+      ggplot2::geom_violin()  +
+      ggplot2::facet_grid(MSOrder + MassAnalyzer ~ ., scales = "free") +
+      ggplot2::scale_y_continuous(breaks = scales::pretty_breaks(8)) +
+      ggplot2::labs(title = "Scan time plot") +
+      ggplot2::labs(subtitle = "Plotting the retention time resolved elapsed scan time density for each mass spectrometry run") +
+      ggplot2::labs(x = "rawfile", y = "Elapsed Scan Time [ms]") +
+      ggplot2::theme_light() +
+      ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90)) -> gp
+  }else if (method == 'overlay'){
+    ggplot2::ggplot(xx, ggplot2::aes(x = .data$StartTime, y = .data$ElapsedScanTimesec,  colour = .data$rawfile)) +
+      ggplot2::geom_point(size = 0.5) +
+      ggplot2::geom_line(ggplot2::aes(group = "rawfile", colour = "rawfile"), stat = "smooth", method = "gam", formula = y ~ s(x, bs= "cs"), se = FALSE) +
+      ggplot2::facet_grid(~ MSOrder + MassAnalyzer, scales = "free") +
+      ggplot2::labs(title = "Scan time plot") +
+      ggplot2::labs(subtitle = "Plotting the elapsed scan time for each individual scan") +
+      ggplot2::labs(x = "Retentione Time [min]", y = "Elapsed Scan Time [ms]") +
+      ggplot2::scale_x_continuous(breaks = scales::pretty_breaks((n = 8))) +
+      ggplot2::scale_y_continuous(breaks = scales::pretty_breaks((n = 8))) +
+      ggplot2::theme_light() +
+      ggplot2::theme(legend.position="top") -> gp
+  }else{NULL}
+  gp
+}
+
+
