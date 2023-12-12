@@ -40,6 +40,23 @@ knitr::opts_chunk$set(fig.wide = TRUE, fig.retina = 3, error=FALSE)
 knitr::include_graphics("octopussy.png")
 ```
 
+
+# Requirements
+
+assemblies aka Common Intermediate Language bytecode -  the download and install
+can be done on all platforms using the command:
+
+```{r installAssemblies, echo=TRUE}
+if (isFALSE(rawrr::.checkDllInMonoPath())){
+  rawrr::installRawFileReaderDLLs()
+}
+
+if (isFALSE(file.exists(rawrr:::.rawrrAssembly()))){
+ rawrr::installRawrrExe()
+}
+```
+
+
 # Usage
 
 ```{r fetchFromExperimentHub, echo=FALSE, eval=TRUE}

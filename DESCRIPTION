@@ -1,7 +1,7 @@
 Package: rawDiag
 Type: Package
 Title: Brings Orbitrap Mass Spectrometry Data to Life; Fast and Colorful 
-Version: 0.99.1
+Version: 0.99.2
 Authors@R: c(person(given = "Christian", family = "Panse", email = "cp@fgcz.ethz.ch", role = c("aut", "cre"),
     comment = c(ORCID = "0000-0003-1975-3064")),
 	person(given = "Christian", family = "Trachsel", email = "Christian.Trachsel@fgcz.ethz.ch", role = "aut"),
