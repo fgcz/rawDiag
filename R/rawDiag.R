@@ -423,11 +423,14 @@ plotInjectionTime <- function(x, method = 'trellis'){
       dplyr::group_by(.data$rawfile, .data$MSOrder) |>
       dplyr::summarise(maxima = max(.data$IonInjectionTime))
     
-    ggplot2::ggplot(x, ggplot2::aes(x = .data$StartTime, y = .data$IonInjectionTime)) +
-      ggplot2::geom_hline(data = maxtimes, ggplot2::aes(yintercept = .data$maxima),
+    ggplot2::ggplot(x, ggplot2::aes(x = .data$StartTime,
+                                    y = .data$IonInjectionTime)) +
+      ggplot2::geom_hline(data = maxtimes,
+                          ggplot2::aes(yintercept = .data$maxima),
                           colour = "red3", linetype = "longdash") +
       ggplot2::geom_point(shape = ".") +
-      ggplot2::geom_line(stat = "smooth", method = "gam", formula = y ~ s(x, bs= "cs"),
+      ggplot2::geom_line(stat = "smooth", method = "gam",
+                         formula = y ~ s(x, bs= "cs"),
                          colour = "deepskyblue3", se = FALSE) +
       ggplot2::facet_grid(rawfile ~ MSOrder, scales = "free") +
       ggplot2::scale_y_continuous(breaks = scales::pretty_breaks((n = 8))) +
@@ -435,14 +438,16 @@ plotInjectionTime <- function(x, method = 'trellis'){
       ggplot2::labs(subtitle = "Plotting injection time against retention time for MS and MSn level") +
       ggplot2::labs(x = "Retentione Time [min]", y = "Injection Time [ms]") -> gp
   }else if (method == 'violin'){
-    ggplot2::ggplot(x, ggplot2::aes(x = .data$rawfile, y = .data$IonInjectionTime)) +
+    ggplot2::ggplot(x, ggplot2::aes(x = .data$rawfile,
+                                    y = .data$IonInjectionTime)) +
       ggplot2::geom_violin() +
       ggplot2::facet_grid(MSOrder ~ .) +
       ggplot2::labs(subtitle = "Plotting retention time resolved injection time density for each mass spectrometry run") +
       ggplot2::labs(x = "rawfile", y = "Injection Time [ms]") +
       ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90)) -> gp
   }else if(method == 'overlay'){
-    ggplot2::ggplot(x, ggplot2::aes(x = .data$StartTime, y = .data$IonInjectionTime, colour = .data$rawfile)) +
+    ggplot2::ggplot(x, ggplot2::aes(x = .data$StartTime,
+                                    y = .data$IonInjectionTime, colour = .data$rawfile)) +
       ggplot2::geom_point(size = 0.5, alpha = 0.1) +
       ggplot2::geom_line(ggplot2::aes(group = .data$rawfile, colour = .data$rawfile),
                 stat = "smooth",
@@ -460,6 +465,67 @@ plotInjectionTime <- function(x, method = 'trellis'){
   gp + ggplot2::labs(title = "Injection time plot") +
     ggplot2::theme_light()
 }
+
+
+#' mZ Distribution Plot of Ms2 Scans
+#' 
+#' draws precursor mass vs retention time for each MS2 scan in the raw file.
+#'
+#' @inherit plotLockMassCorrection params return references author
+#' @examples
+#' rawrr::sampleFilePath() |> rawDiag::read.raw() -> S
+#' plotMzDistribution(S)
+#' @export
+plotMzDistribution <- function(x, method='trellis'){
+    x |>
+        dplyr::filter(MSOrder == "Ms2") -> xx
+    
+    if (method == 'trellis'){
+        ggplot2::ggplot(xx, ggplot2::aes(x = .data$StartTime,
+                                         y = .data$precursorMass)) + 
+            ggplot2::geom_point(shape = ".") +
+            ggplot2::facet_grid(rawfile ~ ., scales = "free") +
+            ggplot2::geom_line(stat = "smooth", method = "gam",
+                               formula = y ~ s(x, bs= "cs"),
+                               linewidth = 1.1, alpha = 0.6,
+                               colour = "cornflowerblue", se = FALSE) +
+            ggplot2::scale_x_continuous(breaks = scales::pretty_breaks(8)) +
+            ggplot2::scale_y_continuous(breaks = scales::pretty_breaks(8)) +
+            ggplot2::labs(title = "Retention Time to m/z correlation plot") +
+            ggplot2::labs(subtitle = "Plotting retention time against m/z value of all selected precursors") +
+            ggplot2::labs(x = "Retention Time", y = "Presursor m/z value") -> gp
+    }else if (method == 'violin'){
+        ggplot2::ggplot(xx, ggplot2::aes(x = .data$rawfile,
+                                         y = .data$precursorMass)) + 
+            ggplot2::geom_violin() +
+            ggplot2::scale_y_continuous(breaks = scales::pretty_breaks(8)) +
+            ggplot2::labs(title = "Retention Time to m/z correlation plot") +
+            ggplot2::labs(subtitle = "Plotting the precursor m/z value density of all mass spectrometry runs") +
+            ggplot2::labs(x = "Filename", y = "Presursor m/z value [Da]") +
+            ggplot2::theme_light() +
+            ggplot2::theme(
+                axis.text.x = ggplot2::element_text(angle = 90)) -> gp
+    }else if (method == 'overlay'){
+        ggplot2::ggplot(xx, ggplot2::aes(x = .data$StartTime,
+                                         y = .data$precursorMass,
+                                         colour = .data$rawfile)) + 
+            ggplot2::geom_point(size = 0.5, alpha = 0.3) +
+            ggplot2::geom_line(stat = "smooth",
+                               method = "gam",
+                               formula = y ~ s(x, bs= "cs"),
+                               size = 1.1,
+                               se = FALSE) +
+            ggplot2::scale_x_continuous(breaks = scales::pretty_breaks(8)) +
+            ggplot2::scale_y_continuous(breaks = scales::pretty_breaks(8)) +
+            ggplot2::labs(title = "Retention Time to m/z correlation plot") +
+            ggplot2::labs(subtitle = "Plotting retention time against m/z value of all selected precursors") +
+            ggplot2::labs(x = "Retention Time [min]", y = "Presursor m/z value [Da]") +
+            ggplot2::theme(legend.position="top") -> gp
+        
+    }else{NULL}
+    gp + ggplot2::theme_light() 
+}
+
 
 #' Mass Distribution Plot
 #'

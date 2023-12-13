@@ -36,6 +36,15 @@ PlotInjectionTime <- function(x, method = 'trellis'){
 	plotInjectionTime(x, method)
 }
 
+
+
+#' @inherit plotMassDistribution params return references author title
+#' @export
+PlotMzDistribution <- function(x, method = 'trellis'){ 
+    .Deprecated("plotMzDistribution")
+    plotMzDistribution(x, method)
+}
+
 #' @inherit plotMassDistribution params return references author title
 #' @export
 PlotMassDistribution <- function(x, method = 'trellis'){ 
