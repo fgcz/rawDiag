@@ -17,7 +17,7 @@ The default is 'trellis'.}
 a \code{\link[ggplot2]{ggplot}} object.
 }
 \description{
-Charge State Overview Plot
+graphs the number of occurrences of all selected precursor charge states.
 }
 \examples{
  rawrr::sampleFilePath() |> rawDiag::read.raw() -> S

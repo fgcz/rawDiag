@@ -528,6 +528,8 @@ plotMzDistribution <- function(x, method='trellis'){
 
 
 #' Mass Distribution Plot
+#' 
+#' displays charge state resolved frequency of precursor masses.
 #'
 #' @description plots the mass frequency in dependency to the charge state
 #' @inherit plotLockMassCorrection params return references author
@@ -576,6 +578,8 @@ plotMassDistribution <- function(x, method = 'trellis'){
 }
 
 #' Charge State Overview Plot
+#' 
+#' graphs the number of occurrences of all selected precursor charge states.
 #' 
 #' @inherit plotLockMassCorrection params return references author
 #' @export
@@ -691,7 +695,8 @@ plotChargeState <- function(x, method='trellis'){
 
 #' Scan Event Plot
 #' 
-#' plots time for each scan event
+#' Plotting the elapsed scan time for each individual scan event.
+#' 
 #' @inherit plotLockMassCorrection params return references author
 #' @export
 #' @examples
@@ -751,4 +756,101 @@ plotScanTime <- function(x, method='trellis'){
   gp
 }
 
+
+#' Fill NA values with last previous value
+#'
+#' @param x a vector of values 
+#' @author Christian Trachsel
+#' @return a vector with any NA values replaced with the last previous actuall value
+#'
+#' @examples
+#' v1 <- c(NA, 1, 2, 3, NA, 4, 5, NA, NA, NA, 6)
+#' v2 <- fillNAgaps(v1)
+.fillNAgaps <- function(x) {
+  goodVals <- c(NA, x[!is.na(x)])
+  fillIdx <- cumsum(!is.na(x))+1
+  res <- goodVals[fillIdx]
+  return(res)
+}
+
+#' Calculate Master Scan Number
+#' 
+#' calculates the MS1 master scan number of an MS2 scan 
+#' and populates the MasterScanNumber with it
+#' 
+#' @inheritParams plotLockMassCorrection
+#' 
+#' @author Christian Trachsel
+.calculatioMasterScan <- function(x){
+  x |>
+    dplyr::mutate(MasterScanNumber = dplyr::case_when(MSOrder == "Ms" ~ scan)) |>
+    dplyr::mutate(MasterScanNumber = .fillNAgaps(.data$MasterScanNumber)) |>
+    dplyr::mutate(MasterScanNumber = replace(MasterScanNumber, scan == MasterScanNumber, NA)) |>
+    dplyr::pull(MasterScanNumber) -> x$MasterScanNumber 
+ x
+}
+
+#' Cycle Load Plot
+#' 
+#' plotting the number of MS2 per MS1 (the duty cycle) scan versus retention
+#' time. The deepskyblue colored loess curve shows the trend.
+#' 
+#' @inherit plotLockMassCorrection params return references author
+#' @export
+#' @examples
+#'  rawrr::sampleFilePath() |> rawDiag::read.raw() -> S
+#'  
+#'  S|> plotCycleLoad()
+plotCycleLoad <- function(x, method = 'trellis'){
+  x |> 
+    .calculatioMasterScan() |>
+    dplyr::filter(MSOrder == "Ms2") |>
+    dplyr::group_by_at(dplyr::vars("rawfile")) |>
+    dplyr::count(MasterScanNumber) |> 
+    dplyr::rename(scan = MasterScanNumber) -> MS2
+  x |>  
+    dplyr::select(StartTime, scan) -> MS
+
+  xx <- dplyr::inner_join(MS, MS2, by = "scan")
+  if (method == 'trellis'){
+    ggplot2::ggplot(xx, ggplot2::aes(x = .data$StartTime, y = .data$n)) +
+      ggplot2::geom_point(shape = ".") +
+      ggplot2::geom_line(stat = "smooth",
+                         method = "loess",
+                         span = 0.2,
+                         colour = "deepskyblue3",
+                         se = FALSE) +
+      ggplot2::facet_wrap(~ rawfile) +
+      ggplot2::scale_x_continuous(breaks = scales::pretty_breaks(8)) +
+      ggplot2::labs(subtitle = "Plotting the number of MS2 per MS1 scan versus retention time. The deepskyblue colored loess curve shows the trend.") -> gp
+  }else if(method == 'violin'){
+    xx <- dplyr::inner_join(MS, MS2, by = "scan") |>
+      dplyr::mutate_at(dplyr::vars("rawfile"), list(~ as.factor(.))) |>
+      dplyr::mutate_at(dplyr::vars("n"), list(~ as.numeric(.)))
+    
+    ggplot2::ggplot(xx, ggplot2::aes(x = .data$rawfile, y = .data$n)) +
+      ggplot2::geom_violin() +
+      ggplot2::labs(subtitle = "Plotting the duty cycle resolved MS2 density for each mass spectrometry run") +
+      ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90)) -> gp
+  }else if (method == 'overlay'){
+    ggplot2::ggplot(xx, ggplot2::aes(x = .data$StartTime,
+                                     y = .data$n,
+                                     colour = .data$rawfile)) +
+      ggplot2::geom_point(shape = ".") +
+      ggplot2::geom_line(ggplot2::aes(group = .data$rawfile,
+                                      colour = .data$rawfile),
+                         stat = "smooth", method = "loess", span = 0.2,
+                         se = FALSE) +
+      ggplot2::labs(title = "Time resolved number of MS2 scans") +
+      ggplot2::scale_x_continuous(breaks = scales::pretty_breaks(8)) +
+      ggplot2::labs(subtitle = "Plotting the number of MS2 per MS1 scan versus retention time") +
+      ggplot2::theme(legend.position = "top") -> gp
+  }else{NULL}
+  gp +
+    ggplot2::labs(title = "Time resolved number of MS2 scans") +
+    ggplot2::labs(x = "Retention Time [min]", y = "Number of MS2 per MS1 [counts]") +
+    ggplot2::scale_y_continuous(breaks = scales::pretty_breaks(8)) +
+    ggplot2::coord_cartesian(ylim = c(0, max(xx$n) + 1)) +
+    ggplot2::theme_light()
+}
 
