@@ -579,14 +579,15 @@ plotMassDistribution <- function(x, method = 'trellis'){
 #' 
 #' @inherit plotLockMassCorrection params return references author
 #' @export
+#' @importFrom rlang .data
 #' @examples
 #'  rawrr::sampleFilePath() |> rawDiag::read.raw() -> S
 #'  
 #'  S|>plotLockMassCorrection()
 plotChargeState <- function(x, method='trellis'){
   x |>
-    dplyr::filter(MSOrder == "Ms2") |>
-    dplyr::group_by_at(dplyr::vars(rawfile)) |>
+    dplyr::filter(.data$MSOrder == "Ms2") |>
+    dplyr::group_by_at(dplyr::vars(.data$rawfile)) |>
     dplyr::count(.data$charge) |>
     dplyr::ungroup() |>
     dplyr::rename_at(dplyr::vars("n"), list(~ as.character("Counts"))) -> xx
@@ -624,7 +625,7 @@ plotChargeState <- function(x, method='trellis'){
       ggplot2::theme(legend.position = "top") -> gp
   }else if (method =='violin'){
    x |>
-      dplyr::filter(MSOrder == "Ms2")  -> xx
+      dplyr::filter(.data$MSOrder == "Ms2")  -> xx
     ggplot2::ggplot(xx, ggplot2::aes(x = .data$rawfile, y = .data$charge)) + 
       ggplot2::geom_violin() +
       ggplot2::scale_y_continuous(breaks = scales::pretty_breaks(8)) +
