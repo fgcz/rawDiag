@@ -472,13 +472,14 @@ plotInjectionTime <- function(x, method = 'trellis'){
 #' draws precursor mass vs retention time for each MS2 scan in the raw file.
 #'
 #' @inherit plotLockMassCorrection params return references author
+#' @importFrom rlang .data
 #' @examples
 #' rawrr::sampleFilePath() |> rawDiag::read.raw() -> S
 #' plotMzDistribution(S)
 #' @export
 plotMzDistribution <- function(x, method='trellis'){
     x |>
-        dplyr::filter(MSOrder == "Ms2") -> xx
+        dplyr::filter(.data$MSOrder == "Ms2") -> xx
     
     if (method == 'trellis'){
         ggplot2::ggplot(xx, ggplot2::aes(x = .data$StartTime,
@@ -694,6 +695,7 @@ plotChargeState <- function(x, method='trellis'){
 #' 
 #' plots time for each scan event
 #' @inherit plotLockMassCorrection params return references author
+#' @importFrom rlang .data
 #' @export
 #' @examples
 #'  rawrr::sampleFilePath() |> rawDiag::read.raw() -> S
@@ -702,7 +704,7 @@ plotChargeState <- function(x, method='trellis'){
 plotScanTime <- function(x, method='trellis'){
   x |>
     .calcTransient() |>
-    dplyr::mutate(ElapsedScanTimesec = ElapsedScanTimesec * 1000) |>
+    dplyr::mutate(ElapsedScanTimesec = .data$ElapsedScanTimesec * 1000) |>
     dplyr::select_at(dplyr::vars("StartTime", "scanType", "ElapsedScanTimesec", "rawfile", "MassAnalyzer", "MSOrder", "transient")) |>
     na.omit() |>
     .mapType()-> xx
