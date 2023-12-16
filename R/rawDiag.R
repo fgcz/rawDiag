@@ -492,7 +492,6 @@ plotMzDistribution <- function(x, method='trellis'){
                                colour = "cornflowerblue", se = FALSE) +
             ggplot2::scale_x_continuous(breaks = scales::pretty_breaks(8)) +
             ggplot2::scale_y_continuous(breaks = scales::pretty_breaks(8)) +
-            ggplot2::labs(title = "Retention Time to m/z correlation plot") +
             ggplot2::labs(subtitle = "Plotting retention time against m/z value of all selected precursors") +
             ggplot2::labs(x = "Retention Time", y = "Presursor m/z value") -> gp
     }else if (method == 'violin'){
@@ -500,7 +499,6 @@ plotMzDistribution <- function(x, method='trellis'){
                                          y = .data$precursorMass)) + 
             ggplot2::geom_violin() +
             ggplot2::scale_y_continuous(breaks = scales::pretty_breaks(8)) +
-            ggplot2::labs(title = "Retention Time to m/z correlation plot") +
             ggplot2::labs(subtitle = "Plotting the precursor m/z value density of all mass spectrometry runs") +
             ggplot2::labs(x = "Filename", y = "Presursor m/z value [Da]") +
             ggplot2::theme_light() +
@@ -518,13 +516,14 @@ plotMzDistribution <- function(x, method='trellis'){
                                se = FALSE) +
             ggplot2::scale_x_continuous(breaks = scales::pretty_breaks(8)) +
             ggplot2::scale_y_continuous(breaks = scales::pretty_breaks(8)) +
-            ggplot2::labs(title = "Retention Time to m/z correlation plot") +
             ggplot2::labs(subtitle = "Plotting retention time against m/z value of all selected precursors") +
             ggplot2::labs(x = "Retention Time [min]", y = "Presursor m/z value [Da]") +
             ggplot2::theme(legend.position="top") -> gp
         
     }else{NULL}
-    gp + ggplot2::theme_light() 
+    gp +
+      ggplot2::theme_light() +
+      ggplot2::labs(title = "Retention Time to m/z correlation plot") 
 }
 
 
@@ -550,7 +549,6 @@ plotMassDistribution <- function(x, method = 'trellis'){
       ggplot2::labs(fill = "Charge State", colour = "Charge State") +
       ggplot2::scale_x_continuous(breaks = scales::pretty_breaks(8)) +
       ggplot2::coord_cartesian(xlim = range(xx$deconv)) +
-      ggplot2::theme_light() + 
       ggplot2::facet_wrap(~ .data$rawfile) -> gp
   }else if (method == 'violin'){ #mz.frequency.violin
     xx |>
@@ -559,7 +557,6 @@ plotMassDistribution <- function(x, method = 'trellis'){
       ggplot2::labs(title = "Precursor mass to charge density plot ") +
       ggplot2::labs(subtitle = "Plotting the charge state resolved precursor masse density for each mass spectrometry run") +
       ggplot2::labs(x = "Charge State ", y = "Neutral Mass [Da]") +
-      ggplot2::theme_light() +
       ggplot2::theme(legend.position = "top") -> gp
   }else if (method == 'overlay'){ #mz.frequency.overlay
     xx |> 
@@ -570,10 +567,10 @@ plotMassDistribution <- function(x, method = 'trellis'){
       ggplot2::labs(x = "Precursor mass [neutral mass]", y = "Density") +
       ggplot2::scale_x_continuous(breaks = scales::pretty_breaks(12)) +
       ggplot2::coord_cartesian(xlim = range(xx$deconv)) +
-      ggplot2::theme_light() +
       ggplot2::theme(legend.position = "top") -> gp
   }else{NULL}
-  gp
+  gp +
+      ggplot2::theme_light() 
 }
 
 #' Charge State Overview Plot
@@ -605,10 +602,8 @@ plotChargeState <- function(x, method='trellis'){
       ggplot2::scale_y_continuous(breaks = scales::pretty_breaks(15),
                                   expand = c(0, 0),
                                   limits = c(0, (max(xx$percentage)) + 3)) +
-      ggplot2::labs(title = "Charge state plot") +
       ggplot2::labs(subtitle = "Plotting the number of occurrences of all selected precursor charge states") +
       ggplot2::labs(x = "Charge States", y = "Percent [%]") +
-      ggplot2::theme_light() +
       ggplot2::facet_wrap(~ rawfile) -> gp
   }else if(method =='overlay'){
     ggplot2::ggplot(xx, ggplot2::aes(x = .data$charge, y = .data$percentage,
@@ -619,10 +614,8 @@ plotChargeState <- function(x, method='trellis'){
       ggplot2::scale_y_continuous(breaks = scales::pretty_breaks(15),
                                   expand = c(0, 0),
                                   limits = c(0, (max(xx$percentage)) + 3)) +
-      ggplot2::labs(title = "Charge state plot") +
       ggplot2::labs(subtitle = "Plotting the number of occurrences of all selected precursor charge states") +
       ggplot2::labs(x = "Charge States", y = "Percent [%]") +
-      ggplot2::theme_light()+
       ggplot2::theme(legend.position = "top") -> gp
   }else if (method =='violin'){
    x |>
@@ -630,12 +623,13 @@ plotChargeState <- function(x, method='trellis'){
     ggplot2::ggplot(xx, ggplot2::aes(x = .data$rawfile, y = .data$charge)) + 
       ggplot2::geom_violin() +
       ggplot2::scale_y_continuous(breaks = scales::pretty_breaks(8)) +
-      ggplot2::labs(title = "Charge state plot") +
       ggplot2::labs(subtitle = "Plotting the precursor charge state density for each mass spectrometry run") +
       ggplot2::labs(x = "Filename", y = "Charge State") +
-      ggplot2::theme_light() +
       ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90)) -> gp
   }else{NULL}
+  gp +
+    ggplot2::theme_light() +
+    ggplot2::labs(title = "Charge state plot") 
 }
 
 .mapType <- function(x){
@@ -708,21 +702,17 @@ plotScanTime <- function(x, method='trellis'){
     dplyr::select_at(dplyr::vars("StartTime", "scanType", "ElapsedScanTimesec", "rawfile", "MassAnalyzer", "MSOrder", "transient")) |>
     na.omit() |>
     .mapType()-> xx
-  
   if(method == 'trellis'){
     ggplot2::ggplot(xx, ggplot2::aes(x = .data$StartTime, y = .data$ElapsedScanTimesec)) +
       ggplot2::geom_point(shape = ".") +
       ggplot2::facet_grid(rawfile ~ Type) +
       ggplot2::geom_line(stat = "smooth", method = "gam",
                          formula = y ~ s(x), colour = "deepskyblue3", se = FALSE) +
-      ggplot2::labs(title = "Scan time plot") +
       ggplot2::labs(subtitle = "Plotting the elapsed scan time for each individual scan") +
       ggplot2::labs(x = "Retentione Time [min]", y = "Elapsed Scan Time [ms]") +
       ggplot2::scale_x_continuous(breaks = scales::pretty_breaks((n = 8))) +
       ggplot2::scale_y_continuous(breaks = scales::pretty_breaks((n = 8))) +
-      ggplot2::theme_light() +
       ggplot2::geom_hline(data = xx, ggplot2::aes(yintercept = .data$transient), colour = "red3") -> gp
-    
   }else if (method == 'violin'){
     xx |> 
       dplyr::mutate_at(dplyr::vars("ElapsedScanTimesec"), list(~ .*1000)) |>
@@ -733,25 +723,23 @@ plotScanTime <- function(x, method='trellis'){
       ggplot2::geom_violin()  +
       ggplot2::facet_grid(MSOrder + MassAnalyzer ~ ., scales = "free") +
       ggplot2::scale_y_continuous(breaks = scales::pretty_breaks(8)) +
-      ggplot2::labs(title = "Scan time plot") +
       ggplot2::labs(subtitle = "Plotting the retention time resolved elapsed scan time density for each mass spectrometry run") +
       ggplot2::labs(x = "rawfile", y = "Elapsed Scan Time [ms]") +
-      ggplot2::theme_light() +
       ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90)) -> gp
   }else if (method == 'overlay'){
     ggplot2::ggplot(xx, ggplot2::aes(x = .data$StartTime, y = .data$ElapsedScanTimesec,  colour = .data$rawfile)) +
       ggplot2::geom_point(size = 0.5) +
       ggplot2::geom_line(ggplot2::aes(group = "rawfile", colour = "rawfile"), stat = "smooth", method = "gam", formula = y ~ s(x, bs= "cs"), se = FALSE) +
       ggplot2::facet_grid(~ MSOrder + MassAnalyzer, scales = "free") +
-      ggplot2::labs(title = "Scan time plot") +
       ggplot2::labs(subtitle = "Plotting the elapsed scan time for each individual scan") +
       ggplot2::labs(x = "Retentione Time [min]", y = "Elapsed Scan Time [ms]") +
       ggplot2::scale_x_continuous(breaks = scales::pretty_breaks((n = 8))) +
       ggplot2::scale_y_continuous(breaks = scales::pretty_breaks((n = 8))) +
-      ggplot2::theme_light() +
       ggplot2::theme(legend.position="top") -> gp
   }else{NULL}
-  gp
+  gp +
+    ggplot2::theme_light() +
+    ggplot2::labs(title = "Scan time plot") 
 }
 
 
