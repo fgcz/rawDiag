@@ -13,12 +13,14 @@ Imports:
   ggplot2 (>= 3.4),
   grDevices,
   htmltools,
+  parallel,
   rawrr (>= 1.10),
   rlang,
   reshape2,
   scales,
   shiny,
-  stats
+  stats,
+  utils
 Suggests:
   BiocStyle (>= 2.28),
   ExperimentHub,
