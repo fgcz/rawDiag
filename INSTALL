@@ -5,4 +5,21 @@ The set up for the rawrr package needs to be run in order to use the rawDiag pac
 
 Therfore, please follow the install notes of the rawrr package.
 
-https://bioconductor.org/packages/rawrr/
+1. Go to https://bioconductor.org/packages/release/bioc/install/rawrr/INSTALL
+to find installation notes for the rawrr package.
+
+2. Follow the instructions provided on the webpage.
+
+3. After installing rawrr, open your R shell.
+
+4. Type and run the following commands:
+
+```
+rawrr::installRawFileReaderDLLs()
+r rawrr::installRawrrExe()
+```
+
+These commands install necessary components. Make sure to execute them in your R shell.
+
+By following these steps, you'll successfully set up rawrr,
+enabling you to use the rawDiag package seamlessly.
