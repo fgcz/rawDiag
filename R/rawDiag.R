@@ -349,6 +349,7 @@ plotTicBasepeak <- function(x, method = 'trellis'){
 #' dashed line.
 #'
 #' @inherit plotLockMassCorrection params return
+#' @aliases PlotCycleTime 
 #'
 #' @importFrom ggplot2 ggplot aes geom_point geom_line scale_x_continuous scale_y_continuous geom_hline theme_light
 #' @importFrom scales pretty_breaks
@@ -412,6 +413,7 @@ plotCycleTime <- function(x, method = 'trellis'){
 #' the more the density is shifted towards the maximum injection time value.
 #' 
 #' @inherit plotLockMassCorrection params return  references author
+#' @aliases PlotInjectionTime
 #' @export
 #' @importFrom ggplot2 ggplot aes geom_point geom_line scale_x_continuous scale_y_continuous geom_hline theme_light
 #' @importFrom rlang .data
@@ -472,6 +474,7 @@ plotInjectionTime <- function(x, method = 'trellis'){
 #' draws precursor mass vs retention time for each MS2 scan in the raw file.
 #'
 #' @inherit plotLockMassCorrection params return references author
+#' @alias PlotMzDistribution
 #' @examples
 #' rawrr::sampleFilePath() |> rawDiag::read.raw() -> S
 #' plotMzDistribution(S)
@@ -533,6 +536,7 @@ plotMzDistribution <- function(x, method='trellis'){
 #'
 #' @description plots the mass frequency in dependency to the charge state
 #' @inherit plotLockMassCorrection params return references author
+#' @aliases PlotMassDistribution
 #' @examples
 #' rawrr::sampleFilePath() |> rawDiag::read.raw() |> rawDiag::plotMassDistribution('overlay')
 #' @export
@@ -582,15 +586,15 @@ plotMassDistribution <- function(x, method = 'trellis'){
 #' graphs the number of occurrences of all selected precursor charge states.
 #' 
 #' @inherit plotLockMassCorrection params return references author
+#' @aliases PlotChargeState
 #' @export
 #' @examples
 #'  rawrr::sampleFilePath() |> rawDiag::read.raw() -> S
 #'  
 #'  S|>plotLockMassCorrection()
 plotChargeState <- function(x, method='trellis'){
-  x |>
-    dplyr::filter(MSOrder == "Ms2") |>
-    dplyr::group_by_at(dplyr::vars(rawfile)) |>
+  x[x$MSOrder == "Ms2", ] |>
+    dplyr::group_by_at(dplyr::vars(.data$rawfile)) |>
     dplyr::count(.data$charge) |>
     dplyr::ungroup() |>
     dplyr::rename_at(dplyr::vars("n"), list(~ as.character("Counts"))) -> xx
@@ -698,14 +702,14 @@ plotChargeState <- function(x, method='trellis'){
 #' Plotting the elapsed scan time for each individual scan event.
 #' 
 #' @inherit plotLockMassCorrection params return references author
+#' @aliases PlotScanTime
 #' @export
 #' @examples
 #'  rawrr::sampleFilePath() |> rawDiag::read.raw() -> S
 #'  
 #'  S|> plotScanTime()
 plotScanTime <- function(x, method='trellis'){
-  x |>
-    .calcTransient() |>
+  x |> .calcTransient() |>
     dplyr::mutate(ElapsedScanTimesec = ElapsedScanTimesec * 1000) |>
     dplyr::select_at(dplyr::vars("StartTime", "scanType", "ElapsedScanTimesec", "rawfile", "MassAnalyzer", "MSOrder", "transient")) |>
     na.omit() |>
@@ -764,8 +768,8 @@ plotScanTime <- function(x, method='trellis'){
 #' @return a vector with any NA values replaced with the last previous actuall value
 #'
 #' @examples
-#' v1 <- c(NA, 1, 2, 3, NA, 4, 5, NA, NA, NA, 6)
-#' v2 <- fillNAgaps(v1)
+#' c(NA, 1, 2, 3, NA, 4, 5, NA, NA, NA, 6) |>
+#'   rawDiag:::.fillNAgaps()
 .fillNAgaps <- function(x) {
   goodVals <- c(NA, x[!is.na(x)])
   fillIdx <- cumsum(!is.na(x))+1
@@ -783,10 +787,10 @@ plotScanTime <- function(x, method='trellis'){
 #' @author Christian Trachsel
 .calculatioMasterScan <- function(x){
   x |>
-    dplyr::mutate(MasterScanNumber = dplyr::case_when(MSOrder == "Ms" ~ scan)) |>
+    dplyr::mutate(MasterScanNumber = dplyr::case_when(.data$MSOrder == "Ms" ~ .data$scan)) |>
     dplyr::mutate(MasterScanNumber = .fillNAgaps(.data$MasterScanNumber)) |>
-    dplyr::mutate(MasterScanNumber = replace(MasterScanNumber, scan == MasterScanNumber, NA)) |>
-    dplyr::pull(MasterScanNumber) -> x$MasterScanNumber 
+    dplyr::mutate(MasterScanNumber = replace(MasterScanNumber, .data$scan == MasterScanNumber, NA)) |>
+    dplyr::pull(.data$MasterScanNumber) -> x$MasterScanNumber 
  x
 }
 
@@ -798,18 +802,18 @@ plotScanTime <- function(x, method='trellis'){
 #' @inherit plotLockMassCorrection params return references author
 #' @export
 #' @examples
-#'  rawrr::sampleFilePath() |> rawDiag::read.raw() -> S
+#' rawrr::sampleFilePath() |> rawDiag::read.raw() -> S
 #'  
 #'  S|> plotCycleLoad()
 plotCycleLoad <- function(x, method = 'trellis'){
   x |> 
     .calculatioMasterScan() |>
-    dplyr::filter(MSOrder == "Ms2") |>
+    dplyr::filter(.data$MSOrder == "Ms2") |>
     dplyr::group_by_at(dplyr::vars("rawfile")) |>
-    dplyr::count(MasterScanNumber) |> 
+    dplyr::count(.data$MasterScanNumber) |> 
     dplyr::rename(scan = MasterScanNumber) -> MS2
-  x |>  
-    dplyr::select(StartTime, scan) -> MS
+  
+  x [, c('StartTime', 'scan')] -> MS
 
   xx <- dplyr::inner_join(MS, MS2, by = "scan")
   if (method == 'trellis'){

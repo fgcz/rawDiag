@@ -76,6 +76,9 @@ rawDiagUI <- function(id){
 #' @param vals containing rawfile
 #' @return shiny module server
 #' @importFrom shiny moduleServer reactive reactiveValues observeEvent renderPlot req NS tagList selectInput checkboxInput plotOutput debounce
+#' @importFrom utils packageVersion
+#' @importFrom parallel detectCores mclapply
+#' @importFrom htmltools a img div
 #' @examplesIf interactive()
 #' rawDiag::shiny(rawDir = (rawrr::sampleFilePath() |> dirname()))
 #' @export

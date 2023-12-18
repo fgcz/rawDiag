@@ -21,7 +21,7 @@ plotting the number of MS2 per MS1 (the duty cycle) scan versus retention
 time. The deepskyblue colored loess curve shows the trend.
 }
 \examples{
- rawrr::sampleFilePath() |> rawDiag::read.raw() -> S
+rawrr::sampleFilePath() |> rawDiag::read.raw() -> S
  
  S|> plotCycleLoad()
 }

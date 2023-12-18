@@ -16,8 +16,8 @@ a vector with any NA values replaced with the last previous actuall value
 Fill NA values with last previous value
 }
 \examples{
-v1 <- c(NA, 1, 2, 3, NA, 4, 5, NA, NA, NA, 6)
-v2 <- fillNAgaps(v1)
+c(NA, 1, 2, 3, NA, 4, 5, NA, NA, NA, 6) |>
+  rawDiag:::.fillNAgaps()
 }
 \author{
 Christian Trachsel
