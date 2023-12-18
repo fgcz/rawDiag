@@ -17,11 +17,11 @@
 #' default is using the \code{message}.
 #' @return a \code{data.frame} containing the selected trailer information.
 #' @author Christian Panse (2016-2023)
-#' @export
 #' @aliases rawDiag
 #' @examples
 #' rawrr::sampleFilePath() |> rawDiag::read.raw()
 #' @importFrom rawrr readIndex readTrailer readChromatogram
+#' @export
 read.raw <- function(rawfile, msgFUN = function(x){message(x)}){
   message("reading index for ", basename(rawfile), "...")
 
@@ -174,6 +174,7 @@ validate_read.raw <- function(x){
 #'
 #' @importFrom ggplot2 ggplot aes_string geom_hline geom_line labs scale_x_continuous facet_wrap theme_light
 #' @export
+#' @aliases PlotLockMassCorrection
 plotLockMassCorrection <- function(x, method = 'trellis'){
   if(isFALSE("LMCorrection" %in% colnames(x))) {return(.plotMissingData())}
 
@@ -221,12 +222,13 @@ plotLockMassCorrection <- function(x, method = 'trellis'){
 #' @inherit plotLockMassCorrection params return references author
 #' @param bins number of bins in both vertical and horizontal directions. default is 80.
 #' @author Christian Trachsel (2017)
-#' @export
 #' @note TODO: define bin with dynamically as h= 2x IQR x n e-1/3 or number of bins (max-min)/h
 #' @importFrom ggplot2 ggplot aes_string geom_hex labs scale_fill_gradientn theme_light
 #' @importFrom grDevices colorRampPalette
 #' @examples
 #' rawrr::sampleFilePath() |> read.raw() |> plotPrecursorHeatmap()
+#' @export
+#' @aliases PlotPrecursorHeatmap
 plotPrecursorHeatmap <- function(x, method = 'overlay', bins = 80){
   spectral <- c("#5E4FA2",
                 "#3288BD",
@@ -269,12 +271,13 @@ plotPrecursorHeatmap <- function(x, method = 'overlay', bins = 80){
 #'
 #' @inheritParams plotLockMassCorrection
 #' @return a ggplot2 object for graphing the TIC and the Base Peak chromatogram.
-#' @export
 #' @author Christian Trachsel (2017), Christian Panse (20231130) refactored
 #' @importFrom ggplot2 ggplot aes_string geom_line labs scale_x_continuous facet_wrap theme_light
 #' @importFrom reshape2 melt
 #' @examples
 #' rawrr::sampleFilePath() |> read.raw() |> plotTicBasepeak()
+#' @export
+#' @aliases PlotTicBasepeak
 plotTicBasepeak <- function(x, method = 'trellis'){
   stopifnot(method %in% c('trellis', 'violin', 'overlay'))
 
@@ -349,16 +352,16 @@ plotTicBasepeak <- function(x, method = 'trellis'){
 #' dashed line.
 #'
 #' @inherit plotLockMassCorrection params return
-#' @aliases PlotCycleTime
 #'
 #' @importFrom ggplot2 ggplot aes geom_point geom_line scale_x_continuous scale_y_continuous geom_hline theme_light
 #' @importFrom scales pretty_breaks
 #' @importFrom dplyr left_join
 #' @importFrom stats quantile na.omit
 #' @importFrom rlang .data
-#' @export
 #' @examples
 #' rawrr::sampleFilePath() |> read.raw() |> plotCycleTime()
+#' @export
+#' @aliases PlotCycleTime
 plotCycleTime <- function(x, method = 'trellis'){
   xx <- .cycleTime(x)
 
@@ -413,11 +416,11 @@ plotCycleTime <- function(x, method = 'trellis'){
 #' the more the density is shifted towards the maximum injection time value.
 #'
 #' @inherit plotLockMassCorrection params return  references author
-#' @aliases PlotInjectionTime
-#' @export
 #' @importFrom ggplot2 ggplot aes geom_point geom_line scale_x_continuous scale_y_continuous geom_hline theme_light
 #' @importFrom rlang .data
 #' @examples
+#' @export
+#' @aliases PlotInjectionTime
 #' rawrr::sampleFilePath() |> read.raw() |> plotInjectionTime()
 plotInjectionTime <- function(x, method = 'trellis'){
   if (method == 'trellis'){
@@ -480,6 +483,7 @@ plotInjectionTime <- function(x, method = 'trellis'){
 #' rawrr::sampleFilePath() |> rawDiag::read.raw() -> S
 #' plotMzDistribution(S)
 #' @export
+#' @aliases PlotMzDistribution
 plotMzDistribution <- function(x, method='trellis'){
     x |>
         dplyr::filter(.data$MSOrder == "Ms2") -> xx
@@ -536,10 +540,10 @@ plotMzDistribution <- function(x, method='trellis'){
 #'
 #' @description plots the mass frequency in dependency to the charge state
 #' @inherit plotLockMassCorrection params return references author
-#' @aliases PlotMassDistribution
 #' @examples
 #' rawrr::sampleFilePath() |> rawDiag::read.raw() |> rawDiag::plotMassDistribution('overlay')
 #' @export
+#' @aliases PlotMassDistribution
 plotMassDistribution <- function(x, method = 'trellis'){
   x[x['MSOrder'] == 'Ms2', c('MSOrder', 'charge','rawfile', 'precursorMass')] -> xx
 
@@ -584,13 +588,13 @@ plotMassDistribution <- function(x, method = 'trellis'){
 #' graphs the number of occurrences of all selected precursor charge states.
 #'
 #' @inherit plotLockMassCorrection params return references author
-#' @aliases PlotChargeState
-#' @export
 #' @importFrom rlang .data
 #' @examples
 #'  rawrr::sampleFilePath() |> rawDiag::read.raw() -> S
 #'
 #'  S|>plotLockMassCorrection()
+#' @export
+#' @aliases PlotChargeState
 plotChargeState <- function(x, method='trellis'){
   x |>
     dplyr::filter(.data$MSOrder == "Ms2") |>
@@ -699,13 +703,13 @@ plotChargeState <- function(x, method='trellis'){
 #' Plotting the elapsed scan time for each individual scan event.
 #'
 #' @inherit plotLockMassCorrection params return references author
-#' @aliases PlotScanTime
 #' @importFrom rlang .data
-#' @export
 #' @examples
 #'  rawrr::sampleFilePath() |> rawDiag::read.raw() -> S
 #'
 #'  S|> plotScanTime()
+#' @export
+#' @aliases PlotScanTime
 plotScanTime <- function(x, method='trellis'){
   x |>
     .calcTransient() |>
@@ -776,13 +780,14 @@ plotScanTime <- function(x, method='trellis'){
 #' and populates the MasterScanNumber with it
 #'
 #' @inheritParams plotLockMassCorrection
+#' @importFrom rlang .data
 #'
 #' @author Christian Trachsel
 .calculatioMasterScan <- function(x){
   x |>
     dplyr::mutate(MasterScanNumber = dplyr::case_when(.data$MSOrder == "Ms" ~ .data$scan)) |>
     dplyr::mutate(MasterScanNumber = .fillNAgaps(.data$MasterScanNumber)) |>
-    dplyr::mutate(MasterScanNumber = replace(MasterScanNumber, .data$scan == MasterScanNumber, NA)) |>
+    dplyr::mutate(MasterScanNumber = replace(.data$MasterScanNumber, .data$scan == .data$MasterScanNumber, NA)) |>
     dplyr::pull(.data$MasterScanNumber) -> x$MasterScanNumber
  x
 }
@@ -793,18 +798,19 @@ plotScanTime <- function(x, method='trellis'){
 #' time. The deepskyblue colored loess curve shows the trend.
 #'
 #' @inherit plotLockMassCorrection params return references author
-#' @export
 #' @examples
 #' rawrr::sampleFilePath() |> rawDiag::read.raw() -> S
 #'
 #'  S|> plotCycleLoad()
+#' @export
+#' @aliases PlotCycleLoad
 plotCycleLoad <- function(x, method = 'trellis'){
   x |>
     .calculatioMasterScan() |>
     dplyr::filter(.data$MSOrder == "Ms2") |>
     dplyr::group_by_at(dplyr::vars("rawfile")) |>
     dplyr::count(.data$MasterScanNumber) |>
-    dplyr::rename(scan = MasterScanNumber) -> MS2
+    dplyr::rename(scan = .data$MasterScanNumber) -> MS2
 
   x [, c('StartTime', 'scan')] -> MS
 

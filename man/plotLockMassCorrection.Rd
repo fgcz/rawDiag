@@ -2,6 +2,7 @@
 % Please edit documentation in R/rawDiag.R
 \name{plotLockMassCorrection}
 \alias{plotLockMassCorrection}
+\alias{PlotLockMassCorrection}
 \title{Lock Mass Correction Plot}
 \usage{
 plotLockMassCorrection(x, method = "trellis")

@@ -2,6 +2,7 @@
 % Please edit documentation in R/rawDiag.R
 \name{plotCycleTime}
 \alias{plotCycleTime}
+\alias{PlotCycleTime}
 \title{Plot Cycle Time}
 \usage{
 plotCycleTime(x, method = "trellis")

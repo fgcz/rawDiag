@@ -11,7 +11,7 @@
 the \code{is.rawDiag} function.}
 }
 \description{
-calculates the MS1 master scan number of an MS2 scan 
+calculates the MS1 master scan number of an MS2 scan
 and populates the MasterScanNumber with it
 }
 \author{

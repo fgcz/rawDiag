@@ -2,6 +2,7 @@
 % Please edit documentation in R/rawDiag.R
 \name{plotChargeState}
 \alias{plotChargeState}
+\alias{PlotChargeState}
 \title{Charge State Overview Plot}
 \usage{
 plotChargeState(x, method = "trellis")
@@ -21,7 +22,7 @@ graphs the number of occurrences of all selected precursor charge states.
 }
 \examples{
  rawrr::sampleFilePath() |> rawDiag::read.raw() -> S
- 
+
  S|>plotLockMassCorrection()
 }
 \references{

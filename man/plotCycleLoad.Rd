@@ -2,6 +2,7 @@
 % Please edit documentation in R/rawDiag.R
 \name{plotCycleLoad}
 \alias{plotCycleLoad}
+\alias{PlotCycleLoad}
 \title{Cycle Load Plot}
 \usage{
 plotCycleLoad(x, method = "trellis")
@@ -22,7 +23,7 @@ time. The deepskyblue colored loess curve shows the trend.
 }
 \examples{
 rawrr::sampleFilePath() |> rawDiag::read.raw() -> S
- 
+
  S|> plotCycleLoad()
 }
 \references{

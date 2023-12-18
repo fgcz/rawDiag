@@ -2,6 +2,7 @@
 % Please edit documentation in R/rawDiag.R
 \name{plotMassDistribution}
 \alias{plotMassDistribution}
+\alias{PlotMassDistribution}
 \title{Mass Distribution Plot}
 \usage{
 plotMassDistribution(x, method = "trellis")
