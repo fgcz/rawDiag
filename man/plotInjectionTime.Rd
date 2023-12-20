@@ -2,6 +2,11 @@
 % Please edit documentation in R/rawDiag.R
 \name{plotInjectionTime}
 \alias{plotInjectionTime}
+\alias{PlotInjectionTime}
+\alias{rawrr::sampleFilePath()}
+\alias{|>}
+\alias{read.raw()}
+\alias{plotInjectionTime()}
 \title{Plot Injection Time}
 \usage{
 plotInjectionTime(x, method = "trellis")
@@ -20,9 +25,6 @@ a \code{\link[ggplot2]{ggplot}} object.
 shows the injection time density of each mass spectrometry file as a violin
 plot. The higher the maximum number of MS2 scans is in the method,
 the more the density is shifted towards the maximum injection time value.
-}
-\examples{
-rawrr::sampleFilePath() |> read.raw() |> plotInjectionTime()
 }
 \references{
 \itemize{

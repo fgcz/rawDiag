@@ -16,7 +16,7 @@ read.raw(
 \item{rawfile}{the name of the raw file containing the mass spectrometry data from the Thermo Fisher Scientific instrument.}
 
 \item{msgFUN}{this function is used for logging information while composing
-the resulting data.frame. It can also be used for shiny progress bar. The 
+the resulting data.frame. It can also be used for shiny progress bar. The
 default is using the \code{message}.}
 }
 \value{

@@ -11,7 +11,7 @@
 the \code{is.rawDiag} function.}
 }
 \value{
-calculates the time of all ms cycles and the 95% quantile value there of. 
+calculates the time of all ms cycles and the 95% quantile value there of.
 the cycle time is defined as the time between two consecutive MS1 scans
 }
 \description{

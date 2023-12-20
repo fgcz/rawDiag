@@ -83,16 +83,21 @@ rawfile |>
   rawDiag::read.raw() -> x
 ```
 
-```{r plotALL, echo = FALSE, eval = TRUE, fig.width = 10, fig.height = 5}
+```{r listFUN}
 library(rawDiag)
 pm <- ls("package:rawDiag")
+pm[grepl(pm, pattern = '^plot')] |>
+  knitr::kable(col.names = "package:rawDiag plot functions")
+```
+
+```{r plotALL, echo = FALSE, eval = TRUE, fig.width = 10, fig.height = 5}
 pm[grepl(pm, pattern = 'plot')] |> 
   lapply(FUN = function(plotFUN) {
     lapply(c('trellis', 'violin', 'overlay'), function(method) {
       message(paste0("plotting", plotFUN, "using method", method, "..."))
       do.call(plotFUN, list(x, method))
     })
-  }) |> print()
+  }) 
 ```
 
 

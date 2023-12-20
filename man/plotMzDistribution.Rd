@@ -2,6 +2,7 @@
 % Please edit documentation in R/rawDiag.R
 \name{plotMzDistribution}
 \alias{plotMzDistribution}
+\alias{PlotMzDistribution}
 \title{mZ Distribution Plot of Ms2 Scans}
 \usage{
 plotMzDistribution(x, method = "trellis")

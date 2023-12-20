@@ -25,8 +25,12 @@ shiny <- function(appDir = system.file('shiny', package = 'rawDiag'),
                 list.files(recursive = TRUE,
                            pattern = "*.raw$")) -> files
   
+<<<<<<< HEAD
   vapply(files, FUN=file.mtime, FUN.VALUE = 1702718537) |>
     order() -> idx
+=======
+  vapply(files, FUN = file.mtime, FUN.VALUE = 1702886922) |> order() -> idx
+>>>>>>> refs/remotes/origin/devel
   files[rev(idx)] ->> files
   
   shiny::runApp(appDir,  ...)
@@ -44,7 +48,9 @@ rawDiagUI <- function(id){
   ns <- NS(id)
   
   plotFunctions <- ls("package:rawDiag")[ls("package:rawDiag") |> grepl(pattern = "^plot")]
+  
   tagList(
+<<<<<<< HEAD
     #fluidRow(a(img(src="https://img.shields.io/badge/JPR-10.1021%2Facs.jproteome.8b00173-brightgreen"),
     #           href='http://dx.doi.org/10.1021/acs.jproteome.8b00173')),
     fluidRow(
@@ -69,6 +75,34 @@ rawDiagUI <- function(id){
     
     fluidRow(plotOutput(ns("plot")))
   )
+=======
+    column(12, offset = 0,
+           #fluidRow(a(img(src="https://img.shields.io/badge/JPR-10.1021%2Facs.jproteome.8b00173-brightgreen"),
+           #           href='http://dx.doi.org/10.1021/acs.jproteome.8b00173')),
+           fluidRow(
+             column(width = 4,
+                    selectInput(ns("plotFUN"), "function", choices = plotFunctions,
+                                selected = plotFunctions[1], multiple = FALSE)),
+             column(width = 4,
+                    selectInput(ns("plotArg"), "argument", choices = c("trellis", "violin", "overlay"),
+                                selected = "trellis", multiple = FALSE),
+             ),
+             column(width = 3,
+                    checkboxInput(ns('useParallel'), 'Use parallel processing (mclapply)', value = TRUE)
+             )),
+           fluidRow(
+             column(width = 4,
+                    selectInput(ns("plotHeight"), "height x n", choices = seq_len(10),
+                                selected = 1, multiple = FALSE)),
+             column(width = 4,
+                    selectInput(ns("plotWidth"), "width x n", choices = seq_len(4),
+                                selected = 1, multiple = FALSE),
+             )),
+           fluidRow(
+             plotOutput(ns("plot"), width = "100%")
+           ),
+    ))
+>>>>>>> refs/remotes/origin/devel
 }
 
 #' rawDiag shiny module
@@ -77,6 +111,9 @@ rawDiagUI <- function(id){
 #' @param vals containing rawfile
 #' @return shiny module server
 #' @importFrom shiny moduleServer reactive reactiveValues observeEvent renderPlot req NS tagList selectInput checkboxInput plotOutput debounce
+#' @importFrom utils packageVersion
+#' @importFrom parallel detectCores mclapply
+#' @importFrom htmltools a img div
 #' @examplesIf interactive()
 #' rawDiag::shiny(rawDir = (rawrr::sampleFilePath() |> dirname()))
 #' @export
@@ -117,7 +154,7 @@ rawDiagServer <- function(id, vals){
                  observeEvent(input$plotFUN, {
                    vals$plot <- input$plotFUN;
                    message(input$plotFUN)
-                   })
+                 })
                  
                  
                  dynamicHeight <- reactive({
@@ -138,12 +175,11 @@ rawDiagServer <- function(id, vals){
                  })
                  
                  output$plot <- renderPlot({
-                   shiny::req(data(), input$plotFUN, input$plotArg)
+                   shiny::req(data())
+
                    progress <- shiny::Progress$new(session = session)
                    progress$set(message = "plotting ...")
                    on.exit(progress$close())
-                   
-                   
                    
                    ## call the plot method
                    do.call(what = input$plotFUN,
@@ -152,8 +188,7 @@ rawDiagServer <- function(id, vals){
                    vals$gp <- gp
                    gp
                  },
-                 height = function()dynamicHeight(),
-                 width = 800)
+                 height = function()dynamicHeight())
                  
                  observeEvent(vals$generatePDF, {
                    shiny::req(data())

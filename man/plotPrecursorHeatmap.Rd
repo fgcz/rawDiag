@@ -2,6 +2,7 @@
 % Please edit documentation in R/rawDiag.R
 \name{plotPrecursorHeatmap}
 \alias{plotPrecursorHeatmap}
+\alias{PlotPrecursorHeatmap}
 \title{Precursor Mass versus StartTime MS2 based hexagons}
 \usage{
 plotPrecursorHeatmap(x, method = "overlay", bins = 80)

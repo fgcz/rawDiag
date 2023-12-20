@@ -2,6 +2,7 @@
 % Please edit documentation in R/rawDiag.R
 \name{plotTicBasepeak}
 \alias{plotTicBasepeak}
+\alias{PlotTicBasepeak}
 \title{Total Ion Count and Base Peak Plot}
 \usage{
 plotTicBasepeak(x, method = "trellis")
@@ -18,7 +19,7 @@ a ggplot2 object for graphing the TIC and the Base Peak chromatogram.
 }
 \description{
 displays the Total Ion Count (TIC) and the Base Peak Chromatogram
-of a mass spectrometry measurement. 
+of a mass spectrometry measurement.
 Multiple files are handled by faceting based on rawfile name.
 }
 \examples{

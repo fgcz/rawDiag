@@ -2,6 +2,7 @@
 % Please edit documentation in R/rawDiag.R
 \name{plotScanTime}
 \alias{plotScanTime}
+\alias{PlotScanTime}
 \title{Scan Event Plot}
 \usage{
 plotScanTime(x, method = "trellis")
@@ -17,11 +18,11 @@ The default is 'trellis'.}
 a \code{\link[ggplot2]{ggplot}} object.
 }
 \description{
-plots time for each scan event
+Plotting the elapsed scan time for each individual scan event.
 }
 \examples{
  rawrr::sampleFilePath() |> rawDiag::read.raw() -> S
- 
+
  S|> plotScanTime()
 }
 \references{

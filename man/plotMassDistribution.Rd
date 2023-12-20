@@ -2,6 +2,7 @@
 % Please edit documentation in R/rawDiag.R
 \name{plotMassDistribution}
 \alias{plotMassDistribution}
+\alias{PlotMassDistribution}
 \title{Mass Distribution Plot}
 \usage{
 plotMassDistribution(x, method = "trellis")
@@ -18,6 +19,9 @@ a \code{\link[ggplot2]{ggplot}} object.
 }
 \description{
 plots the mass frequency in dependency to the charge state
+}
+\details{
+displays charge state resolved frequency of precursor masses.
 }
 \examples{
 rawrr::sampleFilePath() |> rawDiag::read.raw() |> rawDiag::plotMassDistribution('overlay')
