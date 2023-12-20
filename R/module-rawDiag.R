@@ -25,7 +25,8 @@ shiny <- function(appDir = system.file('shiny', package = 'rawDiag'),
                 list.files(recursive = TRUE,
                            pattern = "*.raw$")) -> files
   
-  sapply(files, FUN=file.mtime) |> order() -> idx
+  vapply(files, FUN=file.mtime, FUN.VALUE = 1702718537) |>
+    order() -> idx
   files[rev(idx)] ->> files
   
   shiny::runApp(appDir,  ...)
@@ -59,10 +60,10 @@ rawDiagUI <- function(id){
       )),
     fluidRow(
       column(width = 4,
-             selectInput(ns("plotHeight"), "height x n", choices = 1:10,
+             selectInput(ns("plotHeight"), "height x n", choices = seq_len(10),
                          selected = 1, multiple = FALSE)),
       column(width = 4,
-             selectInput(ns("plotWidth"), "width x n", choices = 1:4,
+             selectInput(ns("plotWidth"), "width x n", choices = seq_len(4),
                          selected = 1, multiple = FALSE),
       )),
     
