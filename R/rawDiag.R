@@ -1,5 +1,82 @@
 #R
 
+.f <- function(rawfile, trailer, name){
+  rawrr::readTrailer(rawfile, trailer) |>
+    as.numeric() -> x
+  df <-data.frame(name = x);
+  colnames(df) <- name
+  df
+}
+
+#' @importFrom rawrr::readIndex 
+.read.raw <- function(rawfile, msgFUN = function(x){message(x)}){
+  msgFUN("composing calls")
+  t0 <- Sys.time()
+  
+  rawfile |>
+    rawrr::readTrailer() -> trailerNames
+  
+  callList <- list()
+  
+  callList <- append(callList, 
+                     call("readIndex", rawfile))
+  
+  if ("LM m/z-Correction (ppm):" %in% trailerNames){
+    callList <- append(callList, 
+                       call(".f", rawfile, "LM m/z-Correction (ppm):", "LMCorrection"))
+  }
+  
+  if ("AGC:" %in% trailerNames){
+    callList <- append(callList, 
+                       call(".f", rawfile, "AGC:", "AGC"))
+  }
+  
+  if ("AGC PS Mode:" %in% trailerNames){
+    callList <- append(callList, 
+                       call(".f", rawfile, "AGC PS Mode:", "PrescanMode"))
+  }
+  
+  if ("FT Resolution:" %in% trailerNames){
+    callList <- append(callList, 
+                       call(".f", rawfile, "FT Resolution:", "FTResolution"))
+  }
+  
+  if ("Ion Injection Time (ms):" %in% trailerNames){
+    callList <- append(callList, 
+                       call(".f", rawfile, "Ion Injection Time (ms):", "IonInjectionTime"))
+  }
+  
+  msgFUN(paste("eval calls using", parallel::detectCores(), "cores"))
+  parallel::mclapply(callList,
+                     FUN = eval,
+                     mc.cores = parallel::detectCores()) |>
+    Reduce(f = cbind) -> rawrrIndex
+  
+  msgFUN("reading TIC ...")
+  rawrrIndex$TIC <- NA
+  rawfile |> rawrr::readChromatogram(type = 'tic') -> tic
+  rawrrIndex$TIC[rawrrIndex$MSOrder == "Ms"] <- tic$intensities
+  
+  msgFUN("reading BasePeakIntensity ...")
+  rawrrIndex$BasePeakIntensity <- NA
+  rawfile |> rawrr::readChromatogram(type = 'bpc') -> bpc
+  rawrrIndex$BasePeakIntensity[rawrrIndex$MSOrder == "Ms"] <- bpc$intensities
+  
+  msgFUN("determining ElapsedScanTimesec ...")
+  rawrrIndex$ElapsedScanTimesec <- c(diff(rawrrIndex$StartTime), NA)
+  
+  rawrrIndex$rawfile <- basename(rawfile)
+  
+  t1 <- Sys.time()
+  
+  td <- difftime(t1, t0, units = "secs") |>
+    round(3) 
+  
+  paste("reading took", td, "seconds") |>
+    message()
+  
+  rawrrIndex |> validate_read.raw()
+}
 #' Reads selected raw file trailer for rawDiag plot functions
 #'
 #' implements a wrapper function using the rawrr methods
@@ -25,6 +102,7 @@
 read.raw <- function(rawfile, msgFUN = function(x){message(x)}){
   message("reading index for ", basename(rawfile), "...")
 
+  t0 <- Sys.time()
   rawfile |>
     rawrr::readIndex() -> rawrrIndex
   rawrrIndex$rawfile <- basename(rawfile)
@@ -83,6 +161,14 @@ read.raw <- function(rawfile, msgFUN = function(x){message(x)}){
   rawfile |> rawrr::readChromatogram(type = 'bpc') -> bpc
   rawrrIndex$BasePeakIntensity[rawrrIndex$MSOrder == "Ms"] <- bpc$intensities
 
+  t1 <- Sys.time()
+  
+  td <- difftime(t1, t0, units = "secs") |>
+    round(3) 
+  
+  paste("reading took", td, "seconds") |>
+    message()
+  
   rawrrIndex |> validate_read.raw()
 }
 

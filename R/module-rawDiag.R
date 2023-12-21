@@ -103,12 +103,12 @@ rawDiagServer <- function(id, vals){
                                   detail = "using parallel::mclapply")
                      
                      parallel::mclapply(rawfile(),
-                                        FUN = rawDiag::read.raw,
+                                        FUN = rawDiag:::.read.raw,
                                         mc.cores = parallel::detectCores()) |>
                        Reduce(f = rbind)
                    }else{
                      lapply(rawfile(), function(f){
-                       rawDiag::read.raw(f,
+                       rawDiag:::.read.raw(f,
                                          msgFUN = function(msg){
                                            progress$set(detail = paste0("from file ", basename(f)),
                                                         message = msg)
