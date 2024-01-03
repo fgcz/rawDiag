@@ -48,11 +48,11 @@ can be done on all platforms using the command:
 
 ```{r installAssemblies, echo=TRUE}
 if (isFALSE(rawrr::.checkDllInMonoPath())){
-  rawrr::installRawFileReaderDLLs()
+#  rawrr::installRawFileReaderDLLs()
 }
 
 if (isFALSE(file.exists(rawrr:::.rawrrAssembly()))){
- rawrr::installRawrrExe()
+#  rawrr::installRawrrExe()
 }
 ```
 
