@@ -33,10 +33,10 @@ urlcolor: blue
 
 ```{r style, echo = FALSE, results = 'asis'}
 BiocStyle::markdown()
-knitr::opts_chunk$set(fig.wide = TRUE, fig.retina = 3, error=FALSE)
+knitr::opts_chunk$set(fig.wide = TRUE, fig.retina = 3, error=FALSE, eval=FALSE)
 ```
 
-```{r rawDiagLogo, echo=FALSE, out.width="50%", eval=TRUE}
+```{r rawDiagLogo, echo=FALSE, out.width="50%"}
 knitr::include_graphics("octopussy.png")
 ```
 
@@ -61,7 +61,7 @@ if (isFALSE(file.exists(rawrr:::.rawrrAssembly()))){
 
 graph all varieties of plots
 
-```{r fetchFromExperimentHub, echo=FALSE, eval=TRUE}
+```{r fetchFromExperimentHub, echo=FALSE}
 # fetch via ExperimentHub
 library(ExperimentHub)
 eh = ExperimentHub()
@@ -73,7 +73,7 @@ if (!file.exists(rawfile)){
 }
 ```
 
-```{r eval=FALSE, echo=FALSE}
+```{r sample, echo=FALSE}
 rawrr::sampleFilePath() -> rawfile
 ```
 
@@ -90,7 +90,7 @@ pm[grepl(pm, pattern = '^plot')] |>
   knitr::kable(col.names = "package:rawDiag plot functions")
 ```
 
-```{r plotALL, echo = FALSE, eval = TRUE, fig.width = 10, fig.height = 5}
+```{r plotALL, echo = FALSE, fig.width = 10, fig.height = 5}
 pm[grepl(pm, pattern = 'plot')] |> 
   lapply(FUN = function(plotFUN) {
     lapply(c('trellis', 'violin', 'overlay'), function(method) {
@@ -103,7 +103,7 @@ pm[grepl(pm, pattern = 'plot')] |>
 
 # Session information {-}
 
-```{r sessioninfo, echo=FALSE}
+```{r sessioninfo, echo=FALSE, eval=TRUE}
 sessionInfo()
 ```
 
