@@ -7,6 +7,7 @@
 #' default is set to the \code{$HOME/Downloads} directory.
 #' @param \ldots passed to the \code{\link{runApp}} method.
 #' @importFrom shiny runApp
+#' @return runs a shiny application
 #' @inherit plotLockMassCorrection author references
 #' @export
 #' @examplesIf interactive()
@@ -25,7 +26,7 @@ shiny <- function(appDir = system.file('shiny', package = 'rawDiag'),
                 list.files(recursive = TRUE,
                            pattern = "*.raw$")) -> files
   
-  vapply(files, FUN=file.mtime, FUN.VALUE = 1702718537) |>
+  vapply(files, FUN = file.mtime, FUN.VALUE = 1702718537) |>
     order() -> idx
   files[rev(idx)] ->> files
   

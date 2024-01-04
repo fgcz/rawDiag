@@ -33,7 +33,7 @@ urlcolor: blue
 
 ```{r style, echo = FALSE, results = 'asis'}
 BiocStyle::markdown()
-knitr::opts_chunk$set(fig.wide = TRUE, fig.retina = 3, error=FALSE, eval=FALSE)
+knitr::opts_chunk$set(fig.wide = TRUE, fig.retina = 3, error=FALSE, eval=TRUE)
 ```
 
 ```{r rawDiagLogo, echo=FALSE, out.width="50%"}
@@ -48,12 +48,15 @@ can be done on all platforms using the command:
 
 ```{r installAssemblies, echo=TRUE}
 if (isFALSE(rawrr::.checkDllInMonoPath())){
-#  rawrr::installRawFileReaderDLLs()
+   message ("exec", "rawrr::installRawFileReaderDLLs()")
 }
 
 if (isFALSE(file.exists(rawrr:::.rawrrAssembly()))){
-#  rawrr::installRawrrExe()
+   message("exec", "rawrr::installRawrrExe()")
 }
+
+
+rawDiag:::.checkRawrr()
 ```
 
 

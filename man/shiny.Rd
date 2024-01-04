@@ -27,6 +27,9 @@ default is set to the \code{$HOME/Downloads} directory.}
 
 \item{\ldots}{passed to the \code{\link{runApp}} method.}
 }
+\value{
+runs a shiny application
+}
 \description{
 Run the rawDiag shiny application
 }
