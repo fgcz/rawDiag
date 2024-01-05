@@ -67,7 +67,7 @@ graph all varieties of plots
 ```{r fetchFromExperimentHub, echo=FALSE}
 # fetch via ExperimentHub
 library(ExperimentHub)
-eh = ExperimentHub()
+eh <- ExperimentHub()
 EH4547 <- normalizePath(eh[["EH4547"]])
 
 (rawfile <- paste0(EH4547, ".raw"))
