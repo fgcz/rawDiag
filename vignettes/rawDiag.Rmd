@@ -96,7 +96,8 @@ pm[grepl(pm, pattern = '^plot')] |>
 ```{r plotALL, echo = FALSE, fig.width = 10, fig.height = 5}
 pm[grepl(pm, pattern = 'plot')] |> 
   lapply(FUN = function(plotFUN) {
-    lapply(c('trellis', 'violin', 'overlay'), function(method) {
+    lapply(c('trellis'), function(method) {
+    #lapply(c('trellis', 'violin', 'overlay'), function(method) {
       message(paste0("plotting", plotFUN, "using method", method, "..."))
       do.call(plotFUN, list(x, method))
     })
