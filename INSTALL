@@ -1,6 +1,5 @@
 # System requirements
 
-
 The set up for the rawrr package needs to be run in order to use the rawDiag package. 
 
 Therfore, please follow the install notes of the rawrr package.
@@ -16,7 +15,7 @@ to find installation notes for the rawrr package.
 
 ```
 rawrr::installRawFileReaderDLLs()
-r rawrr::installRawrrExe()
+rawrr::installRawrrExe()
 ```
 
 These commands install necessary components. Make sure to execute them in your R shell.
