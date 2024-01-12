@@ -505,9 +505,9 @@ plotCycleTime <- function(x, method = 'trellis'){
 #' @importFrom ggplot2 ggplot aes geom_point geom_line scale_x_continuous scale_y_continuous geom_hline theme_light
 #' @importFrom rlang .data
 #' @examples
+#' rawrr::sampleFilePath() |> read.raw() |> plotInjectionTime()
 #' @export
 #' @aliases PlotInjectionTime
-#' rawrr::sampleFilePath() |> read.raw() |> plotInjectionTime()
 plotInjectionTime <- function(x, method = 'trellis'){
   if (method == 'trellis'){
     maxtimes <- x |>
@@ -563,7 +563,7 @@ plotInjectionTime <- function(x, method = 'trellis'){
 #' draws precursor mass vs retention time for each MS2 scan in the raw file.
 #'
 #' @inherit plotLockMassCorrection params return references author
-#' @alias PlotMzDistribution
+#' @aliases PlotMzDistribution
 #' @importFrom rlang .data
 #' @examples
 #' rawrr::sampleFilePath() |> rawDiag::read.raw() -> S
@@ -865,6 +865,7 @@ plotScanTime <- function(x, method='trellis'){
 #' calculates the MS1 master scan number of an MS2 scan
 #' and populates the MasterScanNumber with it
 #'
+#' @return a \code{data.frame} containing a \code{MasterScanNumber} column.
 #' @inheritParams plotLockMassCorrection
 #' @importFrom rlang .data
 #'

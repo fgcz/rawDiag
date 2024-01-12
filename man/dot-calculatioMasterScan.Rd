@@ -10,6 +10,9 @@
 \item{x}{a \code{data.frame} object adhering to the specified criteria for
 the \code{is.rawDiag} function.}
 }
+\value{
+a \code{data.frame} containing a \code{MasterScanNumber} column.
+}
 \description{
 calculates the MS1 master scan number of an MS2 scan
 and populates the MasterScanNumber with it

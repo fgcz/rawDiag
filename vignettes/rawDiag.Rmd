@@ -33,10 +33,10 @@ urlcolor: blue
 
 ```{r style, echo = FALSE, results = 'asis'}
 BiocStyle::markdown()
-knitr::opts_chunk$set(fig.wide = TRUE, fig.retina = 3, error=FALSE)
+knitr::opts_chunk$set(fig.wide = TRUE, fig.retina = 3, error=FALSE, eval=TRUE)
 ```
 
-```{r rawDiagLogo, echo=FALSE, out.width="50%", eval=TRUE}
+```{r rawDiagLogo, echo=FALSE, out.width="50%"}
 knitr::include_graphics("octopussy.png")
 ```
 
@@ -48,12 +48,15 @@ can be done on all platforms using the command:
 
 ```{r installAssemblies, echo=TRUE}
 if (isFALSE(rawrr::.checkDllInMonoPath())){
-  rawrr::installRawFileReaderDLLs()
+   message ("exec", "rawrr::installRawFileReaderDLLs()")
 }
 
 if (isFALSE(file.exists(rawrr:::.rawrrAssembly()))){
- rawrr::installRawrrExe()
+   message("exec", "rawrr::installRawrrExe()")
 }
+
+
+rawDiag:::.checkRawrr()
 ```
 
 
@@ -61,10 +64,10 @@ if (isFALSE(file.exists(rawrr:::.rawrrAssembly()))){
 
 graph all varieties of plots
 
-```{r fetchFromExperimentHub, echo=FALSE, eval=TRUE}
+```{r fetchFromExperimentHub, echo=FALSE}
 # fetch via ExperimentHub
 library(ExperimentHub)
-eh = ExperimentHub()
+eh <- ExperimentHub()
 EH4547 <- normalizePath(eh[["EH4547"]])
 
 (rawfile <- paste0(EH4547, ".raw"))
@@ -73,7 +76,7 @@ if (!file.exists(rawfile)){
 }
 ```
 
-```{r eval=FALSE, echo=FALSE}
+```{r sample, echo=FALSE}
 rawrr::sampleFilePath() -> rawfile
 ```
 
@@ -90,10 +93,11 @@ pm[grepl(pm, pattern = '^plot')] |>
   knitr::kable(col.names = "package:rawDiag plot functions")
 ```
 
-```{r plotALL, echo = FALSE, eval = TRUE, fig.width = 10, fig.height = 5}
+```{r plotALL, echo = FALSE, fig.width = 10, fig.height = 5}
 pm[grepl(pm, pattern = 'plot')] |> 
   lapply(FUN = function(plotFUN) {
-    lapply(c('trellis', 'violin', 'overlay'), function(method) {
+    lapply(c('trellis'), function(method) {
+    #lapply(c('trellis', 'violin', 'overlay'), function(method) {
       message(paste0("plotting", plotFUN, "using method", method, "..."))
       do.call(plotFUN, list(x, method))
     })
@@ -103,7 +107,7 @@ pm[grepl(pm, pattern = 'plot')] |>
 
 # Session information {-}
 
-```{r sessioninfo, echo=FALSE}
+```{r sessioninfo, echo=FALSE, eval=TRUE}
 sessionInfo()
 ```
 
