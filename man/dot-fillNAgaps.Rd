@@ -17,7 +17,7 @@ Fill NA values with last previous value
 }
 \examples{
 c(NA, 1, 2, 3, NA, 4, 5, NA, NA, NA, 6) |>
-  rawDiah:::.fillNAgaps()
+  rawDiag:::.fillNAgaps()
 }
 \author{
 Christian Trachsel
