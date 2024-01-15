@@ -28,7 +28,7 @@ PlotTicBasepeak <- function(x, method = 'trellis'){
 }
 
 
-#' @inherit plotCycleTime params return references author title
+#' @export
 PlotCycleTime <- function(x, method = 'trellis'){
     .Deprecated("plotCycleTime")
     plotCycleTime(x, method)

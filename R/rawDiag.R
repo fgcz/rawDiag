@@ -8,7 +8,7 @@
   df
 }
 
-#' @importFrom rawrr::readIndex 
+#' @importFrom rawrr  readIndex
 .read.raw <- function(rawfile, msgFUN = function(x){message(x)}){
   msgFUN("composing calls")
   t0 <- Sys.time()
