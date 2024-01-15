@@ -5,6 +5,7 @@ author:
   affiliation:
     - &id Functional Genomics Center Zurich (FGCZ) - University of Zurich | ETH Zurich, Winterthurerstrasse 190, CH-8057 Zurich, Switzerland
     - Swiss Institute of Bioinformatics (SIB), Quartier Sorge - Batiment Amphipole, CH-1015 Lausanne, Switzerland
+    - Core for Life - https://coreforlife.sites.vib.be
   email: cp@fgcz.ethz.ch
 package: rawDiag
 abstract: |
@@ -36,14 +37,14 @@ BiocStyle::markdown()
 knitr::opts_chunk$set(fig.wide = TRUE, fig.retina = 3, error=FALSE, eval=TRUE)
 ```
 
-```{r rawDiagLogo, echo=FALSE, out.width="50%"}
+
+```{r rawDiagLogo, echo=FALSE, out.width="50%", fig.cap="The octopussy `rawDiag` package logo by Lilly van de Venn."}
 knitr::include_graphics("octopussy.png")
 ```
 
-
 # Requirements
 
-assemblies aka Common Intermediate Language bytecode -  the download and install
+assemblies aka Common Intermediate Language bytecode - the download and install
 can be done on all platforms using the command:
 
 ```{r installAssemblies, echo=TRUE}
@@ -55,14 +56,14 @@ if (isFALSE(file.exists(rawrr:::.rawrrAssembly()))){
    message("exec", "rawrr::installRawrrExe()")
 }
 
-
 rawDiag:::.checkRawrr()
 ```
 
-
 # Usage
 
-graph all varieties of plots
+fetch example Orbitrap raw file from
+`r BiocStyle::Biocpkg('ExperimentHub')`'s
+`r BiocStyle::Biocpkg('tartare')` package.
 
 ```{r fetchFromExperimentHub, echo=FALSE}
 # fetch via ExperimentHub
@@ -76,9 +77,7 @@ if (!file.exists(rawfile)){
 }
 ```
 
-```{r sample, echo=FALSE}
-rawrr::sampleFilePath() -> rawfile
-```
+read the instrument raw data by using the `r BiocStyle::Biocpkg('rawrr')` package.
 
 ```{r readOrbitrap}
 ## read Orbitrap meta data
@@ -86,12 +85,16 @@ rawfile |>
   rawDiag::read.raw() -> x
 ```
 
+query and list all plot methods of the `r BiocStyle::Biocpkg('rawDiag')` package.
+
 ```{r listFUN}
 library(rawDiag)
 pm <- ls("package:rawDiag")
 pm[grepl(pm, pattern = '^plot')] |>
   knitr::kable(col.names = "package:rawDiag plot functions")
 ```
+
+apply all plot methods on the example data.
 
 ```{r plotALL, echo = FALSE, fig.width = 10, fig.height = 5}
 pm[grepl(pm, pattern = 'plot')] |> 
@@ -104,11 +107,13 @@ pm[grepl(pm, pattern = 'plot')] |>
   }) 
 ```
 
+for more information on the plot methods, please read the package man pages and
+the application examples in manuscript [@Trachsel2018].
+
+# References {-}
 
 # Session information {-}
 
 ```{r sessioninfo, echo=FALSE, eval=TRUE}
 sessionInfo()
 ```
-
-# References {-}
