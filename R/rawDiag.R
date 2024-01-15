@@ -852,7 +852,7 @@ plotScanTime <- function(x, method='trellis'){
 #'
 #' @examples
 #' c(NA, 1, 2, 3, NA, 4, 5, NA, NA, NA, 6) |>
-#'   rawDiag:::.fillNAgaps()
+#'   .fillNAgaps()
 .fillNAgaps <- function(x) {
   goodVals <- c(NA, x[!is.na(x)])
   fillIdx <- cumsum(!is.na(x))+1
