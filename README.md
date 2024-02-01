@@ -1,5 +1,4 @@
 [![JPR](https://img.shields.io/badge/JPR-10.1021%2Facs.jproteome.8b00173-brightgreen)](http://dx.doi.org/10.1021/acs.jproteome.8b00173)
-![Downloads](https://img.shields.io/github/downloads/fgcz/rawDiag/total)
 
 *news (2024-01): This repository is no longer maintained. The R package is on the way to [Bioconductor.org](https://bioconductor.org/packages/rawDiag/). See issue [#3251](https://github.com/Bioconductor/Contributions/issues/3251)*.
 
