@@ -1,12 +1,15 @@
 ---
 title: "Brings Orbitrap Mass Spectrometry Data to Life; Fast and Colorful"
 author:
+- name: Christian Trachsel
 - name: Christian Panse
   affiliation:
     - &id Functional Genomics Center Zurich (FGCZ) - University of Zurich | ETH Zurich, Winterthurerstrasse 190, CH-8057 Zurich, Switzerland
     - Swiss Institute of Bioinformatics (SIB), Quartier Sorge - Batiment Amphipole, CH-1015 Lausanne, Switzerland
     - Core for Life - https://coreforlife.sites.vib.be
   email: cp@fgcz.ethz.ch
+- name: Tobias Kockmann
+  affiliation: *id
 package: rawDiag
 abstract: |
   Optimizing liquid chromatography coupled to mass spectrometry (LC–MS) methods
@@ -41,6 +44,47 @@ knitr::opts_chunk$set(fig.wide = TRUE, fig.retina = 3, error=FALSE, eval=TRUE)
 ```{r rawDiagLogo, echo=FALSE, out.width="50%", fig.cap="The octopussy `rawDiag` package logo by Lilly van de Venn."}
 knitr::include_graphics("octopussy.png")
 ```
+# Introduction
+
+Over the past decade, liquid chromatography coupled to mass 
+spectrometry (LC–MS) has evolved into the method of choice in the 
+field of proteomics. [@Cox2011, @Mallick2010] During a typical 
+LC–MS measurement, a complex mixture of analytes is separated by a 
+liquid chromatography system coupled to a mass spectrometer (MS) 
+through an ion source interface. This interface converts the analytes 
+that elute from the chromatography system over time into a beam of 
+ions. The MS records from this ion beam a series of mass spectra 
+containing detailed information on the analyzed sample. [@Savaryn2016] 
+The resulting raw data consist of the mass spectra and their metadata, 
+typically recorded in a vendor-specific binary format. During a 
+measurement the mass spectrometer applies internal heuristics, which 
+enables the instrument to adapt to sample properties, for example, 
+sample complexity and amount of ions in near real time. Still, method 
+parameters controlling these heuristics need to be set prior to the 
+measurement. Optimal measurement results require a careful balancing of 
+instrument parameters, but their complex interactions with each other 
+make LC–MS method optimization a challenging task.
+
+Here we present `r BiocStyle::Biocpkg('rawDiag')`, a 
+platform-independent software tool implemented in R language that 
+supports LC–MS operators during the process of empirical method 
+optimization. Our work builds on the ideas of the discontinued software 
+*rawMeat* (VAST Scientific). Our application is currently 
+tailored toward spectral data acquired on Thermo Fisher Scientific 
+instruments (raw format), with a particular focus on Orbitrap 
+[@Zubarev2013] mass analyzers (Exactive or Fusion instruments). These 
+instruments are heavily used in the field of bottom-up proteomics 
+[@Aebersold2003] to analyze complex peptide mixtures derived from 
+enzymatic digests of proteomes.
+
+`r BiocStyle::Biocpkg('rawDiag')` is meant to run after MS acquisition, 
+optimally as an interactive R shiny application, and produces a series 
+of diagnostic plots visualizing the impact of method parameter choices 
+on the acquired data across injections. If static reports are required 
+then pdf files can be generated using
+`r BiocStyle::CRANpkg('rmarkdown')`. In this vignette, we present the 
+usage of our tool.
+
 
 # Requirements
 
@@ -109,6 +153,40 @@ pm[grepl(pm, pattern = 'plot')] |>
 
 for more information on the plot methods, please read the package man pages and
 the application examples in manuscript [@Trachsel2018].
+
+## On using Spectra and MsBackendRawFileReaderpackage
+
+```{r backendInitialize, eval = FALSE}
+beRaw <- Spectra::backendInitialize(
+  MsBackendRawFileReader::MsBackendRawFileReader(),
+  files = c(rawfile))
+```
+
+
+```{r backendQuery, eval = FALSE}
+as.rawDiag.Spectra <- function(x){
+  c("scan", "scanType", "StartTime", "precursorMass",
+      "MSOrder", "charge", "masterScan", "dependencyType",
+      "TIC", "BasePeakIntensity", "ElapsedScanTimesec", "rawfile", "AGC",
+      "LMCorrection", "PrescanMode", "FTResolution") 
+  
+  df <- data.frame(
+    scan = Spectra::scanIndex(x),
+    scanType = Spectra::scanType(x),
+    StartTime = Spectra::rtime(x),
+    precursorMass = Spectra::precursorMz(x),
+    MSOrder = Spectra::msLevel(x),
+    charge = Spectra::precursorCharge(x),
+    Spectra::collisionEnergy(x)
+  )
+  
+  
+  df$MSOrder[df$MSOrder == 1] <- "Ms" 
+  df$MSOrder[df$MSOrder == 2] <- "Ms2" 
+  
+  df
+```
+
 
 # References {-}
 
