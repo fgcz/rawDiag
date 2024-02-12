@@ -88,20 +88,113 @@ usage of our tool.
 
 # Requirements
 
+`r BiocStyle::Biocpkg('rawDiag')` proides a wrapper function `readRaw` using the `r BiocStyle::Biocpkg('rawrr')` methods
+`raw::readIndex`, `rawrr::readTrailer`, and `rawrr::readChromatogram` to read
+proprietary mass spectrometer generated data by 
+invoking third-party managed methods through a `system2` `text connection`. 
+See the stack below:
+
+<table>
+<tr style="border:2px solid black">
+<td style="padding:15px">
+`R>`
+</td>
+</tr>
+
+<tr style="border:2px solid black">
+<td style="padding:15px">
+`text connection`
+</td>
+</tr>
+
+<tr style="background-color:yellow;color:black; border:2px solid black">
+<td style="padding:15px">
+`system2`
+</td>
+</tr>
+
+<tr style="background-color:yellowgreen;color:black; border:2px solid black">
+<td style="padding:15px">
+Mono Runtime
+</td>
+</tr>
+
+<tr style="background-color:orange;color:black; border:2px solid black">
+<td style="padding:15px">
+Managed Assembly
+(CIL/.NET code)
+<br>
+rawrr.exe
+</td>
+</tr>
+
+<tr style="background-color:orange;color:black; border:2px solid black">
+<td style="padding:15px">
+ThermoFisher.CommonCore.*.dll
+</td>
+</tr>
+</table>
+
+
+# Install
+
+## Linux (debian/ubuntu)
+
+In case you prefer to compile `rawrr.exe` from C# source code, please install
+the mono compiler and xbuild by installing the following Linux packages:
+
+```
+sudo apt-get install mono-mcs mono-xbuild
+```
+
+Otherwise, to execute the precompiled code, the following Linux packages are
+sufficient:
+
+```
+sudo apt-get install mono-runtime libmono-system-data4.0-cil -y
+```
+
+## macOS (Catalina/BigSur)
+
+```
+brew install mono
+```
+
+or install from
+
+https://www.mono-project.com/
+
+## Microsoft Windows
+
+Running the `rawrr.exe` will run out of the box.
+
+If the native C# compiler is not available install mono from:
+
+https://www.mono-project.com/
+
+
+
+
 assemblies aka Common Intermediate Language bytecode - the download and install
 can be done on all platforms using the command:
 
-```{r installAssemblies, echo=TRUE}
-if (isFALSE(rawrr::.checkDllInMonoPath())){
-   message ("exec", "rawrr::installRawFileReaderDLLs()")
-}
+```{r install, echo=TRUE}
+if (isFALSE(require("BiocManager", quietly = TRUE)))
+    install.packages("BiocManager")
 
-if (isFALSE(file.exists(rawrr:::.rawrrAssembly()))){
-   message("exec", "rawrr::installRawrrExe()")
-}
+if (isFALSE(require("rawrr", quietly = TRUE)))
+    BiocManager::install("rawrr")
 
-rawDiag:::.checkRawrr()
+if (isFALSE(rawrr:::.checkRawFileReaderDLLs()))
+  rawrr::installRawFileReaderDLLs()
+
+if (isFALSE(file.exists(rawrr:::.rawrrAssembly())))
+  rawrr::installRawrrExe()
 ```
+
+
+for more information please read the INSTALL file in the
+`r BiocStyle::Biocpkg('rawrr')` package.
 
 # Usage
 
@@ -153,39 +246,6 @@ pm[grepl(pm, pattern = 'plot')] |>
 
 for more information on the plot methods, please read the package man pages and
 the application examples in manuscript [@Trachsel2018].
-
-## On using Spectra and MsBackendRawFileReaderpackage
-
-```{r backendInitialize, eval = FALSE}
-beRaw <- Spectra::backendInitialize(
-  MsBackendRawFileReader::MsBackendRawFileReader(),
-  files = c(rawfile))
-```
-
-
-```{r backendQuery, eval = FALSE}
-as.rawDiag.Spectra <- function(x){
-  c("scan", "scanType", "StartTime", "precursorMass",
-      "MSOrder", "charge", "masterScan", "dependencyType",
-      "TIC", "BasePeakIntensity", "ElapsedScanTimesec", "rawfile", "AGC",
-      "LMCorrection", "PrescanMode", "FTResolution") 
-  
-  df <- data.frame(
-    scan = Spectra::scanIndex(x),
-    scanType = Spectra::scanType(x),
-    StartTime = Spectra::rtime(x),
-    precursorMass = Spectra::precursorMz(x),
-    MSOrder = Spectra::msLevel(x),
-    charge = Spectra::precursorCharge(x),
-    Spectra::collisionEnergy(x)
-  )
-  
-  
-  df$MSOrder[df$MSOrder == 1] <- "Ms" 
-  df$MSOrder[df$MSOrder == 2] <- "Ms2" 
-  
-  df
-```
 
 
 # References {-}
