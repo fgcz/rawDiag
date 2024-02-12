@@ -46,7 +46,7 @@ knitr::include_graphics("octopussy.png")
 ```
 # Introduction
 
-Over the past decade, liquid chromatography coupled to mass 
+Over the past two decades, liquid chromatography coupled to mass 
 spectrometry (LC–MS) has evolved into the method of choice in the 
 field of proteomics. [@Cox2011, @Mallick2010] During a typical 
 LC–MS measurement, a complex mixture of analytes is separated by a 
@@ -66,7 +66,7 @@ instrument parameters, but their complex interactions with each other
 make LC–MS method optimization a challenging task.
 
 Here we present `r BiocStyle::Biocpkg('rawDiag')`, a 
-platform-independent software tool implemented in R language that 
+platform-independent software tool implemented in the R language that 
 supports LC–MS operators during the process of empirical method 
 optimization. Our work builds on the ideas of the discontinued software 
 *rawMeat* (VAST Scientific). Our application is currently 
@@ -85,6 +85,12 @@ then pdf files can be generated using
 `r BiocStyle::CRANpkg('rmarkdown')`. In this vignette, we present the 
 usage of our tool.
 
+`r BiocStyle::Biocpkg('rawDiag')` gains advantages from being part of
+the Bioconductor ecosystem, such as its ability to utilize the
+`r BiocStyle::Biocpkg('rawrr')` package and potentially extend its
+functionality through interaction with the `r BiocStyle::Biocpkg('Spectra')`
+infrastructure, particularly with the
+`r BiocStyle::Biocpkg('MsBackendRawFileReader')`.
 
 # Requirements
 
