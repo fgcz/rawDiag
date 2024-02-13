@@ -1,11 +1,10 @@
 #R
 
-context("plot*")
 
 library(rawDiag)
 library(testthat)
 
-rawrr::sampleFilePath() |> rawDiag::read.raw() -> S
+rawrr::sampleFilePath() |> rawDiag::readRaw() -> S
 
 test_that("check read.raw", {
 	expect_true(is.rawDiag(S))
