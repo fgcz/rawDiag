@@ -1,5 +1,10 @@
 #R
 
+read.raw <- function(...){
+    .Deprecated("readRaw")
+    readRaw(...)
+}
+
 .checkRawrr <- function(){
   if (isFALSE(rawrr::.checkDllInMonoPath())){
       rawrr::installRawFileReaderDLLs()

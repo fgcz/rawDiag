@@ -16,13 +16,13 @@
 #' default is using the \code{message}.
 #' @return a \code{data.frame} containing the selected trailer information.
 #' @author Christian Panse (2016-2023)
-#' @aliases rawDiag
+#' @aliases rawDiag readRaw
 #' @examples
-#' rawrr::sampleFilePath() |> rawDiag::read.raw()
+#' rawrr::sampleFilePath() |> rawDiag::readRaw()
 #' @importFrom rawrr readIndex readTrailer readChromatogram
 #' @export
 #' @references \doi{10.1021/acs.jproteome.8b00173}
-read.raw <- function(rawfile, msgFUN = function(x){message(x)}){
+readRaw <- function(rawfile, msgFUN = function(x){message(x)}){
   message("reading index for ", basename(rawfile), "...")
 
   t0 <- Sys.time()
@@ -91,7 +91,7 @@ read.raw <- function(rawfile, msgFUN = function(x){message(x)}){
   
   message("reading took", td, "seconds") 
   
-  rawrrIndex |> validate_read.raw()
+  rawrrIndex |> validate_readRaw()
 }
 
 
@@ -109,7 +109,7 @@ read.raw <- function(rawfile, msgFUN = function(x){message(x)}){
 #' @return a boolean
 #' @author Christian Panse 2018
 #' @examples
-#' rawrr::sampleFilePath() |> rawDiag::read.raw() |> rawDiag::is.rawDiag()
+#' rawrr::sampleFilePath() |> rawDiag::readRaw() |> rawDiag::is.rawDiag()
 #'
 #' @export
 is.rawDiag <- function(object){
@@ -124,7 +124,7 @@ is.rawDiag <- function(object){
     return(TRUE)
 }
 
-validate_read.raw <- function(x){
+validate_readRaw <- function(x){
   validateIndex <- TRUE
 
   if (!is.data.frame(x)){
@@ -177,7 +177,7 @@ validate_read.raw <- function(x){
 
 #' @examples
 #' rawrr::sampleFilePath() |>
-#'   read.raw() |>
+#'   readRaw() |>
 #'   plotLockMassCorrection()
 #'
 #' @importFrom ggplot2 ggplot aes_string geom_hline geom_line labs scale_x_continuous facet_wrap theme_light
@@ -234,7 +234,7 @@ plotLockMassCorrection <- function(x, method = 'trellis'){
 #' @importFrom ggplot2 ggplot aes_string geom_hex labs scale_fill_gradientn theme_light
 #' @importFrom grDevices colorRampPalette
 #' @examples
-#' rawrr::sampleFilePath() |> read.raw() |> plotPrecursorHeatmap()
+#' rawrr::sampleFilePath() |> readRaw() |> plotPrecursorHeatmap()
 #' @export
 #' @aliases PlotPrecursorHeatmap
 plotPrecursorHeatmap <- function(x, method = 'overlay', bins = 80){
@@ -283,7 +283,7 @@ plotPrecursorHeatmap <- function(x, method = 'overlay', bins = 80){
 #' @importFrom ggplot2 ggplot aes_string geom_line labs scale_x_continuous facet_wrap theme_light
 #' @importFrom reshape2 melt
 #' @examples
-#' rawrr::sampleFilePath() |> read.raw() |> plotTicBasepeak()
+#' rawrr::sampleFilePath() |> readRaw() |> plotTicBasepeak()
 #' @export
 #' @aliases PlotTicBasepeak
 plotTicBasepeak <- function(x, method = 'trellis'){
@@ -367,7 +367,7 @@ plotTicBasepeak <- function(x, method = 'trellis'){
 #' @importFrom stats quantile na.omit
 #' @importFrom rlang .data
 #' @examples
-#' rawrr::sampleFilePath() |> read.raw() |> plotCycleTime()
+#' rawrr::sampleFilePath() |> readRaw() |> plotCycleTime()
 #' @export
 #' @aliases PlotCycleTime
 plotCycleTime <- function(x, method = 'trellis'){
@@ -427,7 +427,7 @@ plotCycleTime <- function(x, method = 'trellis'){
 #' @importFrom ggplot2 ggplot aes geom_point geom_line scale_x_continuous scale_y_continuous geom_hline theme_light
 #' @importFrom rlang .data
 #' @examples
-#' rawrr::sampleFilePath() |> read.raw() |> plotInjectionTime()
+#' rawrr::sampleFilePath() |> readRaw() |> plotInjectionTime()
 #' @export
 #' @aliases PlotInjectionTime
 plotInjectionTime <- function(x, method = 'trellis'){
@@ -488,7 +488,7 @@ plotInjectionTime <- function(x, method = 'trellis'){
 #' @aliases PlotMzDistribution
 #' @importFrom rlang .data
 #' @examples
-#' rawrr::sampleFilePath() |> rawDiag::read.raw() -> S
+#' rawrr::sampleFilePath() |> rawDiag::readRaw() -> S
 #' plotMzDistribution(S)
 #' @export
 #' @aliases PlotMzDistribution
@@ -549,7 +549,7 @@ plotMzDistribution <- function(x, method='trellis'){
 #' @description plots the mass frequency in dependency to the charge state
 #' @inherit plotLockMassCorrection params return references author
 #' @examples
-#' rawrr::sampleFilePath() |> rawDiag::read.raw() |> rawDiag::plotMassDistribution('overlay')
+#' rawrr::sampleFilePath() |> rawDiag::readRaw() |> rawDiag::plotMassDistribution('overlay')
 #' @export
 #' @aliases PlotMassDistribution
 plotMassDistribution <- function(x, method = 'trellis'){
@@ -598,7 +598,7 @@ plotMassDistribution <- function(x, method = 'trellis'){
 #' @inherit plotLockMassCorrection params return references author
 #' @importFrom rlang .data
 #' @examples
-#'  rawrr::sampleFilePath() |> rawDiag::read.raw() -> S
+#'  rawrr::sampleFilePath() |> rawDiag::readRaw() -> S
 #'
 #'  S|>plotLockMassCorrection()
 #' @export
@@ -713,7 +713,7 @@ plotChargeState <- function(x, method='trellis'){
 #' @inherit plotLockMassCorrection params return references author
 #' @importFrom rlang .data
 #' @examples
-#'  rawrr::sampleFilePath() |> rawDiag::read.raw() -> S
+#'  rawrr::sampleFilePath() |> rawDiag::readRaw() -> S
 #'
 #'  S|> plotScanTime()
 #' @export
@@ -808,7 +808,7 @@ plotScanTime <- function(x, method='trellis'){
 #'
 #' @inherit plotLockMassCorrection params return references author
 #' @examples
-#' rawrr::sampleFilePath() |> rawDiag::read.raw() -> S
+#' rawrr::sampleFilePath() |> rawDiag::readRaw() -> S
 #'
 #'  S|> plotCycleLoad()
 #' @export
