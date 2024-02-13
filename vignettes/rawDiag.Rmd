@@ -94,11 +94,11 @@ infrastructure, particularly with the
 
 # Requirements
 
-`r BiocStyle::Biocpkg('rawDiag')` proides a wrapper function `readRaw` using the `r BiocStyle::Biocpkg('rawrr')` methods
-`raw::readIndex`, `rawrr::readTrailer`, and `rawrr::readChromatogram` to read
-proprietary mass spectrometer generated data by 
-invoking third-party managed methods through a `system2` `text connection`. 
-See the stack below:
+`r BiocStyle::Biocpkg('rawDiag')` proides a wrapper function `readRaw` using the
+`r BiocStyle::Biocpkg('rawrr')` methods `raw::readIndex`, `rawrr::readTrailer`,
+and `rawrr::readChromatogram` to read proprietary mass spectrometer generated
+data by invoking third-party managed methods through a `system2`
+`text connection`. See the stack below:
 
 <table>
 <tr style="border:2px solid black">
@@ -144,7 +144,8 @@ ThermoFisher.CommonCore.*.dll
 
 # Install
 
-## Linux (debian/ubuntu)
+## OS dependencies
+### Linux (debian/ubuntu)
 
 In case you prefer to compile `rawrr.exe` from C# source code, please install
 the mono compiler and xbuild by installing the following Linux packages:
@@ -160,7 +161,7 @@ sufficient:
 sudo apt-get install mono-runtime libmono-system-data4.0-cil -y
 ```
 
-## macOS (Catalina/BigSur)
+### macOS (Catalina/BigSur)
 
 ```
 brew install mono
@@ -170,7 +171,7 @@ or install from
 
 https://www.mono-project.com/
 
-## Microsoft Windows
+### Microsoft Windows
 
 Running the `rawrr.exe` will run out of the box.
 
@@ -178,8 +179,7 @@ If the native C# compiler is not available install mono from:
 
 https://www.mono-project.com/
 
-
-
+## R
 
 assemblies aka Common Intermediate Language bytecode - the download and install
 can be done on all platforms using the command:
@@ -204,14 +204,15 @@ for more information please read the INSTALL file in the
 
 # Usage
 
+## Input
 fetch example Orbitrap raw file from
-`r BiocStyle::Biocpkg('ExperimentHub')`'s
-`r BiocStyle::Biocpkg('tartare')` package.
+`r BiocStyle::Biocpkg('ExperimentHub')`'s `r BiocStyle::Biocpkg('tartare')`
+package.
 
 ```{r fetchFromExperimentHub, echo=FALSE}
-# fetch via ExperimentHub
+## fetch via ExperimentHub
 library(ExperimentHub)
-eh <- ExperimentHub()
+eh <- ExperimentHub(localHub = TRUE )
 EH4547 <- normalizePath(eh[["EH4547"]])
 
 (rawfile <- paste0(EH4547, ".raw"))
@@ -220,7 +221,10 @@ if (!file.exists(rawfile)){
 }
 ```
 
-read the instrument raw data by using the `r BiocStyle::Biocpkg('rawrr')` package.
+## `readRaw` - read Orbitrap raw file 
+
+read the instrument raw data by using the `r BiocStyle::Biocpkg('rawrr')`
+package.
 
 ```{r readOrbitrap}
 ## read Orbitrap meta data
@@ -228,30 +232,36 @@ rawfile |>
   rawDiag::read.raw() -> x
 ```
 
-query and list all plot methods of the `r BiocStyle::Biocpkg('rawDiag')` package.
+query and list all plot methods of the `r BiocStyle::Biocpkg('rawDiag')`
+package.
+
+
+## Output - plot methods
 
 ```{r listFUN}
 library(rawDiag)
-pm <- ls("package:rawDiag")
-pm[grepl(pm, pattern = '^plot')] |>
+ls("package:rawDiag") |>
+  grep(pattern = '^plot', value = TRUE) -> pm
+
+pm |>
   knitr::kable(col.names = "package:rawDiag plot functions")
 ```
 
 apply all plot methods on the example data.
 
 ```{r plotALL, echo = FALSE, fig.width = 10, fig.height = 5}
-pm[grepl(pm, pattern = 'plot')] |> 
+pm |> 
   lapply(FUN = function(plotFUN) {
     lapply(c('trellis'), function(method) {
     #lapply(c('trellis', 'violin', 'overlay'), function(method) {
       message(paste0("plotting", plotFUN, "using method", method, "..."))
-      do.call(plotFUN, list(x, method))
+      do.call(plotFUN, list(x, method)) 
     })
   }) 
 ```
 
-for more information on the plot methods, please read the package man pages and
-the application examples in manuscript [@Trachsel2018].
+for more information on the plot methods and its application, please read the
+package man pages and the application examples in manuscript [@Trachsel2018].
 
 
 # References {-}
