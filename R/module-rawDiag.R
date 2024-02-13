@@ -168,7 +168,6 @@ rawDiagServer <- function(id, vals){
                                       vals$plot, '.pdf'))
                    
                    msg <- paste0("ggplot2::ggsave to file ", pdfFileName)
-                   message(msg)
                    progress <- shiny::Progress$new(session = session, min = 0, max = 1)
                    progress$set(message = msg)
                    on.exit(progress$close())
