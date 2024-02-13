@@ -82,7 +82,7 @@ rawDiagUI <- function(id){
 #' @return shiny module server
 #' @importFrom shiny moduleServer reactive reactiveValues observeEvent renderPlot req NS tagList selectInput checkboxInput plotOutput debounce
 #' @importFrom utils packageVersion
-#' @importFrom parallel detectCores mclapply
+#' @importFrom BiocParallel bplapply
 #' @importFrom htmltools a img div
 #' @examplesIf interactive()
 #' rawDiag::shiny(rawDir = (rawrr::sampleFilePath() |> dirname()))
@@ -100,24 +100,16 @@ rawDiagServer <- function(id, vals){
                    on.exit(progress$close())
                    vals$pdfFileName <- NULL
                    ## TODO(cp): think about as.rawDiag to ensure all columns are there.
-                   if (input$useParallel & parallel::detectCores() > 1 & length(rawfile()) > 1){
-                     progress$set(message = paste0("Reading ", length(rawfile()), " files ..."),
-                                  detail = "using parallel::mclapply")
-                     
-                     parallel::mclapply(rawfile(),
-                                        FUN = rawDiag::readRaw,
-                                        mc.cores = parallel::detectCores()) |>
-                       Reduce(f = rbind)
-                   }else{
-                     lapply(rawfile(), function(f){
-                       rawDiag::readRaw(f,
-                                         msgFUN = function(msg){
-                                           progress$set(detail = paste0("from file ", basename(f)),
-                                                        message = msg)
-                                         })
-                     }) |>
-                       Reduce(f = rbind)
-                   }
+                   
+                   BiocParallel::bplapply(rawfile(), function(f){
+                     rawDiag::readRaw(f,
+                                      msgFUN = function(msg){
+                                        progress$set(detail = paste0("from file ", basename(f)),
+                                                     message = msg)
+                                      })
+                   }) |>
+                     Reduce(f = rbind)
+                   
                  })
                  
                  
