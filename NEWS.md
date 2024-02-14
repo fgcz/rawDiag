@@ -1,6 +1,6 @@
 # News for Package 'rawDiag'
 
-## Changes in version 0.99.17 (2024-02-14)
+## Changes in version 0.99.19 (2024-02-14)
 
 * NAMESPACE
   * renamed `read.raw` to `readRaw`
@@ -10,6 +10,7 @@
 * Code
   * removed paste cmd in message
   * use the BiocParallel 
+* refactor rawDiag shiny application 
 
 ## Changes in version 0.99.9 (2024-01-05)
 
