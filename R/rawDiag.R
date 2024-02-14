@@ -174,7 +174,6 @@ validate_readRaw <- function(x){
 #' * rawDiag: \doi{10.1021/acs.jproteome.8b00173},
 #' * rawrr: \doi{10.1021/acs.jproteome.0c00866}
 #' @md
-
 #' @examples
 #' rawrr::sampleFilePath() |>
 #'   readRaw() |>
@@ -865,7 +864,3 @@ plotCycleLoad <- function(x, method = 'trellis'){
     ggplot2::coord_cartesian(ylim = c(0, max(xx$n) + 1)) +
     ggplot2::theme_light()
 }
-
-
-
-
