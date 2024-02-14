@@ -1,41 +1,107 @@
 #R
 
-#' Run the rawDiag shiny application 
+#' @noRd
+#' @importFrom shiny fluidPage titlePanel sidebarLayout sidebarPanel mainPanel downloadButton downloadHandler
+.buildRawDiagServer <- function(input, output, session) {
+
+    vals <- reactiveValues(rawfile  = NA, gp = NULL, pdfFileName = NULL,
+                           plot = NULL, generatePDF = 0)
+
+    observeEvent(input$rawfile, {
+        vals$rawfile = input$rawfile;
+        message(vals$rawfile )
+    })
+
+    observeEvent(input$generatePDF, {
+        vals$generatePDF <- vals$generatePDF + 1
+    })
+    rawDiag::rawDiagServer("OrbitrapFun02", vals)
+
+    output$downloadPdf <- downloadHandler(
+        filename = function() {
+            basename(vals$pdfFileName)
+        },
+        content = function(file) {
+            file.copy(
+                from = vals$pdfFileName,
+                to = file
+            )
+        }
+    )
+}
+
+#' @noRd
+#' @importFrom shiny fluidPage titlePanel sidebarLayout sidebarPanel mainPanel downloadButton downloadHandler actionButton
+.buildRawDiagUI <- function(){
+  ## Define UI for application that draws a histogram
+  fluidPage(
+    ## Application title
+    titlePanel("rawDiag - Brings Orbitrap Mass Spectrometry Data to Life; Fast and Colorful"),
+
+    ## Sidebar with a slider input for number of bins
+    sidebarLayout(
+      sidebarPanel(
+        tagList(
+          # html::img(src='https://github.com/cpanse/rawDiag/blob/main/vignettes/octopussy.png', height = 100),
+          selectInput("rawfile", "rawfile",
+                      choices = files,
+                      selected = files[1], width = "100%", multiple = TRUE),
+          actionButton('generatePDF', 'generatePDF'),
+          downloadButton("downloadPdf", "Download")
+        )
+      ),
+      mainPanel(
+        rawDiag::rawDiagUI("OrbitrapFun02")
+      )
+    )
+  )
+}
+
+#' Build the rawDiag shiny application
 #'
-#' @inheritParams shiny::runApp
 #' @param rawDir A directory containing the input raw files,
 #' default is set to the \code{$HOME/Downloads} directory.
-#' @param \ldots passed to the \code{\link{runApp}} method.
 #' @importFrom shiny runApp
-#' @return runs a shiny application
+#' @return returns the rawDiag shiny apps
 #' @inherit plotLockMassCorrection author references
 #' @export
+#'
 #' @examplesIf interactive()
-#' rawDiag::shiny(rawDir = (rawrr::sampleFilePath() |> dirname()))
-#' @note launch the shiny application by embracing your command line
-#' * MacOSX and Linux: `R -q -e "rawDiag::shiny(launch.browser = TRUE)"`
-#' * Microsoft Windows: `R.exe -e "rawDiag::shiny(launch.browser = TRUE)"`
+#' rawrr::sampleFilePath() |>
+#'   dirname() |>
+#'   rawDiag::buildRawDiagShinyApp() |>
+#'   shiny::runApp()
+#'
+#' @note launch the shiny application by embracing your command line while
+#' expecting the raw file in \code{$HOME/Downloads}
+#' * MacOSX and Linux: `R -q -e "buildRawDiagShinyApp() |> rawDiag::shiny(launch.browser = TRUE)"`
+#' * Microsoft Windows: `R.exe -e "buildRawDiagShinyApp() |> rawDiag::shiny(launch.browser = TRUE)"`
 #' @md
-shiny <- function(appDir = system.file('shiny', package = 'rawDiag'), 
-                  rawDir = (Sys.getenv('HOME') |>
-                              file.path("Downloads")),
-                  ...){
+buildRawDiagShinyApp <- function(rawDir = (Sys.getenv('HOME') |>
+                                             file.path("Downloads"))){
   
   rawDir |>
     file.path(rawDir |>
                 list.files(recursive = TRUE,
                            pattern = "*.raw$")) -> files
   
+  if (length(files) == 0){
+    warning("No raw files found in ", rawDir, " using raw file",
+            rawrr::sampleFilePath())
+    rawrr::sampleFilePath() -> files
+  }
+
   vapply(files, FUN = file.mtime, FUN.VALUE = 1702718537) |>
     order() -> idx
   files[rev(idx)] ->> files
-  
-  shiny::runApp(appDir,  ...)
+
+  shiny::shinyApp(ui = .buildRawDiagUI, server = .buildRawDiagServer)
 }
 
 #' rawDiag shiny module UI
 #' @return a shiny UI module
 #' @inheritParams shiny::moduleServer
+#' @returns rawDiag shiny module UI
 #' @importFrom shiny fluidRow column
 #' @importFrom htmltools a img
 #' @examplesIf interactive()
@@ -79,7 +145,7 @@ rawDiagUI <- function(id){
 #'
 #' @inheritParams shiny::moduleServer
 #' @param vals containing rawfile
-#' @return shiny module server
+#' @return rawDiag shiny module server
 #' @importFrom shiny moduleServer reactive reactiveValues observeEvent renderPlot req NS tagList selectInput checkboxInput plotOutput debounce
 #' @importFrom utils packageVersion
 #' @importFrom BiocParallel bplapply
