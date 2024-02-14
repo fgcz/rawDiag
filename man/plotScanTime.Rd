@@ -21,7 +21,7 @@ a \code{\link[ggplot2]{ggplot}} object.
 Plotting the elapsed scan time for each individual scan event.
 }
 \examples{
- rawrr::sampleFilePath() |> rawDiag::read.raw() -> S
+ rawrr::sampleFilePath() |> rawDiag::readRaw() -> S
 
  S|> plotScanTime()
 }

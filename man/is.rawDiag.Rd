@@ -16,7 +16,7 @@ a boolean
 Is an Object an rawDiag Object?
 }
 \examples{
-rawrr::sampleFilePath() |> rawDiag::read.raw() |> rawDiag::is.rawDiag()
+rawrr::sampleFilePath() |> rawDiag::readRaw() |> rawDiag::is.rawDiag()
 
 }
 \author{

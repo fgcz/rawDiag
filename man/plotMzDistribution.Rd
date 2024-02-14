@@ -21,7 +21,7 @@ a \code{\link[ggplot2]{ggplot}} object.
 draws precursor mass vs retention time for each MS2 scan in the raw file.
 }
 \examples{
-rawrr::sampleFilePath() |> rawDiag::read.raw() -> S
+rawrr::sampleFilePath() |> rawDiag::readRaw() -> S
 plotMzDistribution(S)
 }
 \references{

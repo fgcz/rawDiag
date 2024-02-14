@@ -24,5 +24,5 @@ A smooth curve graphs the trend. The 95th percentile is indicated by a red
 dashed line.
 }
 \examples{
-rawrr::sampleFilePath() |> read.raw() |> plotCycleTime()
+rawrr::sampleFilePath() |> readRaw() |> plotCycleTime()
 }

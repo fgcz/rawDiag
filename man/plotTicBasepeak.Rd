@@ -23,7 +23,7 @@ of a mass spectrometry measurement.
 Multiple files are handled by faceting based on rawfile name.
 }
 \examples{
-rawrr::sampleFilePath() |> read.raw() |> plotTicBasepeak()
+rawrr::sampleFilePath() |> readRaw() |> plotTicBasepeak()
 }
 \author{
 Christian Trachsel (2017), Christian Panse (20231130) refactored

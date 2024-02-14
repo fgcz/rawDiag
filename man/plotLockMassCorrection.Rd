@@ -22,7 +22,7 @@ Lock Mass Correction Plot
 }
 \examples{
 rawrr::sampleFilePath() |>
-  read.raw() |>
+  readRaw() |>
   plotLockMassCorrection()
 
 }

@@ -24,7 +24,7 @@ plots the mass frequency in dependency to the charge state
 displays charge state resolved frequency of precursor masses.
 }
 \examples{
-rawrr::sampleFilePath() |> rawDiag::read.raw() |> rawDiag::plotMassDistribution('overlay')
+rawrr::sampleFilePath() |> rawDiag::readRaw() |> rawDiag::plotMassDistribution('overlay')
 }
 \references{
 \itemize{

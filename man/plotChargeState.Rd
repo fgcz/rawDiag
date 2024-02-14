@@ -21,7 +21,7 @@ a \code{\link[ggplot2]{ggplot}} object.
 graphs the number of occurrences of all selected precursor charge states.
 }
 \examples{
- rawrr::sampleFilePath() |> rawDiag::read.raw() -> S
+ rawrr::sampleFilePath() |> rawDiag::readRaw() -> S
 
  S|>plotLockMassCorrection()
 }
