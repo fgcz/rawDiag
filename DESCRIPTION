@@ -1,7 +1,7 @@
 Package: rawDiag
 Type: Package
 Title: Brings Orbitrap Mass Spectrometry Data to Life; Fast and Colorful 
-Version: 0.99.17
+Version: 0.99.18
 Authors@R: c(person(given = "Christian", family = "Panse", email = "cp@fgcz.ethz.ch", role = c("aut", "cre"),
     comment = c(ORCID = "0000-0003-1975-3064")),
 	person(given = "Christian", family = "Trachsel", email = "Christian.Trachsel@fgcz.ethz.ch", role = "aut"),
@@ -13,6 +13,7 @@ Imports:
   ggplot2 (>= 3.4),
   grDevices,
   htmltools,
+  BiocManager,
   BiocParallel,
   rawrr (>= 1.10),
   rlang,
@@ -22,14 +23,13 @@ Imports:
   stats,
   utils
 Suggests:
-  BiocManager,
   BiocStyle (>= 2.28),
   ExperimentHub,
   tartare,
   knitr,
   testthat
 Description: Optimizing methods for liquid chromatography coupled to mass
-  spectrometry (LC–MS) poses a nontrivial challenge. The rawDiag package
+  spectrometry (LC-MS) poses a nontrivial challenge. The rawDiag package
   facilitates rational method optimization by generating MS operator-tailored
   diagnostic plots of scan-level metadata. The package is designed for use on
   the R shell or as a Shiny application on the Orbitrap instrument PC.
@@ -38,7 +38,7 @@ URL: https://github.com/cpanse/rawDiag/
 BugReports: https://github.com/cpanse/rawDiag/issues
 Encoding: UTF-8
 NeedsCompilation: no
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.1
 VignetteBuilder: knitr
 biocViews: MassSpectrometry, Proteomics, Metabolomics, Infrastructure, Software
 SystemRequirements: mono 4.x or higher on OSX / Linux, .NET 4.x or
