@@ -184,18 +184,9 @@ https://www.mono-project.com/
 assemblies aka Common Intermediate Language bytecode - the download and install
 can be done on all platforms using the command:
 
-```{r install, echo=TRUE}
-if (isFALSE(require("BiocManager", quietly = TRUE)))
-    install.packages("BiocManager")
-
-if (isFALSE(require("rawrr", quietly = TRUE)))
-    BiocManager::install("rawrr")
-
-if (isFALSE(rawrr:::.checkRawFileReaderDLLs()))
-  rawrr::installRawFileReaderDLLs()
-
-if (isFALSE(file.exists(rawrr:::.rawrrAssembly())))
-  rawrr::installRawrrExe()
+```{r checkRequirements, echo=TRUE}
+rawDiag::checkRawrr
+rawDiag::checkRawrr()
 ```
 
 
@@ -212,7 +203,7 @@ package.
 ```{r fetchFromExperimentHub, echo=FALSE}
 ## fetch via ExperimentHub
 library(ExperimentHub)
-eh <- ExperimentHub(localHub = TRUE )
+eh <- ExperimentHub(localHub = FALSE)
 EH4547 <- normalizePath(eh[["EH4547"]])
 
 (rawfile <- paste0(EH4547, ".raw"))
@@ -226,10 +217,10 @@ if (!file.exists(rawfile)){
 read the instrument raw data by using the `r BiocStyle::Biocpkg('rawrr')`
 package.
 
-```{r readOrbitrap}
+```{r readEH4547OrbitrapTrailerTable}
 ## read Orbitrap meta data
 rawfile |>
-  rawDiag::read.raw() -> x
+  rawDiag::readRaw() -> x
 ```
 
 query and list all plot methods of the `r BiocStyle::Biocpkg('rawDiag')`

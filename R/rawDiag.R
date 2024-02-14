@@ -864,3 +864,20 @@ plotCycleLoad <- function(x, method = 'trellis'){
     ggplot2::coord_cartesian(ylim = c(0, max(xx$n) + 1)) +
     ggplot2::theme_light()
 }
+
+#' Checks Bioconductor installation instructions
+#' @importFrom rawrr installRawFileReaderDLLs installRawrrExe
+#' @export
+checkRawrr <- function(){
+  if (isFALSE(requireNamespace("BiocManager", quietly = TRUE)))
+    stop("exec", "install.packages('BiocManager')")
+
+  if (isFALSE(requireNamespace("rawrr", quietly = TRUE)))
+    stop("exec", "BiocManager::install('rawrr')")
+
+  if (isFALSE(rawrr:::.checkRawFileReaderDLLs()))
+    rawrr::installRawFileReaderDLLs()
+
+  if (isFALSE(file.exists(rawrr:::.rawrrAssembly())))
+    rawrr::installRawrrExe()
+}
