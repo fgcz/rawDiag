@@ -1,18 +1,11 @@
 #R
 
+#' @export
 read.raw <- function(...){
     .Deprecated("readRaw")
     readRaw(...)
 }
 
-.checkRawrr <- function(){
-  if (isFALSE(rawrr::.checkDllInMonoPath())){
-      rawrr::installRawFileReaderDLLs()
-  }
-  if (isFALSE(file.exists(rawrr:::.rawrrAssembly()))){
-     rawrr::installRawrrExe()
-  }
-}
 
 #' @export
 PlotLockMassCorrection <- function(x, method = 'trellis'){
