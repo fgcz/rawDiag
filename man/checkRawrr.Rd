@@ -6,6 +6,9 @@
 \usage{
 checkRawrr()
 }
+\value{
+TRUE if everything is installed correctly
+}
 \description{
 Checks Bioconductor installation instructions
 }
