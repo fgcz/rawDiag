@@ -13,7 +13,6 @@ Imports:
   ggplot2 (>= 3.4),
   grDevices,
   htmltools,
-  BiocManager,
   BiocParallel,
   rawrr (>= 1.10),
   rlang,
