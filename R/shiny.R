@@ -32,7 +32,7 @@
 
 #' @noRd
 #' @importFrom shiny fluidPage titlePanel sidebarLayout sidebarPanel mainPanel downloadButton downloadHandler actionButton
-.buildRawDiagUI <- function(){
+.buildRawDiagUI <- function(files){
   ## Define UI for application that draws a histogram
   fluidPage(
     ## Application title
@@ -93,9 +93,9 @@ buildRawDiagShinyApp <- function(rawDir = (Sys.getenv('HOME') |>
 
   vapply(files, FUN = file.mtime, FUN.VALUE = 1702718537) |>
     order() -> idx
-  files[rev(idx)] ->> files
+  files[rev(idx)] -> files
 
-  shiny::shinyApp(ui = .buildRawDiagUI, server = .buildRawDiagServer)
+  shiny::shinyApp(ui = .buildRawDiagUI(files), server = .buildRawDiagServer)
 }
 
 #' rawDiag shiny module UI
