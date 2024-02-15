@@ -867,6 +867,7 @@ plotCycleLoad <- function(x, method = 'trellis'){
 
 #' Checks Bioconductor installation instructions
 #' @importFrom rawrr installRawFileReaderDLLs installRawrrExe
+#' @importFrom BiocManager install
 #' @return TRUE if everything is installed correctly
 #' @export
 checkRawrr <- function(){
