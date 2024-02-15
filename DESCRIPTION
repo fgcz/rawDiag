@@ -40,6 +40,6 @@ Encoding: UTF-8
 NeedsCompilation: no
 RoxygenNote: 7.3.1
 VignetteBuilder: knitr
-biocViews: MassSpectrometry, Proteomics, Metabolomics, Infrastructure, Software
+biocViews: MassSpectrometry, Proteomics, Metabolomics, Infrastructure, Software, ShinyApps
 SystemRequirements: mono 4.x or higher on OSX / Linux, .NET 4.x or
         higher on Windows, 'msbuild' and 'nuget' available in the path
