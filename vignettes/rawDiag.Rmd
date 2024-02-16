@@ -98,7 +98,9 @@ infrastructure, particularly with the
 `r BiocStyle::Biocpkg('rawrr')` methods `raw::readIndex`, `rawrr::readTrailer`,
 and `rawrr::readChromatogram` to read proprietary mass spectrometer generated
 data by invoking third-party managed methods through a `system2`
-`text connection`. See the stack below:
+`text connection`.
+The `r BiocStyle::Biocpkg('rawrr')` package provides the entire stack below,
+which `r BiocStyle::Biocpkg('rawDiag')` utilizes.
 
 <table>
 <tr style="border:2px solid black">
