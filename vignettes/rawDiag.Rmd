@@ -183,6 +183,15 @@ https://www.mono-project.com/
 
 ## R
 
+To install this package, start R (version ">=4.4") and enter: 
+
+```{r installRawrr, eval=FALSE}
+if (!require("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install("rawrr")
+```
+
 assemblies aka Common Intermediate Language bytecode - the download and install
 can be done on all platforms using the command:
 
@@ -227,7 +236,10 @@ query and list all plot methods of the `r BiocStyle::Biocpkg('rawDiag')`
 package.
 
 
-## Output - plot methods
+## Output -  Visualization
+
+This package provides several plot functions tailored toward MS data. 
+The following list shows all available plot methods.
 
 ```{r listFUN}
 library(rawDiag)
@@ -238,7 +250,9 @@ pm |>
   knitr::kable(col.names = "package:rawDiag plot functions")
 ```
 
-apply all plot methods on the example data.
+An inherent problem of visualizing data is the fact that depending on the data at hand specific visualizations lose their usefulness, e.g., overplotting in scatter plot if too many data points are present. To address this problem, we implemented most of the plot functions in different versions inspired by the work of @Cleveland1993, @Sarkar2008, and @Wickham2009. The data can be displayed in trellis plot manner using the faceting functionality of `r BiocStyle::CRANpkg('ggplot2')`. Alternatively, overplotting using color coding or violin plots based on descriptive statistics values can be chosen, which allows the user to interactively change the appearance of the plots based on the situation at hand. For instance, a large number of files are best visualized by violin plots, giving the user an idea about the distribution of the data points. On the basis of this, a smaller subset of files can be selected and visualized with another technique.
+
+The code snippet below applies all plot methods on the example data.
 
 ```{r plotALL, fig.width = 10, fig.height = 5}
 pm |> 
