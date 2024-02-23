@@ -244,7 +244,7 @@ apply all plot methods on the example data.
 pm |> 
   lapply(FUN = function(plotFUN) {
     lapply(c('trellis'), function(method) {
-      message(paste0("plotting", plotFUN, "using method", method, "..."))
+      message("plotting", plotFUN, "using method", method, "...")
       do.call(plotFUN, list(x, method)) 
     })
   }) 
