@@ -35,13 +35,13 @@ vignette: >
 urlcolor: blue
 ---
 
-```{r style, echo = FALSE, results = 'asis'}
+```{r style, results = 'asis'}
 BiocStyle::markdown()
 knitr::opts_chunk$set(fig.wide = TRUE, fig.retina = 3, error=FALSE, eval=TRUE)
 ```
 
 
-```{r rawDiagLogo, echo=FALSE, out.width="50%", fig.cap="The octopussy `rawDiag` package logo by Lilly van de Venn."}
+```{r rawDiagLogo, out.width="50%", fig.cap="The octopussy `rawDiag` package logo by Lilly van de Venn."}
 knitr::include_graphics("octopussy.png")
 ```
 # Introduction
@@ -186,7 +186,7 @@ https://www.mono-project.com/
 assemblies aka Common Intermediate Language bytecode - the download and install
 can be done on all platforms using the command:
 
-```{r checkRequirements, echo=TRUE}
+```{r checkRequirements}
 rawDiag::checkRawrr
 rawDiag::checkRawrr()
 ```
@@ -202,7 +202,7 @@ fetch example Orbitrap raw file from
 `r BiocStyle::Biocpkg('ExperimentHub')`'s `r BiocStyle::Biocpkg('tartare')`
 package.
 
-```{r fetchFromExperimentHub, echo=FALSE}
+```{r fetchFromExperimentHub}
 ## fetch via ExperimentHub
 library(ExperimentHub)
 eh <- ExperimentHub(localHub = FALSE)
@@ -242,7 +242,7 @@ pm |>
 
 apply all plot methods on the example data.
 
-```{r plotALL, echo = FALSE, fig.width = 10, fig.height = 5}
+```{r plotALL, fig.width = 10, fig.height = 5}
 pm |> 
   lapply(FUN = function(plotFUN) {
     lapply(c('trellis'), function(method) {
@@ -261,6 +261,6 @@ package man pages and the application examples in manuscript [@Trachsel2018].
 
 # Session information {-}
 
-```{r sessioninfo, echo=FALSE, eval=TRUE}
+```{r sessioninfo, eval=TRUE}
 sessionInfo()
 ```
