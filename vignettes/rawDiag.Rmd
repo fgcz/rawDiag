@@ -203,7 +203,6 @@ fetch example Orbitrap raw file from
 package.
 
 ```{r fetchFromExperimentHub}
-## fetch via ExperimentHub
 library(ExperimentHub)
 eh <- ExperimentHub(localHub = FALSE)
 EH4547 <- normalizePath(eh[["EH4547"]])
@@ -220,7 +219,6 @@ read the instrument raw data by using the `r BiocStyle::Biocpkg('rawrr')`
 package.
 
 ```{r readEH4547OrbitrapTrailerTable}
-## read Orbitrap meta data
 rawfile |>
   rawDiag::readRaw() -> x
 ```
@@ -246,7 +244,6 @@ apply all plot methods on the example data.
 pm |> 
   lapply(FUN = function(plotFUN) {
     lapply(c('trellis'), function(method) {
-    #lapply(c('trellis', 'violin', 'overlay'), function(method) {
       message(paste0("plotting", plotFUN, "using method", method, "..."))
       do.call(plotFUN, list(x, method)) 
     })
