@@ -64,6 +64,12 @@ readRaw <- function(rawfile, msgFUN = function(x){message(x)}){
       rawrr::readTrailer("FT Resolution:") |>
       as.numeric() -> FTResolution
     rawrrIndex$FTResolution <- FTResolution
+  }else if ("Orbitrap Resolution:" %in% trailerNames){
+    msgFUN("reading trailer Orbitrap Resolution ...")
+    rawfile |>
+      rawrr::readTrailer("Orbitrap Resolution:") |>
+      as.numeric() -> FTResolution
+    rawrrIndex$FTResolution <- FTResolution
   }
 
   if ("Ion Injection Time (ms):" %in% trailerNames){
