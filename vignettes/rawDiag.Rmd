@@ -214,11 +214,11 @@ package.
 ```{r fetchFromExperimentHub}
 library(ExperimentHub)
 eh <- ExperimentHub(localHub = FALSE)
-EH4547 <- normalizePath(eh[["EH4547"]])
+EH3222 <- normalizePath(eh[["EH3222"]])
 
-(rawfile <- paste0(EH4547, ".raw"))
+(rawfile <- paste0(EH3222, ".raw"))
 if (!file.exists(rawfile)){
-  file.copy(EH4547, rawfile)
+  file.copy(EH3222, rawfile)
 }
 ```
 
