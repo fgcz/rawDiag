@@ -267,6 +267,55 @@ pm |>
 for more information on the plot methods and its application, please read the
 package man pages and the application examples in manuscript [@Trachsel2018].
 
+# Launching the shiny application
+
+The package provides an simple interactive `r BiocStyle::Biocpkg('shiny')`-based
+graphical user interface for exploring Thermo Fisher Scientific *raw* data.
+
+If you have a directory containing raw files, you can create a shiny application
+as follows:
+
+```{r shinyApp}
+rawfile |>
+  dirname() |>
+  rawDiag::buildRawDiagShinyApp() -> app
+```
+
+The `r BiocStyle::Biocpkg('shiny')` runApp function launches the app in our
+browser.
+
+```{r runApp, eval=FALSE}
+shiny::runApp(app)
+```
+
+By default, the application lets you choose the raw files in the provided
+directory and provides the visualizations of the raw data as output.
+The user can interactively change the by the
+`r BiocStyle::Biocpkg('rawDiag')`
+the package provided plot functions and arguments.
+
+Additionally, the application provides PDF generation and download buttons.
+Optionally height and width can be changed in the user interface.
+
+
+# FAQ
+
+## I would like to load multiple files into a single data.frame to do comparisons; what is the preferred method for doing so?
+
+consider all raw files of your working directory, e.g., `~/Downloads` and load them.
+
+```{r FAQ1, eval=FALSE}
+file.path(Sys.getenv("HOME"), "Downloads") |>
+  setwd()
+
+list.files() |>
+  grep(pattern = '*.raw$', value = TRUE) |> 
+  lapply(FUN = rawDiag::readRaw) |> 
+  Reduce(f = rbind) -> x
+```
+
+as alternative to `lapply` you can utilize the
+`r BiocStyle::Biocpkg('BiocParallel')` package `bplapply` function.
 
 # References {-}
 
