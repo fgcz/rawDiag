@@ -206,7 +206,9 @@ for more information please read the INSTALL file in the
 
 # Usage
 
-## Input
+## R command line
+
+### Input
 fetch example Orbitrap raw file from
 `r BiocStyle::Biocpkg('ExperimentHub')`'s `r BiocStyle::Biocpkg('tartare')`
 package.
@@ -222,7 +224,7 @@ if (!file.exists(rawfile)){
 }
 ```
 
-## `readRaw` - read Orbitrap raw file 
+### `readRaw` - read Orbitrap raw file 
 
 read the instrument raw data by using the `r BiocStyle::Biocpkg('rawrr')`
 package.
@@ -236,7 +238,7 @@ query and list all plot methods of the `r BiocStyle::Biocpkg('rawDiag')`
 package.
 
 
-## Output -  Visualization
+### Output -  Visualization
 
 This package provides several plot functions tailored toward MS data. 
 The following list shows all available plot methods.
@@ -267,9 +269,9 @@ pm |>
 for more information on the plot methods and its application, please read the
 package man pages and the application examples in manuscript [@Trachsel2018].
 
-# Launching the shiny application
+## Launching the shiny application
 
-The package provides an simple interactive `r BiocStyle::Biocpkg('shiny')`-based
+The package provides a simple interactive `r BiocStyle::Biocpkg('shiny')`-based
 graphical user interface for exploring Thermo Fisher Scientific *raw* data.
 
 If you have a directory containing raw files, you can create a shiny application
@@ -297,6 +299,8 @@ the package provided plot functions and arguments.
 Additionally, the application provides PDF generation and download buttons.
 Optionally height and width can be changed in the user interface.
 
+Of note, the `rawDiag::rawDiagServer` module can be integrated into an existing
+`r BiocStyle::CRANpkg('shinydashboard')` application, e.g., https://shiny-ms.fgcz.uzh.ch/fgczmsqc-dashboard/.
 
 # FAQ
 
