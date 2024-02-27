@@ -19,7 +19,7 @@ Imports:
   rlang,
   reshape2,
   scales,
-  shiny,
+  shiny (>= 1.5),
   stats,
   utils
 Suggests:
