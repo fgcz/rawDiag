@@ -1,5 +1,13 @@
 # News for Package 'rawDiag'
 
+## Changes in version 0.99.24 (2024-03-01)
+
+* Test
+  * add test case for `rawDiagServerModule`
+* Documentation
+  * add Visualization section in vignette 
+  * add shiny and FAQ section in vignette
+
 ## Changes in version 0.99.23 (2024-02-15)
 
 * pass `R CMD check` on bioconductor with `Status: OK`
@@ -14,7 +22,7 @@
 * Code
   * removed paste cmd in message
   * use the BiocParallel 
-* refactor rawDiag shiny application, e.g.,  `buildRawDiagShinyApp`
+* refactor rawDiag shiny application, e.g., `buildRawDiagShinyApp`
 returns a `shiny::shinyApp` object
 
 ## Changes in version 0.99.9 (2024-01-05)
