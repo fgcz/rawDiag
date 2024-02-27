@@ -1,6 +1,6 @@
 # News for Package 'rawDiag'
 
-## Changes in version 0.99.24 (2024-03-01)
+## Changes in version 0.99.24 (2024-02-27)
 
 * Test
   * add test case for `rawDiagServerModule`
