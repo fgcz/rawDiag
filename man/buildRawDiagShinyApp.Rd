@@ -4,7 +4,7 @@
 \alias{buildRawDiagShinyApp}
 \title{Build the rawDiag shiny application}
 \usage{
-buildRawDiagShinyApp(rawDir = (file.path(Sys.getenv("HOME"), "Downloads")))
+buildRawDiagShinyApp(rawDir = (dirname(rawrr::sampleFilePath())))
 }
 \arguments{
 \item{rawDir}{A directory containing the input raw files,
@@ -30,6 +30,12 @@ rawrr::sampleFilePath() |>
   dirname() |>
   rawDiag::buildRawDiagShinyApp() |>
   shiny::runApp()
+  
+ # or use your 'Download' folder
+ (Sys.getenv('HOME') |>
+   file.path("Downloads")) |>
+   rawDiag::buildRawDiagShinyApp() |>
+   shiny::runApp()
 \dontshow{\}) # examplesIf}
 }
 \references{

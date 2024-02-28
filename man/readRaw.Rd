@@ -33,7 +33,8 @@ The set up procedure for the rawrr package needs to be run in order to use
 this package.
 }
 \examples{
-rawrr::sampleFilePath() |> rawDiag::readRaw()
+rawrr::sampleFilePath() |>
+  rawDiag::readRaw()
 }
 \references{
 \doi{10.1021/acs.jproteome.8b00173}

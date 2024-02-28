@@ -71,15 +71,20 @@
 #'   dirname() |>
 #'   rawDiag::buildRawDiagShinyApp() |>
 #'   shiny::runApp()
+#'   
+#'  # or use your 'Download' folder
+#'  (Sys.getenv('HOME') |>
+#'    file.path("Downloads")) |>
+#'    rawDiag::buildRawDiagShinyApp() |>
+#'    shiny::runApp()
 #'
 #' @note launch the shiny application by embracing your command line while
 #' expecting the raw file in \code{$HOME/Downloads}
 #' * MacOSX and Linux: `R -q -e "buildRawDiagShinyApp() |> rawDiag::shiny(launch.browser = TRUE)"`
 #' * Microsoft Windows: `R.exe -e "buildRawDiagShinyApp() |> rawDiag::shiny(launch.browser = TRUE)"`
 #' @md
-buildRawDiagShinyApp <- function(rawDir = (Sys.getenv('HOME') |>
-                                             file.path("Downloads"))){
-  
+buildRawDiagShinyApp <- function(rawDir = (rawrr::sampleFilePath() |> dirname())){
+
   rawDir |>
     file.path(rawDir |>
                 list.files(recursive = TRUE,
