@@ -66,7 +66,7 @@ instrument parameters, but their complex interactions with each other
 make LC–MS method optimization a challenging task.
 
 Here we present `r BiocStyle::Biocpkg('rawDiag')`, a 
-platform-independent software tool implemented in the R language that 
+platform-independent software tool implemented in the R language [@newS] that 
 supports LC–MS operators during the process of empirical method 
 optimization. Our work builds on the ideas of the discontinued software 
 *rawMeat* (VAST Scientific). Our application is currently 
@@ -209,34 +209,48 @@ for more information please read the INSTALL file in the
 ## R command line
 
 ### Input
-fetch example Orbitrap raw file from
+
+fetch example Orbitrap raw files from
 `r BiocStyle::Biocpkg('ExperimentHub')`'s `r BiocStyle::Biocpkg('tartare')`
 package.
 
 ```{r fetchFromExperimentHub}
 library(ExperimentHub)
-eh <- ExperimentHub(localHub = FALSE)
-EH3222 <- normalizePath(eh[["EH3222"]])
+ExperimentHub::ExperimentHub() -> eh
+normalizePath(eh[["EH3222"]]) -> EH3222
+normalizePath(eh[["EH4547"]]) -> EH4547
 
-(rawfile <- paste0(EH3222, ".raw"))
-if (!file.exists(rawfile)){
-  file.copy(EH3222, rawfile)
+(rawfileEH3222 <- paste0(EH3222, ".raw"))
+if (!file.exists(rawfileEH3222)){
+  file.copy(EH3222, rawfileEH3222)
 }
+
+(rawfileEH4547 <- paste0(EH4547, ".raw"))
+if (!file.exists(rawfileEH4547)){
+  file.copy(EH4547, rawfileEH4547)
+}
+
+c(rawfileEH3222, rawfileEH4547) -> rawfile
+```
+Of note, the *proprietary* .Net assemblies [@RFR] require a file extentention of `.raw`. Therfore we have to rename the EH files and add the `.raw` suffix.
+
+list meta data of the raw files.
+
+```{r header}
+(rawfile |>
+  lapply(FUN = rawrr::readFileHeader) -> rawFileHeader)
 ```
 
 ### `readRaw` - read Orbitrap raw file 
 
-read the instrument raw data by using the `r BiocStyle::Biocpkg('rawrr')`
+read the two instrument raw files by using the `r BiocStyle::Biocpkg('rawDiag')`
 package.
 
 ```{r readEH4547OrbitrapTrailerTable}
 rawfile |>
-  rawDiag::readRaw() -> x
+  BiocParallel::bplapply(FUN = rawDiag::readRaw) |>
+  Reduce(f = rbind) -> x
 ```
-
-query and list all plot methods of the `r BiocStyle::Biocpkg('rawDiag')`
-package.
-
 
 ### Output -  Visualization
 
@@ -252,7 +266,18 @@ pm |>
   knitr::kable(col.names = "package:rawDiag plot functions")
 ```
 
-An inherent problem of visualizing data is the fact that depending on the data at hand specific visualizations lose their usefulness, e.g., overplotting in scatter plot if too many data points are present. To address this problem, we implemented most of the plot functions in different versions inspired by the work of @Cleveland1993, @Sarkar2008, and @Wickham2009. The data can be displayed in trellis plot manner using the faceting functionality of `r BiocStyle::CRANpkg('ggplot2')`. Alternatively, overplotting using color coding or violin plots based on descriptive statistics values can be chosen, which allows the user to interactively change the appearance of the plots based on the situation at hand. For instance, a large number of files are best visualized by violin plots, giving the user an idea about the distribution of the data points. On the basis of this, a smaller subset of files can be selected and visualized with another technique.
+An inherent problem of visualizing data is the fact that depending on the data
+at hand, specific visualizations lose their usefulness, e.g., overplotting in
+a scatter plot if too many data points are present. To address this problem, we implemented most of the plot functions in different versions inspired by the
+work of @Cleveland1993, @Sarkar2008, and @Wickham2009. The data can be displayed
+in trellis plot manner using the faceting functionality of
+`r BiocStyle::CRANpkg('ggplot2')`. Alternatively, overplotting using color
+coding or violin plots based on descriptive statistics values can be chosen,
+which allows the user to interactively change the appearance of the plots based
+on the situation at hand. For instance, a large number of files are best
+visualized by violin plots, giving the user an idea about the distribution of
+the data points. On the basis of this, a smaller subset of files can be selected
+and visualized with another technique.
 
 The code snippet below applies all plot methods on the example data.
 
@@ -266,8 +291,17 @@ pm |>
   }) 
 ```
 
-for more information on the plot methods and its application, please read the
-package man pages and the application examples in manuscript [@Trachsel2018].
+The appearance of each plot depends on the instrument, sample, and method used
+to acquire the data. Therefore, it is hard to say what each ideal plot should
+look like. 
+In particular, in the example above, we use data generated on an
+`r rawFileHeader[[1]]$"Instrument name"`, `r rawFileHeader[[1]]$"RAW file"` and
+`r rawFileHeader[[2]]$"Instrument name"`, `r rawFileHeader[[2]]$"RAW file"`
+instrument using data-independent acquisition (DIA) [@Bruderer2017] and
+data-dependent acquisition (DDA) methods.
+For more information on the plot methods and its application, please read the
+package man pages and the application examples in the manuscript
+[@Trachsel2018].
 
 ## Launching the shiny application
 
