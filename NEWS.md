@@ -1,12 +1,18 @@
 # News for Package 'rawDiag'
 
-## Changes in version 0.99.24 (2024-02-27)
+## Changes in version 0.99.25 (2024-02-28)
 
 * Test
   * add test case for `rawDiagServerModule`
 * Documentation
   * add Visualization section in vignette 
   * add shiny and FAQ section in vignette
+  * use EH4547(DIA) and EH3222(DDA) data from tatare pkg
+  * add FAQ section in vignette
+* Refactor
+  * if trailer information is missing add NA
+* Feature
+  * handle "Orbitrap Resolution:" in trailer
 
 ## Changes in version 0.99.23 (2024-02-15)
 
