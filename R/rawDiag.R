@@ -18,7 +18,8 @@
 #' @author Christian Panse (2016-2023)
 #' @aliases rawDiag readRaw
 #' @examples
-#' rawrr::sampleFilePath() |> rawDiag::readRaw()
+#' rawrr::sampleFilePath() |>
+#'   rawDiag::readRaw()
 #' @importFrom rawrr readIndex readTrailer readChromatogram
 #' @export
 #' @references \doi{10.1021/acs.jproteome.8b00173}
@@ -42,6 +43,8 @@ readRaw <- function(rawfile, msgFUN = function(x){message(x)}){
       rawrr::readTrailer("LM m/z-Correction (ppm):") |>
       as.numeric() -> LMCorrection
     rawrrIndex$LMCorrection <- LMCorrection
+  }else{
+    rawrrIndex$LMCorrection <- NA
   }
 
   if ("AGC:" %in% trailerNames){
@@ -49,6 +52,8 @@ readRaw <- function(rawfile, msgFUN = function(x){message(x)}){
     rawfile |>
       rawrr::readTrailer("AGC:") -> AGC
     rawrrIndex$AGC <- AGC
+  }else{
+    rawrrIndex$AGC <- NA
   }
 
   if ("AGC PS Mode:" %in% trailerNames){
@@ -56,6 +61,8 @@ readRaw <- function(rawfile, msgFUN = function(x){message(x)}){
     rawfile |>
       rawrr::readTrailer("AGC PS Mode:") -> PrescanMode
     rawrrIndex$PrescanMode <- PrescanMode
+  }else{
+    rawrrIndex$PrescanMode <- NA
   }
 
   if ("FT Resolution:" %in% trailerNames){
@@ -70,6 +77,8 @@ readRaw <- function(rawfile, msgFUN = function(x){message(x)}){
       rawrr::readTrailer("Orbitrap Resolution:") |>
       as.numeric() -> FTResolution
     rawrrIndex$FTResolution <- FTResolution
+  }else{
+    rawrrIndex$FTResolution <- NA
   }
 
   if ("Ion Injection Time (ms):" %in% trailerNames){
@@ -78,6 +87,8 @@ readRaw <- function(rawfile, msgFUN = function(x){message(x)}){
       rawrr::readTrailer("Ion Injection Time (ms):") |>
       as.numeric() -> IonInjectionTime
     rawrrIndex$IonInjectionTime <- IonInjectionTime
+  }else{
+    rawrrIndex$IonInjectionTime <- NA
   }
 
   msgFUN("reading TIC ...")
@@ -97,7 +108,8 @@ readRaw <- function(rawfile, msgFUN = function(x){message(x)}){
   
   message("reading took", td, "seconds") 
   
-  rawrrIndex |> validate_readRaw()
+  rawrrIndex |>
+    validate_readRaw()
 }
 
 
