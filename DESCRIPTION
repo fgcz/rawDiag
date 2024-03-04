@@ -12,6 +12,7 @@ Imports:
   dplyr,
   ggplot2 (>= 3.4),
   grDevices,
+  hexbin,
   htmltools,
   BiocManager,
   BiocParallel,
