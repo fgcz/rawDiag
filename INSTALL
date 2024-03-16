@@ -22,3 +22,16 @@ These commands install necessary components. Make sure to execute them in your R
 
 By following these steps, you'll successfully set up rawrr,
 enabling you to use the rawDiag package seamlessly.
+
+
+The `Dockerfile` performing `R CMD build` and `R CMD check` requires
+
+```
+from bioconductor/bioconductor_docker:devel
+run apt-get update && apt-get install mono-mcs mono-xbuild -y
+run apt-get install texlive-base texlive-latex-extra texinfo texlive-fonts-extra -y
+## rawrr
+run R -q -e "BiocManager::install(c('BiocStyle', 'ExperimentHub', 'knitr', 'protViz', 'rmarkdown', 'tartare', 'testthat'))"
+## rawDiag
+run R -q -e "BiocManager::install(c('rawrr', 'gglplot2', 'hexbin', 'BiocParallel', 'reshape2', 'scales'))"
+```
