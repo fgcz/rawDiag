@@ -195,9 +195,14 @@ BiocManager::install("rawrr")
 assemblies aka Common Intermediate Language bytecode - the download and install
 can be done on all platforms using the command:
 
-```{r checkRequirements}
+```{r checkInstallRequirements}
 rawDiag::checkRawrr
 rawDiag::checkRawrr()
+
+if (isFALSE(rawrr::.checkDllInMonoPath())){
+  rawrr::installRawFileReaderDLLs()
+}
+rawrr::installRawrrExe()
 ```
 
 
