@@ -900,6 +900,8 @@ checkRawrr <- function(){
 
   if (isFALSE(file.exists(rawrr:::.rawrrAssembly())))
     rawrr::installRawrrExe()
+  if (isFALSE(rawrr:::.isAssemblyWorking()))
+    stop("rawrr assembly is not working. check if mono if available.")
   
   TRUE
 }
