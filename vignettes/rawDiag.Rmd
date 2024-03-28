@@ -48,7 +48,7 @@ knitr::include_graphics("octopussy.png")
 
 Over the past two decades, liquid chromatography coupled to mass 
 spectrometry (LC–MS) has evolved into the method of choice in the 
-field of proteomics. [@Cox2011, @Mallick2010] During a typical 
+field of proteomics. [@Cox2011; @Mallick2010] During a typical 
 LC–MS measurement, a complex mixture of analytes is separated by a 
 liquid chromatography system coupled to a mass spectrometer (MS) 
 through an ion source interface. This interface converts the analytes 
